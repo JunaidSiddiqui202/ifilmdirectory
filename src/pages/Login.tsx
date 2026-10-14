@@ -180,7 +180,13 @@ export default function Login() {
                 return;
             }
 
-            setError(`Firebase: Error (${err.code || 'unknown'}).`);
+            if (err.code === 'auth/popup-blocked') {
+                setError('Popup blocked or domain unauthorized. Please add ifilmdirectory.vercel.app to Firebase Console -> Authentication -> Settings -> Authorized domains.');
+            } else if (err.code === 'auth/unauthorized-domain') {
+                setError('Domain unauthorized. Please add ifilmdirectory.vercel.app to Firebase Console -> Authentication -> Settings -> Authorized domains.');
+            } else {
+                setError(`Firebase: Error (${err.code || 'unknown'}).`);
+            }
         } finally {
             setGoogleLoading(false);
         }
