@@ -1,0 +1,418 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ============================================
+    // HELPER FUNCTIONS
+    // ============================================
+    
+    // Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Check if user is the owner of the document
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Check if user is admin
+    function isAdmin() {
+      let email = request.auth.token.email;
+      let userDoc = get(/databases/$(database)/documents/users/$(request.auth.uid));
+      return isAuthenticated() && (
+             email == 'junaid202@gmail.com' || 
+             email == 'junaid202@hotmail.com' ||
+             userDoc.data.get('role', '') == 'admin' ||
+             userDoc.data.get('adminRole', '') in ['super_admin', 'user_manager', 'ad_manager']
+      );
+    }
+    
+    // Rate limiting helper - checks if user hasn't exceeded daily limit
+    function withinDailyLimit(collection, limit) {
+      let userDoc = get(/databases/$(database)/documents/users/$(request.auth.uid));
+      let today = request.time.toMillis() / 86400000; // Days since epoch
+      let lastAction = userDoc.data.get(['rateLimits', collection, 'lastAction'], 0) / 86400000;
+      let count = userDoc.data.get(['rateLimits', collection, 'count'], 0);
+      
+      // Reset count if it's a new day
+      return (today > lastAction) || (count < limit);
+    }
+    
+    // Validate data size (prevent large writes)
+    function isValidSize() {
+      // NOTE: request.size is not available in Firestore rules. 
+      // Firestore already has a 1MB limit per document.
+      return true;
+    }
+    
+    // ============================================
+    // USERS COLLECTION
+    // ============================================
+    match /users/{userId} {
+      // Anyone can read public user profiles
+      allow read: if true;
+      
+      // Users can create their own profile
+      allow create: if isAuthenticated() && 
+                      request.auth.uid == userId &&
+                      isValidSize();
+      
+      // Users can update their own profile, admins can update any
+      allow update: if (isOwner(userId) || isAdmin()) &&
+                      isValidSize();
+      
+      // Only admins can delete users
+      allow delete: if isAdmin();
+      
+      // Rate limit tracking subcollection
+      match /rateLimits/{document=**} {
+        allow read, write: if isOwner(userId) || isAdmin();
+      }
+    }
+    
+    // ============================================
+    // PROFILES COLLECTION (Professional Profiles)
+    // ============================================
+    match /profiles/{profileId} {
+      // Anyone can read profiles
+      allow read: if true;
+      
+      // Authenticated users can create profiles (with rate limit)
+      allow create: if isAuthenticated() &&
+                      isValidSize() &&
+                      withinDailyLimit('profiles', 5); // Max 5 profile creates per day
+      
+      // Owner or admin can update
+      allow update: if (isOwner(resource.data.userId) || isAdmin()) &&
+                      isValidSize();
+      
+      // Owner or admin can delete
+      allow delete: if isOwner(resource.data.userId) || isAdmin();
+    }
+    
+    // ============================================
+    // POSTS/SHOWCASE COLLECTION
+    // ============================================
+    match /posts/{postId} {
+      // Anyone can read posts
+      allow read: if true;
+      
+      // Authenticated users can create posts (with rate limit)
+      allow create: if isAuthenticated() &&
+                      isValidSize() &&
+                      withinDailyLimit('posts', 20); // Max 20 posts per day
+      
+      // Owner or admin can update
+      allow update: if (isOwner(resource.data.userId) || isAdmin()) &&
+                      isValidSize();
+      
+      // Owner or admin can delete
+      allow delete: if isOwner(resource.data.userId) || isAdmin();
+      
+      // Comments subcollection
+      match /comments/{commentId} {
+        allow read: if true;
+        allow create: if isAuthenticated() &&
+                        isValidSize() &&
+                        withinDailyLimit('comments', 50); // Max 50 comments per day
+        allow update, delete: if isOwner(resource.data.userId) || isAdmin();
+      }
+      
+      // Likes subcollection
+      match /likes/{likeId} {
+        allow read: if true;
+        allow create: if isAuthenticated() && isOwner(likeId);
+        allow delete: if isOwner(likeId) || isAdmin();
+      }
+    }
+
+    // ============================================
+    // TOP-LEVEL COMMENTS COLLECTION
+    // ============================================
+    match /comments/{commentId} {
+      allow read: if true;
+      allow create: if isAuthenticated() && isValidSize();
+      allow update, delete: if isOwner(resource.data.authorId) || isAdmin();
+    }
+
+    // ============================================
+    // SAVED POSTS COLLECTION
+    // ============================================
+    match /saved_posts/{saveId} {
+      allow read: if isAuthenticated() && (isOwner(resource.data.userId) || isAdmin());
+      allow create: if isAuthenticated() && isOwner(request.resource.data.userId) && isValidSize();
+      allow delete: if isAuthenticated() && (isOwner(resource.data.userId) || isAdmin());
+    }
+
+    // ============================================
+    // SAVED JOBS COLLECTION
+    // ============================================
+    match /saved_jobs/{saveId} {
+      allow read: if isAuthenticated() && (isOwner(resource.data.userId) || isAdmin());
+      allow create: if isAuthenticated() && isOwner(request.resource.data.userId) && isValidSize();
+      allow delete: if isAuthenticated() && (isOwner(resource.data.userId) || isAdmin());
+    }
+
+    // ============================================
+    // REPORTS COLLECTION
+    // ============================================
+    match /reports/{reportId} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated() && isValidSize();
+      allow update, delete: if isAdmin();
+    }
+    
+    // ============================================
+    // BLOGS & EVENTS COLLECTION
+    // ============================================
+    match /blogs/{blogId} {
+      // Anyone can read blogs
+      allow read: if true;
+      
+      // Authenticated users can create blogs (with rate limit)
+      allow create: if isAuthenticated() &&
+                      isValidSize() &&
+                      withinDailyLimit('blogs', 5); // Max 5 blogs per day
+      
+      // Owner or admin can update/delete
+      allow update, delete: if isOwner(resource.data.userId) || isAdmin();
+      
+      // Comments on blogs
+      match /comments/{commentId} {
+        allow read: if true;
+        allow create: if isAuthenticated() && isValidSize();
+        allow update, delete: if isOwner(resource.data.userId) || isAdmin();
+      }
+    }
+    
+    // ============================================
+    // ACCESS REQUESTS COLLECTION
+    // ============================================
+    match /access_requests/{requestId} {
+      // Users can read their own requests, admins can read all
+      // handle case where userId might be missing for unauth requests
+      allow read: if (resource.data.userId != null && isOwner(resource.data.userId)) || isAdmin();
+      
+      // Allow public creation of access requests (since users don't have accounts yet)
+      // No size validation needed as these are typically small documents
+      allow create: if true;
+      
+      // Only admins can update/delete requests
+      allow update, delete: if isAdmin();
+    }
+    
+    // ============================================
+    // PROJECTS COLLECTION (Production Projects)
+    // ============================================
+    match /projects/{projectId} {
+      allow read, write: if request.auth != null;
+      
+      // Project members subcollection
+      match /members/{memberId} {
+        allow read, write: if request.auth != null;
+      }
+    }
+    
+    // ============================================
+    // BOOKINGS/FACILITIES COLLECTION
+    // ============================================
+    match /bookings/{bookingId} {
+      // Users can read their own bookings, facility owners can read bookings for their facilities
+      allow read: if isOwner(resource.data.userId) || 
+                    isOwner(resource.data.facilityOwnerId) || 
+                    isAdmin();
+      
+      // Authenticated users can create bookings (with rate limit)
+      allow create: if isAuthenticated() &&
+                      isValidSize() &&
+                      withinDailyLimit('bookings', 10); // Max 10 bookings per day
+      
+      // Users can update their own bookings, facility owners can update status
+      allow update: if (isOwner(resource.data.userId) || 
+                       isOwner(resource.data.facilityOwnerId) || 
+                       isAdmin()) &&
+                      isValidSize();
+      
+      // Only owner or admin can delete
+      allow delete: if isOwner(resource.data.userId) || isAdmin();
+    }
+    
+    // ============================================
+    // MESSAGES/CHAT COLLECTION
+    // ============================================
+    match /chats/{chatId} {
+      // Authenticated users can access chats
+      allow read, write: if isAuthenticated();
+      
+      // Messages subcollection
+      match /messages/{messageId} {
+        // Authenticated users can access messages
+        allow read, write: if isAuthenticated();
+      }
+    }
+    
+    // ============================================
+    // NOTIFICATIONS COLLECTION
+    // ============================================
+    match /notifications/{notificationId} {
+      // Users can only read their own notifications
+      allow read: if isOwner(resource.data.userId);
+      
+      // Authenticated users can create notifications (for follows, likes, comments, etc.)
+      allow create: if isAuthenticated() && isValidSize();
+      
+      // Users can update their own notifications (mark as read)
+      allow update: if isOwner(resource.data.userId) &&
+                      isValidSize();
+      
+      // Users can delete their own notifications
+      allow delete: if isOwner(resource.data.userId) || isAdmin();
+    }
+    
+    // ============================================
+    // ANALYTICS COLLECTION (Admin only)
+    // ============================================
+    match /analytics/{document=**} {
+      allow read, write: if isAdmin();
+    }
+    
+    // ============================================
+    // SYSTEM CONFIGURATION (Admin only)
+    // ============================================
+    match /config/{document=**} {
+      allow read: if true; // Public config can be read by all
+      allow write: if isAdmin();
+    }
+    
+    // ============================================
+    // SHOWREELS/SHOWCASE COLLECTION
+    // ============================================
+    match /showreels/{showreelId} {
+      allow read: if true;
+      allow create: if isAuthenticated() && isValidSize();
+      allow update: if (isOwner(resource.data.creatorId) || isAdmin()) && isValidSize();
+      allow delete: if (isOwner(resource.data.creatorId) || isAdmin());
+    }
+    
+    // ============================================
+    // POLLS COLLECTION
+    // ============================================
+    match /polls/{pollId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidSize();
+      allow update: if isAuthenticated() && isValidSize(); // For voting
+      allow delete: if isAdmin();
+    }
+    
+    // ============================================
+    // JOBS COLLECTION
+    // ============================================
+    match /jobs/{jobId} {
+      allow read: if true;
+      allow create: if isAuthenticated() && isValidSize();
+      allow update: if (isOwner(resource.data.userId) || isAdmin()) && isValidSize();
+      allow delete: if (isOwner(resource.data.userId) || isAdmin());
+    }
+
+    match /job_applications/{applicationId} {
+      allow read: if isAuthenticated() && (isOwner(resource.data.userId) || isOwner(resource.data.jobOwnerId) || isAdmin());
+      allow create: if isAuthenticated() && isValidSize();
+      allow update: if (isOwner(resource.data.userId) || isOwner(resource.data.jobOwnerId) || isAdmin()) && isValidSize();
+      allow delete: if isAdmin();
+    }
+
+    // ============================================
+    // FOLLOWS COLLECTION
+    // ============================================
+    match /follows/{followId} {
+      allow read: if true;
+      allow create: if isAuthenticated() && isValidSize();
+      allow delete: if isAuthenticated() && (isOwner(resource.data.followerId) || isAdmin());
+    }
+
+    // ============================================
+    // AD CAMPAIGNS COLLECTION
+    // ============================================
+    match /ad_campaigns/{adId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ============================================
+    // FACILITIES/SERVICES COLLECTION
+    // ============================================
+    match /facilities/{facilityId} {
+      allow read: if true;
+      allow create: if isAuthenticated() && isValidSize();
+      allow update: if (isOwner(resource.data.userId) || isAdmin()) && isValidSize();
+      allow delete: if (isOwner(resource.data.userId) || isAdmin());
+    }
+    
+    // ============================================
+    // GUILDS COLLECTION
+    // ============================================
+    match /guilds/{guildId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /guild_posts/{postId} {
+      allow read: if true;
+      allow create: if isAuthenticated() && isValidSize();
+      allow update, delete: if isOwner(resource.data.userId) || isAdmin();
+    }
+
+    match /guild_comments/{commentId} {
+      allow read: if true;
+      allow create: if isAuthenticated() && isValidSize();
+      allow update, delete: if isOwner(resource.data.userId) || isAdmin();
+    }
+
+    match /guild_requests/{requestId} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated() && isValidSize();
+      allow update, delete: if isAdmin();
+    }
+
+    // ============================================
+    // GROUPS & FORUM POSTS COLLECTION
+    // ============================================
+    match /groups/{groupId} {
+      allow read: if true;
+      allow create: if isAuthenticated() && isValidSize();
+      allow update: if isAuthenticated();
+      allow delete: if isAdmin();
+    }
+
+    match /forumPosts/{postId} {
+      allow read: if true;
+      allow create: if isAuthenticated() && isValidSize();
+      allow update: if (isOwner(resource.data.authorId) || isAdmin());
+      allow delete: if (isOwner(resource.data.authorId) || isAdmin());
+    }
+
+    match /forum_posts/{postId} {
+      allow read: if true;
+      allow create: if isAuthenticated() && isValidSize();
+      allow update: if (isOwner(resource.data.authorId) || isAdmin());
+      allow delete: if (isOwner(resource.data.authorId) || isAdmin());
+    }
+
+    // ============================================
+    // ADS COLLECTION
+    // ============================================
+    match /ads/{adId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ============================================
+    // DEFAULT DENY ALL OTHER COLLECTIONS
+    // ============================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

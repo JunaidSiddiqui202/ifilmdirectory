@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">iFilmDirectory</string>
+    <string name="title_activity_main">iFilmDirectory</string>
+    <string name="package_name">com.ifilmdirectory.app</string>
+    <string name="custom_url_scheme">com.ifilmdirectory.app</string>
+</resources>

@@ -1,0 +1,239 @@
+{
+    "blogs": [
+        {
+            "title": "Mastering the Arri Alexa LF",
+            "excerpt": "A deep dive into the color science and dynamic range of the Large Format sensor.",
+            "content": "Full article content here...",
+            "author": "Ravi Varma",
+            "authorId": "user_ravi_varma",
+            "category": "Workshops",
+            "image": "https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=800&h=450&fit=crop",
+            "tags": [
+                "Camera",
+                "Tech"
+            ],
+            "is_dummy": true
+        },
+        {
+            "title": "Networking Night at Prithvi Theatre",
+            "excerpt": "Join us for an evening of networking with top casting directors and producers.",
+            "content": "Event details...",
+            "author": "Community Team",
+            "authorId": "admin",
+            "category": "Events",
+            "image": "https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&h=450&fit=crop",
+            "tags": [
+                "Networking",
+                "Mumbai"
+            ],
+            "is_dummy": true
+        }
+    ],
+    "jobs": [
+        {
+            "title": "2nd AC (Assistant Camera)",
+            "company": "Netflix Original",
+            "description": "Looking for an experienced 2nd AC for a high-budget Netflix series. Must be proficient with Arri Alexa ecosystem. Responsibilities include slate management, camera reports, and lens changes.",
+            "requirements": "3+ years experience, valid passport, Arri Alexa certification preferred.",
+            "location": "Mumbai, Maharashtra",
+            "salary": "₹45,000/day",
+            "deadline": "2026-12-30",
+            "type": "Crew",
+            "postedBy": "user_netflix_mumbai",
+            "postedAt": "2026-06-15T10:00:00Z",
+            "applicationEmail": "casting@netflix.com",
+            "logo": "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=100&h=100&fit=crop",
+            "is_dummy": true,
+            "user_details": {
+                "name": "Netflix India",
+                "verification_level": "verified_pro"
+            }
+        },
+        {
+            "title": "VFX Compositor",
+            "company": "Indie Hollywood Production",
+            "description": "Remote VFX Compositor needed for Roto and Cleanup work on an indie feature film. Must be proficient in Nuke. Fast turnkey required.",
+            "requirements": "Nuke software mandatory, high-speed internet, previous feature film credit.",
+            "location": "Remote / Los Angeles",
+            "salary": "$500/shot",
+            "deadline": "2026-08-01",
+            "type": "Post-Production",
+            "postedBy": "user_hollywood_indie",
+            "postedAt": "2026-06-14T14:30:00Z",
+            "applicationEmail": "vfx@indiefilm.la",
+            "logo": "https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?w=100&h=100&fit=crop",
+            "is_dummy": true,
+            "user_details": {
+                "name": "Indie Studio LA",
+                "verification_level": "verified_pro"
+            }
+        },
+        {
+            "title": "Female Lead Actor",
+            "company": "Suresh Productions",
+            "description": "Casting Call for a Female Lead (Age 20-25) for an upcoming Tollywood Feature. Classical Dance skills are mandatory.",
+            "requirements": "Fluent in Telugu, Classical Dance (Kuchipudi/Bharatanatyam), Age 20-25.",
+            "location": "Hyderabad, Telangana",
+            "salary": "Negotiable",
+            "deadline": "2026-07-20",
+            "type": "Audition",
+            "postedBy": "user_suresh_productions",
+            "postedAt": "2026-06-16T09:15:00Z",
+            "applicationEmail": "casting@sureshproductions.com",
+            "logo": "https://images.unsplash.com/photo-1626544827763-d516dce335ca?w=100&h=100&fit=crop",
+            "is_dummy": true,
+            "user_details": {
+                "name": "Suresh Productions",
+                "verification_level": "verified_pro"
+            }
+        },
+        {
+            "title": "Voice Over Artist (Hindi/English)",
+            "company": "Audible India",
+            "description": "Seeking versatile voice actors for an upcoming audiobook series. Must have a home studio setup.",
+            "requirements": "Fluent in Hindi & English, Pro Tools/Audacity, Home Studio.",
+            "location": "Remote",
+            "salary": "₹5,000/hour",
+            "deadline": "2026-09-15",
+            "type": "Audition",
+            "postedBy": "user_audible_india",
+            "postedAt": "2026-06-20T11:00:00Z",
+            "applicationEmail": "voices@audible.in",
+            "logo": "https://images.unsplash.com/photo-1478737270239-2f52b27e90f3?w=100&h=100&fit=crop",
+            "is_dummy": true,
+            "user_details": {
+                "name": "Audible India",
+                "verification_level": "verified_pro"
+            }
+        },
+        {
+            "title": "Child Actor (Age 5-8)",
+            "company": "Ogilvy Commercial",
+            "description": "Casting for a major chocolate brand TVC. Looking for expressive kids aged 5-8.",
+            "requirements": "Age 5-8, confident in front of camera, parent/guardian must accompany.",
+            "location": "Mumbai, Maharashtra",
+            "salary": "₹20,000/day",
+            "deadline": "2026-05-10",
+            "type": "Audition",
+            "postedBy": "user_ogilvy",
+            "postedAt": "2026-04-12T14:00:00Z",
+            "applicationEmail": "casting@ogilvy.com",
+            "logo": "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&h=100&fit=crop",
+            "is_dummy": true,
+            "user_details": {
+                "name": "Ogilvy India",
+                "verification_level": "verified_pro"
+            }
+        },
+        {
+            "title": "Sound Recordist",
+            "company": "BBC Documentary",
+            "description": "Sound Recordist needed for a 3-day interview shoot in London. Must have own kit (Boom, Lapels, Mixer).",
+            "requirements": "Own equipment required, 5+ years documentary experience.",
+            "location": "London, UK",
+            "salary": "£400/day",
+            "deadline": "2026-07-05",
+            "type": "Crew",
+            "postedBy": "user_bbc_doc",
+            "postedAt": "2026-06-12T11:00:00Z",
+            "applicationEmail": "crew@bbc.co.uk",
+            "logo": "https://images.unsplash.com/photo-1590845947391-ba13a6647b31?w=100&h=100&fit=crop",
+            "is_dummy": true,
+            "user_details": {
+                "name": "BBC Docs",
+                "verification_level": "verified_pro"
+            }
+        }
+    ],
+    "showcase": [
+        {
+            "id": "post_1",
+            "author": "Ravi Varma",
+            "role": "Cinematographer",
+            "content": "Lighting breakdown for the night sequence in 'Midnight Shadows'. Used Arri Skypanels for the moon aura and HMIs for the background depth. Wanted to keep the skin tones natural while maintaining the noir aesthetic.",
+            "image": "https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=800&h=450&fit=crop",
+            "likes": 2400,
+            "comments": 145,
+            "user_image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop",
+            "is_dummy": true,
+            "verification_level": "verified_pro"
+        },
+        {
+            "id": "post_2",
+            "author": "Sarah Jenkins",
+            "role": "Editor",
+            "content": "Before vs After Color Grading in DaVinci Resolve. The goal was to transform the flat log footage into a vibrant, warm summer look. Swipe to see the node graph structure.",
+            "image": "https://images.unsplash.com/photo-1574717432707-c257197f294a?w=800&h=450&fit=crop",
+            "likes": 3100,
+            "comments": 210,
+            "user_image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop",
+            "is_dummy": true,
+            "verification_level": "verified_pro"
+        },
+        {
+            "id": "post_3",
+            "author": "Priya Sharma",
+            "role": "Casting Director",
+            "content": "That's a wrap on the Mumbai schedule! Huge thanks to the entire crew for pulling off some impossible shots in the rain. #FilmLife #MumbaiDiaries",
+            "image": "https://images.unsplash.com/photo-1542204165-65bf26472b9b?w=800&h=450&fit=crop",
+            "likes": 1850,
+            "comments": 89,
+            "user_image": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop",
+            "is_dummy": true,
+            "verification_level": "gold"
+        },
+        {
+            "id": "post_4",
+            "author": "Aditya Singh",
+            "role": "Actor",
+            "content": "Just got my updated headshots back! What do you guys think? Going for a more serious, gritty look for the upcoming crime thriller auditions.",
+            "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=600&fit=crop",
+            "likes": 4200,
+            "comments": 356,
+            "user_image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop",
+            "is_dummy": true,
+            "verification_level": "blue"
+        }
+    ],
+    "facilities": [
+        {
+            "id": 1,
+            "name": "Annapurna Studios",
+            "location": "Hyderabad, Telangana",
+            "rating": 4.9,
+            "reviews": 320,
+            "price": "₹25,000/hr",
+            "image": "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&h=450&fit=crop",
+            "type": "Shooting Floor",
+            "description": "Floor 4 available. Green matte ready. Fully air-conditioned with attached makeup rooms.",
+            "is_dummy": true,
+            "owner_verification": "verified_pro"
+        },
+        {
+            "id": 2,
+            "name": "Abbey Road Studios",
+            "location": "London, UK",
+            "rating": 5.0,
+            "reviews": 5000,
+            "price": "£500/hr",
+            "image": "https://images.unsplash.com/photo-1598653222000-6b7b7a552625?w=800&h=450&fit=crop",
+            "type": "Dubbing Suite",
+            "description": "Studio 2 available for orchestral recording. World-class acoustics and equipment.",
+            "is_dummy": true,
+            "owner_verification": "verified_pro"
+        },
+        {
+            "id": 3,
+            "name": "CineRentals Mumbai",
+            "location": "Mumbai, Maharashtra",
+            "rating": 4.7,
+            "reviews": 85,
+            "price": "₹10,000/day",
+            "image": "https://images.unsplash.com/photo-1535016120720-40c6874c3b1d?w=800&h=450&fit=crop",
+            "type": "Rental House",
+            "description": "Red V-Raptor Kit available for daily rent. Includes lenses and basic rig.",
+            "is_dummy": true,
+            "owner_verification": "verified_pro"
+        }
+    ]
+}

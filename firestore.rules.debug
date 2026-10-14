@@ -1,0 +1,35 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Check if user is the owner of the document
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Check if user is admin
+    function isAdmin() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // projects collection
+    match /projects/{projectId} {
+      allow read, write: if isAuthenticated();
+      
+      match /members/{memberId} {
+        allow read, write: if isAuthenticated();
+      }
+    }
+
+    // Default deny all other collections for this debug version
+    // NOTE: In a real app we'd want to keep all other rules.
+    // I will read the original file again and only replace the projects part and helper part.
+  }
+}

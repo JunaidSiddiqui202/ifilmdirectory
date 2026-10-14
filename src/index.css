@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary: #f59e0b;
+    /* Cinema Warm Amber Gold */
+    --color-background: #f8fafc;
+    --color-background-dark: #090a0c;
+    --color-surface: #ffffff;
+    --color-surface-dark: #121316;
+    --color-text: #0f172a;
+    --color-text-dark: #f8fafc;
+    --color-text-secondary: #64748b;
+    --color-text-secondary-dark: #94a3b8;
+    --color-border: #e2e8f0;
+    --color-border-dark: rgba(255, 255, 255, 0.08);
+  }
+
+  .theme-blue {
+    --color-primary: #3b82f6;
+  }
+
+  .theme-red {
+    --color-primary: #ef4444;
+  }
+
+  .theme-green {
+    --color-primary: #22c55e;
+  }
+
+  .theme-purple {
+    --color-primary: #a855f7;
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark;
+    min-height: 100dvh;
+  }
+
+  * {
+    @apply transition-colors duration-200;
+  }
+}
+
+@layer components {
+  .input-standard {
+    @apply h-12 w-full px-4 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-text-light dark:text-text-dark placeholder:text-text-subtle-light dark:placeholder:text-text-subtle-dark text-sm font-normal focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all;
+  }
+
+  .btn-primary {
+    @apply h-12 px-6 rounded-xl bg-primary text-white font-bold text-sm tracking-wide shadow-md shadow-primary/20 hover:bg-primary/90 hover:scale-[1.01] active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  @keyframes marquee-scroll {
+    0% {
+      transform: translate3d(0, 0, 0);
+    }
+    100% {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+
+  .animate-marquee-scroll {
+    display: flex;
+    width: max-content;
+    will-change: transform;
+    animation: marquee-scroll 160s linear infinite;
+  }
+
+  .animate-marquee-scroll:hover,
+  .animate-marquee-scroll:active {
+    animation-play-state: paused;
+  }
+}
