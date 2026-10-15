@@ -26,3 +26,4 @@ dist-ssr
 *.sln
 *.sw?
 *.zip
+ftp_deploy.py
