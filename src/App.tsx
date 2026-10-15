@@ -17,47 +17,78 @@ const PageLoader = () => (
   </div>
 );
 
-// Lazy load all pages for code splitting
-// Public pages (loaded immediately on first visit)
-const Welcome = lazy(() => import('./pages/Welcome'));
-const Login = lazy(() => import('./pages/Login'));
-const Privacy = lazy(() => import('./pages/Privacy'));
-const Terms = lazy(() => import('./pages/Terms'));
+// Resilient lazy import wrapper that recovers gracefully from stale deployment chunks
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function lazyWithRetry<T extends React.ComponentType<any>>(
+  factory: () => Promise<{ default: T }>,
+  name: string
+) {
+  return lazy(async () => {
+    const retryKey = `chunk_retry_${name}`;
+    try {
+      return await factory();
+    } catch (error: any) {
+      const msg = (error?.message || error?.toString() || '').toString();
+      const isChunkLoadFailed =
+        msg.includes('dynamically imported module') ||
+        msg.includes('Loading chunk') ||
+        msg.includes('Unexpected token') ||
+        msg.includes('Importing a module script failed');
 
-// Protected pages (loaded only when accessed)
-const Home = lazy(() => import('./pages/Home'));
-const ShowreelView3 = lazy(() => import('./pages/ShowreelView3'));
-const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
-const AdminUtils = lazy(() => import('./pages/AdminUtils'));
-const BlogsEvents = lazy(() => import('./pages/BlogsEvents'));
-const EditBlog = lazy(() => import('./pages/EditBlog'));
-const CreateEvent = lazy(() => import('./pages/CreateEvent'));
-const BrowseProfiles = lazy(() => import('./pages/BrowseProfiles'));
-const Jobs = lazy(() => import('./pages/Jobs'));
-const JobDetails = lazy(() => import('./pages/JobDetails'));
-const JobApplications = lazy(() => import('./pages/JobApplications'));
-const PostJob = lazy(() => import('./pages/PostJob'));
-const MessagesList = lazy(() => import('./pages/MessagesList'));
-const Messaging = lazy(() => import('./pages/Messaging'));
-const GroupsForums = lazy(() => import('./pages/GroupsForums'));
-const ShowreelView1 = lazy(() => import('./pages/ShowreelView1'));
-const ShowreelView2 = lazy(() => import('./pages/ShowreelView2'));
-const UploadShowreel = lazy(() => import('./pages/UploadShowreel'));
-const UserProfile = lazy(() => import('./pages/UserProfile'));
-const ServiceProviderShowcase = lazy(() => import('./pages/ServiceProviderShowcase'));
-const ServiceMarketplace = lazy(() => import('./pages/ServiceMarketplace'));
-const BusinessProfile = lazy(() => import('./pages/BusinessProfile'));
-const BookingFacilities = lazy(() => import('./pages/BookingFacilities'));
-const Settings = lazy(() => import('./pages/Settings'));
-const SettingsDetail = lazy(() => import('./pages/SettingsDetail'));
-const Notifications = lazy(() => import('./pages/Notifications'));
-const Search = lazy(() => import('./pages/Search'));
-const Showcase = lazy(() => import('./pages/Showcase'));
-const Guilds = lazy(() => import('./pages/Guilds'));
-const SavedItems = lazy(() => import('./pages/SavedItems'));
-const ProductionProjects = lazy(() => import('./pages/ProductionProjects'));
-const ProjectDetails = lazy(() => import('./pages/ProjectDetails'));
-const SouthCinemaNews = lazy(() => import('./pages/SouthCinemaNews'));
+      const alreadyRetried = sessionStorage.getItem(retryKey);
+      if (!alreadyRetried && isChunkLoadFailed) {
+        sessionStorage.setItem(retryKey, 'true');
+        console.warn(`[Auto-Recovery] Dynamic chunk failed for ${name}. Reloading latest application bundle...`);
+        window.location.reload();
+        return new Promise<{ default: T }>(() => {});
+      }
+
+      throw error;
+    }
+  });
+}
+
+// Lazy load all pages for code splitting with automatic stale chunk recovery
+// Public pages
+const Welcome = lazyWithRetry(() => import('./pages/Welcome'), 'Welcome');
+const Login = lazyWithRetry(() => import('./pages/Login'), 'Login');
+const Privacy = lazyWithRetry(() => import('./pages/Privacy'), 'Privacy');
+const Terms = lazyWithRetry(() => import('./pages/Terms'), 'Terms');
+
+// Protected pages
+const Home = lazyWithRetry(() => import('./pages/Home'), 'Home');
+const ShowreelView3 = lazyWithRetry(() => import('./pages/ShowreelView3'), 'ShowreelView3');
+const AdminDashboard = lazyWithRetry(() => import('./pages/AdminDashboard'), 'AdminDashboard');
+const AdminUtils = lazyWithRetry(() => import('./pages/AdminUtils'), 'AdminUtils');
+const BlogsEvents = lazyWithRetry(() => import('./pages/BlogsEvents'), 'BlogsEvents');
+const EditBlog = lazyWithRetry(() => import('./pages/EditBlog'), 'EditBlog');
+const CreateEvent = lazyWithRetry(() => import('./pages/CreateEvent'), 'CreateEvent');
+const BrowseProfiles = lazyWithRetry(() => import('./pages/BrowseProfiles'), 'BrowseProfiles');
+const Jobs = lazyWithRetry(() => import('./pages/Jobs'), 'Jobs');
+const JobDetails = lazyWithRetry(() => import('./pages/JobDetails'), 'JobDetails');
+const JobApplications = lazyWithRetry(() => import('./pages/JobApplications'), 'JobApplications');
+const PostJob = lazyWithRetry(() => import('./pages/PostJob'), 'PostJob');
+const MessagesList = lazyWithRetry(() => import('./pages/MessagesList'), 'MessagesList');
+const Messaging = lazyWithRetry(() => import('./pages/Messaging'), 'Messaging');
+const GroupsForums = lazyWithRetry(() => import('./pages/GroupsForums'), 'GroupsForums');
+const ShowreelView1 = lazyWithRetry(() => import('./pages/ShowreelView1'), 'ShowreelView1');
+const ShowreelView2 = lazyWithRetry(() => import('./pages/ShowreelView2'), 'ShowreelView2');
+const UploadShowreel = lazyWithRetry(() => import('./pages/UploadShowreel'), 'UploadShowreel');
+const UserProfile = lazyWithRetry(() => import('./pages/UserProfile'), 'UserProfile');
+const ServiceProviderShowcase = lazyWithRetry(() => import('./pages/ServiceProviderShowcase'), 'ServiceProviderShowcase');
+const ServiceMarketplace = lazyWithRetry(() => import('./pages/ServiceMarketplace'), 'ServiceMarketplace');
+const BusinessProfile = lazyWithRetry(() => import('./pages/BusinessProfile'), 'BusinessProfile');
+const BookingFacilities = lazyWithRetry(() => import('./pages/BookingFacilities'), 'BookingFacilities');
+const Settings = lazyWithRetry(() => import('./pages/Settings'), 'Settings');
+const SettingsDetail = lazyWithRetry(() => import('./pages/SettingsDetail'), 'SettingsDetail');
+const Notifications = lazyWithRetry(() => import('./pages/Notifications'), 'Notifications');
+const Search = lazyWithRetry(() => import('./pages/Search'), 'Search');
+const Showcase = lazyWithRetry(() => import('./pages/Showcase'), 'Showcase');
+const Guilds = lazyWithRetry(() => import('./pages/Guilds'), 'Guilds');
+const SavedItems = lazyWithRetry(() => import('./pages/SavedItems'), 'SavedItems');
+const ProductionProjects = lazyWithRetry(() => import('./pages/ProductionProjects'), 'ProductionProjects');
+const ProjectDetails = lazyWithRetry(() => import('./pages/ProjectDetails'), 'ProjectDetails');
+const SouthCinemaNews = lazyWithRetry(() => import('./pages/SouthCinemaNews'), 'SouthCinemaNews');
 
 function App() {
   useEffect(() => {

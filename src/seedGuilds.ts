@@ -1,4 +1,4 @@
-import { db } from './firebaseConfig';
+import { db, auth } from './firebaseConfig';
 import { collection, getDocs, addDoc, serverTimestamp, updateDoc, doc, query, where } from 'firebase/firestore';
 
 const DEFAULT_GUILDS = [
@@ -94,9 +94,10 @@ const DEFAULT_GUILDS = [
 
 export const seedGuilds = async () => {
     try {
-        // Check if we have an authenticated user first to avoid permission errors
-        // However, since this is called on app root, the user might not be loaded yet.
-        // The safest way for a seeding script is to just try-catch the permission error.
+        // Only run seeding when an authenticated user is present
+        if (!auth.currentUser) {
+            return;
+        }
 
         const guildsCol = collection(db, 'guilds');
         const postsCol = collection(db, 'guild_posts');

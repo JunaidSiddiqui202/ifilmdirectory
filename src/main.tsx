@@ -7,7 +7,6 @@ import App from './App.tsx'
 import { ThemeProvider } from './context/ThemeContext.tsx'
 import { AuthProvider } from './context/AuthContext.tsx'
 import { initializeAnalytics } from './utils/analytics';
-import { setupCSP } from './utils/security';
 import ErrorBoundary from './components/ErrorBoundary';
 
 // Initialize Sentry for error tracking and performance monitoring
@@ -59,12 +58,39 @@ if ('serviceWorker' in navigator) {
   }).catch(err => console.error('[App] Failed to unregister Service Workers:', err));
 }
 
-// Add a global error listener for early-stage failures
+// Add a global error listener for early-stage failures and dynamic chunk mismatch
 window.addEventListener('error', (event) => {
   console.error('[Global Error]', event.error || event.message);
-  // If we're stuck on a blank screen, we can try to force a hard reload as a last resort
-  if (document.getElementById('root')?.innerHTML === '') {
-    console.warn('[App] Blank screen detected after error, considering recovery...');
+  const msg = (event.error?.message || event.message || '').toString();
+  if (
+    msg.includes('dynamically imported module') ||
+    msg.includes('Loading chunk') ||
+    msg.includes('Unexpected token') ||
+    msg.includes('Importing a module script failed')
+  ) {
+    const reloaded = sessionStorage.getItem('chunk_unhandled_reloaded');
+    if (!reloaded) {
+      sessionStorage.setItem('chunk_unhandled_reloaded', 'true');
+      console.warn('[Global] Stale bundle mismatch detected. Auto-refreshing app...');
+      window.location.reload();
+    }
+  }
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+  const reason = (event.reason?.message || event.reason?.toString() || '').toString();
+  if (
+    reason.includes('dynamically imported module') ||
+    reason.includes('Loading chunk') ||
+    reason.includes('Unexpected token') ||
+    reason.includes('Importing a module script failed')
+  ) {
+    const reloaded = sessionStorage.getItem('chunk_unhandled_reloaded');
+    if (!reloaded) {
+      sessionStorage.setItem('chunk_unhandled_reloaded', 'true');
+      console.warn('[Global] Stale chunk rejection detected. Auto-refreshing app...');
+      window.location.reload();
+    }
   }
 });
 
@@ -84,10 +110,4 @@ createRoot(rootElement).render(
     </ErrorBoundary>
   </StrictMode>,
 );
-
-// Setup CSP AFTER initial render to ensure it doesn't block the startup script
-// but protects the app from then on.
-setTimeout(() => {
-  setupCSP();
-}, 1000);
 

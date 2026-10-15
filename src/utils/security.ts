@@ -290,32 +290,9 @@ export const secureFetch = async (
 // ==================== CONTENT SECURITY POLICY ====================
 
 export const setupCSP = () => {
-    // Skip CSP in development to avoid Firebase auth issues
-    if (import.meta.env.DEV) {
-        console.log('[Security] Skipping CSP in development mode');
-        return;
-    }
-
-    // Add CSP meta tag if not already present
-    if (!document.querySelector('meta[http-equiv="Content-Security-Policy"]')) {
-        const meta = document.createElement('meta');
-        meta.httpEquiv = 'Content-Security-Policy';
-        meta.content = `
-      default-src 'self';
-      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://www.google.com https://apis.google.com https://*.firebaseapp.com;
-      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.gstatic.com;
-      font-src 'self' data: https://fonts.gstatic.com;
-      img-src 'self' data: https: blob:;
-      connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://*.cloudinary.com https://*.imagekit.io https://*.gumlet.io wss://*.firebaseio.com https://*.ingest.sentry.io https://*.sentry.io;
-      frame-src 'self' https://www.google.com https://*.firebaseapp.com;
-      worker-src 'self' blob:;
-      object-src 'none';
-      base-uri 'self';
-    `.replace(/\s+/g, ' ').trim();
-
-        document.head.appendChild(meta);
-        console.log('[Security] CSP enabled for production');
-    }
+    // Runtime injection of CSP meta tags causes severe WebSocket and dynamic chunk load
+    // failures in WebKit / Safari. Proper CSP headers should be managed via HTTP server (.htaccess).
+    console.log('[Security] CSP runtime meta injection disabled to protect dynamic imports & WebSockets');
 };
 
 // ==================== XSS PROTECTION ====================
