@@ -1,20 +1,77 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { auth, googleProvider, db } from '../firebaseConfig';
 import { signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail } from 'firebase/auth';
 import { collection, addDoc } from 'firebase/firestore';
 import { createUserProfile, triggerEmail } from '../services/userService';
+import { useAuth } from '../context/AuthContext';
 import Logo from '../components/Logo';
 import { useToast } from '../context/ToastContext';
+
+const onboardingSlides = [
+    {
+        icon: 'work',
+        tag: 'CASTINGS & GIGS',
+        title: 'Find Your Next Role',
+        description: 'Access exclusive job listings, audition notices, and crew calls from verified production houses.',
+        accent: 'from-amber-500/20 to-orange-500/10',
+        iconColor: 'text-amber-400',
+        badge: 'Live Auditions Daily',
+    },
+    {
+        icon: 'groups',
+        tag: 'NETWORKING',
+        title: 'Connect with Professionals',
+        description: 'Build your inner circle with directors, technicians, writers, and artists across 50+ cinema crafts.',
+        accent: 'from-blue-500/20 to-cyan-500/10',
+        iconColor: 'text-cyan-400',
+        badge: 'Direct Industry Chat',
+    },
+    {
+        icon: 'movie',
+        tag: 'PORTFOLIO',
+        title: 'Showcase Your Showreels',
+        description: 'Put your cinematic work in front of decision-makers with video portfolios, IMDb credits, and verified badges.',
+        accent: 'from-purple-500/20 to-pink-500/10',
+        iconColor: 'text-purple-400',
+        badge: 'Industry Spotlight',
+    },
+];
+
+const featureHighlights = [
+    {
+        icon: 'explore',
+        title: 'Talent Directory',
+        desc: 'Filter verified actors, cinematographers, sound designers, and technicians by skill & city.',
+    },
+    {
+        icon: 'domain',
+        title: 'Gear & Facilities',
+        desc: 'Book soundstages, RED/ARRI camera kits, grip trucks, and post-production suites.',
+    },
+    {
+        icon: 'newspaper',
+        title: 'Cinema Wire',
+        desc: 'Real-time industry updates, trade analysis, box office reports, and reviews.',
+    },
+    {
+        icon: 'forum',
+        title: 'Guilds & Forums',
+        desc: 'Join private departmental communities to discuss craft, rates, and collaborations.',
+    },
+];
 
 export default function Login() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const toast = useToast();
+    const { currentUser } = useAuth();
 
     // Initialize tab state based on URL parameter
     const initialTab = searchParams.get('tab');
-    const [view, setView] = useState<'login' | 'signup' | 'request'>(initialTab === 'request' ? 'request' : 'login');
+    const [view, setView] = useState<'login' | 'signup' | 'request'>(
+        initialTab === 'request' ? 'request' : initialTab === 'signup' ? 'signup' : 'login'
+    );
     const [showPassword, setShowPassword] = useState(false);
     const [fullName, setFullName] = useState('');
     const [portfolioLink, setPortfolioLink] = useState('');
@@ -26,51 +83,63 @@ export default function Login() {
     const [loading, setLoading] = useState(false);
     const [googleLoading, setGoogleLoading] = useState(false);
     const [submitted, setSubmitted] = useState(false);
+    const [activeSlide, setActiveSlide] = useState(0);
+
     // Honeypot state for bot protection
     const [unionCardFrontFile, setUnionCardFrontFile] = useState<File | null>(null);
     const [unionCardBackFile, setUnionCardBackFile] = useState<File | null>(null);
     const [honeyPot, setHoneyPot] = useState('');
 
+    useEffect(() => {
+        // Capture referral code if present
+        const ref = searchParams.get('ref');
+        if (ref) {
+            localStorage.setItem('referralCode', ref);
+        }
+    }, [searchParams]);
+
+    // Auto-advance slides periodically
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setActiveSlide((prev) => (prev + 1) % onboardingSlides.length);
+        }, 5000);
+        return () => clearInterval(timer);
+    }, []);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Bot Protection: standard Honeypot check
+        // Bot Protection
         if (honeyPot) {
-            console.log("Bot detected via honeypot");
+            console.log('Bot detected via honeypot');
             return;
         }
 
         setError('');
         setLoading(true);
 
-        // Get redirect URL from search params
         const redirectUrl = searchParams.get('redirect') || '/home';
 
         try {
             if (view === 'login') {
                 await signInWithEmailAndPassword(auth, email, password);
-                console.log('[Login] Redirecting to:', redirectUrl);
                 navigate(redirectUrl);
             } else if (view === 'signup') {
                 if (password !== confirmPassword) {
                     throw new Error('Passwords do not match');
                 }
 
-                // 1. Create the Auth User
                 const result = await createUserWithEmailAndPassword(auth, email, password);
 
                 try {
-                    // 2. Create the User Profile (this checks for approval)
                     await createUserProfile(result.user, { displayName: fullName });
-                    console.log('[Signup] Redirecting to:', redirectUrl);
                     navigate(redirectUrl);
                 } catch (profileErr: any) {
-                    // 3. Rollback if not authorized
                     await signOut(auth);
                     throw profileErr;
                 }
             } else {
-                // Request Access Logic
+                // Request Access
                 let unionCardFrontUrl = '';
                 let unionCardBackUrl = '';
 
@@ -97,95 +166,79 @@ export default function Login() {
                     unionCardBackUrl,
                     status: 'pending',
                     referredBy: localStorage.getItem('referralCode') || null,
-                    submittedAt: new Date().toISOString()
+                    submittedAt: new Date().toISOString(),
                 });
 
-                // --- INTERNAL AND EMAIL NOTIFICATIONS ---
-                // 1. In-App Notification to Admins
+                // Internal and Email Notifications
                 try {
                     const { notifyAdminsOfNewRequest } = await import('../services/notificationService');
                     await notifyAdminsOfNewRequest(fullName, email);
                 } catch (notifErr) {
-                    console.error("Failed to send in-app notification:", notifErr);
+                    console.error('Failed to send in-app notification:', notifErr);
                 }
 
-                // 2. Acknowledgment to User (Email)
                 await triggerEmail(email, 'access_request_received', fullName);
-
-                // 3. Alert to Admin (Email Alert to contact@ifilmdirectory.com as requested)
                 await triggerEmail('contact@ifilmdirectory.com', 'admin_access_alert', fullName, {
-                    serviceType: role, // Mapping role to serviceType template field
-                    amount: email      // Mapping email to amount template field to show in the alert
+                    serviceType: role,
+                    amount: email,
                 });
 
                 localStorage.removeItem('referralCode');
                 setSubmitted(true);
+                toast.success('Your access application has been submitted!');
             }
         } catch (err: any) {
             console.error('Submit Error:', err);
             let msg = err.message || 'Action failed';
 
             if (err.code === 'auth/invalid-credential') {
-                msg = 'Incorrect email or password. If you are a new approved member, please use the "Sign Up" tab to create your account.';
+                msg = 'Incorrect email or password. If you are a new member, please use the "Sign Up" or "Request Access" tab.';
             } else if (err.code === 'auth/email-already-in-use') {
                 msg = 'This email is already registered. Please login instead.';
             } else if (err.code === 'auth/weak-password') {
                 msg = 'Password should be at least 6 characters.';
             } else if (err.code === 'permission-denied') {
-                msg = 'Firestore Permission Denied (Check rules)';
+                msg = 'Firestore Permission Denied (Please verify your access).';
             }
 
-            setError(`Firebase: ${msg}`);
+            setError(msg);
+            toast.error(msg);
         } finally {
             setLoading(false);
         }
     };
 
     const handleGoogleLogin = async () => {
-        // Prevent multiple simultaneous popup requests
-        if (googleLoading) {
-            console.log('Google Sign-In already in progress, ignoring duplicate request');
-            return;
-        }
+        if (googleLoading) return;
 
-        // Get redirect URL from search params
         const redirectUrl = searchParams.get('redirect') || '/home';
 
         try {
             setError('');
             setGoogleLoading(true);
-            console.log('Initiating Google Sign-In...');
 
             const result = await signInWithPopup(auth, googleProvider);
-            console.log('Google Auth successful. Verifying membership...');
 
             try {
-                // This will now throw if the user isn't approved
                 await createUserProfile(result.user);
-                console.log('User membership verified. Navigating to:', redirectUrl);
                 navigate(redirectUrl);
             } catch (profileErr: any) {
                 console.warn('Membership check failed:', profileErr.message);
                 setError(profileErr.message || 'Access denied');
-                // IMPORTANT: Sign out from Firebase Auth so they don't stay "half-logged in"
-                const { signOut } = await import('firebase/auth');
                 await signOut(auth);
             }
         } catch (err: any) {
             console.error('Google Sign-In Error:', err);
-
-            // Don't show error for cancelled popup (user closed it or clicked again)
             if (err.code === 'auth/cancelled-popup-request' || err.code === 'auth/popup-closed-by-user') {
-                console.log('Popup was cancelled or closed by user');
                 return;
             }
 
             if (err.code === 'auth/popup-blocked') {
-                setError('Popup blocked or domain unauthorized. Please add ifilmdirectory.vercel.app to Firebase Console -> Authentication -> Settings -> Authorized domains.');
+                setError('Popup blocked by your browser. Please allow popups for ifilmdirectory.com.');
             } else if (err.code === 'auth/unauthorized-domain') {
-                setError('Domain unauthorized. Please add ifilmdirectory.vercel.app to Firebase Console -> Authentication -> Settings -> Authorized domains.');
+                setError('Domain unauthorized in Firebase Console. Please add ifilmdirectory.com.');
             } else {
-                setError(`Firebase: Error (${err.code || 'unknown'}).`);
+                setError(`Google Sign-In Error: ${err.message || 'Authentication failed'}`);
             }
         } finally {
             setGoogleLoading(false);
@@ -193,376 +246,537 @@ export default function Login() {
     };
 
     return (
-        <div className="relative flex min-h-[100dvh] w-full flex-col p-4 pb-12 overflow-y-auto bg-background-light dark:bg-background-dark">
-            <div className="w-full max-w-md mx-auto flex flex-col flex-1">
-            {/* Logo and Image Section */}
-            <div className="flex flex-col items-center pt-8 pb-6">
-                <Logo size="2xl" showText={false} />
-            </div>
+        <div className="relative min-h-[100dvh] w-full bg-[#090A0C] text-white font-sans overflow-x-hidden flex flex-col justify-between selection:bg-amber-500 selection:text-black">
+            {/* Ambient Cinema Lighting Glows */}
+            <div className="pointer-events-none fixed -top-40 left-1/4 w-[700px] h-[450px] bg-amber-500/10 blur-[160px] rounded-full z-0" />
+            <div className="pointer-events-none fixed top-1/2 -right-40 w-[600px] h-[500px] bg-purple-500/5 blur-[160px] rounded-full z-0" />
+            <div className="pointer-events-none fixed bottom-0 left-10 w-[600px] h-[400px] bg-blue-500/5 blur-[150px] rounded-full z-0" />
 
-            {/* Segmented Control */}
-            <div className="flex px-0 py-4">
-                <div className="flex h-12 flex-1 items-center justify-center rounded-xl bg-gray-200 dark:bg-white/5 p-1 border border-border-light dark:border-border-dark">
-                    <button
-                        onClick={() => { setView('login'); setSubmitted(false); }}
-                        className={`flex h-full grow items-center justify-center overflow-hidden rounded-lg px-1.5 sm:px-2 text-xs sm:text-sm font-bold leading-normal transition-all duration-200 ${view === 'login'
-                            ? 'bg-background-light dark:bg-background-dark shadow-sm text-primary'
-                            : 'text-text-subtle-light dark:text-text-subtle-dark hover:text-text-light'
-                            }`}
+            {/* Top Navigation Bar */}
+            <header className="relative z-20 w-full border-b border-white/[0.06] bg-[#090A0C]/80 backdrop-blur-xl">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+                    <div
+                        onClick={() => navigate('/welcome')}
+                        className="cursor-pointer group flex items-center gap-2"
                     >
-                        <span className="truncate">Login</span>
-                    </button>
-                    <button
-                        onClick={() => { setView('signup'); setSubmitted(false); }}
-                        className={`flex h-full grow items-center justify-center overflow-hidden rounded-lg px-1.5 sm:px-2 text-xs sm:text-sm font-bold leading-normal transition-all duration-200 ${view === 'signup'
-                            ? 'bg-background-light dark:bg-background-dark shadow-sm text-primary'
-                            : 'text-text-subtle-light dark:text-text-subtle-dark hover:text-text-light'
-                            }`}
-                    >
-                        <span className="truncate">Sign Up</span>
-                    </button>
-                    <button
-                        onClick={() => { setView('request'); setSubmitted(false); }}
-                        className={`flex h-full grow items-center justify-center overflow-hidden rounded-lg px-1.5 sm:px-2 text-xs sm:text-sm font-bold leading-normal transition-all duration-200 ${view === 'request'
-                            ? 'bg-background-light dark:bg-background-dark shadow-sm text-primary'
-                            : 'text-text-subtle-light dark:text-text-subtle-dark hover:text-text-light'
-                            }`}
-                    >
-                        <span className="truncate">Request Access</span>
-                    </button>
-                </div>
-            </div>
-
-            {/* Error Message */}
-            {error && (
-                <div className="mb-4 p-3 rounded-lg bg-red-100 border border-red-200 text-red-700 text-sm text-center">
-                    {error}
-                </div>
-            )}
-
-            {/* Form Fields */}
-            {submitted ? (
-                <div className="flex flex-col items-center justify-center py-12 px-4 text-center animate-in zoom-in-95 duration-500">
-                    <div className="h-20 w-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-6">
-                        <span className="material-symbols-outlined text-4xl text-green-600">verified</span>
+                        <Logo size="lg" showText={true} />
                     </div>
-                    <h2 className="text-2xl font-bold mb-2">Request Received</h2>
-                    <p className="text-text-subtle-light dark:text-text-subtle-dark max-w-xs mx-auto mb-8">
-                        Thank you for applying. We are currently vetting new profiles to maintain the platform's professional standards.
-                        <strong> Be sure to check your inbox and junk/spam folder for your invitation email</strong> once approved.
-                    </p>
-                    <button
-                        onClick={() => setView('login')}
-                        className="text-primary font-bold hover:underline"
-                    >
-                        Back to Login
-                    </button>
-                </div>
-            ) : (
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
-                    {/* Full Name - For Signup or Request Access */}
-                    {(view === 'signup' || view === 'request') && (
-                        <label className="flex flex-col w-full animate-in slide-in-from-top-2">
-                            <p className="text-sm font-medium leading-normal pb-2">Full Name</p>
-                            <input
-                                className="form-input flex w-full min-w-0 flex-1 rounded-lg focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-gray-100 dark:bg-white/5 h-12 p-3 text-base"
-                                placeholder="Enter your full name"
-                                type="text"
-                                value={fullName}
-                                onChange={(e) => setFullName(e.target.value)}
-                                required
-                            />
-                        </label>
-                    )}
+                    <div className="hidden lg:flex items-center gap-6 text-xs text-zinc-400 font-medium">
+                        <span className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/5">
+                            <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+                            Over 10,000+ Film Creators
+                        </span>
+                        <span className="text-zinc-600">•</span>
+                        <span>Auditions & Castings</span>
+                        <span className="text-zinc-600">•</span>
+                        <span>Talent Directory</span>
+                        <span className="text-zinc-600">•</span>
+                        <span>Showreels & Reviews</span>
+                    </div>
 
-                    {/* Role Selection - Only for Request Access */}
-                    {view === 'request' && (
-                        <label className="flex flex-col w-full animate-in slide-in-from-top-2 delay-75">
-                            <p className="text-sm font-medium leading-normal pb-2">I am a</p>
-                            <select
-                                className="form-select flex w-full min-w-0 flex-1 rounded-lg focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-gray-100 dark:bg-white/5 h-12 p-3 text-base"
-                                value={role}
-                                onChange={(e) => setRole(e.target.value as any)}
-                            >
-                                <option value="actor">Film Professional (Actor/Crew)</option>
-                                <option value="director">Director / Producer</option>
-                                <option value="influencer">Social Media Influencer</option>
-                                <option value="content_creator">YouTuber / Content Creator</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </label>
-                    )}
-                    {/* Portfolio/Social Link - Only for Request Access */}
-                    {view === 'request' && (
-                        <label className="flex flex-col w-full animate-in slide-in-from-top-2 delay-100">
-                            <p className="text-sm font-medium leading-normal pb-2">Work Link (IMDb, Instagram, YouTube, etc.)</p>
-                            <input
-                                className="form-input flex w-full min-w-0 flex-1 rounded-lg focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-gray-100 dark:bg-white/5 h-12 p-3 text-base"
-                                placeholder="Link to your best work or social profile"
-                                type="url"
-                                value={portfolioLink}
-                                onChange={(e) => setPortfolioLink(e.target.value)}
-                                required
-                            />
-                            <p className="text-[10px] text-text-subtle-light dark:text-text-subtle-dark mt-1">
-                                Provide a link that helps us verify your professional work.
-                            </p>
-                        </label>
-                    )}
-
-                    {/* Union Card / ID Proof - Front and Back */}
-                    {view === 'request' && (
-                        <div className="flex flex-col w-full animate-in slide-in-from-top-2 delay-125 gap-4">
-                            <p className="text-sm font-medium leading-normal">Union Card / Professional ID (Photos)</p>
-
-                            <div className="grid grid-cols-2 gap-3">
-                                {/* Front Side */}
-                                <div className="flex flex-col gap-2">
-                                    <div className={`relative flex items-center justify-center border-2 border-dashed rounded-xl h-24 transition-all cursor-pointer overflow-hidden ${unionCardFrontFile ? 'border-primary bg-primary/5' : 'border-border-light dark:border-border-dark bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10'}`}>
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={(e) => setUnionCardFrontFile(e.target.files?.[0] || null)}
-                                            className="absolute inset-0 opacity-0 z-10 cursor-pointer"
-                                        />
-                                        {unionCardFrontFile ? (
-                                            <div className="flex flex-col items-center">
-                                                <span className="material-symbols-outlined text-primary text-2xl">check_circle</span>
-                                                <span className="text-[10px] font-bold text-primary truncate max-w-[80px]">Front Attached</span>
-                                            </div>
-                                        ) : (
-                                            <div className="flex flex-col items-center text-text-subtle-light dark:text-text-subtle-dark">
-                                                <span className="material-symbols-outlined text-2xl">image</span>
-                                                <span className="text-[10px] font-medium">Front Side</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* Back Side */}
-                                <div className="flex flex-col gap-2">
-                                    <div className={`relative flex items-center justify-center border-2 border-dashed rounded-xl h-24 transition-all cursor-pointer overflow-hidden ${unionCardBackFile ? 'border-primary bg-primary/5' : 'border-border-light dark:border-border-dark bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10'}`}>
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={(e) => setUnionCardBackFile(e.target.files?.[0] || null)}
-                                            className="absolute inset-0 opacity-0 z-10 cursor-pointer"
-                                        />
-                                        {unionCardBackFile ? (
-                                            <div className="flex flex-col items-center">
-                                                <span className="material-symbols-outlined text-primary text-2xl">check_circle</span>
-                                                <span className="text-[10px] font-bold text-primary truncate max-w-[80px]">Back Attached</span>
-                                            </div>
-                                        ) : (
-                                            <div className="flex flex-col items-center text-text-subtle-light dark:text-text-subtle-dark">
-                                                <span className="material-symbols-outlined text-2xl">image</span>
-                                                <span className="text-[10px] font-medium">Back Side</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <p className="text-[10px] text-text-subtle-light dark:text-text-subtle-dark -mt-1">
-                                Upload both sides of your ID. This helps us ensure you are a verified professional.
-                            </p>
-                        </div>
-                    )}
-
-                    {/* Email Field */}
-                    <label className="flex flex-col w-full">
-                        <p className="text-sm font-medium leading-normal pb-2">Email</p>
-                        <input
-                            className="form-input flex w-full min-w-0 flex-1 rounded-lg focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-gray-100 dark:bg-white/5 focus:border-primary h-12 placeholder:text-text-subtle-light dark:placeholder:text-text-subtle-dark p-3 text-base font-normal leading-normal"
-                            placeholder="Enter your email"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
-                    </label>
-
-                    {/* Password Field - For Login or Signup */}
-                    {(view === 'login' || view === 'signup') && (
-                        <label className="flex flex-col w-full">
-                            <p className="text-sm font-medium leading-normal pb-2">{view === 'signup' ? 'Create Password' : 'Password'}</p>
-                            <div className="flex w-full flex-1 items-stretch rounded-lg">
-                                <input
-                                    className="form-input flex w-full min-w-0 flex-1 rounded-lg focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-gray-100 dark:bg-white/5 focus:border-primary h-12 placeholder:text-text-subtle-light dark:placeholder:text-text-subtle-dark p-3 rounded-r-none border-r-0 pr-2 text-base font-normal leading-normal"
-                                    placeholder={view === 'signup' ? 'Choose a secure password' : 'Enter your password'}
-                                    type={showPassword ? 'text' : 'password'}
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    aria-label="Toggle password visibility"
-                                    className="text-text-subtle-light dark:text-text-subtle-dark flex border border-border-light dark:border-border-dark bg-gray-100 dark:bg-white/5 items-center justify-center px-3 rounded-r-lg border-l-0 hover:bg-gray-200 dark:hover:bg-white/10"
-                                >
-                                    <span className="material-symbols-outlined text-xl">
-                                        {showPassword ? 'visibility_off' : 'visibility'}
-                                    </span>
-                                </button>
-                            </div>
-                        </label>
-                    )}
-
-                    {/* Confirm Password Field - Only for Signup */}
-                    {view === 'signup' && (
-                        <label className="flex flex-col w-full animate-in slide-in-from-top-2">
-                            <p className="text-sm font-medium leading-normal pb-2">Confirm Password</p>
-                            <input
-                                className="form-input flex w-full min-w-0 flex-1 rounded-lg focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-gray-100 dark:bg-white/5 h-12 p-3 text-base"
-                                placeholder="Repeat your password"
-                                type="password"
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                required
-                            />
-                        </label>
-                    )}
-
-                    {/* Forgot Password Link */}
-                    {view === 'login' && (
-                        <div className="flex justify-end pt-1">
+                    {currentUser ? (
+                        <button
+                            onClick={() => navigate('/home')}
+                            className="px-4 sm:px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs sm:text-sm shadow-lg shadow-amber-500/20 transition-all flex items-center gap-1.5"
+                        >
+                            <span>Enter App</span>
+                            <span className="material-symbols-outlined text-base">arrow_forward</span>
+                        </button>
+                    ) : (
+                        <div className="flex items-center gap-2">
                             <button
-                                type="button"
-                                onClick={async () => {
-                                    if (!email.trim()) {
-                                        setError("Please enter your email above to reset your password.");
-                                        return;
-                                    }
-                                    try {
-                                        await sendPasswordResetEmail(auth, email.trim());
-                                        toast.success(`Password reset link sent to ${email.trim()}`);
-                                    } catch (err: any) {
-                                        setError(err.message || "Failed to send reset email.");
-                                        toast.error(err.message || "Failed to send reset email.");
-                                    }
-                                }}
-                                className="text-sm font-medium text-primary hover:underline bg-transparent border-none cursor-pointer p-0"
+                                onClick={() => { setView('login'); setSubmitted(false); }}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                                    view === 'login' ? 'text-amber-400 bg-amber-500/10' : 'text-zinc-400 hover:text-white'
+                                }`}
                             >
-                                Forgot Password?
+                                Sign In
+                            </button>
+                            <button
+                                onClick={() => { setView('signup'); setSubmitted(false); }}
+                                className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs transition-all shadow-sm"
+                            >
+                                Sign Up
                             </button>
                         </div>
                     )}
-
-                    {/* Honeypot Field (Hidden for humans, visible to bots) */}
-                    <div className="absolute opacity-0 -z-10 h-0 w-0 overflow-hidden">
-                        <label htmlFor="website_hp">Website</label>
-                        <input
-                            id="website_hp"
-                            type="text"
-                            name="website"
-                            value={honeyPot}
-                            onChange={(e) => setHoneyPot(e.target.value)}
-                            tabIndex={-1}
-                            autoComplete="off"
-                        />
-                    </div>
-
-                    {/* CTA Button */}
-                    <div className="pt-6 pb-6">
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="flex h-12 w-full items-center justify-center rounded-xl bg-primary px-6 text-base font-bold text-white shadow-lg hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-background-dark transition-all disabled:opacity-70 disabled:cursor-not-allowed transform active:scale-[0.98]"
-                        >
-                            {loading ? (
-                                <span className="material-symbols-outlined animate-spin">refresh</span>
-                            ) : (
-                                view === 'login' ? 'Login' : view === 'signup' ? 'Create Account' : 'Submit Request'
-                            )}
-                        </button>
-                    </div>
-                </form>
-            )}
-
-            {(view === 'login' || view === 'signup') && (
-                <>
-                    {/* Divider */}
-                    <div className="flex items-center gap-4">
-                        <hr className="flex-grow border-t border-border-light dark:border-border-dark" />
-                        <span className="text-sm font-medium text-text-subtle-light dark:text-text-subtle-dark">
-                            or continue with
-                        </span>
-                        <hr className="flex-grow border-t border-border-light dark:border-border-dark" />
-                    </div>
-
-                    {/* Social Logins */}
-                    <div className="flex justify-center gap-4 pt-6">
-                        {/* Google Button */}
-                        <button
-                            onClick={handleGoogleLogin}
-                            disabled={googleLoading}
-                            aria-label="Continue with Google"
-                            className="flex h-14 w-full items-center justify-center gap-3 rounded-xl border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark hover:bg-gray-100 dark:hover:bg-white/5 transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
-                        >
-                            {googleLoading ? (
-                                <>
-                                    <span className="material-symbols-outlined animate-spin text-primary">refresh</span>
-                                    <span className="text-sm font-bold text-text-light dark:text-text-dark">Signing in...</span>
-                                </>
-                            ) : (
-                                <>
-                                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <g clipPath="url(#clip0_3030_10037)">
-                                            <path
-                                                d="M21.9999 12.2158C21.9999 11.3934 21.9263 10.5898 21.7894 9.81818H12.2178V14.4076H17.7595C17.5218 15.8202 16.7118 17.0652 15.5327 17.8761V20.6695H19.4586C21.0859 19.1834 21.9999 16.9461 21.9999 14.2158V12.2158Z"
-                                                fill="#4285F4"
-                                            ></path>
-                                            <path
-                                                d="M12.2178 22.0001C15.1436 22.0001 17.6186 21.0501 19.4586 19.6695L15.5327 16.8761C14.5363 17.5455 13.2727 17.9546 12.2178 17.9546C10.0454 17.9546 8.16815 16.4955 7.49997 14.5455H3.44995V17.4182C5.23179 20.2546 8.48179 22.0001 12.2178 22.0001Z"
-                                                fill="#34A853"
-                                            ></path>
-                                            <path
-                                                d="M7.5 14.5454C7.25455 13.8409 7.10909 13.0909 7.10909 12.3181C7.10909 11.5454 7.25455 10.7954 7.5 10.0909V7.21814H3.45C2.54545 8.94086 2 10.5727 2 12.3181C2 14.0636 2.54545 15.6954 3.45 17.4181L7.5 14.5454Z"
-                                                fill="#FBBC05"
-                                            ></path>
-                                            <path
-                                                d="M12.2178 6.68182C13.7182 6.68182 14.9818 7.22727 15.9318 8.12273L19.5318 4.52273C17.6136 2.78636 15.1436 2 12.2178 2C8.48179 2 5.23179 3.74545 3.44995 6.58182L7.49997 9.45455C8.16815 7.50455 10.0454 6.68182 12.2178 6.68182Z"
-                                                fill="#EA4335"
-                                            ></path>
-                                        </g>
-                                        <defs>
-                                            <clipPath id="clip0_3030_10037">
-                                                <rect fill="white" height="20" transform="translate(2 2)" width="20"></rect>
-                                            </clipPath>
-                                        </defs>
-                                    </svg>
-                                    <span className="text-sm font-bold text-text-light dark:text-text-dark">Continue with Google</span>
-                                </>
-                            )}
-                        </button>
-                    </div>
-                </>
-            )}
-
-            {/* Footer with Privacy & Terms Links */}
-            <div className="mt-auto pt-8 pb-4 text-center">
-                <div className="flex items-center justify-center gap-4 text-xs text-text-subtle-light dark:text-text-subtle-dark">
-                    <Link
-                        to="/privacy"
-                        className="hover:text-primary transition-colors hover:underline"
-                    >
-                        Privacy Policy
-                    </Link>
-                    <span>•</span>
-                    <Link
-                        to="/terms"
-                        className="hover:text-primary transition-colors hover:underline"
-                    >
-                        Terms of Service
-                    </Link>
                 </div>
-                <p className="text-[10px] text-text-subtle-light dark:text-text-subtle-dark mt-2">
-                    © 2025 iFilmDirectory. All rights reserved.
-                </p>
-            </div>
-            </div>
+            </header>
+
+            {/* Main Merged Hero & Auth Container */}
+            <main className="relative z-10 flex-1 flex flex-col justify-center py-8 lg:py-12">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+                        
+                        {/* LEFT COLUMN (7 COLS): Welcome Hero & Cinematic Feature Showcase */}
+                        <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left space-y-6">
+                            {/* Pill Badge */}
+                            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold tracking-wide uppercase shadow-sm">
+                                <span className="material-symbols-outlined text-sm">movie_filter</span>
+                                The Global Film Industry Network
+                            </div>
+
+                            {/* Main Title */}
+                            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] text-white">
+                                Where Cinema Creators,{' '}
+                                <span className="bg-gradient-to-r from-amber-400 via-amber-300 to-orange-400 bg-clip-text text-transparent">
+                                    Cast & Crew
+                                </span>{' '}
+                                Connect.
+                            </h1>
+
+                            <p className="text-sm sm:text-base lg:text-lg text-zinc-400 max-w-xl leading-relaxed">
+                                Join verified directors, actors, cinematographers, sound designers, studios, and production houses collaborate, cast, and launch feature projects.
+                            </p>
+
+                            {/* Active Feature Slide Deck (Interactive) */}
+                            <div className="w-full max-w-xl space-y-3 pt-2">
+                                <div className="grid grid-cols-3 gap-2 p-1 rounded-xl bg-white/[0.03] border border-white/5">
+                                    {onboardingSlides.map((slide, idx) => (
+                                        <button
+                                            key={idx}
+                                            onClick={() => setActiveSlide(idx)}
+                                            className={`py-2 px-2.5 rounded-lg text-xs font-bold transition-all text-center truncate ${
+                                                activeSlide === idx
+                                                    ? 'bg-amber-500 text-black shadow-md'
+                                                    : 'text-zinc-400 hover:text-white'
+                                            }`}
+                                        >
+                                            {slide.tag}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                <div className="p-4 sm:p-5 rounded-2xl bg-[#121316] border border-white/5 relative overflow-hidden transition-all text-left">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <div className="flex items-center gap-2">
+                                            <span className={`material-symbols-outlined text-xl ${onboardingSlides[activeSlide].iconColor}`}>
+                                                {onboardingSlides[activeSlide].icon}
+                                            </span>
+                                            <span className="text-xs font-bold uppercase tracking-wider text-white">
+                                                {onboardingSlides[activeSlide].title}
+                                            </span>
+                                        </div>
+                                        <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                            {onboardingSlides[activeSlide].badge}
+                                        </span>
+                                    </div>
+                                    <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
+                                        {onboardingSlides[activeSlide].description}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* 4 Feature Cards Grid */}
+                            <div className="grid grid-cols-2 gap-3 w-full max-w-xl pt-2">
+                                {featureHighlights.map((feat, i) => (
+                                    <div key={i} className="p-3 rounded-xl bg-white/[0.02] border border-white/5 flex items-start gap-2.5 text-left">
+                                        <span className="material-symbols-outlined text-amber-400 text-lg shrink-0 mt-0.5">
+                                            {feat.icon}
+                                        </span>
+                                        <div>
+                                            <h4 className="text-xs font-bold text-white">{feat.title}</h4>
+                                            <p className="text-[11px] text-zinc-400 line-clamp-2 mt-0.5 leading-snug">{feat.desc}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* RIGHT COLUMN (5 COLS): The Auth Card (Login / Sign Up / Request Access) */}
+                        <div className="lg:col-span-5 w-full max-w-md mx-auto">
+                            <div className="relative rounded-3xl bg-[#121316]/95 border border-white/10 p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
+                                
+                                {/* Current User Quick Switcher Banner */}
+                                {currentUser && (
+                                    <div className="mb-5 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-between text-xs">
+                                        <div className="truncate pr-2">
+                                            <span className="text-zinc-400">Signed in as </span>
+                                            <strong className="text-white">{currentUser.displayName || currentUser.email}</strong>
+                                        </div>
+                                        <button
+                                            onClick={() => navigate('/home')}
+                                            className="px-2.5 py-1 rounded-lg bg-emerald-500 text-black font-bold shrink-0 hover:bg-emerald-400 transition-colors"
+                                        >
+                                            Feed
+                                        </button>
+                                    </div>
+                                )}
+
+                                {/* Auth Mode Segmented Control */}
+                                <div className="flex h-11 items-center justify-center rounded-xl bg-black/40 p-1 border border-white/10 mb-5">
+                                    <button
+                                        onClick={() => { setView('login'); setSubmitted(false); }}
+                                        className={`flex h-full grow items-center justify-center rounded-lg px-2 text-xs font-extrabold transition-all ${
+                                            view === 'login'
+                                                ? 'bg-amber-500 text-black shadow-md'
+                                                : 'text-zinc-400 hover:text-white'
+                                        }`}
+                                    >
+                                        Sign In
+                                    </button>
+                                    <button
+                                        onClick={() => { setView('signup'); setSubmitted(false); }}
+                                        className={`flex h-full grow items-center justify-center rounded-lg px-2 text-xs font-extrabold transition-all ${
+                                            view === 'signup'
+                                                ? 'bg-amber-500 text-black shadow-md'
+                                                : 'text-zinc-400 hover:text-white'
+                                        }`}
+                                    >
+                                        Sign Up
+                                    </button>
+                                    <button
+                                        onClick={() => { setView('request'); setSubmitted(false); }}
+                                        className={`flex h-full grow items-center justify-center rounded-lg px-2 text-xs font-extrabold transition-all ${
+                                            view === 'request'
+                                                ? 'bg-amber-500 text-black shadow-md'
+                                                : 'text-zinc-400 hover:text-white'
+                                        }`}
+                                    >
+                                        Request Access
+                                    </button>
+                                </div>
+
+                                {/* Form Title & Subtitle */}
+                                <div className="mb-5 text-left">
+                                    <h3 className="text-xl font-black text-white tracking-tight">
+                                        {view === 'login' && 'Welcome Back'}
+                                        {view === 'signup' && 'Create Creator Account'}
+                                        {view === 'request' && 'Request Industry Invitation'}
+                                    </h3>
+                                    <p className="text-xs text-zinc-400 mt-1">
+                                        {view === 'login' && 'Enter your verified cinema credentials to continue.'}
+                                        {view === 'signup' && 'Register your profile to connect with directors and gigs.'}
+                                        {view === 'request' && 'Submit your work or union proof for manual editorial vetting.'}
+                                    </p>
+                                </div>
+
+                                {/* Error Alert */}
+                                {error && (
+                                    <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs text-left flex items-start gap-2">
+                                        <span className="material-symbols-outlined text-base shrink-0 mt-0.5">error</span>
+                                        <span className="leading-snug">{error}</span>
+                                    </div>
+                                )}
+
+                                {/* Submitted State for Request Access */}
+                                {submitted ? (
+                                    <div className="py-8 px-2 text-center space-y-4 animate-in zoom-in-95 duration-300">
+                                        <div className="size-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto border border-emerald-500/30">
+                                            <span className="material-symbols-outlined text-3xl">verified</span>
+                                        </div>
+                                        <h3 className="text-lg font-bold text-white">Application Received</h3>
+                                        <p className="text-xs text-zinc-300 leading-relaxed max-w-sm mx-auto">
+                                            Thank you for applying. We are vetting your profile to maintain the highest industry standards. 
+                                            <strong> Check your inbox and spam folder</strong> for your invitation code.
+                                        </p>
+                                        <button
+                                            onClick={() => setView('login')}
+                                            className="px-5 py-2.5 rounded-xl bg-amber-500 text-black font-extrabold text-xs hover:bg-amber-400 transition-all shadow-md"
+                                        >
+                                            Return to Sign In
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <>
+                                        {/* Google 1-Click Button (for Login & Signup) */}
+                                        {(view === 'login' || view === 'signup') && (
+                                            <div className="mb-4">
+                                                <button
+                                                    onClick={handleGoogleLogin}
+                                                    disabled={googleLoading}
+                                                    className="w-full h-11 rounded-xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white flex items-center justify-center gap-2.5 text-xs font-bold transition-all disabled:opacity-50 active:scale-95 shadow-sm"
+                                                >
+                                                    {googleLoading ? (
+                                                        <span className="material-symbols-outlined text-base animate-spin text-amber-400">progress_activity</span>
+                                                    ) : (
+                                                        <svg className="size-4" viewBox="0 0 24 24">
+                                                            <path d="M21.9999 12.2158C21.9999 11.3934 21.9263 10.5898 21.7894 9.81818H12.2178V14.4076H17.7595C17.5218 15.8202 16.7118 17.0652 15.5327 17.8761V20.6695H19.4586C21.0859 19.1834 21.9999 16.9461 21.9999 14.2158V12.2158Z" fill="#4285F4" />
+                                                            <path d="M12.2178 22.0001C15.1436 22.0001 17.6186 21.0501 19.4586 19.6695L15.5327 16.8761C14.5363 17.5455 13.2727 17.9546 12.2178 17.9546C10.0454 17.9546 8.16815 16.4955 7.49997 14.5455H3.44995V17.4182C5.23179 20.2546 8.48179 22.0001 12.2178 22.0001Z" fill="#34A853" />
+                                                            <path d="M7.5 14.5454C7.25455 13.8409 7.10909 13.0909 7.10909 12.3181C7.10909 11.5454 7.25455 10.7954 7.5 10.0909V7.21814H3.45C2.54545 8.94086 2 10.5727 2 12.3181C2 14.0636 2.54545 15.6954 3.45 17.4181L7.5 14.5454Z" fill="#FBBC05" />
+                                                            <path d="M12.2178 6.68182C13.7182 6.68182 14.9818 7.22727 15.9318 8.12273L19.5318 4.52273C17.6136 2.78636 15.1436 2 12.2178 2C8.48179 2 5.23179 3.74545 3.44995 6.58182L7.49997 9.45455C8.16815 7.50455 10.0454 6.68182 12.2178 6.68182Z" fill="#EA4335" />
+                                                        </svg>
+                                                    )}
+                                                    <span>Continue with Google</span>
+                                                </button>
+
+                                                <div className="flex items-center gap-3 my-4">
+                                                    <div className="h-px bg-white/10 flex-1" />
+                                                    <span className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider">or with email</span>
+                                                    <div className="h-px bg-white/10 flex-1" />
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Standard Form */}
+                                        <form onSubmit={handleSubmit} className="space-y-3.5 text-left">
+                                            {/* Full Name */}
+                                            {(view === 'signup' || view === 'request') && (
+                                                <div>
+                                                    <label className="block text-xs font-bold text-zinc-300 mb-1">
+                                                        Full Name
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        value={fullName}
+                                                        onChange={(e) => setFullName(e.target.value)}
+                                                        placeholder="e.g. Christopher Nolan"
+                                                        required
+                                                        className="w-full h-11 px-3.5 rounded-xl bg-black/40 border border-white/10 text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-amber-500 transition-colors"
+                                                    />
+                                                </div>
+                                            )}
+
+                                            {/* Role for Request Access */}
+                                            {view === 'request' && (
+                                                <div>
+                                                    <label className="block text-xs font-bold text-zinc-300 mb-1">
+                                                        Primary Cinema Craft / Role
+                                                    </label>
+                                                    <select
+                                                        value={role}
+                                                        onChange={(e) => setRole(e.target.value as any)}
+                                                        className="w-full h-11 px-3 rounded-xl bg-black/40 border border-white/10 text-white text-xs focus:outline-none focus:border-amber-500 transition-colors"
+                                                    >
+                                                        <option value="actor">Actor / Model / Performer</option>
+                                                        <option value="director">Director / Writer / Producer</option>
+                                                        <option value="crew">Key Crew (Cinematography / Sound / Edit)</option>
+                                                        <option value="influencer">Film Reviewer / Critic / Journalist</option>
+                                                        <option value="content_creator">YouTuber / OTT Creator</option>
+                                                        <option value="other">Studio / Facility / Other Craft</option>
+                                                    </select>
+                                                </div>
+                                            )}
+
+                                            {/* Portfolio Link for Request Access */}
+                                            {view === 'request' && (
+                                                <div>
+                                                    <label className="block text-xs font-bold text-zinc-300 mb-1">
+                                                        Work Profile Link (IMDb, Instagram, YouTube)
+                                                    </label>
+                                                    <input
+                                                        type="url"
+                                                        value={portfolioLink}
+                                                        onChange={(e) => setPortfolioLink(e.target.value)}
+                                                        placeholder="https://imdb.com/name/..."
+                                                        required
+                                                        className="w-full h-11 px-3.5 rounded-xl bg-black/40 border border-white/10 text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-amber-500 transition-colors"
+                                                    />
+                                                </div>
+                                            )}
+
+                                            {/* Union Card / ID Proof Uploads for Request Access */}
+                                            {view === 'request' && (
+                                                <div className="space-y-1.5">
+                                                    <label className="block text-xs font-bold text-zinc-300">
+                                                        Union Card / Professional ID (Optional Photos)
+                                                    </label>
+                                                    <div className="grid grid-cols-2 gap-2.5">
+                                                        <div className={`relative flex items-center justify-center border border-dashed rounded-xl h-20 transition-all cursor-pointer overflow-hidden ${
+                                                            unionCardFrontFile ? 'border-amber-500 bg-amber-500/10' : 'border-white/15 bg-black/30 hover:border-white/30'
+                                                        }`}>
+                                                            <input
+                                                                type="file"
+                                                                accept="image/*"
+                                                                onChange={(e) => setUnionCardFrontFile(e.target.files?.[0] || null)}
+                                                                className="absolute inset-0 opacity-0 z-10 cursor-pointer"
+                                                            />
+                                                            {unionCardFrontFile ? (
+                                                                <div className="flex flex-col items-center text-amber-400">
+                                                                    <span className="material-symbols-outlined text-xl">check_circle</span>
+                                                                    <span className="text-[10px] font-bold truncate max-w-[90px]">Front Attached</span>
+                                                                </div>
+                                                            ) : (
+                                                                <div className="flex flex-col items-center text-zinc-500">
+                                                                    <span className="material-symbols-outlined text-lg">badge</span>
+                                                                    <span className="text-[10px] font-medium mt-0.5">Front Side</span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+
+                                                        <div className={`relative flex items-center justify-center border border-dashed rounded-xl h-20 transition-all cursor-pointer overflow-hidden ${
+                                                            unionCardBackFile ? 'border-amber-500 bg-amber-500/10' : 'border-white/15 bg-black/30 hover:border-white/30'
+                                                        }`}>
+                                                            <input
+                                                                type="file"
+                                                                accept="image/*"
+                                                                onChange={(e) => setUnionCardBackFile(e.target.files?.[0] || null)}
+                                                                className="absolute inset-0 opacity-0 z-10 cursor-pointer"
+                                                            />
+                                                            {unionCardBackFile ? (
+                                                                <div className="flex flex-col items-center text-amber-400">
+                                                                    <span className="material-symbols-outlined text-xl">check_circle</span>
+                                                                    <span className="text-[10px] font-bold truncate max-w-[90px]">Back Attached</span>
+                                                                </div>
+                                                            ) : (
+                                                                <div className="flex flex-col items-center text-zinc-500">
+                                                                    <span className="material-symbols-outlined text-lg">credit_card</span>
+                                                                    <span className="text-[10px] font-medium mt-0.5">Back Side</span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Email Address */}
+                                            <div>
+                                                <label className="block text-xs font-bold text-zinc-300 mb-1">
+                                                    Email Address
+                                                </label>
+                                                <input
+                                                    type="email"
+                                                    value={email}
+                                                    onChange={(e) => setEmail(e.target.value)}
+                                                    placeholder="director@studio.com"
+                                                    required
+                                                    className="w-full h-11 px-3.5 rounded-xl bg-black/40 border border-white/10 text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-amber-500 transition-colors"
+                                                />
+                                            </div>
+
+                                            {/* Password */}
+                                            {(view === 'login' || view === 'signup') && (
+                                                <div>
+                                                    <div className="flex items-center justify-between mb-1">
+                                                        <label className="text-xs font-bold text-zinc-300">
+                                                            {view === 'signup' ? 'Create Password' : 'Password'}
+                                                        </label>
+                                                        {view === 'login' && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={async () => {
+                                                                    if (!email.trim()) {
+                                                                        setError('Please enter your email above to reset password.');
+                                                                        return;
+                                                                    }
+                                                                    try {
+                                                                        await sendPasswordResetEmail(auth, email.trim());
+                                                                        toast.success(`Password reset link sent to ${email.trim()}`);
+                                                                    } catch (err: any) {
+                                                                        setError(err.message || 'Failed to send reset email.');
+                                                                    }
+                                                                }}
+                                                                className="text-[11px] text-amber-400 hover:underline font-semibold"
+                                                            >
+                                                                Forgot Password?
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                    <div className="relative">
+                                                        <input
+                                                            type={showPassword ? 'text' : 'password'}
+                                                            value={password}
+                                                            onChange={(e) => setPassword(e.target.value)}
+                                                            placeholder={view === 'signup' ? 'Min 6 characters' : 'Enter your password'}
+                                                            required
+                                                            className="w-full h-11 pl-3.5 pr-10 rounded-xl bg-black/40 border border-white/10 text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-amber-500 transition-colors"
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setShowPassword(!showPassword)}
+                                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white"
+                                                            aria-label="Toggle password visibility"
+                                                        >
+                                                            <span className="material-symbols-outlined text-base">
+                                                                {showPassword ? 'visibility_off' : 'visibility'}
+                                                            </span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Confirm Password (Signup only) */}
+                                            {view === 'signup' && (
+                                                <div>
+                                                    <label className="block text-xs font-bold text-zinc-300 mb-1">
+                                                        Confirm Password
+                                                    </label>
+                                                    <input
+                                                        type="password"
+                                                        value={confirmPassword}
+                                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                                        placeholder="Re-enter password"
+                                                        required
+                                                        className="w-full h-11 px-3.5 rounded-xl bg-black/40 border border-white/10 text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-amber-500 transition-colors"
+                                                    />
+                                                </div>
+                                            )}
+
+                                            {/* Honeypot Bot Trap (invisible) */}
+                                            <div className="absolute opacity-0 -z-10 h-0 w-0 overflow-hidden pointer-events-none">
+                                                <input
+                                                    type="text"
+                                                    name="website_trap"
+                                                    value={honeyPot}
+                                                    onChange={(e) => setHoneyPot(e.target.value)}
+                                                    tabIndex={-1}
+                                                    autoComplete="off"
+                                                />
+                                            </div>
+
+                                            {/* Submit Button */}
+                                            <div className="pt-2">
+                                                <button
+                                                    type="submit"
+                                                    disabled={loading}
+                                                    className="w-full h-12 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-black text-xs sm:text-sm shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed active:scale-95"
+                                                >
+                                                    {loading ? (
+                                                        <span className="material-symbols-outlined text-lg animate-spin">progress_activity</span>
+                                                    ) : (
+                                                        <>
+                                                            <span>
+                                                                {view === 'login' && 'Sign In to iFilmDirectory'}
+                                                                {view === 'signup' && 'Create Free Account'}
+                                                                {view === 'request' && 'Submit Request for Verification'}
+                                                            </span>
+                                                            <span className="material-symbols-outlined text-base">arrow_forward</span>
+                                                        </>
+                                                    )}
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </>
+                                )}
+
+                                {/* Legal Disclaimers & Links to Updated Terms */}
+                                <div className="mt-6 pt-4 border-t border-white/10 text-center space-y-2">
+                                    <p className="text-[11px] text-zinc-400 leading-relaxed">
+                                        By signing in or creating an account, you agree to our{' '}
+                                        <Link to="/terms" className="text-amber-400 hover:underline font-semibold">
+                                            Terms of Service
+                                        </Link>{' '}
+                                        and{' '}
+                                        <Link to="/privacy" className="text-amber-400 hover:underline font-semibold">
+                                            Privacy Policy
+                                        </Link>.
+                                    </p>
+                                    <p className="text-[10px] text-zinc-600">
+                                        Operated by 5M Collective Services Private Limited • Hyderabad, India
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            {/* Bottom Footer */}
+            <footer className="relative z-10 w-full border-t border-white/[0.06] bg-[#090A0C]/90 py-5 text-center text-xs text-zinc-500">
+                <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <p className="text-[11px]">
+                        © 2026 iFilmDirectory. All rights reserved. Powered by 5M Collective.
+                    </p>
+                    <div className="flex items-center gap-4 text-[11px]">
+                        <Link to="/privacy" className="hover:text-zinc-300 transition-colors">Privacy</Link>
+                        <span>•</span>
+                        <Link to="/terms" className="hover:text-zinc-300 transition-colors">Terms of Service</Link>
+                        <span>•</span>
+                        <a href="mailto:ifilmdirectory@gmail.com" className="hover:text-zinc-300 transition-colors">Support</a>
+                    </div>
+                </div>
+            </footer>
         </div>
     );
 }
