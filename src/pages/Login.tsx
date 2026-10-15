@@ -90,6 +90,30 @@ export default function Login() {
     const [unionCardBackFile, setUnionCardBackFile] = useState<File | null>(null);
     const [honeyPot, setHoneyPot] = useState('');
 
+    // Terms of Service & Privacy Policy Acceptance State
+    const [termsAccepted, setTermsAccepted] = useState<boolean>(() => {
+        return (
+            localStorage.getItem('ifilm_terms_accepted') === 'true' ||
+            Boolean(localStorage.getItem('ifilm_terms_accepted_date'))
+        );
+    });
+    const [termsError, setTermsError] = useState(false);
+
+    const handleToggleTerms = (checked: boolean) => {
+        setTermsAccepted(checked);
+        if (checked) {
+            const now = new Date().toISOString();
+            localStorage.setItem('ifilm_terms_accepted', 'true');
+            localStorage.setItem('ifilm_terms_accepted_date', now);
+            setTermsError(false);
+            if (error.toLowerCase().includes('terms')) {
+                setError('');
+            }
+        } else {
+            localStorage.removeItem('ifilm_terms_accepted');
+        }
+    };
+
     useEffect(() => {
         // Capture referral code if present
         const ref = searchParams.get('ref');
@@ -116,6 +140,17 @@ export default function Login() {
         }
 
         setError('');
+        setTermsError(false);
+
+        // Enforce Terms of Service & Privacy Policy acceptance
+        if (!termsAccepted) {
+            setTermsError(true);
+            const msg = 'Please tick the checkbox to agree to the Terms of Service & Privacy Policy.';
+            setError(msg);
+            toast.error(msg);
+            return;
+        }
+
         setLoading(true);
 
         const redirectUrl = searchParams.get('redirect') || '/home';
@@ -210,6 +245,18 @@ export default function Login() {
 
     const handleGoogleLogin = async () => {
         if (googleLoading) return;
+
+        setError('');
+        setTermsError(false);
+
+        // Enforce Terms of Service & Privacy Policy acceptance for Google Sign-In
+        if (!termsAccepted) {
+            setTermsError(true);
+            const msg = 'Please tick the checkbox to agree to the Terms of Service & Privacy Policy before signing in with Google.';
+            setError(msg);
+            toast.error('Please agree to the Terms of Service & Privacy Policy to continue.');
+            return;
+        }
 
         const redirectUrl = searchParams.get('redirect') || '/home';
 
@@ -480,6 +527,64 @@ export default function Login() {
                                     </div>
                                 ) : (
                                     <>
+                                        {/* Mandatory Terms of Service & Privacy Policy Tick Option */}
+                                        <div className={`p-3 rounded-2xl border transition-all mb-4 text-left ${
+                                            termsError
+                                                ? 'bg-amber-500/15 border-amber-500/80 shadow-lg shadow-amber-500/10 ring-1 ring-amber-500'
+                                                : termsAccepted
+                                                ? 'bg-emerald-500/5 border-emerald-500/30'
+                                                : 'bg-white/[0.03] border-white/10 hover:border-amber-500/30'
+                                        }`}>
+                                            <label className="flex items-start gap-2.5 cursor-pointer select-none">
+                                                <input
+                                                    type="checkbox"
+                                                    id="login-terms-tick"
+                                                    checked={termsAccepted}
+                                                    onChange={(e) => handleToggleTerms(e.target.checked)}
+                                                    className="mt-0.5 size-4 rounded bg-black/60 border-white/20 text-amber-500 focus:ring-amber-500 focus:ring-offset-0 cursor-pointer accent-amber-500 shrink-0"
+                                                />
+                                                <div className="flex-1">
+                                                    <span className="text-[11px] sm:text-xs text-zinc-300 leading-snug">
+                                                        I agree to the{' '}
+                                                        <Link
+                                                            to="/terms"
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            onClick={(e) => e.stopPropagation()}
+                                                            className="text-amber-400 hover:underline font-bold inline-flex items-center gap-0.5"
+                                                        >
+                                                            <span>Terms of Service</span>
+                                                            <span className="material-symbols-outlined text-[10px]">open_in_new</span>
+                                                        </Link>{' '}
+                                                        and{' '}
+                                                        <Link
+                                                            to="/privacy"
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            onClick={(e) => e.stopPropagation()}
+                                                            className="text-amber-400 hover:underline font-bold inline-flex items-center gap-0.5"
+                                                        >
+                                                            <span>Privacy Policy</span>
+                                                            <span className="material-symbols-outlined text-[10px]">open_in_new</span>
+                                                        </Link>{' '}
+                                                        (Operated by 5M Collective Services Private Limited).
+                                                    </span>
+                                                    {termsError && (
+                                                        <p className="text-[11px] text-amber-400 font-bold mt-1.5 flex items-center gap-1">
+                                                            <span className="material-symbols-outlined text-xs">info</span>
+                                                            <span>Please tick this box to approve before proceeding.</span>
+                                                        </p>
+                                                    )}
+                                                    {termsAccepted && (
+                                                         <p className="text-[10px] text-emerald-400 font-medium mt-1 flex items-center gap-1">
+                                                             <span className="material-symbols-outlined text-xs">check_circle</span>
+                                                             <span>Terms & Privacy Policy approved.</span>
+                                                         </p>
+                                                    )}
+                                                </div>
+                                            </label>
+                                        </div>
+
                                         {/* Google 1-Click Button (for Login & Signup) */}
                                         {(view === 'login' || view === 'signup') && (
                                             <div className="mb-4">
