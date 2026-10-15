@@ -191,9 +191,8 @@ service cloud.firestore {
     // ACCESS REQUESTS COLLECTION
     // ============================================
     match /access_requests/{requestId} {
-      // Users can read their own requests, admins can read all
-      // handle case where userId might be missing for unauth requests
-      allow read: if (resource.data.userId != null && isOwner(resource.data.userId)) || isAdmin();
+      // Users can read their own requests (by email or userId), admins can read all
+      allow read: if (request.auth != null && (resource.data.email == request.auth.token.email || (resource.data.userId != null && request.auth.uid == resource.data.userId))) || isAdmin();
       
       // Allow public creation of access requests (since users don't have accounts yet)
       // No size validation needed as these are typically small documents

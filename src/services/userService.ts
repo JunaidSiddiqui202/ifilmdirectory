@@ -117,32 +117,44 @@ export const isSuperAdmin = (email: string | null | undefined) => {
 export const createUserProfile = async (user: User, additionalData?: any) => {
     if (!user) return;
 
-    const userRef = doc(db, 'users', user.uid);
-    const userSnap = await getDoc(userRef);
+    try {
+        const userRef = doc(db, 'users', user.uid);
+        const userSnap = await getDoc(userRef);
 
-    // If user already has a profile, we're good
-    if (userSnap.exists()) return;
+        // If user already has a profile, we're good
+        if (userSnap.exists()) return;
 
-    // For new users, we MUST check if they are authorized
-    const email = user.email;
+        const email = user.email;
+        let approvedData: any = {};
 
-    // 1. Check if Super Admin (Always allowed)
-    if (isSuperAdmin(email)) {
-        await createProfileDoc(user, additionalData);
-        return;
-    }
+        // If user is Super Admin
+        if (isSuperAdmin(email)) {
+            approvedData.role = 'admin';
+            approvedData.adminRole = 'super_admin';
+            approvedData.verification_tier = 'gold';
+        } else if (email) {
+            // Check if user has an approved Access Request to link credentials
+            try {
+                const isApproved = await checkAccessApproval(email);
+                if (isApproved) {
+                    approvedData.verification_tier = 'blue';
+                }
+            } catch (approvalErr) {
+                console.warn('Access approval check skipped:', approvalErr);
+            }
+        }
 
-    // 2. Check if they have an approved Access Request
-    if (email) {
-        const isApproved = await checkAccessApproval(email);
-        if (isApproved) {
+        // Create the user profile document so the user can enter the platform
+        await createProfileDoc(user, { ...approvedData, ...additionalData });
+    } catch (error) {
+        console.error("Error creating user profile:", error);
+        // Fallback attempt to ensure user has a profile document
+        try {
             await createProfileDoc(user, additionalData);
-            return;
+        } catch (fallbackErr) {
+            console.error("Fallback createProfileDoc failed:", fallbackErr);
         }
     }
-
-    // If we reach here, they are not authorized
-    throw new Error('Access Denied: Your membership request is either pending or does not exist. Please use "Request Access" first.');
 };
 
 // Internal helper to keep code clean

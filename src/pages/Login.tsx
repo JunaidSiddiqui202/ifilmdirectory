@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { auth, googleProvider, db } from '../firebaseConfig';
-import { signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail } from 'firebase/auth';
+import { signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { collection, addDoc } from 'firebase/firestore';
 import { createUserProfile, triggerEmail } from '../services/userService';
 import { useAuth } from '../context/AuthContext';
@@ -168,11 +168,10 @@ export default function Login() {
 
                 try {
                     await createUserProfile(result.user, { displayName: fullName });
-                    navigate(redirectUrl);
                 } catch (profileErr: any) {
-                    await signOut(auth);
-                    throw profileErr;
+                    console.warn('User profile initialization warning:', profileErr);
                 }
+                navigate(redirectUrl);
             } else {
                 // Request Access
                 let unionCardFrontUrl = '';
@@ -268,12 +267,10 @@ export default function Login() {
 
             try {
                 await createUserProfile(result.user);
-                navigate(redirectUrl);
             } catch (profileErr: any) {
-                console.warn('Membership check failed:', profileErr.message);
-                setError(profileErr.message || 'Access denied');
-                await signOut(auth);
+                console.warn('User profile initialization warning:', profileErr);
             }
+            navigate(redirectUrl);
         } catch (err: any) {
             console.error('Google Sign-In Error:', err);
             if (err.code === 'auth/cancelled-popup-request' || err.code === 'auth/popup-closed-by-user') {
