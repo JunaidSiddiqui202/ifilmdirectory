@@ -8,7 +8,9 @@ import { jobService, type Job } from '../services/jobService';
 import { getLatestUsers, type UserProfile } from '../services/userService';
 import { showreelService, type Showreel } from '../services/showreelService';
 import { getPosts, type PostData } from '../services/postService';
+import { rssNewsService, type NewsItem } from '../services/rssNewsService';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import PostMedia from '../components/PostMedia';
 import BreakingTicker from '../components/BreakingTicker';
 
@@ -27,9 +29,23 @@ const formatViews = (views: number) => {
     return views.toString();
 };
 
+const formatNewsTimeAgo = (timestamp: number) => {
+    const diff = Date.now() - timestamp;
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    if (hours < 1) {
+        const mins = Math.max(1, Math.floor(diff / (1000 * 60)));
+        return `${mins}m ago`;
+    }
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    if (days === 1) return 'Yesterday';
+    return `${days}d ago`;
+};
+
 export default function Home() {
     const navigate = useNavigate();
     const { currentUser } = useAuth();
+    const toast = useToast();
     const [blogs, setBlogs] = useState<BlogPost[]>([]);
     const [jobs, setJobs] = useState<Job[]>([]);
     const [newUsers, setNewUsers] = useState<UserProfile[]>([]);
@@ -38,15 +54,32 @@ export default function Home() {
     const [networkPostLiked, setNetworkPostLiked] = useState(false);
     const [selectedPollOption, setSelectedPollOption] = useState<number | null>(null);
 
+    // Film News & Movie Reviews state
+    const [cinemaNews, setCinemaNews] = useState<NewsItem[]>([]);
+    const [newsFilter, setNewsFilter] = useState<'all' | 'review' | 'news'>('all');
+    const [selectedNewsArticle, setSelectedNewsArticle] = useState<NewsItem | null>(null);
+    const [newsLoading, setNewsLoading] = useState(true);
+
     useEffect(() => {
+        // Pre-fill with cached cinema news instantly so UI renders without delay
+        const initialCached = rssNewsService.getCachedNews();
+        if (initialCached && initialCached.length > 0) {
+            setCinemaNews(initialCached);
+            setNewsLoading(false);
+        }
+
         const loadHomeData = async () => {
             try {
-                const [fetchedBlogs, fetchedJobs, fetchedUsers, fetchedReels, fetchedPosts] = await Promise.all([
+                const [fetchedBlogs, fetchedJobs, fetchedUsers, fetchedReels, fetchedPosts, newsResult] = await Promise.all([
                     blogService.getBlogs(),
                     jobService.getJobs(),
                     getLatestUsers(8),
                     showreelService.getTrendingShowreels(10),
-                    getPosts()
+                    getPosts(),
+                    rssNewsService.getNews(false).catch((err) => {
+                        console.error('Error fetching cinema news:', err);
+                        return null;
+                    })
                 ]);
                 setBlogs(fetchedBlogs.slice(0, 4));
                 setJobs(fetchedJobs.slice(0, 6));
@@ -63,12 +96,44 @@ export default function Home() {
                     const freshShowreels = await showreelService.getTrendingShowreels(10);
                     setReels(freshShowreels);
                 }
+
+                if (newsResult && (newsResult as any).items && Array.isArray((newsResult as any).items) && (newsResult as any).items.length > 0) {
+                    setCinemaNews((newsResult as any).items);
+                } else if (Array.isArray(newsResult) && newsResult.length > 0) {
+                    setCinemaNews(newsResult);
+                }
+                setNewsLoading(false);
             } catch (err) {
                 console.error('Error loading home data:', err);
+                setNewsLoading(false);
             }
         };
         loadHomeData();
     }, []);
+
+    const handleShareNews = async (item: NewsItem, e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: item.title,
+                    text: `${item.title} — via iFilmDirectory`,
+                    url: item.link || window.location.href,
+                });
+            } catch {
+                // user cancelled
+            }
+        } else {
+            await navigator.clipboard.writeText(item.link || window.location.href);
+            toast.success('Link copied to clipboard!');
+        }
+    };
+
+    const filteredNews = cinemaNews.filter(item => {
+        if (newsFilter === 'review') return item.category === 'review' || Boolean(item.rating);
+        if (newsFilter === 'news') return item.category === 'news' && !item.rating;
+        return true;
+    });
 
     const poll = {
         question: "Which filmmaking breakthrough are you most excited to use on your next shoot?",
@@ -275,6 +340,79 @@ export default function Home() {
         </section>
     );
 
+    // Reusable Top Movie Reviews Widget (for Desktop Sidebar & Companion view)
+    const TopReviewsWidget = () => {
+        const reviews = cinemaNews.filter(i => i.category === 'review' || Boolean(i.rating)).slice(0, 3);
+        const displayItems = reviews.length > 0 ? reviews : cinemaNews.slice(0, 3);
+
+        return (
+            <section className="rounded-2xl bg-[#121316] border border-white/5 p-4 sm:p-5">
+                <div className="flex items-center justify-between mb-3.5">
+                    <div className="flex items-center gap-2">
+                        <span className="size-2 rounded-full bg-amber-400 animate-pulse" />
+                        <h2 className="text-base font-bold text-white tracking-tight flex items-center gap-1.5">
+                            Movie Reviews & Ratings
+                        </h2>
+                    </div>
+                    <button
+                        onClick={() => navigate('/south-cinema')}
+                        className="text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-0.5"
+                    >
+                        <span>All Reviews</span>
+                        <span className="material-symbols-outlined text-sm">chevron_right</span>
+                    </button>
+                </div>
+
+                <div className="space-y-3">
+                    {newsLoading ? (
+                        [1, 2, 3].map(i => (
+                            <div key={i} className="h-16 rounded-xl bg-white/[0.03] animate-pulse border border-white/5" />
+                        ))
+                    ) : displayItems.length > 0 ? (
+                        displayItems.map((item) => (
+                            <div
+                                key={item.id}
+                                onClick={() => setSelectedNewsArticle(item)}
+                                className="group p-2.5 rounded-xl bg-white/[0.02] border border-white/5 hover:border-amber-500/30 transition-all cursor-pointer flex gap-3 items-center"
+                            >
+                                <div className="relative size-14 rounded-lg overflow-hidden shrink-0 bg-black/60 border border-white/10">
+                                    <img
+                                        src={item.thumbnail || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=200&h=200&fit=crop'}
+                                        alt={item.title}
+                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                        onError={(e) => {
+                                            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=200&h=200&fit=crop';
+                                        }}
+                                    />
+                                    {item.rating && (
+                                        <div className="absolute inset-x-0 bottom-0 bg-amber-500 text-black font-black text-[9px] text-center leading-tight py-0.5">
+                                            {item.rating}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                    <div className="flex items-center gap-1.5 mb-0.5">
+                                        <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400 truncate">
+                                            {item.rating ? '★ Review' : 'Film Scoop'}
+                                        </span>
+                                        <span className="text-[10px] text-zinc-500">• {item.source}</span>
+                                    </div>
+                                    <h4 className="text-xs font-bold text-white group-hover:text-amber-400 transition-colors line-clamp-2 leading-snug">
+                                        {item.title}
+                                    </h4>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="text-center py-4 text-xs text-zinc-500">
+                            Reviews syncing...
+                        </div>
+                    )}
+                </div>
+            </section>
+        );
+    };
+
     return (
         <div className="relative flex min-h-[100dvh] w-full flex-col bg-[#090A0C] text-white pb-36 md:pb-24 overflow-x-hidden font-display">
             <div className="w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-6xl 2xl:max-w-7xl mx-auto flex flex-col flex-1 px-4 sm:px-6">
@@ -449,6 +587,181 @@ export default function Home() {
                                     </div>
                                 )}
                             </div>
+                        </section>
+
+                        {/* Film News & Movie Reviews Section */}
+                        <section className="space-y-3.5">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                <div className="flex items-center gap-2">
+                                    <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
+                                    <div>
+                                        <h2 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2">
+                                            Film News & Movie Reviews
+                                            <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/20">
+                                                Live Wire
+                                            </span>
+                                        </h2>
+                                        <p className="text-[11px] text-zinc-400">
+                                            Breaking scoops, trade updates & certified movie reviews
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Filter Pills + View All */}
+                                <div className="flex items-center gap-2 self-start sm:self-auto">
+                                    <div className="flex items-center bg-white/[0.04] p-0.5 rounded-xl border border-white/5 text-[11px] font-bold">
+                                        <button
+                                            onClick={() => setNewsFilter('all')}
+                                            className={`px-2.5 py-1 rounded-lg transition-all ${
+                                                newsFilter === 'all'
+                                                    ? 'bg-amber-500 text-black shadow-sm'
+                                                    : 'text-zinc-400 hover:text-white'
+                                            }`}
+                                        >
+                                            All
+                                        </button>
+                                        <button
+                                            onClick={() => setNewsFilter('review')}
+                                            className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 ${
+                                                newsFilter === 'review'
+                                                    ? 'bg-amber-500 text-black shadow-sm'
+                                                    : 'text-zinc-400 hover:text-white'
+                                            }`}
+                                        >
+                                            <span className="material-symbols-outlined text-[12px] filled">star</span>
+                                            <span>Reviews</span>
+                                        </button>
+                                        <button
+                                            onClick={() => setNewsFilter('news')}
+                                            className={`px-2.5 py-1 rounded-lg transition-all ${
+                                                newsFilter === 'news'
+                                                    ? 'bg-amber-500 text-black shadow-sm'
+                                                    : 'text-zinc-400 hover:text-white'
+                                            }`}
+                                        >
+                                            News
+                                        </button>
+                                    </div>
+
+                                    <button
+                                        onClick={() => navigate('/south-cinema')}
+                                        className="text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-0.5"
+                                        title="Explore all cinema news"
+                                    >
+                                        <span className="hidden sm:inline">Wire</span>
+                                        <span className="material-symbols-outlined text-sm">chevron_right</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* News Cards Grid */}
+                            {newsLoading ? (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                                    {[1, 2, 3, 4].map(i => (
+                                        <div key={i} className="h-64 rounded-2xl bg-white/[0.03] animate-pulse border border-white/5" />
+                                    ))}
+                                </div>
+                            ) : filteredNews.length > 0 ? (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                                    {filteredNews.slice(0, 4).map((item) => {
+                                        const isReview = item.category === 'review' || Boolean(item.rating);
+                                        return (
+                                            <article
+                                                key={item.id}
+                                                onClick={() => setSelectedNewsArticle(item)}
+                                                className="group relative flex flex-col rounded-2xl bg-[#121316] border border-white/[0.06] hover:border-amber-500/40 transition-all cursor-pointer overflow-hidden shadow-md"
+                                            >
+                                                {/* Thumbnail */}
+                                                <div className="aspect-[16/9] w-full relative overflow-hidden bg-black/60">
+                                                    <img
+                                                        src={item.thumbnail || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&h=450&fit=crop'}
+                                                        alt={item.title}
+                                                        loading="lazy"
+                                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                                        onError={(e) => {
+                                                            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&h=450&fit=crop';
+                                                        }}
+                                                    />
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-[#121316] via-transparent to-black/30 pointer-events-none" />
+
+                                                    {/* Top Badges */}
+                                                    <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 flex-wrap">
+                                                        {isReview ? (
+                                                            <span className="text-[10px] font-black px-2 py-0.5 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 text-black shadow-md flex items-center gap-1 tracking-wide">
+                                                                <span className="material-symbols-outlined text-[11px] filled">star</span>
+                                                                <span>{item.rating || 'REVIEW'}</span>
+                                                            </span>
+                                                        ) : (
+                                                            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-lg bg-blue-500/80 text-white backdrop-blur-md">
+                                                                FILM NEWS
+                                                            </span>
+                                                        )}
+                                                        <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-lg bg-black/60 text-zinc-300 backdrop-blur-md border border-white/10">
+                                                            {item.industry}
+                                                        </span>
+                                                    </div>
+
+                                                    <div className="absolute top-2.5 right-2.5 bg-black/70 backdrop-blur-md px-2 py-0.5 rounded-md border border-white/10 text-[10px] font-medium text-zinc-300">
+                                                        {item.source}
+                                                    </div>
+
+                                                    <div className="absolute bottom-2 right-2.5 text-[10px] font-medium text-zinc-400 bg-black/70 px-2 py-0.5 rounded-md backdrop-blur-sm">
+                                                        {formatNewsTimeAgo(item.timestamp)}
+                                                    </div>
+                                                </div>
+
+                                                {/* Text Content */}
+                                                <div className="p-3.5 flex flex-col flex-1 justify-between gap-2.5">
+                                                    <div>
+                                                        <h3 className="font-bold text-xs sm:text-sm text-white group-hover:text-amber-400 transition-colors line-clamp-2 leading-snug">
+                                                            {item.title}
+                                                        </h3>
+                                                        <p className="text-[11px] text-zinc-400 line-clamp-2 mt-1 leading-relaxed">
+                                                            {item.description}
+                                                        </p>
+                                                    </div>
+
+                                                    <div className="pt-2 border-t border-white/5 flex items-center justify-between text-xs font-semibold">
+                                                        <span className="text-amber-400 group-hover:text-amber-300 flex items-center gap-0.5 text-[11px]">
+                                                            <span>Read Story</span>
+                                                            <span className="material-symbols-outlined text-xs group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+                                                        </span>
+                                                        <div className="flex items-center gap-2">
+                                                            <button
+                                                                onClick={(e) => handleShareNews(item, e)}
+                                                                className="text-zinc-400 hover:text-white p-1 rounded-md hover:bg-white/5 transition-colors"
+                                                                title="Share story"
+                                                            >
+                                                                <span className="material-symbols-outlined text-sm">share</span>
+                                                            </button>
+                                                            <span className="text-[10px] text-zinc-500 flex items-center gap-1">
+                                                                <span className="material-symbols-outlined text-xs">public</span>
+                                                                {item.source}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </article>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                <div className="p-6 rounded-2xl bg-[#121316] border border-white/5 text-center text-xs text-zinc-400">
+                                    No stories found for this filter. Check back shortly!
+                                </div>
+                            )}
+
+                            {filteredNews.length > 4 && (
+                                <div className="text-center pt-1">
+                                    <button
+                                        onClick={() => navigate('/south-cinema')}
+                                        className="px-4 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-xs font-bold text-zinc-300 hover:text-white transition-all inline-flex items-center gap-1.5"
+                                    >
+                                        <span>Browse Full Cinema Wire & Reviews</span>
+                                        <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                                    </button>
+                                </div>
+                            )}
                         </section>
 
                         {/* For You: Gigs & Casting Calls */}
@@ -640,6 +953,9 @@ export default function Home() {
                             <QuickActionsGrid />
                         </div>
 
+                        {/* Top Film Reviews & Ratings (Desktop Companion) */}
+                        <TopReviewsWidget />
+
                         {/* Featured Talent Directory */}
                         <FeaturedTalentSection />
 
@@ -662,6 +978,109 @@ export default function Home() {
                     </div>
                 </div>
             </div>
+
+            {/* IN-APP FILM NEWS & REVIEW READER MODAL */}
+            {selectedNewsArticle && (
+                <div
+                    className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200"
+                    onClick={() => setSelectedNewsArticle(null)}
+                >
+                    <div
+                        className="w-full max-w-2xl bg-[#121316] border border-white/10 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Modal Header Media & Close */}
+                        <div className="relative aspect-[16/9] w-full max-h-64 overflow-hidden bg-black/80 shrink-0">
+                            <img
+                                src={selectedNewsArticle.thumbnail || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&h=450&fit=crop'}
+                                alt={selectedNewsArticle.title}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                    (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&h=450&fit=crop';
+                                }}
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#121316] via-black/30 to-black/60" />
+
+                            {/* Close Button */}
+                            <button
+                                onClick={() => setSelectedNewsArticle(null)}
+                                className="absolute top-3 right-3 size-9 rounded-full bg-black/70 hover:bg-black text-white flex items-center justify-center border border-white/20 transition-all hover:scale-105 z-10"
+                                aria-label="Close story"
+                            >
+                                <span className="material-symbols-outlined text-lg">close</span>
+                            </button>
+
+                            {/* Tags */}
+                            <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-xs">
+                                <div className="flex items-center gap-2">
+                                    {selectedNewsArticle.rating ? (
+                                        <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-lg bg-amber-500 text-black flex items-center gap-1 shadow-md">
+                                            <span className="material-symbols-outlined text-[11px] filled">star</span>
+                                            <span>{selectedNewsArticle.rating}</span>
+                                        </span>
+                                    ) : (
+                                        <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-lg bg-blue-500/80 text-white backdrop-blur-md">
+                                            Film News
+                                        </span>
+                                    )}
+                                    <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-lg bg-black/70 text-zinc-300 backdrop-blur-md border border-white/10">
+                                        {selectedNewsArticle.industry}
+                                    </span>
+                                </div>
+                                <span className="text-zinc-300 text-[11px] font-medium bg-black/70 px-2 py-0.5 rounded-md backdrop-blur-md">
+                                    {selectedNewsArticle.source} • {formatNewsTimeAgo(selectedNewsArticle.timestamp)}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Modal Body */}
+                        <div className="p-5 sm:p-6 overflow-y-auto space-y-4 flex-1 custom-scrollbar">
+                            {selectedNewsArticle.category === 'review' && (
+                                <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <span className="material-symbols-outlined text-amber-400 filled">star</span>
+                                        <span className="text-xs font-black text-amber-300 uppercase tracking-wider">
+                                            Film Review & Verdict
+                                        </span>
+                                    </div>
+                                    <span className="text-sm font-black text-black bg-amber-500 px-2.5 py-0.5 rounded-lg">
+                                        {selectedNewsArticle.rating || '★ CERTIFIED'}
+                                    </span>
+                                </div>
+                            )}
+
+                            <h2 className="text-base sm:text-lg font-bold text-white leading-snug">
+                                {selectedNewsArticle.title}
+                            </h2>
+
+                            <div className="text-xs sm:text-sm text-zinc-300 leading-relaxed whitespace-pre-line space-y-3 pt-3 border-t border-white/5">
+                                {selectedNewsArticle.content || selectedNewsArticle.description}
+                            </div>
+                        </div>
+
+                        {/* Sticky Action Footer */}
+                        <div className="p-4 sm:px-6 bg-[#0e0f12] border-t border-white/10 flex items-center gap-3 shrink-0">
+                            <a
+                                href={selectedNewsArticle.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex-1 py-2.5 sm:py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs sm:text-sm text-center flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95"
+                            >
+                                <span>Read Full Story on {selectedNewsArticle.source}</span>
+                                <span className="material-symbols-outlined text-base">open_in_new</span>
+                            </a>
+
+                            <button
+                                onClick={(e) => handleShareNews(selectedNewsArticle, e)}
+                                className="p-2.5 sm:p-3 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border border-white/10 transition-all"
+                                title="Share"
+                            >
+                                <span className="material-symbols-outlined text-base sm:text-lg">share</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <BottomNav />
         </div>
