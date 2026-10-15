@@ -69,9 +69,9 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
     };
 
     return (
-        <aside className="hidden md:flex flex-col fixed left-0 top-0 bottom-0 z-40 bg-[#090A0C] border-r border-white/[0.08] w-20 xl:w-64 select-none px-3 py-5 justify-between font-display transition-all duration-300">
+        <aside className="hidden md:flex flex-col fixed left-0 top-0 bottom-0 z-40 bg-[#090A0C] border-r border-white/[0.08] w-20 xl:w-64 select-none px-3 py-4 font-display transition-all duration-300 overflow-y-auto overscroll-contain custom-scrollbar">
             {/* Top: Brand Header & Navigation */}
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-4 shrink-0">
                 {/* Logo */}
                 <div
                     onClick={() => navigate('/home')}
@@ -87,14 +87,15 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                 </div>
 
                 {/* Primary Nav Links */}
-                <nav className="flex flex-col gap-1.5" aria-label="Desktop Primary Navigation">
+                <nav className="flex flex-col gap-1" aria-label="Desktop Primary Navigation">
                     {navItems.map((item) => {
                         const active = isActive(item.path);
                         return (
                             <button
                                 key={item.path}
                                 onClick={() => navigate(item.path)}
-                                className={`relative group flex items-center justify-center xl:justify-start gap-4 px-3 py-3 rounded-2xl transition-all duration-200 ${
+                                title={item.label}
+                                className={`relative group flex items-center justify-center xl:justify-start gap-4 px-3 py-2.5 rounded-2xl transition-all duration-200 ${
                                     active
                                         ? 'bg-amber-500/10 text-amber-400 font-bold border border-amber-500/20 shadow-sm'
                                         : 'text-zinc-400 hover:text-white hover:bg-white/[0.05]'
@@ -142,10 +143,10 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                     })}
 
                     {/* Instagram-Style Standout CREATE Button */}
-                    <div className="pt-2">
+                    <div className="pt-1.5">
                         <button
                             onClick={() => setIsCreateOpen(!isCreateOpen)}
-                            className="w-full flex items-center justify-center xl:justify-start gap-3.5 px-3 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-extrabold shadow-lg shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-95 group"
+                            className="w-full flex items-center justify-center xl:justify-start gap-3.5 px-3 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-extrabold shadow-lg shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-95 group"
                             title="Create Post / Job / Reel"
                         >
                             <span className="material-symbols-outlined text-[24px] font-black">add_circle</span>
@@ -163,10 +164,10 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
             </div>
 
             {/* Bottom: Settings, More Options & User Identity */}
-            <div className="flex flex-col gap-2 relative" ref={moreMenuRef}>
+            <div className="flex flex-col gap-1.5 relative mt-auto pt-4 shrink-0" ref={moreMenuRef}>
                 {/* 'More' Options Popover (Instagram Style) */}
                 {isMoreOpen && (
-                    <div className="absolute bottom-full left-0 mb-3 w-56 rounded-2xl bg-[#141519] border border-white/10 shadow-2xl p-2 z-50 animate-in fade-in slide-in-from-bottom-2 duration-150">
+                    <div className="fixed md:left-20 xl:left-4 bottom-24 w-56 rounded-2xl bg-[#141519] border border-white/10 shadow-2xl p-2 z-50 animate-in fade-in slide-in-from-bottom-2 duration-150">
                         <button
                             onClick={() => { setIsMoreOpen(false); navigate('/settings'); }}
                             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-zinc-300 hover:text-white hover:bg-white/5 transition-colors"
@@ -209,6 +210,7 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                 {/* Settings Item */}
                 <button
                     onClick={() => navigate('/settings')}
+                    title="Settings"
                     className={`group flex items-center justify-center xl:justify-start gap-4 px-3 py-2.5 rounded-2xl transition-all ${
                         isActive('/settings')
                             ? 'bg-amber-500/10 text-amber-400 font-bold border border-amber-500/20'
@@ -225,6 +227,7 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                 {/* 'More' Menu Trigger */}
                 <button
                     onClick={() => setIsMoreOpen(!isMoreOpen)}
+                    title="More Options"
                     className="group flex items-center justify-center xl:justify-start gap-4 px-3 py-2.5 rounded-2xl text-zinc-400 hover:text-white hover:bg-white/[0.05] transition-all"
                 >
                     <span className="material-symbols-outlined text-[24px]">menu</span>
@@ -237,7 +240,8 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                 {/* User Card on expanded (xl) */}
                 <div
                     onClick={() => navigate('/profile')}
-                    className="hidden xl:flex items-center gap-3 p-2.5 mt-1 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-amber-500/30 transition-all cursor-pointer group"
+                    title="My Profile"
+                    className="hidden xl:flex items-center gap-3 p-2 mt-0.5 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-amber-500/30 transition-all cursor-pointer group"
                 >
                     <div className="size-9 rounded-full overflow-hidden border border-white/20 group-hover:border-amber-500 transition-colors shrink-0">
                         <PostMedia
@@ -258,5 +262,6 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                 </div>
             </div>
         </aside>
+
     );
 }
