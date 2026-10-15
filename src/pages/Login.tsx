@@ -567,7 +567,7 @@ export default function Login() {
                                                             <span>Privacy Policy</span>
                                                             <span className="material-symbols-outlined text-[10px]">open_in_new</span>
                                                         </Link>{' '}
-                                                        (Operated by 5M Collective Services Private Limited).
+                                                        (A property of 5M Collective Services Pvt. Ltd. / 5MC).
                                                     </span>
                                                     {termsError && (
                                                         <p className="text-[11px] text-amber-400 font-bold mt-1.5 flex items-center gap-1">
@@ -857,8 +857,8 @@ export default function Login() {
                                             Privacy Policy
                                         </Link>.
                                     </p>
-                                    <p className="text-[10px] text-zinc-600">
-                                        Operated by 5M Collective Services Private Limited • Hyderabad, India
+                                    <p className="text-[10px] text-zinc-500">
+                                        A property of 5M Collective Services Pvt. Ltd. (5MC) • Hyderabad, India
                                     </p>
                                 </div>
                             </div>
@@ -871,7 +871,7 @@ export default function Login() {
             <footer className="relative z-10 w-full border-t border-white/[0.06] bg-[#090A0C]/90 py-5 text-center text-xs text-zinc-500">
                 <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
                     <p className="text-[11px]">
-                        © 2026 iFilmDirectory. All rights reserved. Powered by 5M Collective.
+                        © 2026 iFilmDirectory. A property of 5M Collective Services Pvt. Ltd. (5MC). All rights reserved.
                     </p>
                     <div className="flex items-center gap-4 text-[11px]">
                         <Link to="/privacy" className="hover:text-zinc-300 transition-colors">Privacy</Link>

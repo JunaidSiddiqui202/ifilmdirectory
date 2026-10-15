@@ -204,6 +204,9 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                             <span className="material-symbols-outlined text-base">logout</span>
                             <span>Log Out</span>
                         </button>
+                        <div className="pt-2 pb-1 px-2 border-t border-white/5 text-center">
+                            <span className="text-[10px] text-zinc-500">Property of 5M Collective (5MC)</span>
+                        </div>
                     </div>
                 )}
 

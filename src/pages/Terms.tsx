@@ -126,7 +126,7 @@ export default function Terms() {
                         </div>
                         <div className="p-3.5 rounded-2xl bg-[#121316] border border-white/5">
                             <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Operated By</span>
-                            <p className="text-xs font-bold text-white mt-1 leading-snug">5M Collective Services Private Limited</p>
+                            <p className="text-xs font-bold text-white mt-1 leading-snug">5M Collective Services Private Limited (5MC)</p>
                         </div>
                         <div className="p-3.5 rounded-2xl bg-[#121316] border border-white/5">
                             <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Governing Law</span>
@@ -172,7 +172,7 @@ export default function Terms() {
                         INTRODUCTION AND ACCEPTANCE OF TERMS
                     </h2>
                     <p>
-                        <strong className="text-white">1.1.</strong> Welcome to iFilmDirectory ("iFilmDirectory", "Platform", "Website", "we", "us", or "our"), a digital film-industry networking, professional directory, content-sharing, recruitment, production resource and entertainment information platform operated by 5M Collective Services Private Limited ("Company").
+                        <strong className="text-white">1.1.</strong> Welcome to iFilmDirectory ("iFilmDirectory", "Platform", "Website", "we", "us", or "our"), a digital film-industry networking, professional directory, content-sharing, recruitment, production resource and entertainment information platform owned and operated by 5M Collective Services Private Limited ("Company" or "5MC").
                     </p>
                     <p>
                         <strong className="text-white">1.2.</strong> These Terms of Service ("Terms") govern your access to and use of the Platform, including its website, applications, professional profiles, feeds, forums, communication systems, film news, reviews, casting opportunities, project-management features, studio listings and related services.
@@ -676,7 +676,7 @@ export default function Terms() {
                             <span>Designated Grievance Officer</span>
                         </div>
                         <p className="text-white font-bold text-sm">Name: Junaid Siddiqui</p>
-                        <p className="text-xs text-zinc-300">Organisation: 5M Collective Services Private Limited</p>
+                        <p className="text-xs text-zinc-300">Organisation: 5M Collective Services Private Limited (5MC)</p>
                         <p className="text-xs text-zinc-300">Designation: Grievance Officer</p>
                         <p className="text-xs text-zinc-300">
                             Email: <a href="mailto:ifilmdirectory@gmail.com" className="text-amber-400 hover:underline">ifilmdirectory@gmail.com</a>
@@ -782,7 +782,7 @@ export default function Terms() {
                     </h2>
                     <div className="p-5 rounded-2xl bg-[#121316] border border-white/10 space-y-2">
                         <p className="text-base font-black text-white">iFilmDirectory</p>
-                        <p className="text-xs text-zinc-300">Operated by: <strong className="text-white">5M Collective Services Private Limited</strong></p>
+                        <p className="text-xs text-zinc-300">A property of: <strong className="text-white">5M Collective Services Private Limited (5MC)</strong></p>
                         <p className="text-xs text-zinc-300">
                             Website: <a href="https://ifilmdirectory.com" className="text-amber-400 hover:underline">https://ifilmdirectory.com</a>
                         </p>
@@ -840,7 +840,7 @@ export default function Terms() {
                                     className="mt-1 size-5 rounded border-white/20 bg-black/60 text-amber-500 focus:ring-amber-500 focus:ring-offset-0 cursor-pointer accent-amber-500 shrink-0"
                                 />
                                 <span className="text-xs sm:text-sm text-zinc-200 group-hover:text-white leading-snug">
-                                    I confirm that I have read, understood, and voluntarily accept all 31 sections of these Terms of Service (Dated October 15, 2026, Operated by 5M Collective Services Private Limited).
+                                    I confirm that I have read, understood, and voluntarily accept all 31 sections of these Terms of Service (Dated October 15, 2026, Owned & Operated by 5M Collective Services Pvt. Ltd. / 5MC).
                                 </span>
                             </label>
 

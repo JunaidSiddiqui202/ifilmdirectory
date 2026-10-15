@@ -938,7 +938,7 @@ export default function Home() {
                                     <span onClick={() => navigate('/blogs-events')} className="hover:text-zinc-300 cursor-pointer">Editorial</span>
                                     <span onClick={() => navigate('/booking-facilities')} className="hover:text-zinc-300 cursor-pointer">Facilities</span>
                                 </div>
-                                <p className="text-[11px] text-zinc-600">© 2026 iFilmDirectory. All rights reserved.</p>
+                                <p className="text-[11px] text-zinc-600">© 2026 iFilmDirectory. A property of 5M Collective Services Pvt. Ltd. (5MC). All rights reserved.</p>
                             </div>
                         </div>
                     </div>
@@ -973,7 +973,7 @@ export default function Home() {
                                 <span onClick={() => navigate('/blogs-events')} className="hover:text-zinc-300 cursor-pointer">Editorial</span>
                                 <span onClick={() => navigate('/booking-facilities')} className="hover:text-zinc-300 cursor-pointer">Facilities</span>
                             </div>
-                            <p>© 2026 iFilmDirectory. All rights reserved.</p>
+                            <p>© 2026 iFilmDirectory. A property of 5M Collective Services Pvt. Ltd. (5MC). All rights reserved.</p>
                         </div>
                     </div>
                 </div>

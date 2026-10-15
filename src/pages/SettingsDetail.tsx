@@ -226,6 +226,9 @@ export default function SettingsDetail() {
                         <p className="text-zinc-600 dark:text-zinc-300 max-w-xs">
                             The ultimate hub for film professionals to connect, collaborate, and create magic together.
                         </p>
+                        <p className="text-xs text-amber-500 font-semibold max-w-xs">
+                            A property of 5M Collective Services Pvt. Ltd. (5MC)
+                        </p>
                         <div className="mt-8 flex gap-4 text-sm text-zinc-500 dark:text-zinc-400">
                             <Link to="/terms" className="hover:text-primary">Terms of Service</Link>
                             <span>•</span>

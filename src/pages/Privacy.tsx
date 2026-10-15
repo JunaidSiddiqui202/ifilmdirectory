@@ -138,13 +138,13 @@ export default function Privacy() {
                     </h1>
 
                     <p className="text-zinc-400 text-sm sm:text-base max-w-3xl leading-relaxed mb-6">
-                        This Privacy Policy outlines how <strong>5M Collective Services Private Limited</strong> collects, uses, protects, and handles personal and professional data across the iFilmDirectory platform.
+                        This Privacy Policy outlines how <strong>5M Collective Services Private Limited (5MC)</strong> collects, uses, protects, and handles personal and professional data across the iFilmDirectory platform.
                     </p>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
                         <div className="p-3 rounded-xl bg-white/[0.03] border border-white/10">
-                            <span className="text-zinc-500 block text-[10px] uppercase font-bold tracking-wider">Operated By</span>
-                            <span className="text-white font-semibold mt-0.5 block">5M Collective Services Private Limited</span>
+                            <span className="text-zinc-500 block text-[10px] uppercase font-bold tracking-wider">A Property Of</span>
+                            <span className="text-white font-semibold mt-0.5 block">5M Collective Services Pvt. Ltd. (5MC)</span>
                         </div>
                         <div className="p-3 rounded-xl bg-white/[0.03] border border-white/10">
                             <span className="text-zinc-500 block text-[10px] uppercase font-bold tracking-wider">Effective & Updated</span>
@@ -202,7 +202,7 @@ export default function Privacy() {
                             <span className="text-amber-400">1.</span> Introduction
                         </h2>
                         <p><strong>1.1.</strong> iFilmDirectory (&quot;iFilmDirectory&quot;, &quot;Platform&quot;, &quot;Website&quot;, &quot;we&quot;, &quot;us&quot; or &quot;our&quot;) is a digital platform designed for film-industry professionals, production companies, artists, technicians, casting professionals, studios, equipment providers and members of the entertainment community.</p>
-                        <p><strong>1.2.</strong> The Platform is operated by 5M Collective Services Private Limited (&quot;Company&quot;), which determines the purposes and means of processing personal information collected through its services.</p>
+                        <p><strong>1.2.</strong> The Platform is a proprietary property owned and operated by 5M Collective Services Private Limited (&quot;Company&quot; or &quot;5MC&quot;), which determines the purposes and means of processing personal information collected through its services.</p>
                         <p><strong>1.3.</strong> This Privacy Policy explains how we collect, use, store, process, disclose, protect and delete personal information when individuals access or interact with iFilmDirectory.</p>
                         <p><strong>1.4.</strong> This Policy applies to users of our website, registered members, visitors, job applicants, recruiters, content contributors, service providers and other individuals whose personal information we process through the Platform.</p>
                         <p><strong>1.5.</strong> Our handling of personal information is subject to applicable Indian laws, including applicable provisions of the Information Technology Act, 2000, the Digital Personal Data Protection Act, 2023, and rules made under those laws as they come into force.</p>
@@ -502,7 +502,7 @@ export default function Privacy() {
                         </h2>
                         <p>For inquiries, privacy requests, or complaints relating to personal data processing:</p>
                         <div className="p-4 rounded-xl bg-black/40 border border-white/10 space-y-2 text-xs">
-                            <p><strong>Company:</strong> 5M Collective Services Private Limited</p>
+                            <p><strong>Company / Owner:</strong> 5M Collective Services Private Limited (5MC)</p>
                             <p><strong>Platform:</strong> iFilmDirectory</p>
                             <p><strong>Privacy Contact:</strong> <a href="mailto:ifilmdirectory@gmail.com" className="text-amber-400 underline font-semibold">ifilmdirectory@gmail.com</a></p>
                             <p><strong>Registered Correspondence Address:</strong> 105, First Floor, Sahiti Sri Vidya Petals, Street No. 1, Patrika Nagar, HITEC City, Hyderabad, Telangana 500081, India</p>
@@ -523,7 +523,7 @@ export default function Privacy() {
                         <h2 className="text-xl font-bold text-white flex items-center gap-2 border-b border-white/10 pb-3">
                             <span className="text-amber-400">21.</span> Final Notice
                         </h2>
-                        <p>iFilmDirectory is built to empower filmmakers, artists, technicians, and production companies to connect, collaborate, and create cinema. Users remain responsible for deciding what details they voluntarily publish. 5M Collective Services Private Limited assumes legal responsibility under applicable laws for its processing activities.</p>
+                        <p>iFilmDirectory is built to empower filmmakers, artists, technicians, and production companies to connect, collaborate, and create cinema. Users remain responsible for deciding what details they voluntarily publish. 5M Collective Services Private Limited (5MC) assumes legal responsibility under applicable laws for its processing activities as the platform owner and operator.</p>
                         <div className="pt-2 text-xs text-zinc-400">
                             <p><strong>Website:</strong> <a href="https://ifilmdirectory.com" className="text-amber-400 underline">https://ifilmdirectory.com</a></p>
                             <p><strong>Email:</strong> <a href="mailto:ifilmdirectory@gmail.com" className="text-amber-400 underline">ifilmdirectory@gmail.com</a></p>
@@ -550,7 +550,7 @@ export default function Privacy() {
                             </h3>
 
                             <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
-                                By acknowledging, you confirm you have reviewed how 5M Collective Services Private Limited collects, safeguards, and handles your information on iFilmDirectory.
+                                By acknowledging, you confirm you have reviewed how 5M Collective Services Private Limited (5MC) collects, safeguards, and handles your information on iFilmDirectory.
                             </p>
 
                             {hasAgreed && formattedAgreedDate && (
@@ -604,7 +604,7 @@ export default function Privacy() {
                         <Link to="/login" className="text-zinc-400 hover:text-white transition-colors">Sign In</Link>
                     </div>
                     <p className="text-[11px] text-zinc-600">
-                        © 2026 iFilmDirectory. Operated by 5M Collective Services Private Limited. All rights reserved.
+                        © 2026 iFilmDirectory. A property of 5M Collective Services Pvt. Ltd. (5MC). All rights reserved.
                     </p>
                 </div>
             </main>
