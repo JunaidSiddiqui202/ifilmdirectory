@@ -1,6 +1,6 @@
 import { initializeApp, type FirebaseApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, type Auth } from 'firebase/auth';
-import { initializeFirestore, type Firestore } from 'firebase/firestore';
+import { getFirestore, type Firestore } from 'firebase/firestore';
 import { getStorage, type FirebaseStorage } from 'firebase/storage';
 
 const firebaseConfig = {
@@ -33,10 +33,8 @@ console.log('[Firebase] App initialized successfully');
 export const auth: Auth = getAuth(app);
 console.log('[Firebase] Auth initialized successfully');
 
-export const db: Firestore = initializeFirestore(app, {
-    experimentalForceLongPolling: true,
-});
-console.log('[Firebase] Firestore initialized with long polling');
+export const db: Firestore = getFirestore(app);
+console.log('[Firebase] Firestore initialized successfully');
 
 export const storage: FirebaseStorage = getStorage(app);
 console.log('[Firebase] Storage initialized successfully');
