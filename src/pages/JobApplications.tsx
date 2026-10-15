@@ -26,6 +26,7 @@ export default function JobApplications() {
     const [applications, setApplications] = useState<Application[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedFilter, setSelectedFilter] = useState<string>('all');
+    const [activeStatusMenu, setActiveStatusMenu] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -34,14 +35,14 @@ export default function JobApplications() {
             // Fetch job details
             const fetchedJob = await jobService.getJobById(id);
             if (!fetchedJob) {
-                toast.error('Job not found');
+                toast.error('Casting call / Job not found');
                 navigate('/jobs');
                 return;
             }
 
             // Check if user is the owner
             if (fetchedJob.postedBy !== currentUser?.uid) {
-                toast.error('You can only view applications for your own job postings.');
+                toast.error('You can only view applications for your own postings.');
                 navigate('/jobs');
                 return;
             }
@@ -50,7 +51,7 @@ export default function JobApplications() {
 
             // Fetch applications
             const apps = await jobService.getApplicationsForJob(id) as Application[];
-            setApplications(apps);
+            setApplications(apps || []);
             setLoading(false);
         };
 
@@ -58,7 +59,7 @@ export default function JobApplications() {
     }, [id, currentUser, navigate]);
 
     const formatDate = (timestamp: any): string => {
-        if (!timestamp) return 'Unknown';
+        if (!timestamp) return 'Recently';
         const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
         return date.toLocaleDateString('en-IN', {
             day: 'numeric',
@@ -69,16 +70,30 @@ export default function JobApplications() {
         });
     };
 
-    const getStatusColor = (status: string): string => {
+    const getStatusBadge = (status: string) => {
         switch (status) {
-            case 'shortlisted': return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
-            case 'reviewed': return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400';
-            case 'rejected': return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
-            default: return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400';
+            case 'shortlisted':
+                return {
+                    bg: 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400',
+                    dot: 'bg-emerald-400'
+                };
+            case 'reviewed':
+                return {
+                    bg: 'bg-sky-500/15 border-sky-500/30 text-sky-400',
+                    dot: 'bg-sky-400'
+                };
+            case 'rejected':
+                return {
+                    bg: 'bg-rose-500/15 border-rose-500/30 text-rose-400',
+                    dot: 'bg-rose-400'
+                };
+            default:
+                return {
+                    bg: 'bg-amber-500/15 border-amber-500/30 text-amber-400',
+                    dot: 'bg-amber-400'
+                };
         }
     };
-
-    const [activeStatusMenu, setActiveStatusMenu] = useState<string | null>(null);
 
     const handleUpdateStatus = async (applicationId: string, newStatus: 'pending' | 'reviewed' | 'shortlisted' | 'rejected') => {
         try {
@@ -105,177 +120,262 @@ export default function JobApplications() {
 
     if (loading) {
         return (
-            <div className="flex min-h-[100dvh] items-center justify-center bg-background-light dark:bg-background-dark">
-                <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+            <div className="flex min-h-[100dvh] items-center justify-center bg-[#090A0C]">
+                <div className="h-10 w-10 animate-spin rounded-full border-4 border-amber-500 border-t-transparent"></div>
             </div>
         );
     }
 
     return (
-        <div className="relative flex min-h-[100dvh] w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden">
-            <div className="w-full max-w-md md:max-w-3xl lg:max-w-4xl mx-auto flex flex-col flex-1 pb-24">
-            {/* Header */}
-            <header className="sticky top-0 z-10 flex h-14 items-center justify-between border-b border-zinc-200 dark:border-white/10 bg-background-light/80 dark:bg-background-dark/80 px-4 backdrop-blur-sm">
-                <button
-                    onClick={() => navigate(-1)}
-                    className="flex size-10 items-center justify-center text-zinc-900 dark:text-white hover:opacity-70 transition-opacity"
-                >
-                    <span className="material-symbols-outlined text-2xl">arrow_back_ios_new</span>
-                </button>
-                <h1 className="flex-1 text-center text-lg font-bold leading-tight tracking-tight text-zinc-900 dark:text-white">
-                    Applications
-                </h1>
-                <div className="w-10" />
-            </header>
-
-            {/* Job Info Banner */}
-            <div className="bg-primary/10 dark:bg-primary/20 px-4 py-3 border-b border-primary/20">
-                <h2 className="font-bold text-zinc-900 dark:text-white">{job?.title}</h2>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400">{job?.company} • {applications.length} application{applications.length !== 1 ? 's' : ''}</p>
-            </div>
-
-            {/* Filter Tabs */}
-            <div className="flex gap-2 p-4 overflow-x-auto">
-                {['all', 'pending', 'reviewed', 'shortlisted', 'rejected'].map((filter) => (
+        <div className="relative flex min-h-[100dvh] w-full flex-col bg-[#090A0C] text-white overflow-x-hidden selection:bg-amber-500/30">
+            {/* Top Navigation */}
+            <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-white/[0.08] bg-[#090A0C]/90 px-4 md:px-8 backdrop-blur-md">
+                <div className="flex items-center gap-3">
                     <button
-                        key={filter}
-                        onClick={() => setSelectedFilter(filter)}
-                        className={`px-4 py-2 rounded-full text-sm font-medium capitalize whitespace-nowrap transition-colors ${selectedFilter === filter
-                            ? 'bg-primary text-white'
-                            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700'
-                            }`}
+                        onClick={() => navigate(-1)}
+                        className="flex size-10 items-center justify-center rounded-xl bg-white/[0.04] border border-white/[0.08] text-white hover:bg-white/[0.08] transition-all"
                     >
-                        {filter} {filter === 'all' ? `(${applications.length})` : `(${applications.filter(a => a.status === filter).length})`}
+                        <span className="material-symbols-outlined text-xl">arrow_back_ios_new</span>
                     </button>
-                ))}
-            </div>
-
-            {/* Applications List */}
-            <main className="flex-1 pb-24">
-                {filteredApplications.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-                        <span className="material-symbols-outlined text-5xl text-zinc-300 dark:text-zinc-600 mb-4">inbox</span>
-                        <h3 className="text-lg font-bold text-zinc-600 dark:text-zinc-400 mb-2">
-                            {selectedFilter === 'all' ? 'No applications yet' : `No ${selectedFilter} applications`}
-                        </h3>
-                        <p className="text-zinc-500 dark:text-zinc-500">
-                            {selectedFilter === 'all'
-                                ? 'Applications will appear here when candidates apply.'
-                                : `No applications with "${selectedFilter}" status.`}
+                    <div>
+                        <h1 className="text-lg md:text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                            <span>Candidate Applications</span>
+                            <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 font-medium">
+                                {applications.length} Received
+                            </span>
+                        </h1>
+                        <p className="text-xs text-zinc-400 truncate max-w-xs md:max-w-md">
+                            {job?.title} • {job?.company || 'Direct Production'}
                         </p>
                     </div>
-                ) : (
-                    <div className="divide-y divide-zinc-200 dark:divide-zinc-800">
-                        {filteredApplications.map((app) => (
-                            <div
-                                key={app.id}
-                                className="p-4 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
-                            >
-                                <div className="flex gap-3">
-                                    {/* Profile Photo */}
-                                    <img
-                                        src={app.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(app.name)}&background=random`}
-                                        alt={app.name}
-                                        className="w-12 h-12 rounded-full object-cover shrink-0 cursor-pointer border-2 border-zinc-200 dark:border-zinc-700"
-                                        onClick={() => navigate(`/profile/${app.applicantId}`)}
-                                    />
+                </div>
 
-                                    {/* Info */}
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-start justify-between gap-2 mb-1">
-                                            <div>
-                                                <h3
-                                                    className="font-bold text-zinc-900 dark:text-white cursor-pointer hover:text-primary transition-colors"
-                                                    onClick={() => navigate(`/profile/${app.applicantId}`)}
-                                                >
-                                                    {app.name}
-                                                </h3>
-                                                <p className="text-sm text-zinc-500 dark:text-zinc-400">{app.role || 'Professional'}</p>
+                <button
+                    onClick={() => navigate(`/job/${id}`)}
+                    className="hidden sm:flex items-center gap-2 text-xs font-semibold px-3.5 py-2 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-zinc-300 border border-white/[0.08] transition-all"
+                >
+                    <span className="material-symbols-outlined text-sm">visibility</span>
+                    View Job Listing
+                </button>
+            </header>
+
+            <div className="w-full max-w-6xl mx-auto flex flex-col flex-1 px-4 md:px-8 py-6 pb-28">
+                {/* Hero Job Banner */}
+                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#121316] via-[#17191e] to-[#121316] p-5 md:p-6 border border-white/[0.08] shadow-xl mb-6">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+                        <div className="space-y-1.5">
+                            <div className="flex items-center gap-2">
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/20">
+                                    <span className="material-symbols-outlined text-xs">movie</span>
+                                    {job?.type || (job as any)?.category || 'Film Production'}
+                                </span>
+                                {job?.location && (
+                                    <span className="text-xs text-zinc-400 flex items-center gap-1">
+                                        <span className="material-symbols-outlined text-xs">location_on</span>
+                                        {job.location}
+                                    </span>
+                                )}
+                            </div>
+                            <h2 className="text-xl md:text-2xl font-black text-white">{job?.title}</h2>
+                            <p className="text-sm text-zinc-400">
+                                Recruiter Desk • Manage auditions, shortlist talent, and reach out directly.
+                            </p>
+                        </div>
+
+                        {/* Quick Metrics */}
+                        <div className="flex items-center gap-3">
+                            <div className="px-4 py-2.5 rounded-xl bg-black/40 border border-white/[0.06] text-center min-w-[80px]">
+                                <div className="text-lg font-black text-amber-400">
+                                    {applications.filter(a => a.status === 'shortlisted').length}
+                                </div>
+                                <div className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Shortlisted</div>
+                            </div>
+                            <div className="px-4 py-2.5 rounded-xl bg-black/40 border border-white/[0.06] text-center min-w-[80px]">
+                                <div className="text-lg font-black text-sky-400">
+                                    {applications.filter(a => a.status === 'reviewed').length}
+                                </div>
+                                <div className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Reviewed</div>
+                            </div>
+                            <div className="px-4 py-2.5 rounded-xl bg-black/40 border border-white/[0.06] text-center min-w-[80px]">
+                                <div className="text-lg font-black text-zinc-200">
+                                    {applications.filter(a => a.status === 'pending').length}
+                                </div>
+                                <div className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Pending</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Filter Tabs */}
+                <div className="flex items-center gap-2 overflow-x-auto pb-2 mb-6 scrollbar-none">
+                    {(['all', 'shortlisted', 'reviewed', 'pending', 'rejected'] as const).map((filter) => {
+                        const count = filter === 'all'
+                            ? applications.length
+                            : applications.filter(a => a.status === filter).length;
+                        const isSelected = selectedFilter === filter;
+
+                        return (
+                            <button
+                                key={filter}
+                                onClick={() => setSelectedFilter(filter)}
+                                className={`px-4 py-2 rounded-xl text-xs font-semibold capitalize whitespace-nowrap transition-all flex items-center gap-2 border ${
+                                    isSelected
+                                        ? 'bg-amber-500 text-black border-amber-400 shadow-lg shadow-amber-500/20'
+                                        : 'bg-[#121316] text-zinc-400 border-white/[0.06] hover:text-white hover:border-white/20'
+                                }`}
+                            >
+                                <span>{filter}</span>
+                                <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
+                                    isSelected ? 'bg-black/20 text-black' : 'bg-white/[0.06] text-zinc-400'
+                                }`}>
+                                    {count}
+                                </span>
+                            </button>
+                        );
+                    })}
+                </div>
+
+                {/* Applications Grid */}
+                <main className="flex-1">
+                    {filteredApplications.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-20 px-4 text-center rounded-2xl bg-[#121316] border border-white/[0.06]">
+                            <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-4">
+                                <span className="material-symbols-outlined text-3xl text-amber-400">group_off</span>
+                            </div>
+                            <h3 className="text-lg font-bold text-white mb-1">
+                                {selectedFilter === 'all' ? 'No applications received yet' : `No ${selectedFilter} candidates`}
+                            </h3>
+                            <p className="text-sm text-zinc-400 max-w-sm">
+                                {selectedFilter === 'all'
+                                    ? 'Casting calls usually pick up traction within 24-48 hours of posting.'
+                                    : `Try changing your filter to view pending or shortlisted applicants.`}
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {filteredApplications.map((app) => {
+                                const badgeStyle = getStatusBadge(app.status);
+
+                                return (
+                                    <div
+                                        key={app.id}
+                                        className="rounded-2xl bg-[#121316] border border-white/[0.08] hover:border-amber-500/30 p-5 transition-all shadow-lg flex flex-col justify-between group"
+                                    >
+                                        <div>
+                                            {/* Candidate Header */}
+                                            <div className="flex items-start justify-between gap-3 mb-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="relative">
+                                                        <img
+                                                            src={app.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(app.name)}&background=1c1d22&color=f59e0b`}
+                                                            alt={app.name}
+                                                            className="w-13 h-13 rounded-2xl object-cover shrink-0 cursor-pointer border border-white/10 group-hover:border-amber-500/40 transition-colors shadow-md"
+                                                            onClick={() => navigate(`/profile/${app.applicantId}`)}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <h3
+                                                            className="font-bold text-white text-base cursor-pointer hover:text-amber-400 transition-colors flex items-center gap-1.5"
+                                                            onClick={() => navigate(`/profile/${app.applicantId}`)}
+                                                        >
+                                                            {app.name}
+                                                            <span className="material-symbols-outlined text-amber-400 text-sm">verified</span>
+                                                        </h3>
+                                                        <p className="text-xs text-zinc-400 font-medium">
+                                                            {app.role || 'Film Industry Professional'}
+                                                        </p>
+                                                        <p className="text-[11px] text-zinc-500 flex items-center gap-1 mt-0.5">
+                                                            <span className="material-symbols-outlined text-[12px]">schedule</span>
+                                                            {formatDate(app.appliedAt)}
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                {/* Status Selector Dropdown */}
+                                                <div className="relative">
+                                                    <button
+                                                        onClick={() => setActiveStatusMenu(activeStatusMenu === app.id ? null : app.id)}
+                                                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold capitalize flex items-center gap-1.5 border transition-all ${badgeStyle.bg}`}
+                                                    >
+                                                        <span className={`w-2 h-2 rounded-full ${badgeStyle.dot}`} />
+                                                        <span>{app.status}</span>
+                                                        <span className="material-symbols-outlined text-sm">expand_more</span>
+                                                    </button>
+
+                                                    {activeStatusMenu === app.id && (
+                                                        <div className="absolute right-0 top-full mt-2 w-44 bg-[#17191e] rounded-xl shadow-2xl border border-white/[0.12] z-30 p-1.5 backdrop-blur-xl">
+                                                            {(['pending', 'reviewed', 'shortlisted', 'rejected'] as const).map((status) => {
+                                                                const statusConfig = getStatusBadge(status);
+                                                                return (
+                                                                    <button
+                                                                        key={status}
+                                                                        onClick={() => handleUpdateStatus(app.id, status)}
+                                                                        className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold capitalize hover:bg-white/[0.08] flex items-center gap-2 transition-colors ${
+                                                                            app.status === status ? 'bg-white/[0.08] text-white' : 'text-zinc-300'
+                                                                        }`}
+                                                                    >
+                                                                        <span className={`w-2 h-2 rounded-full ${statusConfig.dot}`} />
+                                                                        {status}
+                                                                    </button>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
 
-                                            {/* Status Badge with Dropdown */}
-                                            <div className="relative">
-                                                <button
-                                                    onClick={() => setActiveStatusMenu(activeStatusMenu === app.id ? null : app.id)}
-                                                    className={`px-2 py-0.5 rounded-full text-xs font-medium capitalize flex items-center gap-1 ${getStatusColor(app.status)}`}
-                                                >
-                                                    {app.status}
-                                                    <span className="material-symbols-outlined text-xs">expand_more</span>
-                                                </button>
-
-                                                {/* Status Dropdown */}
-                                                {activeStatusMenu === app.id && (
-                                                    <div className="absolute right-0 top-full mt-1 w-36 bg-white dark:bg-zinc-800 rounded-lg shadow-xl border border-zinc-200 dark:border-zinc-700 z-20 overflow-hidden">
-                                                        {(['pending', 'reviewed', 'shortlisted', 'rejected'] as const).map((status) => (
-                                                            <button
-                                                                key={status}
-                                                                onClick={() => handleUpdateStatus(app.id, status)}
-                                                                className={`w-full text-left px-3 py-2 text-sm capitalize hover:bg-zinc-50 dark:hover:bg-zinc-700 flex items-center gap-2 ${app.status === status ? 'bg-zinc-100 dark:bg-zinc-700' : ''
-                                                                    }`}
-                                                            >
-                                                                <span className={`w-2 h-2 rounded-full ${status === 'shortlisted' ? 'bg-green-500' :
-                                                                    status === 'reviewed' ? 'bg-blue-500' :
-                                                                        status === 'rejected' ? 'bg-red-500' : 'bg-yellow-500'
-                                                                    }`} />
-                                                                {status}
-                                                            </button>
-                                                        ))}
+                                            {/* Pitch Message / Note */}
+                                            {app.message && (
+                                                <div className="bg-black/30 border border-white/[0.04] rounded-xl p-3.5 mb-4">
+                                                    <div className="text-[11px] font-semibold text-zinc-400 mb-1 flex items-center gap-1">
+                                                        <span className="material-symbols-outlined text-xs text-amber-400">format_quote</span>
+                                                        Applicant Pitch Note:
                                                     </div>
-                                                )}
+                                                    <p className="text-xs text-zinc-300 italic line-clamp-3 leading-relaxed">
+                                                        "{app.message}"
+                                                    </p>
+                                                </div>
+                                            )}
+
+                                            {/* Direct Contact Info */}
+                                            <div className="text-xs text-zinc-400 flex items-center gap-2 mb-4 px-1">
+                                                <span className="material-symbols-outlined text-sm text-zinc-500">mail</span>
+                                                <span className="font-mono text-[11px] text-zinc-300 truncate">{app.email}</span>
                                             </div>
                                         </div>
 
-                                        {/* Email */}
-                                        <a
-                                            href={`mailto:${app.email}`}
-                                            className="text-sm text-primary hover:underline flex items-center gap-1 mb-2"
-                                        >
-                                            <span className="material-symbols-outlined text-base">mail</span>
-                                            {app.email}
-                                        </a>
-
-                                        {/* Message */}
-                                        {app.message && (
-                                            <div className="bg-zinc-100 dark:bg-zinc-800 rounded-lg p-3 mb-2">
-                                                <p className="text-sm text-zinc-700 dark:text-zinc-300 italic">"{app.message}"</p>
-                                            </div>
-                                        )}
-
-                                        {/* Applied Date */}
-                                        <p className="text-xs text-zinc-400 dark:text-zinc-500">
-                                            Applied {formatDate(app.appliedAt)}
-                                        </p>
-
-                                        {/* Action Buttons */}
-                                        <div className="flex gap-2 mt-3">
+                                        {/* Action Bar */}
+                                        <div className="flex items-center gap-2 pt-3 border-t border-white/[0.06]">
                                             <button
                                                 onClick={() => navigate(`/profile/${app.applicantId}`)}
-                                                className="flex-1 py-2 px-3 rounded-lg bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors flex items-center justify-center gap-1"
+                                                className="flex-1 py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold transition-all shadow-md shadow-amber-500/10 flex items-center justify-center gap-1.5"
                                             >
-                                                <span className="material-symbols-outlined text-base">person</span>
+                                                <span className="material-symbols-outlined text-sm">person</span>
                                                 View Profile
                                             </button>
                                             <button
-                                                onClick={() => window.open(`mailto:${app.email}?subject=Regarding your application for ${job?.title}`)}
-                                                className="flex-1 py-2 px-3 rounded-lg bg-zinc-100 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-sm font-medium hover:bg-zinc-200 dark:hover:bg-zinc-600 transition-colors flex items-center justify-center gap-1"
+                                                onClick={() => navigate(`/messaging/${app.applicantId}`)}
+                                                className="py-2 px-3 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-zinc-200 border border-white/[0.08] text-xs font-semibold transition-all flex items-center justify-center gap-1.5"
+                                                title="Direct Message"
                                             >
-                                                <span className="material-symbols-outlined text-base">mail</span>
-                                                Contact
+                                                <span className="material-symbols-outlined text-sm text-amber-400">chat</span>
+                                                Chat
                                             </button>
                                             <button
-                                                onClick={() => navigate(`/messaging/${app.applicantId}`)}
-                                                className="py-2 px-3 rounded-lg bg-zinc-100 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-sm font-medium hover:bg-zinc-200 dark:hover:bg-zinc-600 transition-colors flex items-center justify-center"
+                                                onClick={() => window.open(`mailto:${app.email}?subject=Regarding your application for ${job?.title} on iFilm Directory`)}
+                                                className="py-2 px-3 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-zinc-200 border border-white/[0.08] text-xs font-semibold transition-all flex items-center justify-center"
+                                                title="Send Email"
                                             >
-                                                <span className="material-symbols-outlined text-base">chat</span>
+                                                <span className="material-symbols-outlined text-sm">mail</span>
                                             </button>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </main>
+                                );
+                            })}
+                        </div>
+                    )}
+                </main>
             </div>
 
             <BottomNav />

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
-import HamburgerMenu from '../components/HamburgerMenu';
+import PostMedia from '../components/PostMedia';
 import { uploadFile } from '../services/storageService';
 import { subscribeToMessages, sendMessage, clearChat, type Message as FirestoreMessage } from '../services/messagingService';
 import { useAuth } from '../context/AuthContext';
@@ -320,28 +320,44 @@ export default function Messaging() {
     };
 
     return (
-        <div className="relative flex h-auto min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden">
-            <div className="flex flex-col flex-1 pb-24 w-full max-w-md md:max-w-2xl mx-auto">
+        <div className="relative flex h-auto min-h-screen w-full flex-col bg-[#090A0C] text-white overflow-x-hidden">
+            <div className="flex flex-col flex-1 pb-28 w-full max-w-md md:max-w-3xl lg:max-w-4xl mx-auto">
                 {/* Top App Bar */}
-                <div className="sticky top-0 z-10 flex flex-col bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm">
-                    <div className="flex items-center p-4 justify-between">
-                        <div className="text-slate-900 dark:text-white flex size-12 shrink-0 items-center">
-                            <HamburgerMenu />
+                <div className="sticky top-0 z-30 flex flex-col bg-[#090A0C]/90 backdrop-blur-md border-b border-white/[0.08]">
+                    <div className="flex items-center px-4 py-3 justify-between gap-3">
+                        <div className="flex items-center gap-3 min-w-0">
+                            <button
+                                onClick={() => window.history.back()}
+                                className="flex size-9 items-center justify-center rounded-xl bg-white/[0.04] border border-white/[0.08] text-white hover:bg-white/[0.08] transition-all"
+                            >
+                                <span className="material-symbols-outlined text-lg">arrow_back_ios_new</span>
+                            </button>
+                            <div className="relative">
+                                <div className="size-10 rounded-full overflow-hidden border border-white/10 bg-black">
+                                    <PostMedia
+                                        src={otherUserProfile?.photoURL || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop'}
+                                        fallbackType="USER_MALE"
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+                                <span className="absolute bottom-0 right-0 size-2.5 rounded-full bg-emerald-400 border-2 border-[#090A0C]" />
+                            </div>
+                            <div className="min-w-0">
+                                <h2 className="text-white text-sm sm:text-base font-bold leading-tight truncate flex items-center gap-1.5">
+                                    <span>{chatName}</span>
+                                    {otherUserProfile?.verification?.isVerified && (
+                                        <span className="material-symbols-outlined text-amber-400 text-sm filled">
+                                            verified
+                                        </span>
+                                    )}
+                                </h2>
+                                <p className="text-[11px] text-zinc-400 truncate">
+                                    {otherUserProfile?.role || 'Verified Filmmaker'} • Online
+                                </p>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <h2 className="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] text-center">
-                                {chatName}
-                            </h2>
-                            {otherUserProfile?.verification?.isVerified && (
-                                <span
-                                    className="material-symbols-outlined text-blue-500 !text-lg"
-                                    style={{ fontVariationSettings: "'FILL' 1" }}
-                                >
-                                    verified
-                                </span>
-                            )}
-                        </div>
-                        <div className="flex w-12 items-center justify-end gap-2 relative">
+
+                        <div className="flex items-center gap-1.5 relative">
                             <button
                                 onClick={() => {
                                     if (allowCalls) {
@@ -350,54 +366,51 @@ export default function Messaging() {
                                         alert("You have disabled calls for this chat.");
                                     }
                                 }}
-                                className={`flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 w-10 bg-transparent gap-2 text-base font-bold leading-normal tracking-[0.015em] min-w-0 p-0 transition-colors ${allowCalls
-                                    ? 'text-slate-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-800'
-                                    : 'text-slate-400 dark:text-slate-600 cursor-not-allowed'
-                                    }`}
+                                className={`flex items-center justify-center rounded-xl size-9 border transition-all ${
+                                    allowCalls
+                                        ? 'bg-white/[0.05] border-white/[0.08] text-amber-400 hover:bg-amber-500/10 hover:border-amber-500/30'
+                                        : 'bg-white/[0.02] border-white/[0.04] text-zinc-600 cursor-not-allowed'
+                                }`}
+                                title="Call"
                             >
-                                <span className="material-symbols-outlined text-2xl">call</span>
+                                <span className="material-symbols-outlined text-lg">call</span>
                             </button>
 
                             <button
                                 onClick={() => setShowSettings(!showSettings)}
-                                className="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 w-10 bg-transparent text-slate-900 dark:text-white gap-2 text-base font-bold leading-normal tracking-[0.015em] min-w-0 p-0 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors"
+                                className="flex items-center justify-center rounded-xl size-9 bg-white/[0.05] border border-white/[0.08] text-zinc-300 hover:text-white hover:bg-white/[0.1] transition-all"
+                                title="Chat Options"
                             >
-                                <span className="material-symbols-outlined text-2xl">more_vert</span>
+                                <span className="material-symbols-outlined text-lg">more_vert</span>
                             </button>
 
                             {/* Chat Settings Dropdown */}
                             {showSettings && (
-                                <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-zinc-800 rounded-xl shadow-xl border border-gray-200 dark:border-zinc-700 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
-                                    <div className="p-2">
-                                        <button
-                                            onClick={() => {
-                                                setAllowCalls(!allowCalls);
+                                <div className="absolute top-full right-0 mt-2 w-48 bg-[#17191e] rounded-xl shadow-2xl border border-white/[0.12] overflow-hidden z-50 p-1.5 backdrop-blur-xl animate-in fade-in zoom-in-95">
+                                    <button
+                                        onClick={() => {
+                                            setAllowCalls(!allowCalls);
+                                            setShowSettings(false);
+                                        }}
+                                        className="flex items-center justify-between w-full px-3 py-2 text-xs font-semibold text-left hover:bg-white/[0.08] rounded-lg transition-colors text-zinc-200"
+                                    >
+                                        <span>Allow Calls</span>
+                                        <div className={`w-8 h-4 rounded-full relative transition-colors ${allowCalls ? 'bg-amber-500' : 'bg-zinc-700'}`}>
+                                            <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-transform ${allowCalls ? 'left-4.5' : 'left-0.5'}`} />
+                                        </div>
+                                    </button>
+                                    <button
+                                        onClick={async () => {
+                                            if (window.confirm('Clear all conversation history in this thread?')) {
+                                                await clearChat(chatId);
                                                 setShowSettings(false);
-                                            }}
-                                            className="flex items-center justify-between w-full px-3 py-2 text-sm text-left hover:bg-gray-100 dark:hover:bg-zinc-700 rounded-lg transition-colors"
-                                        >
-                                            <span className="text-zinc-900 dark:text-white">Allow Calls</span>
-                                            <div className={`w-8 h-4 rounded-full relative transition-colors ${allowCalls ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'}`}>
-                                                <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-transform ${allowCalls ? 'left-4.5' : 'left-0.5'}`} />
-                                            </div>
-                                        </button>
-                                        <button className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
-                                            <span className="material-symbols-outlined text-lg">block</span>
-                                            Block User
-                                        </button>
-                                        <button
-                                            onClick={async () => {
-                                                if (window.confirm('Are you sure you want to clear this chat? This cannot be undone.')) {
-                                                    await clearChat(chatId);
-                                                    setShowSettings(false);
-                                                }
-                                            }}
-                                            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                                        >
-                                            <span className="material-symbols-outlined text-lg">delete_sweep</span>
-                                            Clear Chat
-                                        </button>
-                                    </div>
+                                            }
+                                        }}
+                                        className="flex items-center gap-2 w-full px-3 py-2 text-xs font-semibold text-left text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
+                                    >
+                                        <span className="material-symbols-outlined text-base">delete_sweep</span>
+                                        Clear History
+                                    </button>
                                 </div>
                             )}
                         </div>
@@ -405,10 +418,10 @@ export default function Messaging() {
                 </div>
 
                 {/* Messages Container */}
-                <div className="flex-1 px-4 py-4 space-y-6 overflow-y-auto no-scrollbar min-h-0">
-                    <div className="text-center">
-                        <span className="text-xs text-slate-500 dark:text-[#cba990] bg-slate-200 dark:bg-[#493222] px-2 py-1 rounded-full">
-                            Today
+                <div className="flex-1 px-4 py-4 space-y-4 overflow-y-auto no-scrollbar min-h-0">
+                    <div className="text-center my-2">
+                        <span className="text-[11px] font-semibold text-zinc-400 bg-white/[0.05] border border-white/[0.08] px-3 py-1 rounded-full">
+                            Encrypted Production Comms
                         </span>
                     </div>
 
@@ -416,12 +429,12 @@ export default function Messaging() {
                         const isEmoji = isEmojiOnly(message.text);
                         return message.isSent ? (
                             <div key={message.id} className="flex items-start gap-2.5 justify-end">
-                                <div className="flex flex-col gap-1 w-full max-w-[320px] items-end">
-                                    <div className="flex flex-col leading-1.5 p-3 bg-primary rounded-l-xl rounded-br-xl">
+                                <div className="flex flex-col gap-1 w-full max-w-[340px] items-end">
+                                    <div className="flex flex-col leading-relaxed p-3.5 bg-gradient-to-r from-amber-500 to-amber-600 text-black font-semibold rounded-2xl rounded-tr-xs shadow-lg shadow-amber-500/10">
                                         {message.type === 'audio' ? (
                                             <div className="flex items-center gap-2 min-w-[200px]">
                                                 {failedAudioIds.has(message.id) ? (
-                                                    <div className="flex items-center gap-2 text-white/80 text-sm italic py-1">
+                                                    <div className="flex items-center gap-2 text-black/70 text-xs italic py-1">
                                                         <span className="material-symbols-outlined text-sm">error</span>
                                                         Audio expired
                                                     </div>
@@ -429,16 +442,63 @@ export default function Messaging() {
                                                     <>
                                                         <button
                                                             onClick={() => toggleMessageAudio(message.id, message.mediaUrl || '')}
-                                                            className="w-8 h-8 flex items-center justify-center bg-white/20 rounded-full hover:bg-white/30 transition-colors"
+                                                            className="w-8 h-8 flex items-center justify-center bg-black/20 rounded-full hover:bg-black/30 transition-colors"
+                                                        >
+                                                            <span className="material-symbols-outlined text-black">
+                                                                {playingMessageId === message.id ? 'pause' : 'play_arrow'}
+                                                            </span>
+                                                        </button>
+                                                        <div className="h-1 flex-1 bg-black/20 rounded-full overflow-hidden">
+                                                            <div className="h-full w-1/3 bg-black rounded-full" />
+                                                        </div>
+                                                        <span className="text-xs text-black font-mono">0:15</span>
+                                                        <audio
+                                                            id={`audio-${message.id}`}
+                                                            src={message.mediaUrl}
+                                                            className="hidden"
+                                                            onEnded={() => setPlayingMessageId(null)}
+                                                            onError={() => handleAudioError(message.id)}
+                                                        />
+                                                    </>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <p className={`${isEmoji ? 'text-4xl' : 'text-sm'} font-medium`}>{message.text}</p>
+                                        )}
+                                    </div>
+                                    <div className="flex items-center gap-1 text-[11px] text-zinc-500 font-medium px-1">
+                                        <span>{message.time}</span>
+                                        <span className="material-symbols-outlined text-[14px] text-amber-500">
+                                            {message.isRead ? 'done_all' : 'done'}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div key={message.id} className="flex items-start gap-2.5">
+                                <div className="flex flex-col gap-1 w-full max-w-[340px]">
+                                    <div className="flex flex-col leading-relaxed p-3.5 bg-[#14161a] border border-white/[0.08] text-white rounded-2xl rounded-tl-xs shadow-md">
+                                        {message.type === 'audio' ? (
+                                            <div className="flex items-center gap-2 min-w-[200px]">
+                                                {failedAudioIds.has(message.id) ? (
+                                                    <div className="flex items-center gap-2 text-zinc-400 text-xs italic py-1">
+                                                        <span className="material-symbols-outlined text-sm">error</span>
+                                                        Audio expired
+                                                    </div>
+                                                ) : (
+                                                    <>
+                                                        <button
+                                                            onClick={() => toggleMessageAudio(message.id, message.mediaUrl || '')}
+                                                            className="w-8 h-8 flex items-center justify-center bg-white/10 rounded-full hover:bg-white/20 transition-colors"
                                                         >
                                                             <span className="material-symbols-outlined text-white">
                                                                 {playingMessageId === message.id ? 'pause' : 'play_arrow'}
                                                             </span>
                                                         </button>
-                                                        <div className="h-1 flex-1 bg-white/30 rounded-full overflow-hidden">
-                                                            <div className="h-full w-1/3 bg-white rounded-full" />
+                                                        <div className="h-1 flex-1 bg-white/10 rounded-full overflow-hidden">
+                                                            <div className="h-full w-1/3 bg-amber-400 rounded-full" />
                                                         </div>
-                                                        <span className="text-xs text-white">0:15</span>
+                                                        <span className="text-xs text-zinc-400 font-mono">0:15</span>
                                                         <audio
                                                             id={`audio-${message.id}`}
                                                             src={message.mediaUrl}
@@ -450,127 +510,50 @@ export default function Messaging() {
                                                 )}
                                             </div>
                                         ) : (
-                                            <p className={`${isEmoji ? 'text-4xl' : 'text-sm'} font-normal text-white`}>{message.text}</p>
+                                            <p className={`${isEmoji ? 'text-4xl' : 'text-sm'} text-zinc-100 font-normal`}>{message.text}</p>
                                         )}
                                     </div>
-                                    <div className="flex items-center gap-1">
-                                        <span className="text-xs text-slate-500 dark:text-[#cba990]">{message.time}</span>
-                                        <span className="material-symbols-outlined !text-base text-blue-500">
-                                            {message.isRead ? 'done_all' : 'done'}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div
-                                    className="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-8 w-8 shrink-0"
-                                    style={{
-                                        backgroundImage:
-                                            'url(https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop)',
-                                    }}
-                                />
-                            </div>
-                        ) : (
-                            <div key={message.id} className="flex items-start gap-2.5">
-                                <div
-                                    className="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-8 w-8 shrink-0"
-                                    style={{
-                                        backgroundImage:
-                                            `url(${otherUserProfile?.photoURL || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop'})`,
-                                    }}
-                                />
-                                <div className="flex flex-col gap-1 w-full max-w-[320px]">
-                                    <div className="flex flex-col leading-1.5 p-3 border-slate-200 bg-slate-200 dark:bg-[#493222] rounded-r-xl rounded-bl-xl">
-                                        {message.type === 'audio' ? (
-                                            <div className="flex items-center gap-2 min-w-[200px]">
-                                                {failedAudioIds.has(message.id) ? (
-                                                    <div className="flex items-center gap-2 text-zinc-500 dark:text-zinc-400 text-sm italic py-1">
-                                                        <span className="material-symbols-outlined text-sm">error</span>
-                                                        Audio expired
-                                                    </div>
-                                                ) : (
-                                                    <>
-                                                        <button
-                                                            onClick={() => toggleMessageAudio(message.id, message.mediaUrl || '')}
-                                                            className="w-8 h-8 flex items-center justify-center bg-zinc-900/10 dark:bg-white/10 rounded-full hover:bg-zinc-900/20 dark:hover:bg-white/20 transition-colors"
-                                                        >
-                                                            <span className="material-symbols-outlined text-zinc-900 dark:text-white">
-                                                                {playingMessageId === message.id ? 'pause' : 'play_arrow'}
-                                                            </span>
-                                                        </button>
-                                                        <div className="h-1 flex-1 bg-zinc-900/10 dark:bg-white/10 rounded-full overflow-hidden">
-                                                            <div className="h-full w-1/3 bg-zinc-900 dark:bg-white rounded-full" />
-                                                        </div>
-                                                        <span className="text-xs text-zinc-500 dark:text-zinc-400">0:15</span>
-                                                        <audio
-                                                            id={`audio-${message.id}`}
-                                                            src={message.mediaUrl}
-                                                            className="hidden"
-                                                            onEnded={() => setPlayingMessageId(null)}
-                                                            onError={() => handleAudioError(message.id)}
-                                                        />
-                                                    </>
-                                                )}
-                                            </div>
-                                        ) : (
-                                            <p className={`${isEmoji ? 'text-4xl' : 'text-sm'} font-normal text-slate-900 dark:text-white`}>{message.text}</p>
-                                        )}
-                                    </div>
-                                    <span className="text-xs text-slate-500 dark:text-[#cba990]">{message.time}</span>
+                                    <span className="text-[11px] text-zinc-500 font-medium px-1">{message.time}</span>
                                 </div>
                             </div>
                         );
                     })}
 
                     <div ref={messagesEndRef} />
-
-                    <div className="flex items-center justify-center gap-2 py-2">
-                        <span className="material-symbols-outlined text-base text-slate-500 dark:text-[#cba990]">
-                            videocam_off
-                        </span>
-                        <span className="text-xs text-slate-500 dark:text-[#cba990]">
-                            {chatName} does not have video calls enabled
-                        </span>
-                    </div>
                 </div>
 
                 {/* Message Input Area */}
-                <div className="fixed bottom-24 z-10 left-1/2 -translate-x-1/2 w-full max-w-md md:max-w-2xl px-4">
+                <div className="fixed bottom-20 md:bottom-24 z-30 left-1/2 -translate-x-1/2 w-full max-w-md md:max-w-3xl lg:max-w-4xl px-4">
                     {showAttachments && (
-                        <div className="absolute bottom-full left-4 mb-2 flex flex-col gap-1 rounded-xl bg-white dark:bg-zinc-800 p-2 shadow-xl border border-gray-200 dark:border-zinc-700 animate-in slide-in-from-bottom-2 min-w-[200px] z-50">
+                        <div className="absolute bottom-full left-4 mb-2 flex flex-col gap-1 rounded-2xl bg-[#17191e] border border-white/[0.12] p-2 shadow-2xl animate-in slide-in-from-bottom-2 min-w-[210px] z-50">
                             <button
                                 onClick={() => {
                                     setShowEmojiPicker(true);
                                     setShowAttachments(false);
                                 }}
-                                className="flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-gray-100 dark:hover:bg-zinc-700 transition-colors text-left"
+                                className="flex items-center gap-3 rounded-xl px-3 py-2 text-xs font-semibold hover:bg-white/[0.08] transition-colors text-left text-zinc-200"
                             >
-                                <span className="material-symbols-outlined text-yellow-500">sentiment_satisfied</span>
-                                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Emoji</span>
+                                <span className="material-symbols-outlined text-amber-400 text-lg">sentiment_satisfied</span>
+                                <span>Add Emoji</span>
                             </button>
-                            <button className="flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-gray-100 dark:hover:bg-zinc-700 transition-colors text-left">
-                                <span className="material-symbols-outlined text-blue-500">image</span>
-                                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Photos & Videos</span>
+                            <button className="flex items-center gap-3 rounded-xl px-3 py-2 text-xs font-semibold hover:bg-white/[0.08] transition-colors text-left text-zinc-200">
+                                <span className="material-symbols-outlined text-sky-400 text-lg">image</span>
+                                <span>Stills & Clips</span>
                             </button>
-                            <button className="flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-gray-100 dark:hover:bg-zinc-700 transition-colors text-left">
-                                <span className="material-symbols-outlined text-purple-500">description</span>
-                                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Document</span>
-                            </button>
-                            <button className="flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-gray-100 dark:hover:bg-zinc-700 transition-colors text-left">
-                                <span className="material-symbols-outlined text-green-500">person</span>
-                                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Contact</span>
-                            </button>
-                            <button className="flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-gray-100 dark:hover:bg-zinc-700 transition-colors text-left">
-                                <span className="material-symbols-outlined text-red-500">location_on</span>
-                                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Location</span>
+                            <button className="flex items-center gap-3 rounded-xl px-3 py-2 text-xs font-semibold hover:bg-white/[0.08] transition-colors text-left text-zinc-200">
+                                <span className="material-symbols-outlined text-purple-400 text-lg">description</span>
+                                <span>Call Sheet / Script PDF</span>
                             </button>
                         </div>
                     )}
+
                     {showEmojiPicker && (
-                        <div className="absolute bottom-full right-4 mb-2 w-64 rounded-xl bg-white dark:bg-zinc-800 p-2 shadow-xl border border-gray-200 dark:border-zinc-700 animate-in slide-in-from-bottom-2 grid grid-cols-6 gap-1 h-64 overflow-y-auto custom-scrollbar z-50">
+                        <div className="absolute bottom-full right-4 mb-2 w-64 rounded-2xl bg-[#17191e] border border-white/[0.12] p-2.5 shadow-2xl animate-in slide-in-from-bottom-2 grid grid-cols-6 gap-1 h-60 overflow-y-auto scrollbar-none z-50">
                             {emojis.map((emoji, index) => (
                                 <button
                                     key={index}
                                     onClick={() => handleEmojiClick(emoji)}
-                                    className="flex items-center justify-center p-1 hover:bg-gray-100 dark:hover:bg-zinc-700 rounded text-xl transition-colors"
+                                    className="flex items-center justify-center p-1.5 hover:bg-white/[0.08] rounded-lg text-lg transition-colors"
                                 >
                                     {emoji}
                                 </button>
@@ -578,71 +561,62 @@ export default function Messaging() {
                         </div>
                     )}
 
-                    <div className="flex items-center gap-2 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm p-4 rounded-xl border border-slate-200/80 dark:border-slate-800/80 min-h-[72px]">
+                    <div className="flex items-center gap-2 bg-[#121316]/95 backdrop-blur-xl p-2 rounded-2xl border border-white/[0.1] shadow-2xl min-h-[58px]">
                         {isRecording ? (
-                            <div className="flex items-center w-full gap-4 animate-in fade-in slide-in-from-bottom-2">
+                            <div className="flex items-center w-full gap-3 animate-in fade-in px-2">
                                 <button
                                     onClick={cancelRecording}
-                                    className="p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500 transition-colors"
+                                    className="p-2 rounded-xl hover:bg-rose-500/20 text-rose-400 transition-colors"
                                 >
-                                    <span className="material-symbols-outlined">delete</span>
+                                    <span className="material-symbols-outlined text-lg">delete</span>
                                 </button>
-                                <div className="flex-1 flex items-center justify-center gap-3 bg-red-50 dark:bg-red-900/10 rounded-full px-4 py-2">
-                                    <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                                    <span className="font-mono font-medium text-red-500">{formatTime(recordingDuration)}</span>
+                                <div className="flex-1 flex items-center justify-center gap-3 bg-rose-500/10 border border-rose-500/20 rounded-xl px-4 py-1.5">
+                                    <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+                                    <span className="font-mono text-xs font-bold text-rose-400">{formatTime(recordingDuration)}</span>
                                     <div className="flex items-center gap-1 h-4 min-w-0">
                                         {waveform.map((height, i) => (
                                             <div
                                                 key={i}
-                                                className="w-1 bg-red-400 rounded-full transition-all duration-75 shrink-0"
-                                                style={{
-                                                    height: `${height}px`
-                                                }}
+                                                className="w-1 bg-rose-400 rounded-full transition-all duration-75 shrink-0"
+                                                style={{ height: `${height}px` }}
                                             />
                                         ))}
                                     </div>
                                 </div>
                                 <button
                                     onClick={stopRecording}
-                                    className="p-2 rounded-full bg-red-500 text-white hover:bg-red-600 shadow-lg shadow-red-500/30 transition-all"
+                                    className="p-2 rounded-xl bg-rose-500 text-white hover:bg-rose-400 shadow-md shadow-rose-500/30 transition-all"
                                 >
-                                    <span className="material-symbols-outlined">stop</span>
+                                    <span className="material-symbols-outlined text-lg">stop</span>
                                 </button>
                             </div>
                         ) : audioPreview ? (
-                            <div className="flex items-center w-full gap-4 animate-in fade-in slide-in-from-bottom-2">
+                            <div className="flex items-center w-full gap-3 animate-in fade-in px-2">
                                 <button
                                     onClick={cancelRecording}
-                                    className="p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500 transition-colors"
+                                    className="p-2 rounded-xl hover:bg-rose-500/20 text-rose-400 transition-colors"
                                 >
-                                    <span className="material-symbols-outlined">delete</span>
+                                    <span className="material-symbols-outlined text-lg">delete</span>
                                 </button>
-                                <div className="flex-1 flex items-center gap-3 bg-zinc-100 dark:bg-zinc-800 rounded-full px-4 py-2">
+                                <div className="flex-1 flex items-center gap-3 bg-black/40 border border-white/[0.08] rounded-xl px-3 py-1.5">
                                     <button
                                         onClick={togglePreviewAudio}
-                                        className="w-8 h-8 flex items-center justify-center bg-zinc-200 dark:bg-zinc-700 rounded-full hover:bg-zinc-300 dark:hover:bg-zinc-600 transition-colors"
+                                        className="w-7 h-7 flex items-center justify-center bg-white/10 rounded-full hover:bg-white/20 transition-colors"
                                     >
                                         <span className="material-symbols-outlined text-sm">
                                             {isPreviewPlaying ? 'pause' : 'play_arrow'}
                                         </span>
                                     </button>
-                                    <div className="h-1 flex-1 bg-zinc-300 dark:bg-zinc-600 rounded-full overflow-hidden">
-                                        <div className="h-full w-0 bg-primary rounded-full" />
+                                    <div className="h-1 flex-1 bg-white/10 rounded-full overflow-hidden">
+                                        <div className="h-full w-0 bg-amber-400 rounded-full" />
                                     </div>
-                                    <span className="text-xs font-mono text-zinc-500">{formatTime(recordingDuration)}</span>
-                                    <audio
-                                        key={audioPreview}
-                                        id="preview-audio"
-                                        src={audioPreview || ''}
-                                        className="hidden"
-                                        onEnded={() => setIsPreviewPlaying(false)}
-                                    />
+                                    <span className="text-[11px] font-mono text-zinc-400">{formatTime(recordingDuration)}</span>
                                 </div>
                                 <button
                                     onClick={sendAudioMessage}
-                                    className="p-2 rounded-full bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/30 transition-all"
+                                    className="p-2 rounded-xl bg-amber-500 text-black hover:bg-amber-400 shadow-md shadow-amber-500/25 transition-all"
                                 >
-                                    <span className="material-symbols-outlined">send</span>
+                                    <span className="material-symbols-outlined text-lg font-bold">send</span>
                                 </button>
                             </div>
                         ) : (
@@ -652,44 +626,46 @@ export default function Messaging() {
                                         setShowAttachments(!showAttachments);
                                         setShowEmojiPicker(false);
                                     }}
-                                    className={`flex items-center justify-center h-10 w-10 shrink-0 transition-colors ${showAttachments ? 'text-primary rotate-45' : 'text-slate-500 dark:text-[#cba990] hover:text-primary'}`}
+                                    className={`flex items-center justify-center h-9 w-9 rounded-xl transition-all ${showAttachments ? 'bg-amber-500 text-black' : 'text-zinc-400 hover:text-white hover:bg-white/[0.06]'}`}
+                                    title="Add Attachment"
                                 >
-                                    <span className="material-symbols-outlined text-2xl transition-transform duration-200">add_circle</span>
+                                    <span className="material-symbols-outlined text-xl">add</span>
                                 </button>
-                                <label className="flex flex-col min-w-40 h-10 w-full">
-                                    <div className="flex w-full flex-1 items-center rounded-full h-full bg-slate-200 dark:bg-[#493222] px-4">
-                                        <input
-                                            className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-full text-slate-900 dark:text-white focus:outline-0 focus:ring-0 border-none bg-transparent focus:border-none h-full placeholder:text-slate-500 dark:placeholder:text-[#cba990] text-base font-normal leading-normal p-0"
-                                            placeholder="Type a message..."
-                                            value={messageText}
-                                            onChange={(e) => setMessageText(e.target.value)}
-                                            onKeyPress={handleKeyPress}
-                                        />
-                                        <button
-                                            onClick={() => {
-                                                setShowEmojiPicker(!showEmojiPicker);
-                                                setShowAttachments(false);
-                                            }}
-                                            className={`flex items-center justify-center h-8 w-8 shrink-0 ml-2 transition-colors ${showEmojiPicker ? 'text-primary' : 'text-slate-500 dark:text-[#cba990] hover:text-primary'}`}
-                                        >
-                                            <span className="material-symbols-outlined text-xl">sentiment_satisfied</span>
-                                        </button>
-                                    </div>
-                                </label>
+
+                                <input
+                                    className="flex w-full min-w-0 flex-1 bg-transparent border-none text-white focus:outline-none placeholder:text-zinc-500 text-xs sm:text-sm px-2"
+                                    placeholder="Discuss shoot dates, equipment, or scenes..."
+                                    value={messageText}
+                                    onChange={(e) => setMessageText(e.target.value)}
+                                    onKeyPress={handleKeyPress}
+                                />
+
+                                <button
+                                    onClick={() => {
+                                        setShowEmojiPicker(!showEmojiPicker);
+                                        setShowAttachments(false);
+                                    }}
+                                    className={`flex items-center justify-center h-9 w-9 rounded-xl transition-all ${showEmojiPicker ? 'text-amber-400' : 'text-zinc-400 hover:text-white'}`}
+                                    title="Emoji"
+                                >
+                                    <span className="material-symbols-outlined text-xl">sentiment_satisfied</span>
+                                </button>
 
                                 {messageText.trim() ? (
                                     <button
                                         onClick={handleSendMessage}
-                                        className="flex items-center justify-center h-10 w-10 shrink-0 text-primary hover:scale-110 transition-transform"
+                                        className="flex items-center justify-center h-9 w-9 rounded-xl bg-amber-500 text-black hover:bg-amber-400 shadow-md shadow-amber-500/20 active:scale-95 transition-all"
+                                        title="Send"
                                     >
-                                        <span className="material-symbols-outlined text-2xl">send</span>
+                                        <span className="material-symbols-outlined text-base font-bold">send</span>
                                     </button>
                                 ) : (
                                     <button
                                         onClick={startRecording}
-                                        className="flex items-center justify-center h-10 w-10 shrink-0 text-slate-500 dark:text-[#cba990] hover:text-primary transition-colors"
+                                        className="flex items-center justify-center h-9 w-9 rounded-xl text-zinc-400 hover:text-amber-400 hover:bg-white/[0.06] transition-colors"
+                                        title="Record Voice Note"
                                     >
-                                        <span className="material-symbols-outlined text-2xl">mic</span>
+                                        <span className="material-symbols-outlined text-xl">mic</span>
                                     </button>
                                 )}
                             </>

@@ -132,318 +132,307 @@ export default function JobDetails() {
 
     const isOwnJob = currentUser?.uid === job.postedBy;
 
+    const renderVerificationBadge = (tier?: 'gold' | 'blue' | 'gray') => {
+        if (tier === 'gold') return <span title="Verified Studio / Production House" className="material-symbols-outlined text-amber-400 text-sm ml-0.5 select-none filled" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>;
+        if (tier === 'blue') return <span title="Verified Recruiter / Director" className="material-symbols-outlined text-sky-400 text-sm ml-0.5 select-none filled" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>;
+        return null;
+    };
+
     return (
-        <div className="relative flex min-h-[100dvh] w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden">
-            <div className="w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto flex flex-col flex-1 pb-24">
-            {/* Header */}
-            <header className="sticky top-0 z-10 flex h-14 items-center justify-between border-b border-zinc-200 dark:border-white/10 bg-background-light/80 dark:bg-background-dark/80 px-4 backdrop-blur-sm">
-                <button
-                    onClick={() => navigate(-1)}
-                    className="flex size-10 items-center justify-center text-zinc-900 dark:text-white hover:opacity-70 transition-opacity"
-                >
-                    <span className="material-symbols-outlined text-2xl">arrow_back_ios_new</span>
-                </button>
-                <h1 className="flex-1 text-center text-lg font-bold leading-tight tracking-tight text-zinc-900 dark:text-white">
-                    Job Details
-                </h1>
-                <button
-                    onClick={handleBookmark}
-                    className="flex size-10 items-center justify-center text-zinc-900 dark:text-white hover:scale-110 transition-transform"
-                >
-                    <span
-                        className={`material-symbols-outlined text-2xl ${isBookmarked ? 'filled text-primary' : ''
-                            }`}
+        <div className="relative flex min-h-[100dvh] w-full flex-col bg-[#090A0C] text-white pb-36 md:pb-28 overflow-x-hidden font-display transition-colors">
+            <div className="w-full max-w-4xl mx-auto flex flex-col flex-1 px-4 sm:px-6">
+                {/* Cinema Top Header */}
+                <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-white/[0.06] bg-[#090A0C]/90 -mx-4 sm:-mx-6 px-4 sm:px-6 backdrop-blur-2xl">
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="flex size-10 items-center justify-center rounded-xl bg-white/[0.04] text-zinc-300 hover:text-white hover:bg-white/10 transition-colors"
+                        title="Back"
                     >
-                        {isBookmarked ? 'bookmark' : 'bookmark_border'}
-                    </span>
-                </button>
-            </header>
-
-            {/* Main Content */}
-            <main className="flex-1 pb-60 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both">
-                {/* Hero Title Section */}
-                <section className="relative px-4 pt-8 pb-6 bg-gradient-to-b from-primary/5 to-transparent">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="size-16 shrink-0 rounded-2xl border-2 border-white dark:border-zinc-800 shadow-md bg-white overflow-hidden">
-                            <PostMedia src={job.logo || ''} fallbackType="COMPANY_LOGO" className="w-full h-full" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                            <button
-                                onClick={() => navigate(`/profile/${job.postedBy}`)}
-                                className="text-primary text-sm font-bold uppercase tracking-wider hover:opacity-80 transition-all flex items-center gap-1"
-                            >
-                                {job.company}
-                                {job.user_details?.verification_tier === 'gold' && <span title="Verified Production House">🥇</span>}
-                                {job.user_details?.verification_tier === 'blue' && <span title="Verified Professional">🔵</span>}
-                            </button>
-                            <h2 className="text-[28px] font-black leading-tight tracking-tight text-zinc-900 dark:text-white break-words">
-                                {job.title}
-                            </h2>
-                        </div>
+                        <span className="material-symbols-outlined text-xl">arrow_back</span>
+                    </button>
+                    <h1 className="flex-1 text-center text-sm sm:text-base font-black tracking-tight text-white uppercase truncate px-3">
+                        Call Details
+                    </h1>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={handleBookmark}
+                            className={`flex size-10 items-center justify-center rounded-xl border transition-all ${
+                                isBookmarked
+                                    ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                                    : 'bg-white/[0.04] text-zinc-400 border-white/5 hover:text-white'
+                            }`}
+                            title={isBookmarked ? "Saved to Bookmarks" : "Save Job"}
+                        >
+                            <span className="material-symbols-outlined text-xl" style={isBookmarked ? { fontVariationSettings: "'FILL' 1" } : undefined}>
+                                {isBookmarked ? 'bookmark' : 'bookmark_border'}
+                            </span>
+                        </button>
                     </div>
+                </header>
 
-                    {/* Quick Metadata Bar */}
-                    <div className="flex flex-wrap gap-2 pt-2">
-                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-white/10 border border-zinc-200 dark:border-white/5">
-                            <span className="material-symbols-outlined text-sm text-primary">location_on</span>
-                            <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">{job.location}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-white/10 border border-zinc-200 dark:border-white/5">
-                            <span className="material-symbols-outlined text-sm text-primary">work</span>
-                            <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">{job.type}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-white/10 border border-zinc-200 dark:border-white/5">
-                            <span className="material-symbols-outlined text-sm text-primary">payments</span>
-                            <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">{job.salary}</span>
-                        </div>
-                    </div>
-                </section>
+                {/* Main Content */}
+                <main className="flex-1 pt-6 pb-20 space-y-6">
+                    {/* Hero Title Section */}
+                    <section className="relative p-6 sm:p-8 rounded-3xl bg-[#121316] border border-white/[0.08] shadow-xl overflow-hidden">
+                        <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
-                {/* Deadline & Post Info */}
-                <section className="px-4 py-4 flex items-center justify-between border-y border-zinc-100 dark:border-zinc-800/50 bg-zinc-50/50 dark:bg-white/[0.02]">
-                    <div className="flex flex-col">
-                        <span className="text-[10px] font-black uppercase text-zinc-400 dark:text-zinc-500 tracking-widest">Posted On</span>
-                        <span className="text-sm font-bold text-zinc-900 dark:text-white">
-                            {job.postedAt?.toDate ? job.postedAt.toDate().toLocaleDateString() : 'Recently'}
-                        </span>
-                    </div>
-                    <div className="flex flex-col text-right">
-                        <span className="text-[10px] font-black uppercase text-red-400 tracking-widest">Deadline</span>
-                        <span className="text-sm font-bold text-red-600 dark:text-red-400">
-                            {job.deadline}
-                        </span>
-                    </div>
-                </section>
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-5 relative z-10">
+                            <div className="size-20 shrink-0 rounded-2xl border-2 border-white/10 shadow-2xl bg-black overflow-hidden">
+                                <PostMedia src={job.logo || ''} fallbackType="COMPANY_LOGO" className="w-full h-full object-cover" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <button
+                                    onClick={() => navigate(`/profile/${job.postedBy}`)}
+                                    className="text-amber-400 text-xs font-bold uppercase tracking-wider hover:underline flex items-center gap-1.5 mb-1.5"
+                                >
+                                    <span>{job.company}</span>
+                                    {renderVerificationBadge(job.user_details?.verification_tier)}
+                                </button>
+                                <h2 className="text-2xl sm:text-3xl font-black leading-tight tracking-tight text-white break-words">
+                                    {job.title}
+                                </h2>
+                            </div>
+                        </div>
 
-                {/* Audition Specific Details */}
-                {job.type === 'Audition' && (
-                    <section className="m-4 p-5 bg-primary/5 dark:bg-white/[0.03] rounded-2xl border border-primary/10 dark:border-white/5">
-                        <h3 className="text-xs font-black text-primary uppercase tracking-[0.2em] mb-4">Audition Requirements</h3>
-                        <div className="grid grid-cols-2 gap-y-5 gap-x-4">
-                            {job.gender && (
-                                <div className="space-y-0.5">
-                                    <p className="text-[10px] font-black uppercase text-zinc-400 tracking-widest">Gender</p>
-                                    <p className="text-sm text-zinc-900 dark:text-white font-bold">{job.gender}</p>
+                        {/* Metadata Badges */}
+                        <div className="flex flex-wrap items-center gap-2.5 pt-6 mt-6 border-t border-white/[0.06] relative z-10">
+                            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/10 text-xs text-zinc-300">
+                                <span className="material-symbols-outlined text-sm text-amber-400">location_on</span>
+                                <span className="font-semibold">{job.location || 'India'}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 text-amber-300 border border-amber-500/20 text-xs font-bold">
+                                <span className="material-symbols-outlined text-sm">work</span>
+                                <span>{job.type}</span>
+                            </div>
+                            {job.salary && (
+                                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-bold">
+                                    <span className="material-symbols-outlined text-sm">payments</span>
+                                    <span>₹ {job.salary}</span>
                                 </div>
                             )}
-                            {job.ageRange && (
-                                <div className="space-y-0.5">
-                                    <p className="text-[10px] font-black uppercase text-zinc-400 tracking-widest">Age Range</p>
-                                    <p className="text-sm text-zinc-900 dark:text-white font-bold">{job.ageRange}</p>
-                                </div>
-                            )}
-                            {job.shootDate && (
-                                <div className="space-y-0.5">
-                                    <p className="text-[10px] font-black uppercase text-zinc-400 tracking-widest">Shoot Date</p>
-                                    <p className="text-sm text-zinc-900 dark:text-white font-bold">{new Date(job.shootDate).toLocaleDateString()}</p>
-                                </div>
-                            )}
-                            {job.daysRequired && (
-                                <div className="space-y-0.5">
-                                    <p className="text-[10px] font-black uppercase text-zinc-400 tracking-widest">Duration</p>
-                                    <p className="text-sm text-zinc-900 dark:text-white font-bold">{job.daysRequired}</p>
+                            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/10 text-xs text-zinc-400">
+                                <span className="material-symbols-outlined text-sm">schedule</span>
+                                <span>Posted {job.postedAt?.toDate ? job.postedAt.toDate().toLocaleDateString() : 'Recently'}</span>
+                            </div>
+                            {job.deadline && (
+                                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 text-xs font-bold ml-auto">
+                                    <span className="material-symbols-outlined text-sm">event_busy</span>
+                                    <span>Deadline: {job.deadline}</span>
                                 </div>
                             )}
                         </div>
                     </section>
-                )}
 
-                {/* Reference Media */}
-                {job.videoUrl && (
-                    <section className="px-4 py-6">
-                        <h3 className="text-xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.2em] mb-3">Reference Video</h3>
-                        <div className="rounded-2xl overflow-hidden bg-black aspect-video shadow-lg ring-1 ring-white/10">
-                            <video src={job.videoUrl} controls className="w-full h-full object-contain" />
-                        </div>
-                    </section>
-                )}
+                    {/* Audition Specific Details */}
+                    {job.type === 'Audition' && (
+                        <section className="p-6 bg-[#121316] rounded-3xl border border-white/[0.06] shadow-lg">
+                            <h3 className="text-xs font-black text-amber-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                <span className="material-symbols-outlined text-sm">theater_comedy</span>
+                                <span>Casting & Character Specs</span>
+                            </h3>
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                {job.gender && (
+                                    <div className="p-3 rounded-2xl bg-white/[0.02] border border-white/5">
+                                        <p className="text-[10px] font-bold uppercase text-zinc-500 tracking-wider">Gender</p>
+                                        <p className="text-sm text-white font-bold mt-1">{job.gender}</p>
+                                    </div>
+                                )}
+                                {job.ageRange && (
+                                    <div className="p-3 rounded-2xl bg-white/[0.02] border border-white/5">
+                                        <p className="text-[10px] font-bold uppercase text-zinc-500 tracking-wider">Age Window</p>
+                                        <p className="text-sm text-white font-bold mt-1">{job.ageRange}</p>
+                                    </div>
+                                )}
+                                {job.shootDate && (
+                                    <div className="p-3 rounded-2xl bg-white/[0.02] border border-white/5">
+                                        <p className="text-[10px] font-bold uppercase text-zinc-500 tracking-wider">Tentative Shoot</p>
+                                        <p className="text-sm text-white font-bold mt-1">{new Date(job.shootDate).toLocaleDateString()}</p>
+                                    </div>
+                                )}
+                                {job.daysRequired && (
+                                    <div className="p-3 rounded-2xl bg-white/[0.02] border border-white/5">
+                                        <p className="text-[10px] font-bold uppercase text-zinc-500 tracking-wider">Shoot Schedule</p>
+                                        <p className="text-sm text-white font-bold mt-1">{job.daysRequired}</p>
+                                    </div>
+                                )}
+                            </div>
+                        </section>
+                    )}
 
-                {/* External Links */}
-                {job.externalLinks && (job.externalLinks.imdb || job.externalLinks.wiki) && (
-                    <section className="px-4 py-2 flex gap-3">
-                        {job.externalLinks.imdb && (
-                            <a href={job.externalLinks.imdb} target="_blank" rel="noopener noreferrer"
-                                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#f5c518] text-black font-black rounded-xl text-xs uppercase tracking-wider hover:scale-[1.02] transition-transform">
-                                <span className="material-symbols-outlined text-lg">movie</span>
-                                IMDb
-                            </a>
-                        )}
-                        {job.externalLinks.wiki && (
-                            <a href={job.externalLinks.wiki} target="_blank" rel="noopener noreferrer"
-                                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-white font-black rounded-xl text-xs uppercase tracking-wider hover:scale-[1.02] transition-transform">
-                                <span className="material-symbols-outlined text-lg">public</span>
-                                Wikipedia
-                            </a>
-                        )}
-                    </section>
-                )}
+                    {/* Reference Media */}
+                    {job.videoUrl && (
+                        <section className="p-6 bg-[#121316] rounded-3xl border border-white/[0.06] shadow-lg">
+                            <h3 className="text-xs font-black text-zinc-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                                <span className="material-symbols-outlined text-sm text-amber-400">play_circle</span>
+                                <span>Reference Mood Reel / Character Pitch</span>
+                            </h3>
+                            <div className="rounded-2xl overflow-hidden bg-black aspect-video shadow-2xl border border-white/10">
+                                <video src={job.videoUrl} controls className="w-full h-full object-contain" />
+                            </div>
+                        </section>
+                    )}
 
-                {/* Main Content Sections */}
-                <div className="px-4 pt-8 space-y-10">
-                    <section>
-                        <h3 className="text-[22px] font-black text-zinc-900 dark:text-white mb-4">Role Description</h3>
-                        <p className="text-[15px] font-medium leading-relaxed text-zinc-600 dark:text-zinc-400 whitespace-pre-wrap">
+                    {/* Role Description */}
+                    <section className="p-6 sm:p-8 bg-[#121316] rounded-3xl border border-white/[0.06] shadow-lg space-y-4">
+                        <h3 className="text-lg font-black text-white flex items-center gap-2">
+                            <span className="material-symbols-outlined text-amber-400 text-xl">description</span>
+                            <span>Opportunity Overview</span>
+                        </h3>
+                        <p className="text-sm leading-relaxed text-zinc-300 whitespace-pre-wrap font-normal">
                             {job.description}
                         </p>
                     </section>
 
-                    <section>
-                        <h3 className="text-[22px] font-black text-zinc-900 dark:text-white mb-4">Requirements</h3>
-                        <p className="text-[15px] font-medium leading-relaxed text-zinc-600 dark:text-zinc-400 whitespace-pre-wrap">
-                            {job.requirements}
-                        </p>
-                    </section>
-                    {/* Posted By */}
-                    <section className="px-4 pt-8">
-                        <div className="rounded-xl border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-white/5 p-4">
-                            <h3 className="text-xl font-bold text-zinc-900 dark:text-white">Posted By</h3>
-                            <div className="flex items-center gap-4 pt-4">
-                                <div className="size-14 shrink-0 rounded-full border-2 border-primary overflow-hidden">
-                                    <PostMedia src={job.logo || ''} fallbackType="COMPANY_LOGO" className="w-full h-full" />
+                    {/* Requirements */}
+                    {job.requirements && (
+                        <section className="p-6 sm:p-8 bg-[#121316] rounded-3xl border border-white/[0.06] shadow-lg space-y-4">
+                            <h3 className="text-lg font-black text-white flex items-center gap-2">
+                                <span className="material-symbols-outlined text-amber-400 text-xl">checklist</span>
+                                <span>Candidate Requirements & Skills</span>
+                            </h3>
+                            <p className="text-sm leading-relaxed text-zinc-300 whitespace-pre-wrap font-normal">
+                                {job.requirements}
+                            </p>
+                        </section>
+                    )}
+
+                    {/* Posted By Card */}
+                    <section className="p-6 bg-[#121316] rounded-3xl border border-white/[0.06] shadow-lg">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div className="flex items-center gap-4">
+                                <div className="size-14 shrink-0 rounded-2xl border border-white/10 overflow-hidden bg-black">
+                                    <PostMedia src={job.logo || ''} fallbackType="COMPANY_LOGO" className="w-full h-full object-cover" />
                                 </div>
-                                <div className="flex-1">
-                                    <p className="text-lg font-bold text-zinc-900 dark:text-white flex items-center gap-1">
-                                        {job.company}
-                                        {job.user_details?.verification_tier === 'gold' && <span title="Verified Production House">🥇</span>}
-                                        {job.user_details?.verification_tier === 'blue' && <span title="Verified Professional">🔵</span>}
+                                <div>
+                                    <p className="text-xs font-bold uppercase tracking-wider text-zinc-500">Recruiter / Production</p>
+                                    <p className="text-base font-extrabold text-white flex items-center gap-1.5 mt-0.5">
+                                        <span>{job.company}</span>
+                                        {renderVerificationBadge(job.user_details?.verification_tier)}
                                     </p>
                                 </div>
-                                <button
-                                    onClick={() => navigate(`/profile/${job.postedBy}`)}
-                                    className="flex h-10 shrink-0 items-center justify-center rounded-lg bg-primary/20 px-4 text-sm font-bold text-primary hover:bg-primary/30 transition-colors"
-                                >
-                                    View Profile
-                                </button>
                             </div>
+                            <button
+                                onClick={() => navigate(`/profile/${job.postedBy}`)}
+                                className="px-5 py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/10 text-white text-xs font-bold border border-white/10 transition-all self-start sm:self-auto"
+                            >
+                                View Creator Profile
+                            </button>
                         </div>
                     </section>
+                </main>
+
+                {/* Fixed Bottom Action Drawer */}
+                <div className="fixed bottom-0 left-0 z-30 w-full bg-[#090A0C]/95 backdrop-blur-xl border-t border-white/[0.08] p-4">
+                    <div className="max-w-4xl mx-auto flex items-center gap-3">
+                        {isOwnJob ? (
+                            <button
+                                onClick={() => navigate(`/job/${job.id}/applications`)}
+                                className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-amber-500 hover:bg-amber-400 text-black text-sm font-black shadow-lg shadow-amber-500/20 transition-all active:scale-95"
+                            >
+                                <span className="material-symbols-outlined">group</span>
+                                <span>Review Applications ({(job as any).applicationsCount || 0})</span>
+                            </button>
+                        ) : hasApplied ? (
+                            <div className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-sm font-extrabold">
+                                <span className="material-symbols-outlined text-lg">check_circle</span>
+                                <span>Application Submitted</span>
+                            </div>
+                        ) : (
+                            <button
+                                onClick={handleApply}
+                                className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black text-sm font-black shadow-xl shadow-amber-500/20 transition-all active:scale-95"
+                            >
+                                <span className="material-symbols-outlined text-lg">send</span>
+                                <span>Apply with iFilm Profile</span>
+                            </button>
+                        )}
+                    </div>
                 </div>
-            </main>
 
-            {/* Footer with Apply Button */}
-            <div className="fixed bottom-20 left-0 z-20 w-full bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm p-4">
-                {isOwnJob ? (
-                    <button
-                        onClick={() => navigate(`/job/${job.id}/applications`)}
-                        className="flex h-12 w-full items-center justify-center rounded-lg bg-primary text-base font-bold text-white hover:bg-primary/90 transition-colors"
-                    >
-                        <span className="material-symbols-outlined mr-2">group</span>
-                        View Applications
-                    </button>
-                ) : hasApplied ? (
-                    <button
-                        disabled
-                        className="flex h-12 w-full items-center justify-center rounded-lg bg-green-600 text-base font-bold text-white"
-                    >
-                        <span className="material-symbols-outlined mr-2">check_circle</span>
-                        Applied Successfully
-                    </button>
-                ) : (
-                    <button
-                        onClick={handleApply}
-                        className="flex h-12 w-full items-center justify-center rounded-lg bg-primary text-base font-bold text-white hover:bg-primary/90 transition-colors"
-                    >
-                        Apply Now
-                    </button>
-                )}
-            </div>
-
-            {/* Apply Modal */}
-            {
-                showApplyModal && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => { setShowApplyModal(false); setDisclaimerAccepted(false); }}>
-                        <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 mx-4 max-w-md w-full shadow-xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                                    <span className="material-symbols-outlined text-primary">send</span>
+                {/* Apply Modal */}
+                {showApplyModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in" onClick={() => { setShowApplyModal(false); setDisclaimerAccepted(false); }}>
+                        <div className="bg-[#141519] border border-white/10 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto space-y-5 animate-in zoom-in-95" onClick={(e) => e.stopPropagation()}>
+                            <div className="flex items-center gap-3 border-b border-white/10 pb-4">
+                                <div className="size-11 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30 shrink-0">
+                                    <span className="material-symbols-outlined text-xl">send</span>
                                 </div>
-                                <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Apply for {job.title}</h3>
+                                <div className="min-w-0">
+                                    <h3 className="text-base sm:text-lg font-black text-white truncate">Submit Application</h3>
+                                    <p className="text-xs text-zinc-400 truncate">{job.title} • {job.company}</p>
+                                </div>
                             </div>
 
-                            <div className="mb-4 p-3 bg-zinc-50 dark:bg-zinc-700 rounded-lg">
-                                <p className="text-sm text-zinc-600 dark:text-zinc-300">
-                                    <span className="font-medium">Company:</span> {job.company}
+                            <div className="p-4 rounded-2xl bg-black/50 border border-white/5 space-y-1.5 text-xs">
+                                <p className="text-zinc-400">
+                                    Applying as: <strong className="text-white">{currentUser?.displayName || 'Creator'}</strong>
                                 </p>
-                                <p className="text-sm text-zinc-600 dark:text-zinc-300">
-                                    <span className="font-medium">Your Email:</span> {currentUser?.email}
+                                <p className="text-zinc-400">
+                                    Direct Contact: <strong className="text-white">{currentUser?.email}</strong>
                                 </p>
                             </div>
 
-                            <label className="block mb-4">
-                                <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Add a message (optional)</span>
+                            <label className="block space-y-1.5">
+                                <span className="text-xs font-bold text-zinc-300">Note to Director / Recruiter (Optional)</span>
                                 <textarea
                                     value={applicationMessage}
                                     onChange={(e) => setApplicationMessage(e.target.value)}
-                                    placeholder="Tell them why you're a great fit..."
-                                    className="mt-1 w-full p-3 rounded-lg border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white resize-none h-24"
+                                    placeholder="Introduce yourself, mention key credits, or why you fit this role..."
+                                    className="w-full p-3.5 rounded-xl border border-white/10 bg-black/60 text-white placeholder:text-zinc-500 text-xs resize-none h-24 focus:outline-none focus:border-amber-500 transition-colors"
                                 />
                             </label>
 
-                            {/* Legal Safety Disclaimer */}
-                            <div className="mb-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-xl">
-                                <div className="flex items-start gap-2 mb-2">
-                                    <span className="material-symbols-outlined text-amber-600 dark:text-amber-400 mt-0.5">warning</span>
-                                    <h4 className="font-bold text-amber-800 dark:text-amber-300 text-sm">Safety Disclaimer</h4>
+                            {/* Safety Disclaimer */}
+                            <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl text-xs space-y-2">
+                                <div className="flex items-center gap-2 text-amber-400 font-bold">
+                                    <span className="material-symbols-outlined text-base">verified_user</span>
+                                    <span>Film Professional Safety Notice</span>
                                 </div>
-                                <p className="text-xs text-amber-700 dark:text-amber-300/90 leading-relaxed mb-3">
-                                    <strong>IMPORTANT:</strong> iFilmDirectory is a platform that connects film industry professionals. We do not employ, endorse, or verify any job poster or their listings. By applying:
+                                <p className="text-[11px] text-zinc-300 leading-relaxed">
+                                    iFilmDirectory connects creative professionals. Never pay money upfront for auditions or role offers. Report any suspicious listings directly to support.
                                 </p>
-                                <ul className="text-xs text-amber-700 dark:text-amber-300/90 space-y-1 mb-3 ml-4 list-disc">
-                                    <li>You acknowledge this is your own decision and responsibility.</li>
-                                    <li>iFilmDirectory is <strong>NOT responsible</strong> for any non-payment, misbehavior, fraud, or disputes.</li>
-                                    <li>Always verify the legitimacy of job postings independently.</li>
-                                    <li>Meet in public places for initial meetings.</li>
-                                    <li>Never pay money upfront for any job opportunity.</li>
-                                    <li>Report suspicious postings to us immediately.</li>
-                                </ul>
-                                <label className="flex items-start gap-3 cursor-pointer mt-3 pt-3 border-t border-amber-200 dark:border-amber-700">
+                                <label className="flex items-start gap-2.5 cursor-pointer pt-2 border-t border-white/10">
                                     <input
                                         type="checkbox"
                                         checked={disclaimerAccepted}
                                         onChange={(e) => setDisclaimerAccepted(e.target.checked)}
-                                        className="mt-0.5 w-4 h-4 rounded border-amber-400 text-primary focus:ring-primary"
+                                        className="mt-0.5 size-4 rounded border-white/20 bg-black text-amber-500 focus:ring-amber-500 accent-amber-500"
                                     />
-                                    <span className="text-xs text-amber-800 dark:text-amber-200 font-medium">
-                                        I understand and accept that iFilmDirectory acts only as a platform and bears no responsibility for any interactions, payments, or outcomes resulting from this application.
+                                    <span className="text-[11px] text-zinc-300 font-semibold select-none leading-snug">
+                                        I understand and accept independent responsibility for professional communications.
                                     </span>
                                 </label>
                             </div>
 
-                            <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-4">
-                                Your profile link will be shared with {job.company}. They will contact you at your registered email if interested.
-                            </p>
-
-                            <div className="flex gap-3">
+                            <div className="flex gap-3 pt-2">
                                 <button
                                     onClick={() => { setShowApplyModal(false); setDisclaimerAccepted(false); }}
                                     disabled={isApplying}
-                                    className="flex-1 py-2.5 px-4 rounded-lg border border-zinc-300 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 font-medium hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-50"
+                                    className="flex-1 py-3 px-4 rounded-xl border border-white/10 text-zinc-300 font-bold text-xs hover:bg-white/5 transition-all"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={confirmApplication}
                                     disabled={isApplying || !disclaimerAccepted}
-                                    title={!disclaimerAccepted ? 'Please accept the safety disclaimer to continue' : ''}
-                                    className="flex-1 py-2.5 px-4 rounded-lg bg-primary text-white font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                    className="flex-1 py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-black text-xs disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20"
                                 >
                                     {isApplying ? (
                                         <>
-                                            <span className="material-symbols-outlined animate-spin text-lg">sync</span>
-                                            Sending...
+                                            <span className="material-symbols-outlined animate-spin text-base">progress_activity</span>
+                                            <span>Sending...</span>
                                         </>
                                     ) : (
                                         <>
-                                            <span className="material-symbols-outlined text-lg">send</span>
-                                            Send Application
+                                            <span className="material-symbols-outlined text-base">check</span>
+                                            <span>Confirm & Send</span>
                                         </>
                                     )}
                                 </button>
                             </div>
                         </div>
                     </div>
-                )
-            }
+                )}
             </div>
 
             <BottomNav />

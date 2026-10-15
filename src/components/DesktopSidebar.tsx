@@ -1,4 +1,3 @@
-import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Logo from './Logo';
@@ -12,20 +11,7 @@ interface DesktopSidebarProps {
 export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: DesktopSidebarProps) {
     const navigate = useNavigate();
     const location = useLocation();
-    const { currentUser, logout } = useAuth();
-    const [isMoreOpen, setIsMoreOpen] = useState(false);
-    const moreMenuRef = useRef<HTMLDivElement>(null);
-
-    // Close 'More' popover when clicking outside
-    useEffect(() => {
-        const handleClickOutside = (e: MouseEvent) => {
-            if (moreMenuRef.current && !moreMenuRef.current.contains(e.target as Node)) {
-                setIsMoreOpen(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+    const { currentUser } = useAuth();
 
     const isActive = (path: string) => {
         if (path === '/home') return location.pathname === '/home';
@@ -57,16 +43,6 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
         { path: '/saved', label: 'Saved Items', icon: 'bookmarks' },
         { path: '/profile', label: 'Profile', icon: 'person', isProfile: true },
     ];
-
-    const handleLogout = async () => {
-        try {
-            setIsMoreOpen(false);
-            await logout();
-            navigate('/login');
-        } catch (err) {
-            console.error('Logout error:', err);
-        }
-    };
 
     return (
         <aside className="hidden md:flex flex-col fixed left-0 top-0 bottom-0 z-40 bg-[#090A0C] border-r border-white/[0.08] w-20 xl:w-64 select-none px-3 py-4 font-display transition-all duration-300 overflow-y-auto overscroll-contain custom-scrollbar">
@@ -163,53 +139,8 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                 </nav>
             </div>
 
-            {/* Bottom: Settings, More Options & User Identity */}
-            <div className="flex flex-col gap-1.5 relative mt-auto pt-4 shrink-0" ref={moreMenuRef}>
-                {/* 'More' Options Popover (Instagram Style) */}
-                {isMoreOpen && (
-                    <div className="fixed md:left-20 xl:left-4 bottom-24 w-56 rounded-2xl bg-[#141519] border border-white/10 shadow-2xl p-2 z-50 animate-in fade-in slide-in-from-bottom-2 duration-150">
-                        <button
-                            onClick={() => { setIsMoreOpen(false); navigate('/settings'); }}
-                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-zinc-300 hover:text-white hover:bg-white/5 transition-colors"
-                        >
-                            <span className="material-symbols-outlined text-base">settings</span>
-                            <span>Settings & Privacy</span>
-                        </button>
-                        <button
-                            onClick={() => { setIsMoreOpen(false); navigate('/saved'); }}
-                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-zinc-300 hover:text-white hover:bg-white/5 transition-colors"
-                        >
-                            <span className="material-symbols-outlined text-base">bookmarks</span>
-                            <span>Saved Items</span>
-                        </button>
-                        <button
-                            onClick={() => { setIsMoreOpen(false); navigate('/privacy'); }}
-                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-zinc-300 hover:text-white hover:bg-white/5 transition-colors"
-                        >
-                            <span className="material-symbols-outlined text-base">security</span>
-                            <span>Privacy Policy</span>
-                        </button>
-                        <button
-                            onClick={() => { setIsMoreOpen(false); navigate('/terms'); }}
-                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-zinc-300 hover:text-white hover:bg-white/5 transition-colors"
-                        >
-                            <span className="material-symbols-outlined text-base">description</span>
-                            <span>Terms of Service</span>
-                        </button>
-                        <div className="h-px bg-white/5 my-1" />
-                        <button
-                            onClick={handleLogout}
-                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold text-red-400 hover:bg-red-500/10 transition-colors"
-                        >
-                            <span className="material-symbols-outlined text-base">logout</span>
-                            <span>Log Out</span>
-                        </button>
-                        <div className="pt-2 pb-1 px-2 border-t border-white/5 text-center">
-                            <span className="text-[10px] text-zinc-500">Property of 5M Collective (5MC)</span>
-                        </div>
-                    </div>
-                )}
-
+            {/* Bottom: Settings & User Identity */}
+            <div className="flex flex-col gap-1.5 relative mt-auto pt-4 shrink-0">
                 {/* Settings Item */}
                 <button
                     onClick={() => navigate('/settings')}
@@ -224,19 +155,6 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                     <span className="hidden xl:inline text-sm font-medium">Settings</span>
                     <span className="xl:hidden opacity-0 pointer-events-none group-hover:opacity-100 absolute left-full ml-3 px-2.5 py-1 bg-[#18191D] border border-white/10 text-white text-xs font-semibold rounded-lg shadow-xl whitespace-nowrap z-50 transition-opacity">
                         Settings
-                    </span>
-                </button>
-
-                {/* 'More' Menu Trigger */}
-                <button
-                    onClick={() => setIsMoreOpen(!isMoreOpen)}
-                    title="More Options"
-                    className="group flex items-center justify-center xl:justify-start gap-4 px-3 py-2.5 rounded-2xl text-zinc-400 hover:text-white hover:bg-white/[0.05] transition-all"
-                >
-                    <span className="material-symbols-outlined text-[24px]">menu</span>
-                    <span className="hidden xl:inline text-sm font-medium">More Options</span>
-                    <span className="xl:hidden opacity-0 pointer-events-none group-hover:opacity-100 absolute left-full ml-3 px-2.5 py-1 bg-[#18191D] border border-white/10 text-white text-xs font-semibold rounded-lg shadow-xl whitespace-nowrap z-50 transition-opacity">
-                        More
                     </span>
                 </button>
 

@@ -4,12 +4,14 @@ import { useAuth } from '../context/AuthContext';
 import { projectService, type ProductionProject } from '../services/projectService';
 import BottomNav from '../components/BottomNav';
 import HamburgerMenu from '../components/HamburgerMenu';
-import EmptyState from '../components/EmptyState';
+import Logo from '../components/Logo';
 import PostMedia from '../components/PostMedia';
+import { useToast } from '../context/ToastContext';
 
 export default function ProductionProjects() {
     const navigate = useNavigate();
     const { currentUser } = useAuth();
+    const toast = useToast();
     const [projects, setProjects] = useState<ProductionProject[]>([]);
     const [loading, setLoading] = useState(true);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -24,7 +26,7 @@ export default function ProductionProjects() {
         setLoading(true);
         try {
             const data = await projectService.getProducerProjects(currentUser.uid);
-            setProjects(data);
+            setProjects(data || []);
         } catch (error) {
             console.error(error);
         } finally {
@@ -36,24 +38,18 @@ export default function ProductionProjects() {
         e.preventDefault();
         if (!currentUser) return;
         try {
-            console.log("Attempt v2.0 - Creating project with data:", {
-                ...newProject,
-                producerId: currentUser.uid,
-                status: 'active'
-            });
             await projectService.createProject({
                 ...newProject,
                 producerId: currentUser.uid,
                 status: 'active'
             });
-            console.log("Project created successfully");
+            toast.success("Production project initialized!");
             setIsCreateModalOpen(false);
             setNewProject({ name: '', description: '', location: '' });
             fetchProjects();
         } catch (error: any) {
-            console.error("Project creation error v2.0:", error);
-            console.error("Error Code:", error.code);
-            console.error("Error Message:", error.message);
+            console.error("Project creation error:", error);
+            toast.error("Failed to create project");
         }
     };
 
@@ -62,166 +58,253 @@ export default function ProductionProjects() {
         setLoading(true);
         try {
             await projectService.seedProjects(currentUser.uid);
-            alert("Seed projects added successfully!"); // Direct feedback
+            toast.success("Demo film productions added to your deck!");
             await fetchProjects();
         } catch (error) {
             console.error(error);
-            alert("Failed to seed projects. Check permissions.");
+            toast.error("Could not seed projects.");
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="relative mx-auto flex h-full min-h-[100dvh] w-full max-w-md md:max-w-3xl lg:max-w-4xl flex-col bg-[#F8F9FA] dark:bg-zinc-950 pb-24 overflow-x-hidden">
-            <header className="sticky top-0 z-40 bg-white/70 dark:bg-zinc-950/70 px-4 sm:px-6 pt-4 sm:pt-5 pb-3 sm:pb-4 backdrop-blur-3xl border-b border-black/[0.02] dark:border-white/[0.02] flex justify-between items-center gap-2">
-                <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-                    <HamburgerMenu />
-                    <h1 className="text-lg sm:text-xl font-black tracking-tight text-zinc-900 dark:text-white uppercase truncate">My Projects</h1>
+        <div className="relative flex min-h-screen w-full flex-col bg-[#090A0C] text-white overflow-x-hidden font-display selection:bg-amber-500/30 pb-28">
+            {/* Top Navigation */}
+            <header className="sticky top-0 z-40 bg-[#090A0C]/90 backdrop-blur-xl border-b border-white/[0.08] px-4 md:px-8 py-3.5 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3 min-w-0">
+                    <div className="md:hidden flex items-center gap-2.5 cursor-pointer select-none" onClick={() => navigate('/home')}>
+                        <HamburgerMenu />
+                        <Logo size="sm" showText={true} />
+                    </div>
+                    <div className="hidden md:flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                            <span className="material-symbols-outlined text-xl">movie_filter</span>
+                        </div>
+                        <div>
+                            <h1 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
+                                <span>Production Project Desk</span>
+                                <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 font-medium">
+                                    {projects.length} Titles
+                                </span>
+                            </h1>
+                            <p className="text-xs text-zinc-400">
+                                Line production boards, crew shortlists, and filming logistics
+                            </p>
+                        </div>
+                    </div>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
+
+                <div className="flex items-center gap-2.5">
                     <button
                         onClick={handleSeedProjects}
-                        className="size-9 sm:size-10 bg-zinc-100 dark:bg-zinc-800 text-zinc-500 rounded-full flex items-center justify-center hover:text-primary transition-all active:scale-95"
-                        title="Seed Demo Projects"
+                        className="p-2 sm:px-3 sm:py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-zinc-400 hover:text-white border border-white/[0.08] text-xs font-semibold flex items-center gap-1.5 transition-all"
+                        title="Load Demo Slate"
                     >
-                        <span className="material-symbols-outlined text-[18px] sm:text-[20px]">database</span>
+                        <span className="material-symbols-outlined text-base text-amber-400">database</span>
+                        <span className="hidden sm:inline">Demo Slate</span>
                     </button>
                     <button
                         onClick={() => setIsCreateModalOpen(true)}
-                        className="size-9 sm:size-10 bg-primary text-white rounded-full shadow-lg shadow-primary/20 flex items-center justify-center hover:scale-110 active:scale-95 transition-all"
+                        className="flex items-center gap-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 px-4 py-2 text-xs font-bold text-black shadow-lg shadow-amber-500/20 transition-all active:scale-95"
                     >
-                        <span className="material-symbols-outlined">add</span>
+                        <span className="material-symbols-outlined text-base font-bold">add</span>
+                        <span>New Project</span>
                     </button>
                 </div>
             </header>
 
-            <main className="flex-1 p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                {loading ? (
-                    <div className="flex flex-col items-center justify-center pt-20 gap-4 md:col-span-2">
-                        <div className="size-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-                    </div>
-                ) : projects.length > 0 ? (
-                    projects.map((project) => (
-                        <div
-                            key={project.id}
-                            onClick={() => navigate(`/project/${project.id}`)}
-                            className="bg-white dark:bg-zinc-900 rounded-[32px] p-6 shadow-sm border border-zinc-100 dark:border-white/5 hover:shadow-md transition-all cursor-pointer group"
-                        >
-                            <div className="flex justify-between items-start mb-4">
-                                <div>
-                                    <h3 className="text-lg font-black text-zinc-900 dark:text-white uppercase tracking-tight group-hover:text-primary transition-colors">{project.name}</h3>
-                                    <p className="text-xs text-zinc-500 font-bold uppercase tracking-widest flex items-center gap-1 mt-1">
-                                        <span className="material-symbols-outlined text-xs">location_on</span>
-                                        {project.location || 'Global'}
-                                    </p>
-                                </div>
-                                <span className="px-2 py-1 rounded-full bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400 text-[8px] font-black uppercase tracking-widest">
-                                    {project.status}
-                                </span>
-                            </div>
+            <div className="w-full max-w-6xl mx-auto flex flex-col flex-1 px-4 md:px-8 py-6">
+                {/* Mobile Hero */}
+                <div className="md:hidden mb-4">
+                    <h1 className="text-xl font-black text-white tracking-tight flex items-center gap-2">
+                        <span>Production Projects</span>
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold">
+                            {projects.length}
+                        </span>
+                    </h1>
+                    <p className="text-xs text-zinc-400 mt-1">
+                        Manage active titles, crew shortlists, and shoot schedules
+                    </p>
+                </div>
 
-                            <p className="text-sm text-zinc-600 dark:text-zinc-400 line-clamp-2 mb-6">
-                                {project.description}
+                {/* Projects Grid */}
+                <main className="flex-1">
+                    {loading ? (
+                        <div className="flex flex-col items-center justify-center py-24">
+                            <div className="size-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+                            <p className="mt-3 text-xs font-bold text-zinc-400 tracking-wide uppercase">
+                                Loading Production Slate...
                             </p>
+                        </div>
+                    ) : projects.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                            {projects.map((project) => (
+                                <div
+                                    key={project.id}
+                                    onClick={() => navigate(`/project/${project.id}`)}
+                                    className="bg-[#121316] rounded-2xl p-5 shadow-xl border border-white/[0.08] hover:border-amber-500/40 transition-all cursor-pointer group flex flex-col justify-between"
+                                >
+                                    <div>
+                                        <div className="flex justify-between items-start gap-2 mb-3">
+                                            <div className="min-w-0 flex-1">
+                                                <h3 className="text-base font-bold text-white group-hover:text-amber-400 transition-colors truncate">
+                                                    {project.name}
+                                                </h3>
+                                                <p className="text-xs text-zinc-400 flex items-center gap-1 mt-1 truncate">
+                                                    <span className="material-symbols-outlined text-xs text-amber-500">location_on</span>
+                                                    {project.location || 'Pan-India Locations'}
+                                                </p>
+                                            </div>
+                                            <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/25 text-emerald-400 text-[10px] font-bold uppercase tracking-wider shrink-0">
+                                                {project.status || 'Active'}
+                                            </span>
+                                        </div>
 
-                            <div className="flex items-center justify-between border-t border-zinc-100 dark:border-white/5 pt-4">
-                                <div className="flex items-center gap-2">
-                                    <div className="flex -space-x-2">
-                                        {project.shortlist.slice(0, 3).map((talent) => (
-                                            <div key={talent.userId} className="size-8 rounded-full border-2 border-white dark:border-zinc-900 overflow-hidden shrink-0 -ml-2 first:ml-0">
-                                                <PostMedia
-                                                    src={talent.userPhoto || ''}
-                                                    fallbackType="USER_MALE"
-                                                    className="size-full"
-                                                />
-                                            </div>
-                                        ))}
-                                        {project.shortlist.length > 3 && (
-                                            <div className="size-8 rounded-full border-2 border-white dark:border-zinc-900 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-[10px] font-bold text-zinc-500">
-                                                +{project.shortlist.length - 3}
-                                            </div>
-                                        )}
+                                        <p className="text-xs text-zinc-300 leading-relaxed line-clamp-3 mb-5">
+                                            {project.description || 'Feature production in pre-production staging. Direct crew shortlisting active.'}
+                                        </p>
                                     </div>
-                                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
-                                        {project.shortlist.length} Crew Shortlisted
-                                    </span>
+
+                                    <div className="border-t border-white/[0.06] pt-3.5 flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <div className="flex -space-x-2">
+                                                {project.shortlist.slice(0, 3).map((talent) => (
+                                                    <div key={talent.userId} className="size-7 rounded-full border-2 border-[#121316] overflow-hidden shrink-0 bg-black">
+                                                        <PostMedia
+                                                            src={talent.userPhoto || ''}
+                                                            fallbackType="USER_MALE"
+                                                            className="size-full object-cover"
+                                                        />
+                                                    </div>
+                                                ))}
+                                                {project.shortlist.length > 3 && (
+                                                    <div className="size-7 rounded-full border-2 border-[#121316] bg-[#1a1b20] flex items-center justify-center text-[9px] font-bold text-amber-400">
+                                                        +{project.shortlist.length - 3}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <span className="text-[11px] font-semibold text-zinc-400">
+                                                {project.shortlist.length} Crew Shortlisted
+                                            </span>
+                                        </div>
+                                        <span className="material-symbols-outlined text-zinc-500 group-hover:text-amber-400 group-hover:translate-x-1 transition-all text-lg">
+                                            arrow_forward
+                                        </span>
+                                    </div>
                                 </div>
-                                <span className="material-symbols-outlined text-zinc-300 group-hover:text-primary transition-all group-hover:translate-x-1">chevron_right</span>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center py-20 text-center px-4 rounded-2xl bg-[#121316] border border-white/[0.06]">
+                            <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-4 text-amber-400">
+                                <span className="material-symbols-outlined text-3xl">movie_edit</span>
+                            </div>
+                            <h3 className="text-base font-bold text-white mb-1">
+                                No Production Projects Yet
+                            </h3>
+                            <p className="text-xs text-zinc-400 max-w-sm mx-auto mb-5">
+                                Create your first film or web series production board to shortlist certified DPs, directors, and actors.
+                            </p>
+                            <div className="flex flex-col sm:flex-row items-center gap-3">
+                                <button
+                                    onClick={() => setIsCreateModalOpen(true)}
+                                    className="px-5 py-2.5 rounded-xl bg-amber-500 text-black text-xs font-bold hover:bg-amber-400 transition-all shadow-lg shadow-amber-500/20"
+                                >
+                                    Start New Project
+                                </button>
+                                <button
+                                    onClick={handleSeedProjects}
+                                    className="px-4 py-2.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-zinc-300 text-xs font-semibold border border-white/[0.08] transition-all flex items-center gap-1.5"
+                                >
+                                    <span className="material-symbols-outlined text-base text-amber-400">database</span>
+                                    Load 3 Demo Productions
+                                </button>
                             </div>
                         </div>
-                    ))
-                ) : (
-                    <div className="flex flex-col gap-4 md:col-span-2">
-                        <EmptyState
-                            message="No Production Projects"
-                            subMessage="Create your first project to start building your dream crew."
-                            icon="architecture"
-                            actionLabel="Create Project"
-                            onAction={() => setIsCreateModalOpen(true)}
-                        />
-                        <button
-                            onClick={handleSeedProjects}
-                            className="mx-auto mt-4 px-6 py-2.5 rounded-full border border-zinc-200 dark:border-white/10 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400 hover:bg-white dark:hover:bg-zinc-800 hover:border-primary hover:text-primary transition-all flex items-center gap-2 shadow-sm active:scale-95"
-                        >
-                            <span className="material-symbols-outlined text-sm">database</span>
-                            Initialize 3 Seed Projects
-                        </button>
-                    </div>
-                )}
-            </main>
+                    )}
+                </main>
+            </div>
 
             {/* Create Project Modal */}
             {isCreateModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
-                    <form onSubmit={handleCreateProject} className="bg-white dark:bg-zinc-900 rounded-[32px] w-full max-w-sm p-8 shadow-2xl border border-zinc-200 dark:border-white/5 space-y-4 animate-in zoom-in-95">
-                        <h3 className="text-xl font-black text-zinc-900 dark:text-white uppercase tracking-tight mb-4">Start New Project</h3>
+                <div
+                    className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in"
+                    onClick={() => setIsCreateModalOpen(false)}
+                >
+                    <form
+                        onSubmit={handleCreateProject}
+                        onClick={(e) => e.stopPropagation()}
+                        className="bg-[#121316] rounded-2xl w-full max-w-md p-6 sm:p-7 shadow-2xl border border-white/[0.12] space-y-4 text-white animate-in zoom-in-95"
+                    >
+                        <div className="flex items-center justify-between mb-2">
+                            <div>
+                                <h3 className="text-lg font-bold text-white">Start New Production</h3>
+                                <p className="text-xs text-zinc-400">Initialize a production board and shortlist crew</p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setIsCreateModalOpen(false)}
+                                className="p-1 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-zinc-400 hover:text-white transition-colors"
+                            >
+                                <span className="material-symbols-outlined text-lg">close</span>
+                            </button>
+                        </div>
 
-                        <div className="space-y-4">
-                            <label className="block">
-                                <span className="text-xs font-black text-zinc-500 uppercase tracking-widest ml-1 mb-2 block">Project Name</span>
+                        <div className="space-y-3.5">
+                            <div>
+                                <label className="text-xs font-bold uppercase tracking-wider text-zinc-400 block mb-1.5">
+                                    Project / Film Title
+                                </label>
                                 <input
                                     required
                                     value={newProject.name}
                                     onChange={e => setNewProject({ ...newProject, name: e.target.value })}
-                                    className="w-full h-14 px-4 bg-zinc-100 dark:bg-zinc-800 rounded-2xl border-none text-zinc-900 dark:text-white font-bold focus:ring-2 focus:ring-primary"
-                                    placeholder="e.g. My Next Feature"
+                                    className="w-full bg-black/40 border border-white/[0.08] rounded-xl px-4 py-2.5 text-xs sm:text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-amber-500 transition-colors"
+                                    placeholder="e.g. Kaithi 2 / Untitled Crime Thriller"
                                 />
-                            </label>
-                            <label className="block">
-                                <span className="text-xs font-black text-zinc-500 uppercase tracking-widest ml-1 mb-2 block">Description</span>
+                            </div>
+
+                            <div>
+                                <label className="text-xs font-bold uppercase tracking-wider text-zinc-400 block mb-1.5">
+                                    Logline / Production Brief
+                                </label>
                                 <textarea
                                     required
+                                    rows={3}
                                     value={newProject.description}
                                     onChange={e => setNewProject({ ...newProject, description: e.target.value })}
-                                    className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-2xl border-none text-zinc-900 dark:text-white font-bold focus:ring-2 focus:ring-primary min-h-[100px]"
-                                    placeholder="Describe your vision..."
+                                    className="w-full bg-black/40 border border-white/[0.08] rounded-xl px-4 py-2.5 text-xs sm:text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-amber-500 resize-none transition-colors"
+                                    placeholder="Brief outline of the project, shoot schedule, or crew needs..."
                                 />
-                            </label>
-                            <label className="block">
-                                <span className="text-xs font-black text-zinc-500 uppercase tracking-widest ml-1 mb-2 block">Shoot Location</span>
+                            </div>
+
+                            <div>
+                                <label className="text-xs font-bold uppercase tracking-wider text-zinc-400 block mb-1.5">
+                                    Primary Shoot Location
+                                </label>
                                 <input
                                     value={newProject.location}
                                     onChange={e => setNewProject({ ...newProject, location: e.target.value })}
-                                    className="w-full h-14 px-4 bg-zinc-100 dark:bg-zinc-800 rounded-2xl border-none text-zinc-900 dark:text-white font-bold focus:ring-2 focus:ring-primary"
-                                    placeholder="e.g. London / Mumbai / Global"
+                                    className="w-full bg-black/40 border border-white/[0.08] rounded-xl px-4 py-2.5 text-xs sm:text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-amber-500 transition-colors"
+                                    placeholder="e.g. Hyderabad & London Studios"
                                 />
-                            </label>
+                            </div>
                         </div>
 
-                        <div className="flex gap-3 pt-4">
+                        <div className="flex gap-3 pt-3">
                             <button
                                 type="button"
                                 onClick={() => setIsCreateModalOpen(false)}
-                                className="flex-1 h-14 bg-zinc-100 dark:bg-zinc-800 text-zinc-500 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-zinc-200"
+                                className="flex-1 py-3 rounded-xl border border-white/[0.08] text-xs font-bold text-zinc-300 hover:bg-white/[0.05] transition-all"
                             >
                                 Cancel
                             </button>
                             <button
                                 type="submit"
-                                className="flex-1 h-14 bg-primary text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
+                                className="flex-1 py-3 rounded-xl bg-amber-500 text-black text-xs font-bold hover:bg-amber-400 shadow-md shadow-amber-500/20 transition-all"
                             >
-                                Create
+                                Initialize Project
                             </button>
                         </div>
                     </form>

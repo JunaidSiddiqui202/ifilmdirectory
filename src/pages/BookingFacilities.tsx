@@ -16,21 +16,20 @@ export default function BookingFacilities() {
     const [showMap, setShowMap] = useState(false);
 
     const categories = [
-        { id: 'All', label: 'All', icon: 'grid_view' },
+        { id: 'All', label: 'All Spaces', icon: 'grid_view' },
         { id: 'Studio', label: 'Shooting Floors', icon: 'photo_camera' },
-        { id: 'Dubbing', label: 'Dubbing Suites', icon: 'mic' },
-        { id: 'Post-Production', label: 'Editing & VFX', icon: 'movie_edit' },
-        { id: 'Equipment', label: 'Gear & Camera', icon: 'videocam' },
-        { id: 'Location', label: 'Film Locations', icon: 'location_on' },
+        { id: 'Dubbing', label: 'Dubbing & Dolby Atmos', icon: 'mic' },
+        { id: 'Post-Production', label: 'Editing & VFX Suites', icon: 'movie_edit' },
+        { id: 'Equipment', label: 'Camera & Cine Lighting', icon: 'videocam' },
+        { id: 'Location', label: 'Film Sets & Estates', icon: 'location_on' },
     ];
 
     useEffect(() => {
         const fetchFacilities = async () => {
             setLoading(true);
             try {
-                // Fetch all for now, client-side filter is fine for small lists
                 const data = await facilityService.getFacilities();
-                setFacilities(data);
+                setFacilities(data || []);
             } catch (error) {
                 console.error("Failed to load facilities", error);
             } finally {
@@ -45,8 +44,11 @@ export default function BookingFacilities() {
         const matchesCategory =
             activeCategory === 'All' ||
             typeLower.includes(activeCategory.toLowerCase()) ||
-            (activeCategory === 'Studio' && (typeLower.includes('floor') || typeLower.includes('stage'))) ||
-            (activeCategory === 'Post-Production' && (typeLower.includes('vfx') || typeLower.includes('edit') || typeLower.includes('di')));
+            (activeCategory === 'Studio' && (typeLower.includes('floor') || typeLower.includes('stage') || typeLower.includes('studio'))) ||
+            (activeCategory === 'Dubbing' && (typeLower.includes('sound') || typeLower.includes('dub') || typeLower.includes('audio') || typeLower.includes('mic'))) ||
+            (activeCategory === 'Post-Production' && (typeLower.includes('vfx') || typeLower.includes('edit') || typeLower.includes('di') || typeLower.includes('color'))) ||
+            (activeCategory === 'Equipment' && (typeLower.includes('gear') || typeLower.includes('camera') || typeLower.includes('lens') || typeLower.includes('light'))) ||
+            (activeCategory === 'Location' && (typeLower.includes('location') || typeLower.includes('resort') || typeLower.includes('palace') || typeLower.includes('bungalow')));
 
         const matchesSearch =
             (facility.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -56,75 +58,95 @@ export default function BookingFacilities() {
         return matchesCategory && matchesSearch;
     });
 
-
     return (
-        <div className="relative flex h-auto min-h-screen w-full flex-col bg-background-light dark:bg-[#090A0C] text-zinc-900 dark:text-white overflow-x-hidden pb-36 md:pb-24 font-display transition-colors">
-            <div className="w-full max-w-md md:max-w-3xl lg:max-w-5xl mx-auto flex flex-col flex-1">
-                {/* Cinema Header */}
-                <header className="sticky top-0 z-40 bg-white/80 dark:bg-[#090A0C]/85 p-4 pb-3 backdrop-blur-2xl border-b border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="md:hidden flex items-center gap-2.5 cursor-pointer select-none" onClick={() => navigate('/home')}>
-                            <HamburgerMenu />
-                            <Logo size="sm" showText={true} />
-                            <span className="hidden sm:inline-block text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20">
-                                Facilities
-                            </span>
+        <div className="relative flex min-h-screen w-full flex-col bg-[#090A0C] text-white overflow-x-hidden font-display selection:bg-amber-500/30">
+            {/* Top Navigation */}
+            <header className="sticky top-0 z-40 bg-[#090A0C]/90 backdrop-blur-xl border-b border-white/[0.08] px-4 md:px-8 py-3.5 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3 min-w-0">
+                    <div className="md:hidden flex items-center gap-2.5 cursor-pointer select-none" onClick={() => navigate('/home')}>
+                        <HamburgerMenu />
+                        <Logo size="sm" showText={true} />
+                    </div>
+                    <div className="hidden md:flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                            <span className="material-symbols-outlined text-xl">apartment</span>
                         </div>
-                        <h1 className="hidden md:flex items-center gap-2 text-base font-bold text-zinc-900 dark:text-white">
-                            <span className="material-symbols-outlined text-amber-500 text-xl">apartment</span>
-                            <span>Film Studios & Production Facilities</span>
-                        </h1>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <button
-                            onClick={() => setShowMap(true)}
-                            className="flex items-center justify-center rounded-xl size-9 bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-black border border-amber-500/20 transition-all"
-                            title="Interactive Map"
-                        >
-                            <span className="material-symbols-outlined text-xl">map</span>
-                        </button>
-                    </div>
-                </header>
-
-                {/* Universal Search Bar */}
-                <div className="px-4 py-2.5">
-                    <div className="relative flex items-center">
-                        <span className="material-symbols-outlined absolute left-3.5 text-zinc-400 dark:text-zinc-500 text-xl pointer-events-none">
-                            search
-                        </span>
-                        <input
-                            type="text"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Search sound stages, camera gear, editing suites..."
-                            className="w-full bg-zinc-100 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-xl pl-10 pr-9 py-2.5 text-xs text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all"
-                        />
-                        {searchQuery && (
-                            <button
-                                onClick={() => setSearchQuery('')}
-                                className="absolute right-3 text-zinc-400 hover:text-zinc-600 dark:hover:text-white"
-                            >
-                                <span className="material-symbols-outlined text-base">close</span>
-                            </button>
-                        )}
+                        <div>
+                            <h1 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
+                                <span>Film Studios & Production Facilities</span>
+                                <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 font-medium">
+                                    {facilities.length} Verified
+                                </span>
+                            </h1>
+                            <p className="text-xs text-zinc-400">
+                                Pre-book sound stages, post suites, cine gear houses, and shoot sets across India
+                            </p>
+                        </div>
                     </div>
                 </div>
 
-                {/* Unified Category Filter Bar with Icons */}
-                <div className="flex gap-2 px-4 pb-3 overflow-x-auto no-scrollbar">
+                <div className="flex items-center gap-2.5">
+                    <button
+                        onClick={() => setShowMap(true)}
+                        className="px-3.5 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/25 text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 shadow-sm"
+                    >
+                        <span className="material-symbols-outlined text-base">map</span>
+                        <span className="hidden sm:inline">Interactive Map</span>
+                    </button>
+                </div>
+            </header>
+
+            <div className="w-full max-w-7xl mx-auto flex flex-col flex-1 px-4 md:px-8 py-6 pb-28">
+                {/* Hero Spotlight Header on Mobile / Tablet */}
+                <div className="md:hidden mb-4">
+                    <h1 className="text-xl font-black text-white tracking-tight flex items-center gap-2">
+                        <span>Film Studios & Gear</span>
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold">
+                            {facilities.length}
+                        </span>
+                    </h1>
+                    <p className="text-xs text-zinc-400 mt-1">
+                        Sound stages, editing bays, and cine equipment
+                    </p>
+                </div>
+
+                {/* Search Bar & Controls */}
+                <div className="relative mb-5">
+                    <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 text-xl pointer-events-none">
+                        search
+                    </span>
+                    <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search sound stages, camera gear, editing suites, lighting trucks, cities..."
+                        className="w-full bg-[#121316] border border-white/[0.08] hover:border-white/20 focus:border-amber-500 rounded-2xl pl-12 pr-10 py-3 text-sm text-white placeholder:text-zinc-500 focus:outline-none transition-all shadow-lg"
+                    />
+                    {searchQuery && (
+                        <button
+                            onClick={() => setSearchQuery('')}
+                            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white"
+                        >
+                            <span className="material-symbols-outlined text-lg">close</span>
+                        </button>
+                    )}
+                </div>
+
+                {/* Category Pills */}
+                <div className="flex gap-2 pb-4 overflow-x-auto scrollbar-none mb-4">
                     {categories.map((cat) => {
                         const isActive = activeCategory === cat.id;
                         return (
                             <button
                                 key={cat.id}
                                 onClick={() => setActiveCategory(cat.id)}
-                                className={`flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-xs font-bold transition-all border ${
+                                className={`flex h-10 shrink-0 items-center gap-2 rounded-xl px-4 text-xs font-bold transition-all border ${
                                     isActive
-                                        ? 'bg-amber-500 text-black border-amber-500 shadow-sm shadow-amber-500/25'
-                                        : 'bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-white/5 hover:bg-zinc-200 dark:hover:bg-white/10'
+                                        ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-black border-amber-400 shadow-md shadow-amber-500/20'
+                                        : 'bg-[#121316] text-zinc-400 border-white/[0.06] hover:text-white hover:border-white/20'
                                 }`}
                             >
-                                <span className={`material-symbols-outlined text-[17px] ${isActive ? 'text-black' : 'text-amber-500'}`}>
+                                <span className={`material-symbols-outlined text-base ${isActive ? 'text-black' : 'text-amber-400'}`}>
                                     {cat.icon}
                                 </span>
                                 <span>{cat.label}</span>
@@ -133,90 +155,119 @@ export default function BookingFacilities() {
                     })}
                 </div>
 
-                {/* Popular Facilities Header */}
-                <h2 className="text-zinc-900 dark:text-white text-base sm:text-lg font-bold leading-tight tracking-tight px-4 pb-3 pt-2">
-                    Popular Facilities & Spaces
-                </h2>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-4 pb-4">
+                {/* Facilities Grid */}
+                <main className="flex-1">
                     {loading ? (
-                        <div className="flex justify-center py-16 md:col-span-2">
-                            <div className="size-9 animate-spin rounded-full border-2 border-amber-500 border-t-transparent"></div>
-                        </div>
-                    ) : filteredFacilities.length > 0 ? (
-                        filteredFacilities.map((facility) => (
-                            <div
-                                key={facility.id}
-                                onClick={() => navigate(`/booking/details/${facility.id}`)}
-                                className="rounded-2xl bg-white dark:bg-[#121316] border border-black/[0.04] dark:border-white/[0.07] overflow-hidden p-3.5 shadow-sm hover:border-amber-500/25 transition-all group cursor-pointer flex flex-col justify-between"
-                            >
-                                <div>
-                                    <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-black mb-3">
-                                        <PostMedia
-                                            src={facility.image || ''}
-                                            fallbackType="COMPANY_LOGO"
-                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                        />
-                                        <span className="absolute top-2 left-2 px-2.5 py-0.5 rounded-full bg-black/75 backdrop-blur-sm text-xs font-semibold text-amber-500 border border-amber-500/20">
-                                            {facility.type}
-                                        </span>
-                                        <div className="absolute top-2 right-2 bg-black/75 backdrop-blur-sm px-2 py-0.5 rounded-full border border-white/10 flex items-center gap-1 text-xs">
-                                            <span className="material-symbols-outlined text-amber-500 text-sm filled" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                                            <span className="text-white text-xs font-bold">{facility.rating || 4.9}</span>
-                                        </div>
-                                        {facility.price && (
-                                            <span className="absolute bottom-2 right-2 px-2.5 py-1 rounded-lg bg-amber-500 text-black text-xs font-black shadow-md">
-                                                {facility.price}
-                                            </span>
-                                        )}
-                                    </div>
-
-                                    <h3 className="text-sm font-bold text-zinc-900 dark:text-white group-hover:text-amber-500 transition-colors truncate">
-                                        {facility.name}
-                                    </h3>
-                                    <p className="text-xs text-zinc-500 dark:text-zinc-400 flex items-center gap-1 mt-0.5 truncate">
-                                        <span className="material-symbols-outlined text-xs">location_on</span>
-                                        {facility.location}
-                                    </p>
-                                </div>
-
-                                <div className="pt-2.5 border-t border-black/[0.04] dark:border-white/[0.06] mt-3 flex items-center justify-between">
-                                    <span className="text-xs text-zinc-400">
-                                        Direct Booking
-                                    </span>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            navigate(`/booking/details/${facility.id}`);
-                                        }}
-                                        className="px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold transition-all active:scale-95 flex items-center gap-1"
-                                    >
-                                        <span>View Details</span>
-                                        <span className="material-symbols-outlined text-sm">arrow_forward</span>
-                                    </button>
-                                </div>
-                            </div>
-                        ))
-                    ) : (
-                        <div className="flex flex-col items-center justify-center py-16 text-center text-zinc-400 md:col-span-2">
-                            <span className="material-symbols-outlined text-5xl mb-3 text-zinc-500">
-                                location_off
-                            </span>
-                            <p className="text-zinc-600 dark:text-zinc-300 font-medium text-sm">
-                                No facilities found
+                        <div className="flex flex-col items-center justify-center py-24">
+                            <div className="size-10 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+                            <p className="mt-3 text-xs font-bold text-zinc-400 uppercase tracking-wide">
+                                Loading Verified Film Facilities...
                             </p>
                         </div>
+                    ) : filteredFacilities.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                            {filteredFacilities.map((facility) => (
+                                <div
+                                    key={facility.id}
+                                    onClick={() => navigate(`/booking/details/${facility.id}`)}
+                                    className="rounded-2xl bg-[#121316] border border-white/[0.08] hover:border-amber-500/40 overflow-hidden p-4 shadow-xl transition-all group cursor-pointer flex flex-col justify-between"
+                                >
+                                    <div>
+                                        {/* Image Box */}
+                                        <div className="relative w-full aspect-[16/10] rounded-xl overflow-hidden bg-black mb-3.5 border border-white/5">
+                                            <PostMedia
+                                                src={facility.image || ''}
+                                                fallbackType="COMPANY_LOGO"
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                            />
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
+
+                                            {/* Type Pill */}
+                                            <span className="absolute top-2.5 left-2.5 px-3 py-1 rounded-lg bg-black/75 backdrop-blur-md text-[11px] font-bold text-amber-400 border border-amber-500/25">
+                                                {facility.type}
+                                            </span>
+
+                                            {/* Rating */}
+                                            <div className="absolute top-2.5 right-2.5 bg-black/75 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/10 flex items-center gap-1 text-xs">
+                                                <span className="material-symbols-outlined text-amber-400 text-sm filled" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                                                <span className="text-white font-bold">{facility.rating || 4.9}</span>
+                                            </div>
+
+                                            {/* Price Tag */}
+                                            {facility.price && (
+                                                <span className="absolute bottom-2.5 right-2.5 px-3 py-1 rounded-lg bg-amber-500 text-black text-xs font-black shadow-lg">
+                                                    {facility.price}
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        <h3 className="text-base font-bold text-white group-hover:text-amber-400 transition-colors truncate">
+                                            {facility.name}
+                                        </h3>
+                                        <p className="text-xs text-zinc-400 flex items-center gap-1 mt-1 truncate">
+                                            <span className="material-symbols-outlined text-xs text-amber-500">location_on</span>
+                                            {facility.location || 'Pan-India Production Hub'}
+                                        </p>
+
+                                        {/* Specs tags if available */}
+                                        <div className="flex items-center gap-2 mt-3 flex-wrap">
+                                            <span className="text-[10px] px-2 py-0.5 rounded-md bg-white/[0.04] text-zinc-300 border border-white/[0.06] flex items-center gap-1">
+                                                <span className="material-symbols-outlined text-[11px] text-amber-400">verified</span>
+                                                Cine Certified
+                                            </span>
+                                            <span className="text-[10px] px-2 py-0.5 rounded-md bg-white/[0.04] text-zinc-300 border border-white/[0.06]">
+                                                Direct Inquiries
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div className="pt-3 border-t border-white/[0.06] mt-4 flex items-center justify-between gap-2">
+                                        <span className="text-xs text-zinc-400 font-medium">
+                                            5MC Verified Facility
+                                        </span>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                navigate(`/booking/details/${facility.id}`);
+                                            }}
+                                            className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold transition-all active:scale-95 flex items-center gap-1.5 shadow-md shadow-amber-500/10"
+                                        >
+                                            <span>View Details</span>
+                                            <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center py-20 text-center rounded-2xl bg-[#121316] border border-white/[0.06]">
+                            <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-4">
+                                <span className="material-symbols-outlined text-3xl text-amber-400">location_off</span>
+                            </div>
+                            <h3 className="text-base font-bold text-white mb-1">
+                                No facilities found matching "{searchQuery}"
+                            </h3>
+                            <p className="text-xs text-zinc-400 max-w-sm mb-4">
+                                Try adjusting your search query or switching to 'All Spaces' to explore all verified studios.
+                            </p>
+                            <button
+                                onClick={() => { setSearchQuery(''); setActiveCategory('All'); }}
+                                className="px-4 py-2 rounded-xl bg-amber-500 text-black text-xs font-bold hover:bg-amber-400 transition-all"
+                            >
+                                Reset Search Filters
+                            </button>
+                        </div>
                     )}
-                </div>
+                </main>
             </div>
 
             {/* Bottom Navigation */}
             <BottomNav />
 
-            {/* Map Discovery */}
+            {/* Map Discovery Modal */}
             {showMap && (
                 <div
-                    className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm animate-in fade-in"
+                    className="fixed inset-0 z-[100] bg-black/75 backdrop-blur-md animate-in fade-in"
                     onClick={() => setShowMap(false)}
                 >
                     <div className="h-full w-full" onClick={(e) => e.stopPropagation()}>

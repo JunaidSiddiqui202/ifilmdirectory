@@ -348,24 +348,25 @@ export default function BusinessProfile() {
 
     if (loading) {
         return (
-            <div className="flex h-screen items-center justify-center bg-white dark:bg-black">
-                <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+            <div className="flex h-screen items-center justify-center bg-[#090A0C]">
+                <div className="h-10 w-10 animate-spin rounded-full border-4 border-amber-500 border-t-transparent"></div>
             </div>
         );
     }
 
     return (
-        <div className="relative flex min-h-screen w-full flex-col bg-zinc-50 dark:bg-zinc-950 pb-32">
+        <div className="relative flex min-h-screen w-full flex-col bg-[#090A0C] text-white pb-32">
+            <div className="w-full max-w-5xl mx-auto flex flex-col flex-1">
             {/* Header with Cover Image */}
             <div className="relative">
                 {/* Reduced Cover Image */}
-                <div className="relative h-48 w-full overflow-hidden">
+                <div className="relative h-56 md:h-72 w-full overflow-hidden md:rounded-b-3xl">
                     <PostMedia
                         src={business.coverImage}
-                        className="h-full w-full object-cover grayscale-[20%] brightness-90"
+                        className="h-full w-full object-cover grayscale-[10%] brightness-90"
                         fallbackType="GENERAL"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-zinc-50 dark:to-zinc-950"></div>
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-[#090A0C]"></div>
 
                     {/* Navigation Buttons */}
                     <div className="absolute inset-x-4 top-4 flex items-center justify-between">
@@ -454,51 +455,51 @@ export default function BusinessProfile() {
             </div>
 
             {/* Availability & Location Bar */}
-            <div className="mx-6 mt-6 flex items-center justify-between gap-3 bg-white dark:bg-zinc-900 p-3 rounded-2xl border border-zinc-100 dark:border-zinc-800 shadow-sm">
+            <div className="mx-4 md:mx-0 mt-6 flex items-center justify-between gap-3 bg-[#121316] p-3.5 rounded-2xl border border-white/[0.08] shadow-lg">
                 <div className="flex items-center gap-2 px-2">
-                    <span className={`h-2.5 w-2.5 rounded-full ${business.isAvailable ? 'bg-green-500' : 'bg-red-500'} animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]`}></span>
-                    <span className="text-xs font-black uppercase tracking-tight text-zinc-900 dark:text-white">{business.nextAvailable}</span>
+                    <span className={`h-2.5 w-2.5 rounded-full ${business.isAvailable ? 'bg-emerald-400' : 'bg-rose-400'} animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.5)]`}></span>
+                    <span className="text-xs font-black uppercase tracking-tight text-white">{business.nextAvailable}</span>
                 </div>
-                <div className="flex items-center gap-1.5 px-2 py-1.5 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl">
-                    <span className="material-symbols-outlined text-sm text-zinc-400">location_on</span>
-                    <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 truncate max-w-[100px]">{business.city}</span>
+                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-black/40 border border-white/[0.06] rounded-xl">
+                    <span className="material-symbols-outlined text-sm text-amber-500">location_on</span>
+                    <span className="text-[11px] font-bold text-zinc-300 truncate max-w-[150px]">{business.city}</span>
                 </div>
             </div>
 
             {/* Quick Stats redesigned as minimalist cards */}
-            <div className="mx-6 mt-4 grid grid-cols-3 gap-3">
-                <div className="rounded-2xl bg-white dark:bg-zinc-900 p-4 border border-zinc-100 dark:border-zinc-800 shadow-sm transition-transform hover:-translate-y-1 hover:shadow-md duration-300">
+            <div className="mx-4 md:mx-0 mt-4 grid grid-cols-3 gap-3">
+                <div className="rounded-2xl bg-[#121316] p-4 border border-white/[0.08] shadow-lg transition-transform hover:-translate-y-0.5 duration-300 text-center">
                     <div className="flex items-center gap-1 mb-1 justify-center">
-                        <span className="text-lg font-black text-zinc-900 dark:text-white">{business.rating}</span>
-                        <span className="material-symbols-outlined text-yellow-500 text-sm filled">star</span>
+                        <span className="text-lg font-black text-white">{business.rating}</span>
+                        <span className="material-symbols-outlined text-amber-400 text-sm filled" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
                     </div>
-                    <div className="text-[10px] font-black text-zinc-400 uppercase tracking-widest text-center">{business.reviewCount} Reviews</div>
+                    <div className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">{business.reviewCount} Reviews</div>
                 </div>
-                <div className="rounded-2xl bg-white dark:bg-zinc-900 p-4 border border-zinc-100 dark:border-zinc-800 shadow-sm transition-transform hover:-translate-y-1 hover:shadow-md duration-300">
-                    <div className="text-lg font-black text-zinc-900 dark:text-white text-center mb-1">{business.projectsCompleted}+</div>
-                    <div className="text-[10px] font-black text-zinc-400 uppercase tracking-widest text-center">Projects</div>
+                <div className="rounded-2xl bg-[#121316] p-4 border border-white/[0.08] shadow-lg transition-transform hover:-translate-y-0.5 duration-300 text-center">
+                    <div className="text-lg font-black text-amber-400 text-center mb-1">{business.projectsCompleted}+</div>
+                    <div className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Projects</div>
                 </div>
-                <div className="rounded-2xl bg-white dark:bg-zinc-900 p-4 border border-zinc-100 dark:border-zinc-800 shadow-sm transition-transform hover:-translate-y-1 hover:shadow-md duration-300">
-                    <div className="text-lg font-black text-zinc-900 dark:text-white text-center mb-1">{business.yearsExperience}</div>
-                    <div className="text-[10px] font-black text-zinc-400 uppercase tracking-widest text-center">Years</div>
+                <div className="rounded-2xl bg-[#121316] p-4 border border-white/[0.08] shadow-lg transition-transform hover:-translate-y-0.5 duration-300 text-center">
+                    <div className="text-lg font-black text-white text-center mb-1">{business.yearsExperience}</div>
+                    <div className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Years</div>
                 </div>
             </div>
 
             {/* Tabs */}
-            <div className="sticky top-0 z-10 mt-6 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-black/80 backdrop-blur-md">
-                <div className="flex gap-1 px-6 overflow-x-auto no-scrollbar">
+            <div className="sticky top-0 z-10 mt-6 border-b border-white/[0.08] bg-[#090A0C]/90 backdrop-blur-md">
+                <div className="flex gap-2 px-4 md:px-0 overflow-x-auto no-scrollbar">
                     {(['about', 'services', 'gallery', 'reviews'] as const).map((tab) => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
                             className={`px-4 py-3 text-sm font-bold capitalize transition-colors relative ${activeTab === tab
-                                ? 'text-primary'
-                                : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                                ? 'text-amber-400'
+                                : 'text-zinc-400 hover:text-white'
                                 }`}
                         >
                             {tab}
                             {activeTab === tab && (
-                                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full"></div>
+                                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-400 rounded-full"></div>
                             )}
                         </button>
                     ))}
@@ -774,18 +775,23 @@ export default function BusinessProfile() {
                 )}
             </div>
             {/* Fixed Bottom CTA */}
-            <div className="fixed bottom-32 left-0 right-0 z-20 px-6">
-                <div className="mx-auto max-w-md">
-                    <div className="rounded-2xl bg-white dark:bg-zinc-900 p-4 shadow-2xl border border-zinc-200 dark:border-zinc-800">
-                        <div className="flex items-center gap-3">
+            <div className="fixed bottom-24 left-0 right-0 z-20 px-4 pointer-events-none">
+                <div className="mx-auto max-w-md pointer-events-auto">
+                    <div className="rounded-2xl bg-[#121316]/95 backdrop-blur-xl p-3 shadow-2xl border border-white/[0.1]">
+                        <div className="flex items-center gap-2.5">
                             <button
                                 onClick={() => setShowContactModal(true)}
-                                className="flex-1 min-w-0 rounded-xl bg-primary py-4 font-black text-white hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+                                className="flex-1 min-w-0 rounded-xl bg-amber-500 hover:bg-amber-400 py-3.5 font-black text-black shadow-lg shadow-amber-500/20 transition-all active:scale-95 flex items-center justify-center gap-2"
                             >
-                                <span className="text-base pb-1">Contact Us</span>
+                                <span className="material-symbols-outlined text-xl">calendar_month</span>
+                                <span className="text-sm font-bold">Contact & Inquire Booking</span>
                             </button>
-                            <button className="w-12 h-12 shrink-0 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors flex items-center justify-center">
-                                <span className="material-symbols-outlined text-xl">bookmark_border</span>
+                            <button 
+                                onClick={handleShare}
+                                className="w-12 h-12 shrink-0 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-zinc-300 border border-white/[0.08] transition-colors flex items-center justify-center"
+                                title="Share"
+                            >
+                                <span className="material-symbols-outlined text-xl">share</span>
                             </button>
                         </div>
                     </div>
@@ -796,47 +802,50 @@ export default function BusinessProfile() {
             {
                 showContactModal && (
                     <div
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in"
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-4 animate-in fade-in"
                         onClick={() => setShowContactModal(false)}
                     >
                         <div
-                            className="w-full max-w-md rounded-3xl bg-white dark:bg-zinc-900 p-6 shadow-2xl animate-in zoom-in-95"
+                            className="w-full max-w-md rounded-3xl bg-[#121316] border border-white/[0.12] p-6 shadow-2xl animate-in zoom-in-95 text-white"
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <div className="flex items-center justify-between mb-6">
-                                <h3 className="text-xl font-black text-zinc-900 dark:text-white">Contact {business.name}</h3>
+                            <div className="flex items-center justify-between mb-5">
+                                <div>
+                                    <h3 className="text-lg font-bold text-white">Contact {business.name}</h3>
+                                    <p className="text-xs text-zinc-400">Direct studio desk & booking inquiries</p>
+                                </div>
                                 <button
                                     onClick={() => setShowContactModal(false)}
-                                    className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+                                    className="p-1 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-zinc-400 hover:text-white transition-colors"
                                 >
-                                    <span className="material-symbols-outlined">close</span>
+                                    <span className="material-symbols-outlined text-lg">close</span>
                                 </button>
                             </div>
 
-                            <div className="space-y-4">
+                            <div className="space-y-3">
                                 <a
                                     href={`tel:${business.phone}`}
-                                    className="flex items-center gap-4 rounded-xl bg-zinc-50 dark:bg-zinc-800 p-4 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
+                                    className="flex items-center gap-3.5 rounded-xl bg-black/40 border border-white/[0.06] p-3.5 hover:border-amber-500/40 transition-all"
                                 >
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                                        <span className="material-symbols-outlined text-primary">call</span>
+                                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400">
+                                        <span className="material-symbols-outlined text-lg">call</span>
                                     </div>
-                                    <div className="flex-1">
-                                        <p className="text-sm font-bold text-zinc-900 dark:text-white">Phone</p>
-                                        <p className="text-sm text-zinc-500 dark:text-zinc-400">{business.phone}</p>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-xs font-bold text-white">Direct Phone</p>
+                                        <p className="text-xs text-zinc-400 truncate">{business.phone}</p>
                                     </div>
                                 </a>
 
                                 <a
                                     href={`mailto:${business.email}`}
-                                    className="flex items-center gap-4 rounded-xl bg-zinc-50 dark:bg-zinc-800 p-4 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
+                                    className="flex items-center gap-3.5 rounded-xl bg-black/40 border border-white/[0.06] p-3.5 hover:border-amber-500/40 transition-all"
                                 >
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                                        <span className="material-symbols-outlined text-primary">email</span>
+                                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400">
+                                        <span className="material-symbols-outlined text-lg">email</span>
                                     </div>
-                                    <div className="flex-1">
-                                        <p className="text-sm font-bold text-zinc-900 dark:text-white">Email</p>
-                                        <p className="text-sm text-zinc-500 dark:text-zinc-400">{business.email}</p>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-xs font-bold text-white">Official Email</p>
+                                        <p className="text-xs text-zinc-400 truncate">{business.email}</p>
                                     </div>
                                 </a>
 
@@ -845,14 +854,14 @@ export default function BusinessProfile() {
                                         href={`https://${business.website}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="flex items-center gap-4 rounded-xl bg-zinc-50 dark:bg-zinc-800 p-4 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
+                                        className="flex items-center gap-3.5 rounded-xl bg-black/40 border border-white/[0.06] p-3.5 hover:border-amber-500/40 transition-all"
                                     >
-                                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                                            <span className="material-symbols-outlined text-primary">language</span>
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400">
+                                            <span className="material-symbols-outlined text-lg">language</span>
                                         </div>
-                                        <div className="flex-1">
-                                            <p className="text-sm font-bold text-zinc-900 dark:text-white">Website</p>
-                                            <p className="text-sm text-zinc-500 dark:text-zinc-400">{business.website}</p>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-xs font-bold text-white">Studio Website</p>
+                                            <p className="text-xs text-zinc-400 truncate">{business.website}</p>
                                         </div>
                                     </a>
                                 )}
@@ -860,9 +869,10 @@ export default function BusinessProfile() {
 
                             <button
                                 onClick={() => navigate(`/messaging`)}
-                                className="mt-6 w-full rounded-xl bg-primary py-3.5 text-sm font-bold text-white hover:bg-primary/90 transition-colors"
+                                className="mt-5 w-full rounded-xl bg-amber-500 hover:bg-amber-400 py-3 text-xs font-black text-black transition-all shadow-md flex items-center justify-center gap-2"
                             >
-                                Send Message
+                                <span className="material-symbols-outlined text-sm">chat</span>
+                                <span>Message on iFilm Directory</span>
                             </button>
                         </div>
                     </div>
@@ -873,7 +883,7 @@ export default function BusinessProfile() {
             {
                 showMap && (
                     <div
-                        className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm animate-in fade-in"
+                        className="fixed inset-0 z-[100] bg-black/75 backdrop-blur-md animate-in fade-in"
                         onClick={() => setShowMap(false)}
                     >
                         <div className="h-full w-full" onClick={(e) => e.stopPropagation()}>
@@ -893,6 +903,7 @@ export default function BusinessProfile() {
                     </div>
                 )
             }
+            </div>
 
             <BottomNav />
         </div >
