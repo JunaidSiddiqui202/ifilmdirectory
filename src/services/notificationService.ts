@@ -19,7 +19,7 @@ const db = getFirestore(app);
 export interface NotificationData {
     id: string;
     userId: string;
-    type: 'like' | 'comment' | 'follow' | 'job' | 'system' | 'connection';
+    type: 'like' | 'comment' | 'follow' | 'job' | 'system' | 'connection' | 'message';
     title: string;
     message: string;
     createdAt: Timestamp;

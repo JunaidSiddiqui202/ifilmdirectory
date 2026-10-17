@@ -3,7 +3,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import PostMedia from '../components/PostMedia';
 import { uploadFile } from '../services/storageService';
-import { subscribeToMessages, sendMessage, clearChat, type Message as FirestoreMessage } from '../services/messagingService';
+import { subscribeToMessages, sendMessage, clearChat, markChatAsRead, type Message as FirestoreMessage } from '../services/messagingService';
 import { useAuth } from '../context/AuthContext';
 import { getUserProfile, type UserProfile } from '../services/userService';
 
@@ -58,13 +58,37 @@ export default function Messaging() {
 
     const [messages, setMessages] = useState<Message[]>([]);
     const [otherUserProfile, setOtherUserProfile] = useState<UserProfile | null>(null);
-    const chatId = id || 'demo-chat-ranveer';
+    const rawId = id || 'demo-chat-ranveer';
     const currentUserId = currentUser?.uid || 'demo-user';
 
-    // Extract the other user's ID from the chatId (assuming format: userId1-userId2)
-    const otherUserId = chatId.split('-').find(uid => uid !== currentUserId) || chatId;
+    // Compute canonical chatId and recipient otherUserId
+    let otherUserId = rawId;
+    let chatId = rawId;
 
-    const chatName = otherUserProfile?.displayName || chatId.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
+    if (currentUser && rawId !== 'demo-chat-ranveer') {
+        if (rawId.includes('_')) {
+            const parts = rawId.split('_');
+            otherUserId = parts.find(p => p !== currentUser.uid) || rawId;
+            chatId = rawId;
+        } else if (rawId.includes('-')) {
+            const parts = rawId.split('-');
+            otherUserId = parts.find(p => p !== currentUser.uid) || rawId;
+            chatId = [currentUser.uid, otherUserId].sort().join('_');
+        } else {
+            // rawId is a direct user profile UID
+            otherUserId = rawId;
+            chatId = [currentUser.uid, otherUserId].sort().join('_');
+        }
+    }
+
+    // Auto-mark chat as read when viewed
+    useEffect(() => {
+        if (currentUser && chatId && chatId !== 'demo-chat-ranveer') {
+            markChatAsRead(chatId, currentUser.uid);
+        }
+    }, [chatId, currentUser, messages.length]);
+
+    const chatName = otherUserProfile?.displayName || (otherUserId ? otherUserId.slice(0, 12) : 'Filmmaker');
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -131,11 +155,18 @@ export default function Messaging() {
     const handleSendMessage = async () => {
         if (messageText.trim()) {
             try {
-                await sendMessage(chatId, {
-                    text: messageText,
-                    senderId: currentUserId,
-                    type: 'text'
-                });
+                const recipient = otherUserId !== currentUserId && otherUserId !== 'demo-chat-ranveer' ? otherUserId : undefined;
+                await sendMessage(
+                    chatId,
+                    {
+                        text: messageText,
+                        senderId: currentUserId,
+                        type: 'text'
+                    },
+                    recipient,
+                    currentUser?.displayName || 'Filmmaker',
+                    currentUser?.photoURL || undefined
+                );
                 setMessageText('');
                 scrollToBottom();
             } catch (error) {
@@ -252,12 +283,19 @@ export default function Messaging() {
         try {
             const response = await uploadFile(audioFile);
             if (response.url) {
-                await sendMessage(chatId, {
-                    text: 'Voice Message',
-                    senderId: currentUserId,
-                    type: 'audio',
-                    mediaUrl: response.url
-                });
+                const recipient = otherUserId !== currentUserId && otherUserId !== 'demo-chat-ranveer' ? otherUserId : undefined;
+                await sendMessage(
+                    chatId,
+                    {
+                        text: 'Voice Message',
+                        senderId: currentUserId,
+                        type: 'audio',
+                        mediaUrl: response.url
+                    },
+                    recipient,
+                    currentUser?.displayName || 'Filmmaker',
+                    currentUser?.photoURL || undefined
+                );
                 scrollToBottom();
             } else {
                 alert('Failed to upload voice message');

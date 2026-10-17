@@ -3,6 +3,7 @@ import { lazy, Suspense, useEffect } from 'react';
 import ProtectedRoute from './components/ProtectedRoute';
 import NotificationListener from './components/NotificationListener';
 import { ToastProvider } from './context/ToastContext';
+import { UnreadProvider } from './context/UnreadContext';
 import { seedGuilds } from './seedGuilds';
 
 // Loading component for Suspense fallback
@@ -98,59 +99,61 @@ function App() {
   return (
     <BrowserRouter>
       <ToastProvider>
-        <NotificationListener />
-        <Suspense fallback={<PageLoader />}>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<Navigate to="/welcome" replace />} />
-          <Route path="/welcome" element={<Welcome />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/terms" element={<Terms />} />
+        <UnreadProvider>
+          <NotificationListener />
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<Navigate to="/welcome" replace />} />
+              <Route path="/welcome" element={<Welcome />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
 
-          {/* Protected Routes */}
-          <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-          <Route path="/-admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-          <Route path="/-admin/utils" element={<ProtectedRoute><AdminUtils /></ProtectedRoute>} />
-          <Route path="/blogs-events" element={<ProtectedRoute><BlogsEvents /></ProtectedRoute>} />
-          <Route path="/edit-blog" element={<ProtectedRoute><EditBlog /></ProtectedRoute>} />
-          <Route path="/create-blog" element={<ProtectedRoute><EditBlog /></ProtectedRoute>} />
-          <Route path="/create-event" element={<ProtectedRoute><CreateEvent /></ProtectedRoute>} />
-          <Route path="/browse-profiles" element={<ProtectedRoute><BrowseProfiles /></ProtectedRoute>} />
-          <Route path="/jobs" element={<ProtectedRoute><Jobs /></ProtectedRoute>} />
-          <Route path="/job/:id" element={<ProtectedRoute><JobDetails /></ProtectedRoute>} />
-          <Route path="/job/:id/applications" element={<ProtectedRoute><JobApplications /></ProtectedRoute>} />
-          <Route path="/post-job" element={<ProtectedRoute><PostJob /></ProtectedRoute>} />
-          <Route path="/messaging" element={<ProtectedRoute><MessagesList /></ProtectedRoute>} />
-          <Route path="/chat/:id" element={<ProtectedRoute><Messaging /></ProtectedRoute>} />
-          <Route path="/groups-forums" element={<ProtectedRoute><GroupsForums /></ProtectedRoute>} />
-          <Route path="/showreel/view1" element={<ProtectedRoute><ShowreelView1 /></ProtectedRoute>} />
-          <Route path="/showreel/view2" element={<ProtectedRoute><ShowreelView2 /></ProtectedRoute>} />
-          <Route path="/showreel/view3" element={<ProtectedRoute><ShowreelView3 /></ProtectedRoute>} />
-          <Route path="/showreel/upload" element={<ProtectedRoute><UploadShowreel /></ProtectedRoute>} />
-          <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
-          <Route path="/profile/:id" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
-          <Route path="/service-providers" element={<ProtectedRoute><ServiceProviderShowcase /></ProtectedRoute>} />
-          <Route path="/marketplace" element={<ProtectedRoute><ServiceMarketplace /></ProtectedRoute>} />
-          <Route path="/booking-facilities" element={<ProtectedRoute><BookingFacilities /></ProtectedRoute>} />
-          <Route path="/booking/details/:id" element={<ProtectedRoute><BusinessProfile /></ProtectedRoute>} />
-          <Route path="/business/:id" element={<ProtectedRoute><BusinessProfile /></ProtectedRoute>} />
-          <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-          <Route path="/settings/:section" element={<ProtectedRoute><SettingsDetail /></ProtectedRoute>} />
-          <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
-          <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
-          <Route path="/showcase" element={<ProtectedRoute><Showcase /></ProtectedRoute>} />
-          <Route path="/guilds" element={<ProtectedRoute><Guilds /></ProtectedRoute>} />
-          <Route path="/saved" element={<ProtectedRoute><SavedItems /></ProtectedRoute>} />
-          <Route path="/projects" element={<ProtectedRoute><ProductionProjects /></ProtectedRoute>} />
-          <Route path="/project/:id" element={<ProtectedRoute><ProjectDetails /></ProtectedRoute>} />
-          <Route path="/south-cinema" element={<ProtectedRoute><SouthCinemaNews /></ProtectedRoute>} />
-          <Route path="/news" element={<ProtectedRoute><SouthCinemaNews /></ProtectedRoute>} />
+              {/* Protected Routes */}
+              <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+              <Route path="/-admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+              <Route path="/-admin/utils" element={<ProtectedRoute><AdminUtils /></ProtectedRoute>} />
+              <Route path="/blogs-events" element={<ProtectedRoute><BlogsEvents /></ProtectedRoute>} />
+              <Route path="/edit-blog" element={<ProtectedRoute><EditBlog /></ProtectedRoute>} />
+              <Route path="/create-blog" element={<ProtectedRoute><EditBlog /></ProtectedRoute>} />
+              <Route path="/create-event" element={<ProtectedRoute><CreateEvent /></ProtectedRoute>} />
+              <Route path="/browse-profiles" element={<ProtectedRoute><BrowseProfiles /></ProtectedRoute>} />
+              <Route path="/jobs" element={<ProtectedRoute><Jobs /></ProtectedRoute>} />
+              <Route path="/job/:id" element={<ProtectedRoute><JobDetails /></ProtectedRoute>} />
+              <Route path="/job/:id/applications" element={<ProtectedRoute><JobApplications /></ProtectedRoute>} />
+              <Route path="/post-job" element={<ProtectedRoute><PostJob /></ProtectedRoute>} />
+              <Route path="/messaging" element={<ProtectedRoute><MessagesList /></ProtectedRoute>} />
+              <Route path="/chat/:id" element={<ProtectedRoute><Messaging /></ProtectedRoute>} />
+              <Route path="/groups-forums" element={<ProtectedRoute><GroupsForums /></ProtectedRoute>} />
+              <Route path="/showreel/view1" element={<ProtectedRoute><ShowreelView1 /></ProtectedRoute>} />
+              <Route path="/showreel/view2" element={<ProtectedRoute><ShowreelView2 /></ProtectedRoute>} />
+              <Route path="/showreel/view3" element={<ProtectedRoute><ShowreelView3 /></ProtectedRoute>} />
+              <Route path="/showreel/upload" element={<ProtectedRoute><UploadShowreel /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
+              <Route path="/profile/:id" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
+              <Route path="/service-providers" element={<ProtectedRoute><ServiceProviderShowcase /></ProtectedRoute>} />
+              <Route path="/marketplace" element={<ProtectedRoute><ServiceMarketplace /></ProtectedRoute>} />
+              <Route path="/booking-facilities" element={<ProtectedRoute><BookingFacilities /></ProtectedRoute>} />
+              <Route path="/booking/details/:id" element={<ProtectedRoute><BusinessProfile /></ProtectedRoute>} />
+              <Route path="/business/:id" element={<ProtectedRoute><BusinessProfile /></ProtectedRoute>} />
+              <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+              <Route path="/settings/:section" element={<ProtectedRoute><SettingsDetail /></ProtectedRoute>} />
+              <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+              <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
+              <Route path="/showcase" element={<ProtectedRoute><Showcase /></ProtectedRoute>} />
+              <Route path="/guilds" element={<ProtectedRoute><Guilds /></ProtectedRoute>} />
+              <Route path="/saved" element={<ProtectedRoute><SavedItems /></ProtectedRoute>} />
+              <Route path="/projects" element={<ProtectedRoute><ProductionProjects /></ProtectedRoute>} />
+              <Route path="/project/:id" element={<ProtectedRoute><ProjectDetails /></ProtectedRoute>} />
+              <Route path="/south-cinema" element={<ProtectedRoute><SouthCinemaNews /></ProtectedRoute>} />
+              <Route path="/news" element={<ProtectedRoute><SouthCinemaNews /></ProtectedRoute>} />
 
-          {/* Catch-all fallback */}
-          <Route path="*" element={<Navigate to="/home" replace />} />
-        </Routes>
-      </Suspense>
+              {/* Catch-all fallback */}
+              <Route path="*" element={<Navigate to="/home" replace />} />
+            </Routes>
+          </Suspense>
+        </UnreadProvider>
       </ToastProvider>
     </BrowserRouter>
   );

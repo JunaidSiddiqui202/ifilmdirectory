@@ -1,6 +1,7 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { useUnread } from '../context/UnreadContext';
 import Logo from './Logo';
 import PostMedia from './PostMedia';
 
@@ -14,6 +15,7 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
     const location = useLocation();
     const { currentUser } = useAuth();
     const { isDarkMode, toggleDarkMode } = useTheme();
+    const { hasUnreadMessages, hasUnreadNotifications } = useUnread();
 
     const isActive = (path: string) => {
         if (path === '/home') return location.pathname === '/home';
@@ -40,8 +42,8 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
         { path: '/browse-profiles', label: 'Talent Directory', icon: 'explore' },
         { path: '/booking-facilities', label: 'Facilities & Gear', icon: 'domain' },
         { path: '/groups-forums', label: 'Guilds & Forums', icon: 'forum' },
-        { path: '/messaging', label: 'Messages', icon: 'chat_bubble', hasBadge: false },
-        { path: '/notifications', label: 'Notifications', icon: 'notifications', hasDot: true },
+        { path: '/messaging', label: 'Messages', icon: 'chat_bubble', hasBadge: hasUnreadMessages },
+        { path: '/notifications', label: 'Notifications', icon: 'notifications', hasDot: hasUnreadNotifications },
         { path: '/projects', label: 'My Projects', icon: 'architecture' },
         { path: '/saved', label: 'Saved Items', icon: 'bookmarks' },
         { path: '/profile', label: 'Profile', icon: 'person', isProfile: true },
@@ -102,9 +104,12 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                                         </span>
                                     )}
 
-                                    {/* Unread Indicator Dot */}
-                                    {item.hasDot && (
-                                        <span className="absolute -top-0.5 -right-0.5 size-2 bg-amber-500 rounded-full animate-pulse" />
+                                    {/* Unread Indicator Dots */}
+                                    {item.hasBadge && (
+                                        <span className="absolute -top-1 -right-1 size-2.5 bg-red-500 rounded-full ring-2 ring-white dark:ring-[#090A0C] animate-pulse shadow-sm shadow-red-500/60" />
+                                    )}
+                                    {item.hasDot && !item.hasBadge && (
+                                        <span className="absolute -top-0.5 -right-0.5 size-2 bg-amber-500 rounded-full animate-pulse shadow-sm shadow-amber-500/50" />
                                     )}
                                 </div>
 

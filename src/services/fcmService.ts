@@ -146,41 +146,103 @@ export const listenForMessages = (callback: (payload: any) => void) => {
     }
 };
 
+let sharedAudioCtx: AudioContext | null = null;
+
 /**
- * Play notification sound with fallback
+ * Unlock AudioContext on first user interaction to bypass browser autoplay policy
+ */
+export const unlockAudio = () => {
+    try {
+        if (typeof window === 'undefined') return;
+        const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+        if (!AudioCtx) return;
+        if (!sharedAudioCtx) {
+            sharedAudioCtx = new AudioCtx();
+        }
+        if (sharedAudioCtx.state === 'suspended') {
+            sharedAudioCtx.resume().catch(() => {});
+        }
+    } catch (e) {
+        // Safe fail
+    }
+};
+
+// Register one-time user interaction listeners to unlock sound
+if (typeof window !== 'undefined') {
+    const handleFirstInteraction = () => {
+        unlockAudio();
+        window.removeEventListener('click', handleFirstInteraction);
+        window.removeEventListener('touchstart', handleFirstInteraction);
+        window.removeEventListener('keydown', handleFirstInteraction);
+    };
+    window.addEventListener('click', handleFirstInteraction, { passive: true });
+    window.addEventListener('touchstart', handleFirstInteraction, { passive: true });
+    window.addEventListener('keydown', handleFirstInteraction, { passive: true });
+}
+
+/**
+ * Synthesizes a gentle, premium 2-tone chime (D5 -> A5) via Web Audio API
+ */
+export const playSynthesizedChime = () => {
+    try {
+        if (typeof window === 'undefined') return;
+        const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = sharedAudioCtx || new AudioCtx();
+        if (ctx.state === 'suspended') {
+            ctx.resume().catch(() => {});
+        }
+        const now = ctx.currentTime;
+
+        // Tone 1: Gentle bell D5 (587.33 Hz)
+        const osc1 = ctx.createOscillator();
+        const gain1 = ctx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(587.33, now);
+        gain1.gain.setValueAtTime(0.35, now);
+        gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+        osc1.connect(gain1);
+        gain1.connect(ctx.destination);
+        osc1.start(now);
+        osc1.stop(now + 0.35);
+
+        // Tone 2: Bright chime A5 (880 Hz)
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(880, now + 0.12);
+        gain2.gain.setValueAtTime(0.001, now);
+        gain2.gain.setValueAtTime(0.45, now + 0.12);
+        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.start(now + 0.12);
+        osc2.stop(now + 0.6);
+    } catch (e) {
+        console.warn('Web Audio synthesis prevented:', e);
+    }
+};
+
+/**
+ * Play notification sound with fallback to synthesized chime
  */
 export const playNotificationSound = () => {
     try {
-        // Try to play custom sound first
-        const audio = new Audio('/notification-sound.mp3');
-        audio.volume = 0.7;
+        unlockAudio();
+        // 1. Try native wav audio file
+        const audio = new Audio('/notification-sound.wav');
+        audio.volume = 0.85;
 
-        audio.play().catch((err) => {
-            console.log('Custom sound failed, trying fallback:', err);
-
-            // Fallback: Use Web Audio API to generate a simple notification beep
-            try {
-                const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
-
-                oscillator.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-
-                oscillator.frequency.value = 800; // Frequency in Hz
-                oscillator.type = 'sine';
-
-                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-
-                oscillator.start(audioContext.currentTime);
-                oscillator.stop(audioContext.currentTime + 0.3);
-            } catch (beepError) {
-                console.log('Beep sound also failed:', beepError);
-            }
-        });
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(() => {
+                // Autoplay policy or file issue: fallback to synthesized chime
+                playSynthesizedChime();
+            });
+        }
     } catch (error) {
-        console.log('Sound playback not available:', error);
+        // Immediate fallback
+        playSynthesizedChime();
     }
 };
 

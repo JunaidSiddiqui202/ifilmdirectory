@@ -4,12 +4,14 @@ import BottomNav from '../components/BottomNav';
 import Logo from '../components/Logo';
 import { getChats } from '../services/messagingService';
 import { useAuth } from '../context/AuthContext';
+import { useUnread } from '../context/UnreadContext';
 import PostMedia from '../components/PostMedia';
 import { getUserProfile, type UserProfile } from '../services/userService';
 
 export default function MessagesList() {
     const navigate = useNavigate();
     const { currentUser } = useAuth();
+    const { hasUnreadNotifications } = useUnread();
     const [activeTab, setActiveTab] = useState<'primary' | 'requests' | 'general'>('primary');
     const [recentChats, setRecentChats] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -95,6 +97,8 @@ export default function MessagesList() {
                             console.error(`Error fetching profile for ${otherUserId}:`, error);
                         }
 
+                        const isUnread = Boolean(c.unreadBy && currentUser?.uid && Array.isArray(c.unreadBy) && c.unreadBy.includes(currentUser.uid));
+
                         return {
                             id: c.id,
                             name: userName,
@@ -103,7 +107,7 @@ export default function MessagesList() {
                             time: 'Recent',
                             image: userImage,
                             isStory: false,
-                            unread: false
+                            unread: isUnread
                         };
                     });
 
@@ -158,9 +162,12 @@ export default function MessagesList() {
                             onClick={() => navigate('/notifications')} 
                             className="relative p-2 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:border-amber-500/30 transition-all"
                             aria-label="Notifications"
+                            title="Notifications & Alerts"
                         >
                             <span className="material-symbols-outlined text-xl">notifications</span>
-                            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-amber-500 rounded-full animate-pulse"></span>
+                            {hasUnreadNotifications && (
+                                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-amber-500 rounded-full animate-pulse shadow-sm shadow-amber-500/50"></span>
+                            )}
                         </button>
                         <button 
                             onClick={() => navigate('/browse-profiles')}

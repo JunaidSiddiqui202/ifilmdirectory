@@ -11,6 +11,7 @@ import { getPosts, type PostData } from '../services/postService';
 import { rssNewsService, type NewsItem } from '../services/rssNewsService';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { useUnread } from '../context/UnreadContext';
 import PostMedia from '../components/PostMedia';
 import BreakingTicker from '../components/BreakingTicker';
 
@@ -46,6 +47,7 @@ export default function Home() {
     const navigate = useNavigate();
     const { currentUser } = useAuth();
     const toast = useToast();
+    const { hasUnreadMessages, hasUnreadNotifications } = useUnread();
     const [blogs, setBlogs] = useState<BlogPost[]>([]);
     const [jobs, setJobs] = useState<Job[]>([]);
     const [newUsers, setNewUsers] = useState<UserProfile[]>([]);
@@ -436,16 +438,23 @@ export default function Home() {
                             onClick={() => navigate('/notifications')}
                             className="relative p-2 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:border-amber-500/30 transition-all active:scale-95"
                             aria-label="Notifications"
+                            title="Notifications & Alerts"
                         >
                             <span className="material-symbols-outlined text-xl">notifications</span>
-                            <span className="absolute top-1.5 right-1.5 size-2 bg-amber-500 rounded-full animate-pulse" />
+                            {hasUnreadNotifications && (
+                                <span className="absolute top-1.5 right-1.5 size-2 bg-amber-500 rounded-full animate-pulse shadow-sm shadow-amber-500/50" />
+                            )}
                         </button>
                         <button
                             onClick={() => navigate('/messaging')}
-                            className="p-2 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:border-amber-500/30 transition-all active:scale-95"
+                            className="relative p-2 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:border-amber-500/30 transition-all active:scale-95"
                             aria-label="Messages"
+                            title="Direct Messages"
                         >
                             <span className="material-symbols-outlined text-xl">chat_bubble</span>
+                            {hasUnreadMessages && (
+                                <span className="absolute top-1.5 right-1.5 size-2.5 bg-red-500 rounded-full ring-2 ring-white dark:ring-[#121316] animate-pulse shadow-sm shadow-red-500/60" />
+                            )}
                         </button>
                         <div
                             onClick={() => navigate('/profile')}

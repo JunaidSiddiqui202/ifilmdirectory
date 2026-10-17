@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import BottomNav from '../components/BottomNav';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useUnread } from '../context/UnreadContext';
 import { subscribeToNotifications, markNotificationAsRead, type NotificationData } from '../services/notificationService';
 import { formatTimeAgo } from '../utils/dateUtils';
 
@@ -10,6 +11,7 @@ type TabType = 'general' | 'jobs' | 'connections';
 export default function Notifications() {
     const navigate = useNavigate();
     const { currentUser } = useAuth();
+    const { hasUnreadMessages } = useUnread();
     const [activeTab, setActiveTab] = useState<TabType>('general');
     const [notifications, setNotifications] = useState<NotificationData[]>([]);
     const [loading, setLoading] = useState(true);
@@ -137,11 +139,14 @@ export default function Notifications() {
                     )}
                     <button
                         onClick={() => navigate('/messaging')}
-                        className="size-9 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.04] border border-zinc-200 dark:border-white/[0.08] text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white flex items-center justify-center transition-all"
+                        className="relative size-9 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.04] border border-zinc-200 dark:border-white/[0.08] text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white flex items-center justify-center transition-all"
                         title="Direct Messages"
                         aria-label="Direct Messages"
                     >
                         <span className="material-symbols-outlined text-lg">chat_bubble</span>
+                        {hasUnreadMessages && (
+                            <span className="absolute top-1 right-1 size-2 bg-red-500 rounded-full animate-pulse ring-2 ring-white dark:ring-[#090A0C] shadow-sm shadow-red-500/60" />
+                        )}
                     </button>
                     <button
                         onClick={() => navigate('/settings')}

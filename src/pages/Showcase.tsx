@@ -11,6 +11,7 @@ import { addCommentToPost, getCommentsForPost, toggleLikePost, deletePost, repor
 import { Timestamp, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { useToast } from '../context/ToastContext';
+import { useUnread } from '../context/UnreadContext';
 import { rssNewsService, type NewsItem } from '../services/rssNewsService';
 
 interface Comment {
@@ -101,6 +102,7 @@ export default function Showcase() {
     const [searchParams] = useSearchParams();
     const { currentUser } = useAuth();
     const toast = useToast();
+    const { hasUnreadMessages, hasUnreadNotifications } = useUnread();
     const [posts, setPosts] = useState<Post[]>([]);
 
     useEffect(() => {
@@ -1092,10 +1094,23 @@ export default function Showcase() {
                         </button>
                         <button
                             onClick={() => navigate('/notifications')}
-                            className="size-8 sm:size-9 rounded-lg sm:rounded-xl flex items-center justify-center text-zinc-600 dark:text-zinc-400 hover:text-amber-500 hover:bg-black/5 dark:hover:bg-white/5 transition-all"
+                            className="relative size-8 sm:size-9 rounded-lg sm:rounded-xl flex items-center justify-center text-zinc-600 dark:text-zinc-400 hover:text-amber-500 hover:bg-black/5 dark:hover:bg-white/5 transition-all"
                             title="Notifications"
                         >
                             <span className="material-symbols-outlined text-[18px] sm:text-[20px]">notifications</span>
+                            {hasUnreadNotifications && (
+                                <span className="absolute top-1.5 right-1.5 size-2 bg-amber-500 rounded-full animate-pulse shadow-sm shadow-amber-500/50" />
+                            )}
+                        </button>
+                        <button
+                            onClick={() => navigate('/messaging')}
+                            className="relative size-8 sm:size-9 rounded-lg sm:rounded-xl flex items-center justify-center text-zinc-600 dark:text-zinc-400 hover:text-amber-500 hover:bg-black/5 dark:hover:bg-white/5 transition-all"
+                            title="Direct Messages"
+                        >
+                            <span className="material-symbols-outlined text-[18px] sm:text-[20px]">chat_bubble</span>
+                            {hasUnreadMessages && (
+                                <span className="absolute top-1 right-1 size-2.5 bg-red-500 rounded-full ring-2 ring-white dark:ring-[#090A0C] animate-pulse shadow-sm shadow-red-500/60" />
+                            )}
                         </button>
                         <div
                             onClick={() => navigate('/profile')}
