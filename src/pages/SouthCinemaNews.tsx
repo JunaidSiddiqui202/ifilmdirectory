@@ -224,32 +224,32 @@ export default function SouthCinemaNews() {
                     <div>
                         <div className="flex items-center gap-2">
                             <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
-                            <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+                            <h1 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
                                 South Cinema Wire
-                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 uppercase tracking-widest">
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 uppercase tracking-widest">
                                     Live RSS
                                 </span>
                             </h1>
                         </div>
-                        <p className="text-xs text-zinc-400 mt-1">
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
                             Live Tollywood, Kollywood, Mollywood & Sandalwood breaking updates, box office & reviews.
                         </p>
                     </div>
 
                     {/* Sync telemetry & action buttons */}
                     <div className="flex items-center gap-2.5 self-start sm:self-auto">
-                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#121316] border border-white/5 text-[11px] text-zinc-400">
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 text-[11px] text-zinc-600 dark:text-zinc-400 shadow-xs dark:shadow-none">
                             <span className="size-1.5 rounded-full bg-emerald-500" />
                             <span>
                                 {lastSyncTime ? `Synced ${formatTimeAgo(lastSyncTime)}` : 'Connecting...'}
                             </span>
-                            <span className="text-zinc-600">• Auto 15m</span>
+                            <span className="text-zinc-400 dark:text-zinc-600">• Auto 15m</span>
                         </div>
 
                         <button
                             onClick={handleManualRefresh}
                             disabled={isRefreshing}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 text-black hover:bg-amber-400 font-bold text-xs transition-all active:scale-95 disabled:opacity-50"
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 text-black hover:bg-amber-400 font-bold text-xs transition-all active:scale-95 disabled:opacity-50 shadow-xs"
                         >
                             <span className={`material-symbols-outlined text-sm ${isRefreshing ? 'animate-spin' : ''}`}>sync</span>
                             <span className="hidden xs:inline">Refresh</span>
@@ -257,10 +257,10 @@ export default function SouthCinemaNews() {
 
                         <button
                             onClick={() => setIsFeedModalOpen(true)}
-                            className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl bg-[#121316] border border-white/10 hover:border-amber-500/30 text-zinc-300 hover:text-white text-xs font-semibold flex items-center gap-1 transition-all"
+                            className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/10 hover:border-amber-500/30 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white text-xs font-semibold flex items-center gap-1 transition-all shadow-xs dark:shadow-none"
                             title="Add / Configure Feeds"
                         >
-                            <span className="material-symbols-outlined text-base text-amber-400">tune</span>
+                            <span className="material-symbols-outlined text-base text-amber-500">tune</span>
                             <span className="hidden sm:inline">Feeds</span>
                         </button>
                     </div>
@@ -279,12 +279,12 @@ export default function SouthCinemaNews() {
                             placeholder="Search stars, films, reviews or breaking headlines..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full h-11 pl-10 pr-10 rounded-xl bg-[#121316] border border-white/10 text-white placeholder-zinc-500 text-xs sm:text-sm focus:outline-none focus:border-amber-500 transition-colors"
+                            className="w-full h-11 pl-10 pr-10 rounded-xl bg-white dark:bg-[#121316] border border-zinc-300 dark:border-white/10 text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 text-xs sm:text-sm focus:outline-none focus:border-amber-500 transition-colors shadow-xs dark:shadow-none"
                         />
                         {searchQuery && (
                             <button
                                 onClick={() => setSearchQuery('')}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 dark:hover:text-white"
                             >
                                 <span className="material-symbols-outlined text-sm">close</span>
                             </button>
@@ -298,7 +298,7 @@ export default function SouthCinemaNews() {
                             className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all ${
                                 activeTab === 'all'
                                     ? 'bg-amber-500 text-black shadow-md'
-                                    : 'bg-[#121316] text-zinc-400 hover:text-white border border-white/5'
+                                    : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/5'
                             }`}
                         >
                             All Stories ({news.length})
@@ -309,7 +309,7 @@ export default function SouthCinemaNews() {
                             className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 flex items-center gap-1.5 transition-all ${
                                 activeTab === 'news'
                                     ? 'bg-blue-600 text-white shadow-md'
-                                    : 'bg-[#121316] text-zinc-400 hover:text-white border border-white/5'
+                                    : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/5'
                             }`}
                         >
                             <span className="material-symbols-outlined text-sm">campaign</span>
@@ -320,11 +320,11 @@ export default function SouthCinemaNews() {
                             onClick={() => setActiveTab('review')}
                             className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 flex items-center gap-1.5 transition-all ${
                                 activeTab === 'review'
-                                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/50 shadow-md'
-                                    : 'bg-[#121316] text-zinc-400 hover:text-white border border-white/5'
+                                    ? 'bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/50 shadow-md'
+                                    : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/5'
                             }`}
                         >
-                            <span className="material-symbols-outlined text-sm filled text-amber-400">star</span>
+                            <span className="material-symbols-outlined text-sm filled text-amber-500">star</span>
                             Movie Reviews ({reviewsCount})
                         </button>
 
@@ -332,8 +332,8 @@ export default function SouthCinemaNews() {
                             onClick={() => setActiveTab('telugu')}
                             className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all ${
                                 activeTab === 'telugu'
-                                    ? 'bg-amber-500/20 text-amber-400 border border-amber-500/50'
-                                    : 'bg-[#121316] text-zinc-400 hover:text-white border border-white/5'
+                                    ? 'bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-500/50'
+                                    : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/5'
                             }`}
                         >
                             Tollywood (Telugu)
@@ -343,8 +343,8 @@ export default function SouthCinemaNews() {
                             onClick={() => setActiveTab('tamil')}
                             className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all ${
                                 activeTab === 'tamil'
-                                    ? 'bg-rose-500/20 text-rose-400 border border-rose-500/50'
-                                    : 'bg-[#121316] text-zinc-400 hover:text-white border border-white/5'
+                                    ? 'bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/50'
+                                    : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/5'
                             }`}
                         >
                             Kollywood (Tamil)
@@ -354,8 +354,8 @@ export default function SouthCinemaNews() {
                             onClick={() => setActiveTab('malayalam')}
                             className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all ${
                                 activeTab === 'malayalam'
-                                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/50'
-                                    : 'bg-[#121316] text-zinc-400 hover:text-white border border-white/5'
+                                    ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/50'
+                                    : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/5'
                             }`}
                         >
                             Mollywood (Malayalam)
@@ -365,8 +365,8 @@ export default function SouthCinemaNews() {
                             onClick={() => setActiveTab('kannada')}
                             className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all ${
                                 activeTab === 'kannada'
-                                    ? 'bg-purple-500/20 text-purple-400 border border-purple-500/50'
-                                    : 'bg-[#121316] text-zinc-400 hover:text-white border border-white/5'
+                                    ? 'bg-purple-500/20 text-purple-600 dark:text-purple-400 border border-purple-500/50'
+                                    : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/5'
                             }`}
                         >
                             Sandalwood (Kannada)
@@ -378,25 +378,25 @@ export default function SouthCinemaNews() {
                 {isLoading ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {[1, 2, 3, 4, 5, 6].map((n) => (
-                            <div key={n} className="rounded-2xl bg-[#121316] border border-white/5 overflow-hidden p-4 space-y-3 animate-pulse">
-                                <div className="aspect-video w-full bg-white/5 rounded-xl" />
-                                <div className="h-4 w-3/4 bg-white/10 rounded" />
-                                <div className="h-3 w-1/2 bg-white/5 rounded" />
+                            <div key={n} className="rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 overflow-hidden p-4 space-y-3 animate-pulse">
+                                <div className="aspect-video w-full bg-zinc-100 dark:bg-white/5 rounded-xl" />
+                                <div className="h-4 w-3/4 bg-zinc-200 dark:bg-white/10 rounded" />
+                                <div className="h-3 w-1/2 bg-zinc-100 dark:bg-white/5 rounded" />
                             </div>
                         ))}
                     </div>
                 ) : filteredNews.length === 0 ? (
-                    <div className="rounded-2xl bg-[#121316] border border-white/5 p-12 text-center space-y-3 my-6">
-                        <div className="size-14 mx-auto rounded-full bg-white/5 flex items-center justify-center text-zinc-500">
+                    <div className="rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 p-12 text-center space-y-3 my-6 shadow-sm dark:shadow-none">
+                        <div className="size-14 mx-auto rounded-full bg-zinc-100 dark:bg-white/5 flex items-center justify-center text-zinc-500">
                             <span className="material-symbols-outlined text-2xl">newspaper</span>
                         </div>
-                        <h3 className="text-base font-bold text-white">No stories match your filter</h3>
-                        <p className="text-xs text-zinc-400 max-w-sm mx-auto">
+                        <h3 className="text-base font-bold text-zinc-900 dark:text-white">No stories match your filter</h3>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto">
                             Try searching for different keywords or select "All Stories" to view recent coverage.
                         </p>
                         <button
                             onClick={() => { setActiveTab('all'); setSearchQuery(''); }}
-                            className="px-4 py-2 rounded-xl bg-amber-500 text-black text-xs font-bold mt-2 hover:bg-amber-400 transition-all"
+                            className="px-4 py-2 rounded-xl bg-amber-500 text-black text-xs font-bold mt-2 hover:bg-amber-400 transition-all shadow-xs"
                         >
                             Show All Stories
                         </button>
@@ -411,7 +411,7 @@ export default function SouthCinemaNews() {
                                 <article
                                     key={item.id}
                                     onClick={() => setSelectedArticle(item)}
-                                    className="group rounded-2xl bg-[#121316] border border-white/5 hover:border-amber-500/40 transition-all overflow-hidden flex flex-col cursor-pointer shadow-md hover:shadow-xl hover:-translate-y-0.5"
+                                    className="group rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 hover:border-amber-500/40 transition-all overflow-hidden flex flex-col cursor-pointer shadow-sm hover:shadow-lg dark:shadow-md dark:hover:shadow-xl hover:-translate-y-0.5"
                                 >
                                     {/* Thumbnail Image Header */}
                                     <div className="aspect-[16/9] w-full relative overflow-hidden bg-black">
@@ -425,7 +425,7 @@ export default function SouthCinemaNews() {
                                                 (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&h=450&fit=crop';
                                             }}
                                         />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-[#121316] via-transparent to-black/30 pointer-events-none" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/30 pointer-events-none" />
 
                                         {/* Industry & Category Badges */}
                                         <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 flex-wrap">
@@ -441,12 +441,12 @@ export default function SouthCinemaNews() {
                                         </div>
 
                                         {/* Source Tag */}
-                                        <div className="absolute top-2.5 right-2.5 bg-black/70 backdrop-blur-md px-2 py-0.5 rounded-lg border border-white/10 text-[10px] font-semibold text-zinc-300">
+                                        <div className="absolute top-2.5 right-2.5 bg-black/75 backdrop-blur-md px-2 py-0.5 rounded-lg border border-white/20 text-[10px] font-semibold text-white max-w-[130px] truncate">
                                             {item.source}
                                         </div>
 
                                         {/* Time badge at bottom */}
-                                        <div className="absolute bottom-2 right-2.5 text-[10px] font-medium text-zinc-400 bg-black/60 px-2 py-0.5 rounded-md backdrop-blur-sm">
+                                        <div className="absolute bottom-2 right-2.5 text-[10px] font-medium text-white/90 bg-black/75 px-2 py-0.5 rounded-md backdrop-blur-sm">
                                             {formatTimeAgo(item.timestamp)}
                                         </div>
                                     </div>
@@ -454,30 +454,30 @@ export default function SouthCinemaNews() {
                                     {/* Content Body */}
                                     <div className="p-4 flex flex-col flex-1 justify-between">
                                         <div className="space-y-2.5">
-                                            <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-amber-400 transition-colors leading-snug">
+                                            <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors leading-snug">
                                                 {item.title}
                                             </h3>
 
                                             {/* In-place full text or preview excerpt */}
                                             {expandedId === item.id ? (
-                                                <div className="text-xs sm:text-sm text-zinc-200 leading-relaxed whitespace-pre-line pt-1 border-t border-white/5 space-y-2 animate-in fade-in duration-200 max-h-72 overflow-y-auto pr-1">
+                                                <div className="text-xs sm:text-sm text-zinc-800 dark:text-zinc-200 leading-relaxed whitespace-pre-line pt-1 border-t border-zinc-200 dark:border-white/5 space-y-2 animate-in fade-in duration-200 max-h-72 overflow-y-auto pr-1">
                                                     {item.content || item.description}
                                                 </div>
                                             ) : (
-                                                <p className="text-xs text-zinc-400 leading-relaxed">
+                                                <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
                                                     {item.description}
                                                 </p>
                                             )}
                                         </div>
 
                                         {/* Card Footer with Expand and Actions */}
-                                        <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
+                                        <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-white/5 flex items-center justify-between">
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     setExpandedId(expandedId === item.id ? null : item.id);
                                                 }}
-                                                className="text-[11px] font-bold text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-1 active:scale-95"
+                                                className="text-[11px] font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors flex items-center gap-1 active:scale-95"
                                             >
                                                 <span>{expandedId === item.id ? 'Collapse News' : 'Read Full Story'}</span>
                                                 <span className="material-symbols-outlined text-sm">
@@ -491,7 +491,7 @@ export default function SouthCinemaNews() {
                                                         e.stopPropagation();
                                                         setSelectedArticle(item);
                                                     }}
-                                                    className="text-[11px] font-semibold text-zinc-400 hover:text-white transition-colors flex items-center gap-0.5"
+                                                    className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors flex items-center gap-0.5"
                                                     title="Open in full reader"
                                                 >
                                                     <span>Reader</span>
@@ -500,7 +500,7 @@ export default function SouthCinemaNews() {
 
                                                 <button
                                                     onClick={(e) => handleShare(item, e)}
-                                                    className="size-7 rounded-lg hover:bg-white/10 text-zinc-400 hover:text-white flex items-center justify-center transition-colors"
+                                                    className="size-7 rounded-lg hover:bg-zinc-100 dark:hover:bg-white/10 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white flex items-center justify-center transition-colors"
                                                     title="Share story"
                                                 >
                                                     <span className="material-symbols-outlined text-sm">share</span>
@@ -522,7 +522,7 @@ export default function SouthCinemaNews() {
                     onClick={() => setSelectedArticle(null)}
                 >
                     <div
-                        className="w-full max-w-2xl bg-[#121316] border border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200"
+                        className="w-full max-w-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/10 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Modal Header Image */}
@@ -532,32 +532,32 @@ export default function SouthCinemaNews() {
                                 alt={selectedArticle.title}
                                 className="w-full h-full object-cover"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-[#121316] via-transparent to-black/40 pointer-events-none" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/60 pointer-events-none" />
                             <button
                                 onClick={() => setSelectedArticle(null)}
-                                className="absolute top-3 right-3 size-9 rounded-full bg-black/75 text-white flex items-center justify-center border border-white/20 hover:scale-110 active:scale-95 transition-transform"
+                                className="absolute top-3 right-3 size-9 rounded-full bg-black/70 hover:bg-black text-white flex items-center justify-center border border-white/20 transition-all hover:scale-105 z-10"
                                 aria-label="Close reader"
                             >
-                                <span className="material-symbols-outlined text-xl">close</span>
+                                <span className="material-symbols-outlined text-lg">close</span>
                             </button>
 
                             <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-xs">
                                 <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg bg-black/70 backdrop-blur-md text-amber-400 border border-amber-500/30">
                                     {selectedArticle.industry}
                                 </span>
-                                <span className="text-zinc-300 font-medium bg-black/70 px-2 py-0.5 rounded-md backdrop-blur-md text-[11px]">
+                                <span className="text-white font-medium bg-black/70 px-2 py-0.5 rounded-md backdrop-blur-md text-[11px]">
                                     {selectedArticle.source} • {formatTimeAgo(selectedArticle.timestamp)}
                                 </span>
                             </div>
                         </div>
 
                         {/* Modal Full Article Scrollable Body */}
-                        <div className="p-5 sm:p-7 overflow-y-auto space-y-4 flex-1">
+                        <div className="p-5 sm:p-7 overflow-y-auto space-y-4 flex-1 custom-scrollbar">
                             {selectedArticle.category === 'review' && (
                                 <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between">
                                     <div className="flex items-center gap-2">
-                                        <span className="material-symbols-outlined text-amber-400 filled">star</span>
-                                        <span className="text-xs font-black text-amber-300 uppercase tracking-wider">
+                                        <span className="material-symbols-outlined text-amber-500 filled">star</span>
+                                        <span className="text-xs font-black text-amber-600 dark:text-amber-300 uppercase tracking-wider">
                                             Film Review & Verdict
                                         </span>
                                     </div>
@@ -567,23 +567,23 @@ export default function SouthCinemaNews() {
                                 </div>
                             )}
 
-                            <h2 className="text-base sm:text-xl font-black text-white leading-snug">
+                            <h2 className="text-base sm:text-xl font-bold text-zinc-900 dark:text-white leading-snug">
                                 {selectedArticle.title}
                             </h2>
 
                             {/* Complete Full Story Content */}
-                            <div className="text-xs sm:text-sm text-zinc-200 leading-relaxed whitespace-pre-line space-y-3 pt-2 border-t border-white/5 font-normal">
+                            <div className="text-xs sm:text-sm text-zinc-700 dark:text-zinc-200 leading-relaxed whitespace-pre-line space-y-3 pt-3 border-t border-zinc-200 dark:border-white/5 font-normal">
                                 {selectedArticle.content || selectedArticle.description}
                             </div>
                         </div>
 
                         {/* Sticky Action Footer */}
-                        <div className="p-4 sm:px-6 bg-[#0e0f12] border-t border-white/10 flex items-center gap-3 shrink-0">
+                        <div className="p-4 sm:px-6 bg-slate-50 dark:bg-[#0e0f12] border-t border-zinc-200 dark:border-white/10 flex items-center gap-3 shrink-0">
                             <a
                                 href={selectedArticle.link}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex-1 py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs sm:text-sm text-center flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95"
+                                className="flex-1 py-2.5 sm:py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs sm:text-sm text-center flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95"
                             >
                                 <span>Read Original Source on {selectedArticle.source}</span>
                                 <span className="material-symbols-outlined text-base">open_in_new</span>
@@ -591,10 +591,10 @@ export default function SouthCinemaNews() {
 
                             <button
                                 onClick={(e) => handleShare(selectedArticle, e)}
-                                className="p-3 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border border-white/10 transition-all"
+                                className="p-2.5 sm:p-3 rounded-xl bg-white dark:bg-white/5 hover:bg-zinc-100 dark:hover:bg-white/10 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/10 transition-all shadow-xs"
                                 title="Share"
                             >
-                                <span className="material-symbols-outlined text-lg">share</span>
+                                <span className="material-symbols-outlined text-base sm:text-lg">share</span>
                             </button>
                         </div>
                     </div>
@@ -608,25 +608,25 @@ export default function SouthCinemaNews() {
                     onClick={() => setIsFeedModalOpen(false)}
                 >
                     <div
-                        className="w-full max-w-lg bg-[#121316] border border-white/10 rounded-2xl p-5 sm:p-6 shadow-2xl space-y-5 animate-in zoom-in-95 duration-200 max-h-[85vh] overflow-y-auto"
+                        className="w-full max-w-lg bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/10 rounded-2xl p-5 sm:p-6 shadow-2xl space-y-5 animate-in zoom-in-95 duration-200 max-h-[85vh] overflow-y-auto"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                        <div className="flex items-center justify-between border-b border-zinc-200 dark:border-white/10 pb-3">
                             <div className="flex items-center gap-2">
                                 <span className="material-symbols-outlined text-amber-500">rss_feed</span>
-                                <h2 className="text-base font-bold text-white">Manage Cinema RSS Feeds</h2>
+                                <h2 className="text-base font-bold text-zinc-900 dark:text-white">Manage Cinema RSS Feeds</h2>
                             </div>
                             <button
                                 onClick={() => setIsFeedModalOpen(false)}
-                                className="text-zinc-400 hover:text-white"
+                                className="text-zinc-400 hover:text-zinc-700 dark:hover:text-white"
                             >
                                 <span className="material-symbols-outlined">close</span>
                             </button>
                         </div>
 
                         {/* Add Custom Feed Form */}
-                        <form onSubmit={handleAddCustomFeed} className="space-y-3 bg-white/[0.02] p-3.5 rounded-xl border border-white/5">
-                            <h3 className="text-xs font-bold uppercase tracking-wider text-amber-400">
+                        <form onSubmit={handleAddCustomFeed} className="space-y-3 bg-zinc-50 dark:bg-white/[0.02] p-3.5 rounded-xl border border-zinc-200 dark:border-white/5">
+                            <h3 className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
                                 Add Custom RSS Feed Link
                             </h3>
                             <div className="space-y-2">
@@ -635,20 +635,20 @@ export default function SouthCinemaNews() {
                                     placeholder="Feed Name (e.g. 123Telugu, Behindwoods)"
                                     value={newFeedName}
                                     onChange={(e) => setNewFeedName(e.target.value)}
-                                    className="w-full h-10 px-3 rounded-lg bg-black/40 border border-white/10 text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-amber-500"
+                                    className="w-full h-10 px-3 rounded-lg bg-white dark:bg-black/40 border border-zinc-300 dark:border-white/10 text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 text-xs focus:outline-none focus:border-amber-500"
                                 />
                                 <input
                                     type="url"
                                     placeholder="RSS Feed URL (e.g. https://domain.com/feed)"
                                     value={newFeedUrl}
                                     onChange={(e) => setNewFeedUrl(e.target.value)}
-                                    className="w-full h-10 px-3 rounded-lg bg-black/40 border border-white/10 text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-amber-500"
+                                    className="w-full h-10 px-3 rounded-lg bg-white dark:bg-black/40 border border-zinc-300 dark:border-white/10 text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 text-xs focus:outline-none focus:border-amber-500"
                                 />
                                 <div className="flex items-center gap-2">
                                     <select
                                         value={newFeedIndustry}
                                         onChange={(e) => setNewFeedIndustry(e.target.value as any)}
-                                        className="h-10 px-3 rounded-lg bg-black/40 border border-white/10 text-white text-xs focus:outline-none focus:border-amber-500 flex-1"
+                                        className="h-10 px-3 rounded-lg bg-white dark:bg-black/40 border border-zinc-300 dark:border-white/10 text-zinc-900 dark:text-white text-xs focus:outline-none focus:border-amber-500 flex-1"
                                     >
                                         <option value="telugu">Tollywood (Telugu)</option>
                                         <option value="tamil">Kollywood (Tamil)</option>
@@ -669,12 +669,12 @@ export default function SouthCinemaNews() {
                         {/* Configured Feeds List */}
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
-                                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                                     Active Feed Sources ({feeds.length})
                                 </h3>
                                 <button
                                     onClick={handleResetFeeds}
-                                    className="text-[11px] text-zinc-500 hover:text-amber-400 transition-colors"
+                                    className="text-[11px] text-zinc-500 hover:text-amber-500 dark:hover:text-amber-400 transition-colors"
                                 >
                                     Reset to Defaults
                                 </button>
@@ -684,16 +684,16 @@ export default function SouthCinemaNews() {
                                 {feeds.map((f) => (
                                     <div
                                         key={f.id}
-                                        className="p-3 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-between gap-3"
+                                        className="p-3 rounded-xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-200 dark:border-white/5 flex items-center justify-between gap-3"
                                     >
                                         <div className="min-w-0">
                                             <div className="flex items-center gap-2">
-                                                <span className="text-xs font-bold text-white truncate">{f.name}</span>
-                                                <span className="text-[9px] uppercase px-1.5 py-0.5 rounded bg-white/5 text-zinc-400">
+                                                <span className="text-xs font-bold text-zinc-900 dark:text-white truncate">{f.name}</span>
+                                                <span className="text-[9px] uppercase px-1.5 py-0.5 rounded bg-zinc-200 dark:bg-white/5 text-zinc-700 dark:text-zinc-400">
                                                     {f.industry}
                                                 </span>
                                                 {f.isCustom && (
-                                                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400">
+                                                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-600 dark:text-amber-400">
                                                         Custom
                                                     </span>
                                                 )}
@@ -705,7 +705,7 @@ export default function SouthCinemaNews() {
                                             <button
                                                 onClick={() => handleToggleFeed(f.id, !f.enabled)}
                                                 className={`size-6 rounded-md flex items-center justify-center text-xs transition-colors ${
-                                                    f.enabled ? 'bg-emerald-500/20 text-emerald-400' : 'bg-zinc-800 text-zinc-500'
+                                                    f.enabled ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-500'
                                                 }`}
                                                 title={f.enabled ? 'Disable' : 'Enable'}
                                             >
@@ -717,7 +717,7 @@ export default function SouthCinemaNews() {
                                             {f.isCustom && (
                                                 <button
                                                     onClick={() => handleRemoveFeed(f.id)}
-                                                    className="size-6 rounded-md bg-red-500/20 text-red-400 flex items-center justify-center hover:bg-red-500/30 transition-colors"
+                                                    className="size-6 rounded-md bg-red-500/20 text-red-500 dark:text-red-400 flex items-center justify-center hover:bg-red-500/30 transition-colors"
                                                     title="Delete"
                                                 >
                                                     <span className="material-symbols-outlined text-sm">delete</span>

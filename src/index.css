@@ -150,6 +150,16 @@ html:not(.dark) div.sticky.bg-\[\#090A0C\]\/85 {
   border-color: #e2e8f0 !important;
 }
 
+/* Gradients that were hardcoded dark */
+html:not(.dark) [class*="from-[#121316]"],
+html:not(.dark) [class*="from-[#14151a]"],
+html:not(.dark) [class*="from-[#0e0f13]"],
+html:not(.dark) [class*="from-[#090A0C]"],
+html:not(.dark) [class*="from-[#14161a]"] {
+  background-image: none !important;
+  background-color: #ffffff !important;
+}
+
 /* Cards and content blocks */
 html:not(.dark) .bg-\[\#121316\],
 html:not(.dark) .bg-\[\#14161a\],
@@ -157,7 +167,9 @@ html:not(.dark) .bg-\[\#18191D\],
 html:not(.dark) .bg-\[\#1a1b1e\],
 html:not(.dark) .bg-\[\#16171b\],
 html:not(.dark) .bg-\[\#131418\],
-html:not(.dark) .bg-\[\#15171c\] {
+html:not(.dark) .bg-\[\#15171c\],
+html:not(.dark) .bg-\[\#0e0f12\],
+html:not(.dark) .bg-\[\#0e0f13\] {
   background-color: #ffffff !important;
   border-color: #e2e8f0 !important;
   color: #0f172a;
@@ -185,29 +197,56 @@ html:not(.dark) .border-white\/\[0\.1\] {
   border-color: #e2e8f0 !important;
 }
 
-/* General Headings and Titles (except colored buttons, badges, gradients, and video overlays) */
-html:not(.dark) h1.text-white:not([class*="bg-amber"]):not([class*="bg-gradient"]),
-html:not(.dark) h2.text-white:not([class*="bg-amber"]):not([class*="bg-gradient"]),
-html:not(.dark) h3.text-white:not([class*="bg-amber"]):not([class*="bg-gradient"]),
-html:not(.dark) h4.text-white:not([class*="bg-amber"]):not([class*="bg-gradient"]),
-html:not(.dark) h5.text-white:not([class*="bg-amber"]):not([class*="bg-gradient"]) {
+/* Media Overlays & Badges: ALWAYS keep crisp white/bright text over images & dark overlays */
+html:not(.dark) [class*="aspect-"] .text-white,
+html:not(.dark) [class*="aspect-"] .text-white\/90,
+html:not(.dark) [class*="aspect-"] .text-zinc-100,
+html:not(.dark) [class*="aspect-"] .text-zinc-200,
+html:not(.dark) [class*="aspect-"] .text-zinc-300,
+html:not(.dark) [class*="aspect-"] .text-zinc-400,
+html:not(.dark) [class*="bg-black\/"] .text-white,
+html:not(.dark) [class*="bg-black\/"] .text-zinc-100,
+html:not(.dark) [class*="bg-black\/"] .text-zinc-200,
+html:not(.dark) [class*="bg-black\/"] .text-zinc-300,
+html:not(.dark) [class*="bg-black\/"] .text-zinc-400,
+html:not(.dark) [class*="bg-black"] .text-white,
+html:not(.dark) [class*="bg-black"] .text-zinc-200,
+html:not(.dark) [class*="bg-black"] .text-zinc-300,
+html:not(.dark) [class*="bg-black"] .text-zinc-400 {
+  color: #ffffff !important;
+}
+
+/* Ensure rating chips with black text keep black text */
+html:not(.dark) .bg-amber-500.text-black,
+html:not(.dark) .bg-amber-500 .text-black,
+html:not(.dark) [class*="aspect-"] .bg-amber-500.text-black,
+html:not(.dark) [class*="aspect-"] .bg-amber-500 .text-black {
+  color: #000000 !important;
+}
+
+/* General Headings and Titles on cards/pages */
+html:not(.dark) h1.text-white:not([class*="bg-"]):not([class*="aspect-"] *):not([class*="bg-black"] *),
+html:not(.dark) h2.text-white:not([class*="bg-"]):not([class*="aspect-"] *):not([class*="bg-black"] *),
+html:not(.dark) h3.text-white:not([class*="bg-"]):not([class*="aspect-"] *):not([class*="bg-black"] *),
+html:not(.dark) h4.text-white:not([class*="bg-"]):not([class*="aspect-"] *):not([class*="bg-black"] *),
+html:not(.dark) h5.text-white:not([class*="bg-"]):not([class*="aspect-"] *):not([class*="bg-black"] *) {
   color: #0f172a !important;
 }
 
-/* Body / Secondary Text */
-html:not(.dark) p.text-white:not([class*="bg-amber"]):not([class*="bg-gradient"]):not(.aspect-\[9\/16\] *):not(.aspect-video *),
-html:not(.dark) span.text-white:not([class*="bg-"]):not([class*="rounded-full"]):not([class*="rounded-lg"]):not(.aspect-\[9\/16\] *):not(.aspect-video *) {
+/* Body / Secondary Text on light cards */
+html:not(.dark) p.text-white:not([class*="bg-"]):not([class*="aspect-"] *):not([class*="bg-black"] *) {
   color: #1e293b !important;
 }
 
-html:not(.dark) .text-zinc-100,
-html:not(.dark) .text-zinc-200,
-html:not(.dark) .text-zinc-300 {
-  color: #334155 !important;
+html:not(.dark) span.text-white:not([class*="bg-"]):not([class*="rounded-"]):not([class*="aspect-"] *):not([class*="bg-black"] *) {
+  color: #1e293b !important;
 }
 
-html:not(.dark) .text-zinc-400 {
-  color: #64748b !important;
+/* Secondary muted text */
+html:not(.dark) .bg-white .text-zinc-400,
+html:not(.dark) .bg-slate-50 .text-zinc-400,
+html:not(.dark) [class*="bg-white"] .text-zinc-400 {
+  color: #64748b;
 }
 
 /* Ensure colored pills, tags, badges, buttons, and media overlays stay bright */
@@ -218,12 +257,6 @@ html:not(.dark) [class*="bg-emerald-"] *,
 html:not(.dark) [class*="bg-red-"] *,
 html:not(.dark) [class*="bg-purple-"] * {
   color: inherit;
-}
-
-html:not(.dark) .aspect-\[9\/16\] .text-white,
-html:not(.dark) .aspect-video .text-white,
-html:not(.dark) [class*="bg-black\/"] .text-white {
-  color: #ffffff !important;
 }
 
 /* Form inputs & textareas in day theme */

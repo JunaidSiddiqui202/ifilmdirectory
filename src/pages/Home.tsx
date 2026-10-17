@@ -152,63 +152,63 @@ export default function Home() {
         <div className="grid grid-cols-4 gap-2">
             <button
                 onClick={() => navigate('/post-job')}
-                className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-gradient-to-b from-amber-500/20 to-amber-500/5 border border-amber-500/30 hover:border-amber-500/60 transition-all group active:scale-95 text-center"
+                className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-gradient-to-b from-amber-500/20 to-amber-500/5 border border-amber-500/30 hover:border-amber-500/60 transition-all group active:scale-95 text-center shadow-sm"
             >
                 <div className="size-9 rounded-xl bg-amber-500 text-black flex items-center justify-center mb-1.5 shadow-sm group-hover:scale-110 transition-transform">
                     <span className="material-symbols-outlined text-lg">campaign</span>
                 </div>
-                <span className="text-xs font-bold text-white leading-tight">Post Call</span>
-                <span className="text-[10px] text-zinc-400 mt-0.5">Cast & Crew</span>
+                <span className="text-xs font-bold text-zinc-900 dark:text-white leading-tight">Post Call</span>
+                <span className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Cast & Crew</span>
             </button>
 
             <button
                 onClick={() => navigate('/browse-profiles')}
-                className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-[#121316] border border-white/5 hover:border-white/20 transition-all group active:scale-95 text-center"
+                className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 hover:border-amber-500/40 dark:hover:border-white/20 transition-all group active:scale-95 text-center shadow-sm dark:shadow-none"
             >
-                <div className="size-9 rounded-xl bg-white/10 text-white flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform">
+                <div className="size-9 rounded-xl bg-zinc-100 dark:bg-white/10 text-zinc-800 dark:text-white flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform">
                     <span className="material-symbols-outlined text-lg">group</span>
                 </div>
-                <span className="text-xs font-bold text-white leading-tight">Directory</span>
-                <span className="text-[10px] text-zinc-400 mt-0.5">Talent & Crew</span>
+                <span className="text-xs font-bold text-zinc-900 dark:text-white leading-tight">Directory</span>
+                <span className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Talent & Crew</span>
             </button>
 
             <button
                 onClick={() => navigate('/booking-facilities')}
-                className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-[#121316] border border-white/5 hover:border-white/20 transition-all group active:scale-95 text-center"
+                className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 hover:border-amber-500/40 dark:hover:border-white/20 transition-all group active:scale-95 text-center shadow-sm dark:shadow-none"
             >
-                <div className="size-9 rounded-xl bg-white/10 text-white flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform">
+                <div className="size-9 rounded-xl bg-zinc-100 dark:bg-white/10 text-zinc-800 dark:text-white flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform">
                     <span className="material-symbols-outlined text-lg">apartment</span>
                 </div>
-                <span className="text-xs font-bold text-white leading-tight">Facilities</span>
-                <span className="text-[10px] text-zinc-400 mt-0.5">Studios & Gear</span>
+                <span className="text-xs font-bold text-zinc-900 dark:text-white leading-tight">Facilities</span>
+                <span className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Studios & Gear</span>
             </button>
 
             <button
                 onClick={() => navigate('/groups-forums')}
-                className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-[#121316] border border-white/5 hover:border-white/20 transition-all group active:scale-95 text-center"
+                className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 hover:border-amber-500/40 dark:hover:border-white/20 transition-all group active:scale-95 text-center shadow-sm dark:shadow-none"
             >
-                <div className="size-9 rounded-xl bg-white/10 text-white flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform">
+                <div className="size-9 rounded-xl bg-zinc-100 dark:bg-white/10 text-zinc-800 dark:text-white flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform">
                     <span className="material-symbols-outlined text-lg">forum</span>
                 </div>
-                <span className="text-xs font-bold text-white leading-tight">Guilds</span>
-                <span className="text-[10px] text-zinc-400 mt-0.5">Discussions</span>
+                <span className="text-xs font-bold text-zinc-900 dark:text-white leading-tight">Guilds</span>
+                <span className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Discussions</span>
             </button>
         </div>
     );
 
     // Reusable Featured Talent Section
     const FeaturedTalentSection = () => (
-        <section className="rounded-2xl bg-[#121316] border border-white/5 p-4 sm:p-5">
+        <section className="rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 p-4 sm:p-5 shadow-sm dark:shadow-none">
             <div className="flex items-center justify-between mb-3.5">
                 <div className="flex items-center gap-2">
                     <span className="size-2 rounded-full bg-purple-500" />
-                    <h2 className="text-base font-bold text-white tracking-tight">
+                    <h2 className="text-base font-bold text-zinc-900 dark:text-white tracking-tight">
                         Featured Talent & Studios
                     </h2>
                 </div>
                 <button
                     onClick={() => navigate('/browse-profiles')}
-                    className="text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-0.5"
+                    className="text-xs font-bold text-amber-500 dark:text-amber-400 hover:text-amber-600 dark:hover:text-amber-300 transition-colors flex items-center gap-0.5"
                 >
                     <span>Directory</span>
                     <span className="material-symbols-outlined text-sm">chevron_right</span>
@@ -220,19 +220,19 @@ export default function Home() {
                     <div
                         key={user.uid}
                         onClick={() => navigate(`/profile/${user.uid}`)}
-                        className="rounded-xl bg-white/[0.02] border border-white/5 p-3 hover:border-amber-500/30 transition-all cursor-pointer group flex flex-col items-center text-center"
+                        className="rounded-xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-200 dark:border-white/5 p-3 hover:border-amber-500/30 transition-all cursor-pointer group flex flex-col items-center text-center shadow-xs dark:shadow-none"
                     >
-                        <div className="size-12 rounded-full overflow-hidden border-2 border-white/10 group-hover:border-amber-500/50 transition-colors mb-2">
+                        <div className="size-12 rounded-full overflow-hidden border-2 border-zinc-200 dark:border-white/10 group-hover:border-amber-500/50 transition-colors mb-2">
                             <PostMedia
                                 src={user.photoURL || ''}
                                 fallbackType="USER_MALE"
                                 className="w-full h-full object-cover"
                             />
                         </div>
-                        <h3 className="font-bold text-xs text-white group-hover:text-amber-400 transition-colors truncate w-full">
+                        <h3 className="font-bold text-xs text-zinc-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors truncate w-full">
                             {user.displayName || 'Filmmaker'}
                         </h3>
-                        <p className="text-xs text-zinc-400 font-medium truncate w-full mt-0.5">
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium truncate w-full mt-0.5">
                             {(user as any).role || user.bio?.slice(0, 20) || 'Key Crew'}
                         </p>
                     </div>
@@ -243,14 +243,14 @@ export default function Home() {
 
     // Reusable Poll Section
     const DailyPollSection = () => (
-        <section className="rounded-2xl bg-gradient-to-br from-[#121316] to-[#18191D] border border-white/5 p-5">
+        <section className="rounded-2xl bg-white dark:bg-gradient-to-br dark:from-[#121316] dark:to-[#18191D] border border-zinc-200 dark:border-white/5 p-5 shadow-sm dark:shadow-none">
             <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-amber-400">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-amber-600 dark:text-amber-400">
                     Industry Pulse • Daily Poll
                 </span>
-                <span className="text-[10px] text-zinc-400 font-semibold">{totalVotes} votes</span>
+                <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-semibold">{totalVotes} votes</span>
             </div>
-            <h3 className="text-sm font-bold text-white mb-3.5 leading-snug">
+            <h3 className="text-sm font-bold text-zinc-900 dark:text-white mb-3.5 leading-snug">
                 {poll.question}
             </h3>
             <div className="space-y-2.5">
@@ -266,7 +266,7 @@ export default function Home() {
                             className={`relative w-full text-left p-2.5 rounded-xl border transition-all overflow-hidden ${
                                 isSelected
                                     ? 'border-amber-500 bg-amber-500/10'
-                                    : 'border-white/5 bg-white/[0.02] hover:border-white/20'
+                                    : 'border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-white/[0.02] hover:border-amber-500/30 dark:hover:border-white/20'
                             }`}
                         >
                             {selectedPollOption !== null && (
@@ -275,10 +275,10 @@ export default function Home() {
                                     style={{ width: `${percentage}%` }}
                                 />
                             )}
-                            <div className="relative flex items-center justify-between text-xs font-semibold text-white">
+                            <div className="relative flex items-center justify-between text-xs font-semibold text-zinc-800 dark:text-white">
                                 <span className="truncate pr-2">{option.text}</span>
                                 {selectedPollOption !== null && (
-                                    <span className="text-amber-400 font-bold shrink-0">{percentage}%</span>
+                                    <span className="text-amber-600 dark:text-amber-400 font-bold shrink-0">{percentage}%</span>
                                 )}
                             </div>
                         </button>
@@ -290,17 +290,17 @@ export default function Home() {
 
     // Reusable Articles Section
     const EditorialArticlesSection = () => (
-        <section className="rounded-2xl bg-[#121316] border border-white/5 p-4 sm:p-5">
+        <section className="rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 p-4 sm:p-5 shadow-sm dark:shadow-none">
             <div className="flex items-center justify-between mb-3.5">
                 <div className="flex items-center gap-2">
                     <span className="size-2 rounded-full bg-amber-500" />
-                    <h2 className="text-base font-bold text-white tracking-tight">
+                    <h2 className="text-base font-bold text-zinc-900 dark:text-white tracking-tight">
                         Industry Insights & Articles
                     </h2>
                 </div>
                 <button
                     onClick={() => navigate('/blogs-events')}
-                    className="text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-0.5"
+                    className="text-xs font-bold text-amber-500 dark:text-amber-400 hover:text-amber-600 dark:hover:text-amber-300 transition-colors flex items-center gap-0.5"
                 >
                     <span>Read All</span>
                     <span className="material-symbols-outlined text-sm">chevron_right</span>
@@ -312,7 +312,7 @@ export default function Home() {
                     <div
                         key={blog.id}
                         onClick={() => navigate('/blogs-events')}
-                        className="rounded-xl bg-white/[0.02] border border-white/5 overflow-hidden hover:border-amber-500/30 transition-all cursor-pointer group flex gap-3 p-2.5"
+                        className="rounded-xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-200 dark:border-white/5 overflow-hidden hover:border-amber-500/30 transition-all cursor-pointer group flex gap-3 p-2.5 shadow-xs dark:shadow-none"
                     >
                         <div className="size-20 rounded-lg overflow-hidden shrink-0 relative">
                             <img
@@ -323,14 +323,14 @@ export default function Home() {
                         </div>
                         <div className="flex flex-col justify-between min-w-0 flex-1">
                             <div>
-                                <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
+                                <span className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
                                     {blog.category || 'Film Trade'}
                                 </span>
-                                <h3 className="font-bold text-xs text-white group-hover:text-amber-400 transition-colors line-clamp-2 mt-0.5">
+                                <h3 className="font-bold text-xs text-zinc-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors line-clamp-2 mt-0.5">
                                     {blog.title}
                                 </h3>
                             </div>
-                            <span className="text-xs text-zinc-400">
+                            <span className="text-xs text-zinc-500 dark:text-zinc-400">
                                 3 min read
                             </span>
                         </div>
@@ -346,17 +346,17 @@ export default function Home() {
         const displayItems = reviews.length > 0 ? reviews : cinemaNews.slice(0, 3);
 
         return (
-            <section className="rounded-2xl bg-[#121316] border border-white/5 p-4 sm:p-5">
+            <section className="rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 p-4 sm:p-5 shadow-sm dark:shadow-none">
                 <div className="flex items-center justify-between mb-3.5">
                     <div className="flex items-center gap-2">
                         <span className="size-2 rounded-full bg-amber-400 animate-pulse" />
-                        <h2 className="text-base font-bold text-white tracking-tight flex items-center gap-1.5">
+                        <h2 className="text-base font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-1.5">
                             Movie Reviews & Ratings
                         </h2>
                     </div>
                     <button
                         onClick={() => navigate('/south-cinema')}
-                        className="text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-0.5"
+                        className="text-xs font-bold text-amber-500 dark:text-amber-400 hover:text-amber-600 dark:hover:text-amber-300 transition-colors flex items-center gap-0.5"
                     >
                         <span>All Reviews</span>
                         <span className="material-symbols-outlined text-sm">chevron_right</span>
@@ -366,14 +366,14 @@ export default function Home() {
                 <div className="space-y-3">
                     {newsLoading ? (
                         [1, 2, 3].map(i => (
-                            <div key={i} className="h-16 rounded-xl bg-white/[0.03] animate-pulse border border-white/5" />
+                            <div key={i} className="h-16 rounded-xl bg-zinc-100 dark:bg-white/[0.03] animate-pulse border border-zinc-200 dark:border-white/5" />
                         ))
                     ) : displayItems.length > 0 ? (
                         displayItems.map((item) => (
                             <div
                                 key={item.id}
                                 onClick={() => setSelectedNewsArticle(item)}
-                                className="group p-2.5 rounded-xl bg-white/[0.02] border border-white/5 hover:border-amber-500/30 transition-all cursor-pointer flex gap-3 items-center"
+                                className="group p-2.5 rounded-xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-200 dark:border-white/5 hover:border-amber-500/30 transition-all cursor-pointer flex gap-3 items-center shadow-xs dark:shadow-none"
                             >
                                 <div className="relative size-14 rounded-lg overflow-hidden shrink-0 bg-black/60 border border-white/10">
                                     <img
@@ -392,19 +392,19 @@ export default function Home() {
                                 </div>
                                 <div className="min-w-0 flex-1">
                                     <div className="flex items-center gap-1.5 mb-0.5">
-                                        <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400 truncate">
+                                        <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 truncate">
                                             {item.rating ? '★ Review' : 'Film Scoop'}
                                         </span>
-                                        <span className="text-[10px] text-zinc-500">• {item.source}</span>
+                                        <span className="text-[10px] text-zinc-500 dark:text-zinc-400">• {item.source}</span>
                                     </div>
-                                    <h4 className="text-xs font-bold text-white group-hover:text-amber-400 transition-colors line-clamp-2 leading-snug">
+                                    <h4 className="text-xs font-bold text-zinc-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors line-clamp-2 leading-snug">
                                         {item.title}
                                     </h4>
                                 </div>
                             </div>
                         ))
                     ) : (
-                        <div className="text-center py-4 text-xs text-zinc-500">
+                        <div className="text-center py-4 text-xs text-zinc-500 dark:text-zinc-400">
                             Reviews syncing...
                         </div>
                     )}
@@ -474,13 +474,13 @@ export default function Home() {
                                     <span className="size-1.5 rounded-full bg-amber-500" />
                                     Filmmaker Network & Production Hub
                                 </span>
-                                <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white mt-0.5">
+                                <h1 className="text-xl sm:text-2xl font-black tracking-tight text-zinc-900 dark:text-white mt-0.5">
                                     Welcome back, {currentUser?.displayName?.split(' ')[0] || 'Creator'}!
                                 </h1>
                             </div>
                             <button
                                 onClick={() => navigate('/showcase')}
-                                className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 text-xs font-bold transition-all active:scale-95"
+                                className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/20 text-xs font-bold transition-all active:scale-95"
                             >
                                 <span className="material-symbols-outlined text-base">movie</span>
                                 <span>Feed</span>
@@ -510,7 +510,7 @@ export default function Home() {
                                                     ? 'border-2 border-dashed border-amber-500' 
                                                     : 'bg-gradient-to-tr from-amber-500 via-yellow-400 to-amber-600'
                                             }`}>
-                                                <div className="w-full h-full rounded-full overflow-hidden border-2 border-[#090A0C]">
+                                                <div className="w-full h-full rounded-full overflow-hidden border-2 border-white dark:border-[#090A0C]">
                                                     <PostMedia
                                                         src={story.isUser ? (currentUser?.photoURL || story.image) : story.image}
                                                         fallbackType="USER_MALE"
@@ -519,12 +519,12 @@ export default function Home() {
                                                 </div>
                                             </div>
                                             {story.isUser && (
-                                                <div className="absolute bottom-0 right-0 size-5 bg-amber-500 text-black rounded-full flex items-center justify-center border-2 border-[#090A0C] shadow-sm font-bold text-xs">
+                                                <div className="absolute bottom-0 right-0 size-5 bg-amber-500 text-black rounded-full flex items-center justify-center border-2 border-white dark:border-[#090A0C] shadow-sm font-bold text-xs">
                                                     <span className="material-symbols-outlined text-xs">add</span>
                                                 </div>
                                             )}
                                         </div>
-                                        <span className="text-[11px] font-semibold text-zinc-300 max-w-[68px] truncate text-center group-hover:text-amber-400 transition-colors">
+                                        <span className="text-[11px] font-semibold text-zinc-800 dark:text-zinc-200 max-w-[68px] truncate text-center group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
                                             {story.name}
                                         </span>
                                     </div>
@@ -537,13 +537,13 @@ export default function Home() {
                             <div className="flex items-center justify-between mb-3">
                                 <div className="flex items-center gap-2">
                                     <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
-                                    <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
+                                    <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white tracking-tight">
                                         Trending Showreels & BTS
                                     </h2>
                                 </div>
                                 <button
                                     onClick={() => navigate('/showreel/view1')}
-                                    className="text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-0.5"
+                                    className="text-xs font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors flex items-center gap-0.5"
                                 >
                                     <span>Watch All</span>
                                     <span className="material-symbols-outlined text-sm">chevron_right</span>
@@ -556,7 +556,7 @@ export default function Home() {
                                         <div
                                             key={reel.id}
                                             onClick={() => navigate('/showreel/view1')}
-                                            className="w-[130px] sm:w-[155px] shrink-0 aspect-[9/16] relative rounded-2xl overflow-hidden snap-start group cursor-pointer shadow-lg border border-white/5 hover:border-amber-500/40 transition-all bg-[#121316]"
+                                            className="w-[130px] sm:w-[155px] shrink-0 aspect-[9/16] relative rounded-2xl overflow-hidden snap-start group cursor-pointer shadow-lg border border-zinc-200 dark:border-white/5 hover:border-amber-500/40 transition-all bg-black"
                                         >
                                             <PostMedia
                                                 src={reel.videoUrl || reel.thumbnail}
@@ -575,7 +575,7 @@ export default function Home() {
                                                 <p className="text-white text-xs font-bold truncate group-hover:text-amber-400 transition-colors">
                                                     {reel.title || 'Cinematic Reel'}
                                                 </p>
-                                                <p className="text-zinc-400 text-[10px] uppercase font-semibold tracking-wider truncate mt-0.5">
+                                                <p className="text-zinc-300 text-[10px] uppercase font-semibold tracking-wider truncate mt-0.5">
                                                     {reel.creator}
                                                 </p>
                                             </div>
@@ -595,13 +595,13 @@ export default function Home() {
                                 <div className="flex items-center gap-2">
                                     <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
                                     <div>
-                                        <h2 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2">
+                                        <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
                                             Film News & Movie Reviews
-                                            <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/20">
+                                            <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/20">
                                                 Live Wire
                                             </span>
                                         </h2>
-                                        <p className="text-[11px] text-zinc-400">
+                                        <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
                                             Breaking scoops, trade updates & certified movie reviews
                                         </p>
                                     </div>
@@ -609,13 +609,13 @@ export default function Home() {
 
                                 {/* Filter Pills + View All */}
                                 <div className="flex items-center gap-2 self-start sm:self-auto">
-                                    <div className="flex items-center bg-white/[0.04] p-0.5 rounded-xl border border-white/5 text-[11px] font-bold">
+                                    <div className="flex items-center bg-zinc-100 dark:bg-white/[0.04] p-0.5 rounded-xl border border-zinc-200 dark:border-white/5 text-[11px] font-bold">
                                         <button
                                             onClick={() => setNewsFilter('all')}
                                             className={`px-2.5 py-1 rounded-lg transition-all ${
                                                 newsFilter === 'all'
                                                     ? 'bg-amber-500 text-black shadow-sm'
-                                                    : 'text-zinc-400 hover:text-white'
+                                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                             }`}
                                         >
                                             All
@@ -625,7 +625,7 @@ export default function Home() {
                                             className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 ${
                                                 newsFilter === 'review'
                                                     ? 'bg-amber-500 text-black shadow-sm'
-                                                    : 'text-zinc-400 hover:text-white'
+                                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                             }`}
                                         >
                                             <span className="material-symbols-outlined text-[12px] filled">star</span>
@@ -636,7 +636,7 @@ export default function Home() {
                                             className={`px-2.5 py-1 rounded-lg transition-all ${
                                                 newsFilter === 'news'
                                                     ? 'bg-amber-500 text-black shadow-sm'
-                                                    : 'text-zinc-400 hover:text-white'
+                                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                             }`}
                                         >
                                             News
@@ -645,7 +645,7 @@ export default function Home() {
 
                                     <button
                                         onClick={() => navigate('/south-cinema')}
-                                        className="text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-0.5"
+                                        className="text-xs font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors flex items-center gap-0.5"
                                         title="Explore all cinema news"
                                     >
                                         <span className="hidden sm:inline">Wire</span>
@@ -669,10 +669,10 @@ export default function Home() {
                                             <article
                                                 key={item.id}
                                                 onClick={() => setSelectedNewsArticle(item)}
-                                                className="group relative flex flex-col rounded-2xl bg-[#121316] border border-white/[0.06] hover:border-amber-500/40 transition-all cursor-pointer overflow-hidden shadow-md"
+                                                className="group relative flex flex-col rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.06] hover:border-amber-500/40 transition-all cursor-pointer overflow-hidden shadow-sm dark:shadow-md"
                                             >
                                                 {/* Thumbnail */}
-                                                <div className="aspect-[16/9] w-full relative overflow-hidden bg-black/60">
+                                                <div className="aspect-[16/9] w-full relative overflow-hidden bg-black">
                                                     <img
                                                         src={item.thumbnail || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&h=450&fit=crop'}
                                                         alt={item.title}
@@ -682,7 +682,7 @@ export default function Home() {
                                                             (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&h=450&fit=crop';
                                                         }}
                                                     />
-                                                    <div className="absolute inset-0 bg-gradient-to-t from-[#121316] via-transparent to-black/30 pointer-events-none" />
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30 pointer-events-none" />
 
                                                     {/* Top Badges */}
                                                     <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 flex-wrap">
@@ -692,20 +692,20 @@ export default function Home() {
                                                                 <span>{item.rating || 'REVIEW'}</span>
                                                             </span>
                                                         ) : (
-                                                            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-lg bg-blue-500/80 text-white backdrop-blur-md">
+                                                            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-lg bg-blue-600 text-white backdrop-blur-md">
                                                                 FILM NEWS
                                                             </span>
                                                         )}
-                                                        <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-lg bg-black/60 text-zinc-300 backdrop-blur-md border border-white/10">
+                                                        <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-lg bg-black/70 text-white backdrop-blur-md border border-white/20">
                                                             {item.industry}
                                                         </span>
                                                     </div>
 
-                                                    <div className="absolute top-2.5 right-2.5 bg-black/70 backdrop-blur-md px-2 py-0.5 rounded-md border border-white/10 text-[10px] font-medium text-zinc-300">
+                                                    <div className="absolute top-2.5 right-2.5 bg-black/75 backdrop-blur-md px-2 py-0.5 rounded-md border border-white/20 text-[10px] font-medium text-white max-w-[130px] truncate">
                                                         {item.source}
                                                     </div>
 
-                                                    <div className="absolute bottom-2 right-2.5 text-[10px] font-medium text-zinc-400 bg-black/70 px-2 py-0.5 rounded-md backdrop-blur-sm">
+                                                    <div className="absolute bottom-2 right-2.5 text-[10px] font-medium text-white/90 bg-black/75 px-2 py-0.5 rounded-md backdrop-blur-sm">
                                                         {formatNewsTimeAgo(item.timestamp)}
                                                     </div>
                                                 </div>
@@ -713,28 +713,28 @@ export default function Home() {
                                                 {/* Text Content */}
                                                 <div className="p-3.5 flex flex-col flex-1 justify-between gap-2.5">
                                                     <div>
-                                                        <h3 className="font-bold text-xs sm:text-sm text-white group-hover:text-amber-400 transition-colors line-clamp-2 leading-snug">
+                                                        <h3 className="font-bold text-xs sm:text-sm text-zinc-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors line-clamp-2 leading-snug">
                                                             {item.title}
                                                         </h3>
-                                                        <p className="text-[11px] text-zinc-400 line-clamp-2 mt-1 leading-relaxed">
+                                                        <p className="text-[11px] text-zinc-500 dark:text-zinc-400 line-clamp-2 mt-1 leading-relaxed">
                                                             {item.description}
                                                         </p>
                                                     </div>
 
-                                                    <div className="pt-2 border-t border-white/5 flex items-center justify-between text-xs font-semibold">
-                                                        <span className="text-amber-400 group-hover:text-amber-300 flex items-center gap-0.5 text-[11px]">
+                                                    <div className="pt-2 border-t border-zinc-100 dark:border-white/5 flex items-center justify-between text-xs font-semibold">
+                                                        <span className="text-amber-600 dark:text-amber-400 group-hover:text-amber-700 dark:group-hover:text-amber-300 flex items-center gap-0.5 text-[11px]">
                                                             <span>Read Story</span>
                                                             <span className="material-symbols-outlined text-xs group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
                                                         </span>
                                                         <div className="flex items-center gap-2">
                                                             <button
                                                                 onClick={(e) => handleShareNews(item, e)}
-                                                                className="text-zinc-400 hover:text-white p-1 rounded-md hover:bg-white/5 transition-colors"
+                                                                className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white p-1 rounded-md hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors"
                                                                 title="Share story"
                                                             >
                                                                 <span className="material-symbols-outlined text-sm">share</span>
                                                             </button>
-                                                            <span className="text-[10px] text-zinc-500 flex items-center gap-1">
+                                                            <span className="text-[10px] text-zinc-500 dark:text-zinc-400 flex items-center gap-1 max-w-[90px] truncate">
                                                                 <span className="material-symbols-outlined text-xs">public</span>
                                                                 {item.source}
                                                             </span>
@@ -746,7 +746,7 @@ export default function Home() {
                                     })}
                                 </div>
                             ) : (
-                                <div className="p-6 rounded-2xl bg-[#121316] border border-white/5 text-center text-xs text-zinc-400">
+                                <div className="p-6 rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 text-center text-xs text-zinc-600 dark:text-zinc-400">
                                     No stories found for this filter. Check back shortly!
                                 </div>
                             )}
@@ -755,7 +755,7 @@ export default function Home() {
                                 <div className="text-center pt-1">
                                     <button
                                         onClick={() => navigate('/south-cinema')}
-                                        className="px-4 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-xs font-bold text-zinc-300 hover:text-white transition-all inline-flex items-center gap-1.5"
+                                        className="px-4 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] border border-zinc-200 dark:border-white/10 text-xs font-bold text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-all inline-flex items-center gap-1.5"
                                     >
                                         <span>Browse Full Cinema Wire & Reviews</span>
                                         <span className="material-symbols-outlined text-sm">arrow_forward</span>
@@ -769,13 +769,13 @@ export default function Home() {
                             <div className="flex items-center justify-between mb-3">
                                 <div className="flex items-center gap-2">
                                     <span className="size-2 rounded-full bg-emerald-500" />
-                                    <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
+                                    <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white tracking-tight">
                                         For You: Gigs & Casting Calls
                                     </h2>
                                 </div>
                                 <button
                                     onClick={() => navigate('/jobs')}
-                                    className="text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-0.5"
+                                    className="text-xs font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors flex items-center gap-0.5"
                                 >
                                     <span>Explore Gigs</span>
                                     <span className="material-symbols-outlined text-sm">chevron_right</span>
@@ -787,11 +787,11 @@ export default function Home() {
                                     <div
                                         key={job.id}
                                         onClick={() => navigate(`/job/${job.id}`)}
-                                        className="min-w-[285px] sm:min-w-[320px] rounded-2xl bg-[#121316] border border-white/5 p-4 shadow-sm hover:border-amber-500/30 snap-center transition-all cursor-pointer group flex flex-col justify-between"
+                                        className="min-w-[285px] sm:min-w-[320px] rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 p-4 shadow-sm hover:border-amber-500/30 snap-center transition-all cursor-pointer group flex flex-col justify-between"
                                     >
                                         <div>
                                             <div className="flex items-center gap-3 mb-3">
-                                                <div className="size-11 rounded-full overflow-hidden shrink-0 border border-white/10 bg-black">
+                                                <div className="size-11 rounded-full overflow-hidden shrink-0 border border-zinc-200 dark:border-white/10 bg-black">
                                                     <PostMedia
                                                         src={job.logo || ''}
                                                         fallbackType="COMPANY_LOGO"
@@ -799,31 +799,31 @@ export default function Home() {
                                                     />
                                                 </div>
                                                 <div className="min-w-0 flex-1">
-                                                    <span className="text-xs font-semibold text-amber-400 truncate block">
+                                                    <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 truncate block">
                                                         {job.company}
                                                     </span>
-                                                    <h3 className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors truncate">
+                                                    <h3 className="text-sm font-bold text-zinc-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors truncate">
                                                         {job.title}
                                                     </h3>
                                                 </div>
                                             </div>
 
                                             <div className="flex items-center gap-2 mb-2.5">
-                                                <span className="px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-zinc-300">
+                                                <span className="px-2.5 py-0.5 rounded-full bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-xs font-semibold text-zinc-700 dark:text-zinc-300">
                                                     {job.location}
                                                 </span>
-                                                <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-xs font-semibold text-amber-400">
+                                                <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-xs font-semibold text-amber-600 dark:text-amber-400">
                                                     {job.type}
                                                 </span>
                                             </div>
 
-                                            <p className="text-xs text-zinc-400 line-clamp-2 leading-relaxed mb-3">
+                                            <p className="text-xs text-zinc-600 dark:text-zinc-400 line-clamp-2 leading-relaxed mb-3">
                                                 {job.description || 'Production unit seeking passionate cinema professionals.'}
                                             </p>
                                         </div>
 
-                                        <div className="flex items-center justify-between pt-2.5 border-t border-white/5">
-                                            <span className="text-xs font-bold text-white">
+                                        <div className="flex items-center justify-between pt-2.5 border-t border-zinc-100 dark:border-white/5">
+                                            <span className="text-xs font-bold text-zinc-900 dark:text-white">
                                                 ₹ {job.salary}
                                             </span>
                                             <button
@@ -847,13 +847,13 @@ export default function Home() {
                             <div className="flex items-center justify-between mb-3">
                                 <div className="flex items-center gap-2">
                                     <span className="size-2 rounded-full bg-blue-500" />
-                                    <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
+                                    <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white tracking-tight">
                                         Latest From Your Network
                                     </h2>
                                 </div>
                                 <button
                                     onClick={() => navigate('/showcase')}
-                                    className="text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-0.5"
+                                    className="text-xs font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors flex items-center gap-0.5"
                                 >
                                     <span>Open Feed</span>
                                     <span className="material-symbols-outlined text-sm">chevron_right</span>
@@ -862,11 +862,11 @@ export default function Home() {
 
                             <div
                                 onClick={() => navigate('/showcase')}
-                                className="rounded-2xl bg-[#121316] border border-white/5 p-4 sm:p-5 hover:border-amber-500/30 transition-all cursor-pointer group"
+                                className="rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 p-4 sm:p-5 hover:border-amber-500/30 transition-all cursor-pointer group shadow-sm dark:shadow-none"
                             >
                                 <div className="flex items-center justify-between mb-3">
                                     <div className="flex items-center gap-2.5">
-                                        <div className="size-10 rounded-full overflow-hidden border border-white/10 shrink-0">
+                                        <div className="size-10 rounded-full overflow-hidden border border-zinc-200 dark:border-white/10 shrink-0">
                                             <PostMedia
                                                 src={networkPost?.authorImage || 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop'}
                                                 fallbackType="USER_MALE"
@@ -874,24 +874,24 @@ export default function Home() {
                                             />
                                         </div>
                                         <div>
-                                            <h3 className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors">
+                                            <h3 className="text-sm font-bold text-zinc-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors">
                                                 {networkPost?.author || 'Karan Johar'}
                                             </h3>
-                                            <p className="text-xs text-zinc-400">
+                                            <p className="text-xs text-zinc-500 dark:text-zinc-400">
                                                 Producer & Director • 2h ago
                                             </p>
                                         </div>
                                     </div>
-                                    <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-white/5 text-zinc-400 border border-white/10">
+                                    <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-white/10">
                                         Network Update
                                     </span>
                                 </div>
 
-                                <p className="text-xs sm:text-sm text-zinc-200 leading-relaxed mb-3 line-clamp-3">
+                                <p className="text-xs sm:text-sm text-zinc-800 dark:text-zinc-200 leading-relaxed mb-3 line-clamp-3">
                                     {networkPost?.content || "Just wrapped up principal photography for our new feature film in Mumbai! Incredible work by our camera department and lighting team. Post-production starts Monday. #CinemaLife #Wrap"}
                                 </p>
 
-                                <div className="w-full aspect-video rounded-xl overflow-hidden bg-black/40 mb-3 border border-white/5">
+                                <div className="w-full aspect-video rounded-xl overflow-hidden bg-black mb-3 border border-zinc-200 dark:border-white/5">
                                     <PostMedia
                                         src={networkPost?.image || 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&h=450&fit=crop'}
                                         fallbackType="FILM_SET"
@@ -899,24 +899,24 @@ export default function Home() {
                                     />
                                 </div>
 
-                                <div className="flex items-center justify-between text-xs font-semibold text-zinc-400 pt-2 border-t border-white/5">
+                                <div className="flex items-center justify-between text-xs font-semibold text-zinc-500 dark:text-zinc-400 pt-2 border-t border-zinc-100 dark:border-white/5">
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             setNetworkPostLiked(!networkPostLiked);
                                         }}
-                                        className={`flex items-center gap-1.5 transition-colors ${networkPostLiked ? 'text-red-500' : 'hover:text-white'}`}
+                                        className={`flex items-center gap-1.5 transition-colors ${networkPostLiked ? 'text-red-500' : 'hover:text-zinc-900 dark:hover:text-white'}`}
                                     >
                                         <span className="material-symbols-outlined text-base">
                                             {networkPostLiked ? 'favorite' : 'favorite_border'}
                                         </span>
                                         <span>{(networkPost?.likes || 124) + (networkPostLiked ? 1 : 0)}</span>
                                     </button>
-                                    <span className="flex items-center gap-1.5 hover:text-white transition-colors">
+                                    <span className="flex items-center gap-1.5 hover:text-zinc-900 dark:hover:text-white transition-colors">
                                         <span className="material-symbols-outlined text-base">chat_bubble_outline</span>
                                         <span>28 Comments</span>
                                     </span>
-                                    <span className="flex items-center gap-1.5 hover:text-white transition-colors">
+                                    <span className="flex items-center gap-1.5 hover:text-zinc-900 dark:hover:text-white transition-colors">
                                         <span className="material-symbols-outlined text-base">share</span>
                                         <span>Share</span>
                                     </span>
@@ -931,14 +931,14 @@ export default function Home() {
                             <EditorialArticlesSection />
 
                             {/* Mobile Footer Links */}
-                            <div className="pt-4 pb-4 px-2 text-center text-xs text-zinc-500 space-y-2 border-t border-white/5">
+                            <div className="pt-4 pb-4 px-2 text-center text-xs text-zinc-500 space-y-2 border-t border-zinc-200 dark:border-white/5">
                                 <div className="flex flex-wrap justify-center gap-x-4 gap-y-1.5">
-                                    <span onClick={() => navigate('/privacy')} className="hover:text-zinc-300 cursor-pointer">Privacy</span>
-                                    <span onClick={() => navigate('/terms')} className="hover:text-zinc-300 cursor-pointer">Terms</span>
-                                    <span onClick={() => navigate('/blogs-events')} className="hover:text-zinc-300 cursor-pointer">Editorial</span>
-                                    <span onClick={() => navigate('/booking-facilities')} className="hover:text-zinc-300 cursor-pointer">Facilities</span>
+                                    <span onClick={() => navigate('/privacy')} className="hover:text-zinc-900 dark:hover:text-zinc-300 cursor-pointer">Privacy</span>
+                                    <span onClick={() => navigate('/terms')} className="hover:text-zinc-900 dark:hover:text-zinc-300 cursor-pointer">Terms</span>
+                                    <span onClick={() => navigate('/blogs-events')} className="hover:text-zinc-900 dark:hover:text-zinc-300 cursor-pointer">Editorial</span>
+                                    <span onClick={() => navigate('/booking-facilities')} className="hover:text-zinc-900 dark:hover:text-zinc-300 cursor-pointer">Facilities</span>
                                 </div>
-                                <p className="text-[11px] text-zinc-600">© 2026 iFilmDirectory. A property of 5M Collective Services Pvt. Ltd. (5MC). All rights reserved.</p>
+                                <p className="text-[11px] text-zinc-500">© 2026 iFilmDirectory. A property of 5M Collective Services Pvt. Ltd. (5MC). All rights reserved.</p>
                             </div>
                         </div>
                     </div>
@@ -946,8 +946,8 @@ export default function Home() {
                     {/* DESKTOP RIGHT SIDEBAR (1 col on xl desktop) */}
                     <div className="hidden xl:flex flex-col gap-6">
                         {/* Quick Actions Deck */}
-                        <div className="rounded-2xl bg-[#121316] border border-white/5 p-4">
-                            <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-400 mb-3">
+                        <div className="rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 p-4 shadow-sm dark:shadow-none">
+                            <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-3">
                                 Creator Shortcuts
                             </h3>
                             <QuickActionsGrid />
@@ -986,11 +986,11 @@ export default function Home() {
                     onClick={() => setSelectedNewsArticle(null)}
                 >
                     <div
-                        className="w-full max-w-2xl bg-[#121316] border border-white/10 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200"
+                        className="w-full max-w-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/10 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Modal Header Media & Close */}
-                        <div className="relative aspect-[16/9] w-full max-h-64 overflow-hidden bg-black/80 shrink-0">
+                        <div className="relative aspect-[16/9] w-full max-h-64 overflow-hidden bg-black shrink-0">
                             <img
                                 src={selectedNewsArticle.thumbnail || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&h=450&fit=crop'}
                                 alt={selectedNewsArticle.title}
@@ -999,7 +999,7 @@ export default function Home() {
                                     (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&h=450&fit=crop';
                                 }}
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-[#121316] via-black/30 to-black/60" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/60 pointer-events-none" />
 
                             {/* Close Button */}
                             <button
@@ -1019,15 +1019,15 @@ export default function Home() {
                                             <span>{selectedNewsArticle.rating}</span>
                                         </span>
                                     ) : (
-                                        <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-lg bg-blue-500/80 text-white backdrop-blur-md">
+                                        <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-lg bg-blue-600 text-white backdrop-blur-md">
                                             Film News
                                         </span>
                                     )}
-                                    <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-lg bg-black/70 text-zinc-300 backdrop-blur-md border border-white/10">
+                                    <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-lg bg-black/70 text-white backdrop-blur-md border border-white/20">
                                         {selectedNewsArticle.industry}
                                     </span>
                                 </div>
-                                <span className="text-zinc-300 text-[11px] font-medium bg-black/70 px-2 py-0.5 rounded-md backdrop-blur-md">
+                                <span className="text-white text-[11px] font-medium bg-black/70 px-2 py-0.5 rounded-md backdrop-blur-md">
                                     {selectedNewsArticle.source} • {formatNewsTimeAgo(selectedNewsArticle.timestamp)}
                                 </span>
                             </div>
@@ -1038,8 +1038,8 @@ export default function Home() {
                             {selectedNewsArticle.category === 'review' && (
                                 <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between">
                                     <div className="flex items-center gap-2">
-                                        <span className="material-symbols-outlined text-amber-400 filled">star</span>
-                                        <span className="text-xs font-black text-amber-300 uppercase tracking-wider">
+                                        <span className="material-symbols-outlined text-amber-500 filled">star</span>
+                                        <span className="text-xs font-black text-amber-600 dark:text-amber-300 uppercase tracking-wider">
                                             Film Review & Verdict
                                         </span>
                                     </div>
@@ -1049,17 +1049,17 @@ export default function Home() {
                                 </div>
                             )}
 
-                            <h2 className="text-base sm:text-lg font-bold text-white leading-snug">
+                            <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white leading-snug">
                                 {selectedNewsArticle.title}
                             </h2>
 
-                            <div className="text-xs sm:text-sm text-zinc-300 leading-relaxed whitespace-pre-line space-y-3 pt-3 border-t border-white/5">
+                            <div className="text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed whitespace-pre-line space-y-3 pt-3 border-t border-zinc-200 dark:border-white/5">
                                 {selectedNewsArticle.content || selectedNewsArticle.description}
                             </div>
                         </div>
 
                         {/* Sticky Action Footer */}
-                        <div className="p-4 sm:px-6 bg-[#0e0f12] border-t border-white/10 flex items-center gap-3 shrink-0">
+                        <div className="p-4 sm:px-6 bg-slate-50 dark:bg-[#0e0f12] border-t border-zinc-200 dark:border-white/10 flex items-center gap-3 shrink-0">
                             <a
                                 href={selectedNewsArticle.link}
                                 target="_blank"
@@ -1072,7 +1072,7 @@ export default function Home() {
 
                             <button
                                 onClick={(e) => handleShareNews(selectedNewsArticle, e)}
-                                className="p-2.5 sm:p-3 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border border-white/10 transition-all"
+                                className="p-2.5 sm:p-3 rounded-xl bg-white dark:bg-white/5 hover:bg-zinc-100 dark:hover:bg-white/10 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/10 transition-all shadow-xs"
                                 title="Share"
                             >
                                 <span className="material-symbols-outlined text-base sm:text-lg">share</span>

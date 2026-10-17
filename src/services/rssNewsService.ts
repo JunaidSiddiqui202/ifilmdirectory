@@ -548,13 +548,23 @@ class RSSNewsService {
 
             const { category, rating, detectedIndustry } = this.classifyItem(title, content || description, feed.industry);
 
+            let source = item.author || feedTitle || feed.name;
+            if (source.includes('Google News') || source.length > 28 || source.includes(' OR ') || source.includes('"')) {
+                const titleParts = title.split(' - ');
+                if (titleParts.length > 1 && titleParts[titleParts.length - 1].length < 25) {
+                    source = titleParts[titleParts.length - 1].trim();
+                } else {
+                    source = feed.name;
+                }
+            }
+
             return {
                 id: `r2j_${Math.abs(this.hashCode(link + title))}`,
                 title,
                 link,
                 pubDate,
                 timestamp: isNaN(timestamp) ? Date.now() : timestamp,
-                source: item.author || feedTitle || feed.name,
+                source,
                 sourceUrl: feed.url,
                 description,
                 content: content || description,
