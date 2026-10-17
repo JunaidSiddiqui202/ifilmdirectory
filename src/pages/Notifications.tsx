@@ -136,8 +136,17 @@ export default function Notifications() {
                         </button>
                     )}
                     <button
+                        onClick={() => navigate('/messaging')}
+                        className="size-9 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.04] border border-zinc-200 dark:border-white/[0.08] text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white flex items-center justify-center transition-all"
+                        title="Direct Messages"
+                        aria-label="Direct Messages"
+                    >
+                        <span className="material-symbols-outlined text-lg">chat_bubble</span>
+                    </button>
+                    <button
                         onClick={() => navigate('/settings')}
                         className="size-9 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.04] border border-zinc-200 dark:border-white/[0.08] text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white flex items-center justify-center transition-all"
+                        title="Settings"
                     >
                         <span className="material-symbols-outlined text-lg">settings</span>
                     </button>
