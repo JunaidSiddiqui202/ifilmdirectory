@@ -1,9 +1,9 @@
 {
     "name": "iFilmDirectory - Film Professionals Hub",
     "short_name": "iFilmDirectory",
-    "version": "2.0.202601060020",
+    "version": "2.0.202610171842",
     "description": "The ultimate platform connecting film professionals, cast, crew, and production houses worldwide",
-    "start_url": "/?v=202601060020",
+    "start_url": "/?v=202610171842",
     "display": "standalone",
     "background_color": "#0a0a0a",
     "theme_color": "#8b5cf6",

@@ -21,8 +21,11 @@ if [ $? -eq 0 ]; then
     echo ""
     
     # Step 2: Deploy to Firebase
-    echo "🌐 Step 3/3: Deploying to Firebase Hosting..."
-    firebase deploy --only hosting
+    if command -v firebase &> /dev/null; then
+        firebase deploy --only hosting
+    else
+        npx -y firebase-tools deploy --only hosting
+    fi
     
     if [ $? -eq 0 ]; then
         echo ""

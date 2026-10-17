@@ -15,15 +15,6 @@ import { useUnread } from '../context/UnreadContext';
 import PostMedia from '../components/PostMedia';
 import BreakingTicker from '../components/BreakingTicker';
 
-const stories = [
-    { name: 'Your Story', image: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop', isUser: true },
-    { name: 'Alia Bhatt', role: 'Actor & Producer', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop', verified: true },
-    { name: 'Ranbir K.', role: 'Lead Actor', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop', verified: true },
-    { name: 'Priyanka C.', role: 'Director', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop', verified: true },
-    { name: 'Deepika P.', role: 'Producer', image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop', verified: true },
-    { name: 'Ranveer S.', role: 'Lead Actor', image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop', verified: true },
-];
-
 const formatViews = (views: number) => {
     if (views >= 1000000) return `${(views / 1000000).toFixed(1)}M`;
     if (views >= 1000) return `${(views / 1000).toFixed(1)}K`;
@@ -41,6 +32,17 @@ const formatNewsTimeAgo = (timestamp: number) => {
     const days = Math.floor(hours / 24);
     if (days === 1) return 'Yesterday';
     return `${days}d ago`;
+};
+
+const formatJobTimeAgo = (timestamp: any) => {
+    if (!timestamp) return 'Recent';
+    try {
+        const ms = timestamp.toDate ? timestamp.toDate().getTime() : (typeof timestamp === 'number' ? timestamp : new Date(timestamp).getTime());
+        if (isNaN(ms)) return 'Recent';
+        return formatNewsTimeAgo(ms);
+    } catch {
+        return 'Recent';
+    }
 };
 
 export default function Home() {
@@ -61,6 +63,9 @@ export default function Home() {
     const [newsFilter, setNewsFilter] = useState<'all' | 'review' | 'news'>('all');
     const [selectedNewsArticle, setSelectedNewsArticle] = useState<NewsItem | null>(null);
     const [newsLoading, setNewsLoading] = useState(true);
+
+    // Film & Media Fraternity Jobs modal state
+    const [selectedJobModal, setSelectedJobModal] = useState<Job | null>(null);
 
     useEffect(() => {
         // Pre-fill with cached cinema news instantly so UI renders without delay
@@ -136,6 +141,26 @@ export default function Home() {
         if (newsFilter === 'news') return item.category === 'news' && !item.rating;
         return true;
     });
+
+    const handleShareJob = async (job: Job, e: React.MouseEvent) => {
+        e.stopPropagation();
+        const shareUrl = `${window.location.origin}/job/${job.id}`;
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: `${job.title} at ${job.company}`,
+                    text: `Film Fraternity Job: ${job.title} at ${job.company} (${job.location}) — Check it out on iFilmDirectory`,
+                    url: shareUrl
+                });
+            } catch {
+                // user cancelled
+            }
+        } else {
+            await navigator.clipboard.writeText(shareUrl);
+            toast.success('Job link copied to clipboard!');
+        }
+    };
+
 
     const poll = {
         question: "Which filmmaking breakthrough are you most excited to use on your next shoot?",
@@ -342,10 +367,10 @@ export default function Home() {
         </section>
     );
 
-    // Reusable Top Movie Reviews Widget (for Desktop Sidebar & Companion view)
+    // Reusable Top Movie Reviews Widget (for Desktop Sidebar Card 2)
     const TopReviewsWidget = () => {
-        const reviews = cinemaNews.filter(i => i.category === 'review' || Boolean(i.rating)).slice(0, 3);
-        const displayItems = reviews.length > 0 ? reviews : cinemaNews.slice(0, 3);
+        const reviews = cinemaNews.filter(i => i.category === 'review' || Boolean(i.rating)).slice(0, 4);
+        const displayItems = reviews.length > 0 ? reviews : cinemaNews.slice(0, 4);
 
         return (
             <section className="rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 p-4 sm:p-5 shadow-sm dark:shadow-none">
@@ -353,7 +378,7 @@ export default function Home() {
                     <div className="flex items-center gap-2">
                         <span className="size-2 rounded-full bg-amber-400 animate-pulse" />
                         <h2 className="text-base font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-1.5">
-                            Movie Reviews & Ratings
+                            Certified Movie Reviews
                         </h2>
                     </div>
                     <button
@@ -365,7 +390,7 @@ export default function Home() {
                     </button>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-2.5">
                     {newsLoading ? (
                         [1, 2, 3].map(i => (
                             <div key={i} className="h-16 rounded-xl bg-zinc-100 dark:bg-white/[0.03] animate-pulse border border-zinc-200 dark:border-white/5" />
@@ -408,6 +433,95 @@ export default function Home() {
                     ) : (
                         <div className="text-center py-4 text-xs text-zinc-500 dark:text-zinc-400">
                             Reviews syncing...
+                        </div>
+                    )}
+                </div>
+            </section>
+        );
+    };
+
+    // Reusable Top Fraternity Jobs Widget (for Desktop Sidebar Card 3)
+    const TopJobsWidget = () => {
+        const displayJobs = jobs.slice(0, 4);
+
+        return (
+            <section className="rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 p-4 sm:p-5 shadow-sm dark:shadow-none">
+                <div className="flex items-center justify-between mb-3.5">
+                    <div className="flex items-center gap-2">
+                        <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+                        <h2 className="text-base font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-1.5">
+                            Hot Cast & Crew Calls
+                        </h2>
+                    </div>
+                    <button
+                        onClick={() => navigate('/jobs')}
+                        className="text-xs font-bold text-amber-500 dark:text-amber-400 hover:text-amber-600 dark:hover:text-amber-300 transition-colors flex items-center gap-0.5"
+                    >
+                        <span>All Jobs</span>
+                        <span className="material-symbols-outlined text-sm">chevron_right</span>
+                    </button>
+                </div>
+
+                <div className="space-y-2.5">
+                    {displayJobs.length > 0 ? (
+                        displayJobs.map((job) => (
+                            <div
+                                key={job.id}
+                                onClick={() => setSelectedJobModal(job)}
+                                className="group p-2.5 rounded-xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-200 dark:border-white/5 hover:border-amber-500/30 transition-all cursor-pointer flex gap-3 items-center shadow-xs dark:shadow-none"
+                            >
+                                <div className="relative size-12 rounded-xl overflow-hidden shrink-0 bg-black/60 border border-zinc-200 dark:border-white/10">
+                                    <PostMedia
+                                        src={job.logo || ''}
+                                        fallbackType="COMPANY_LOGO"
+                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                    />
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                    <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
+                                        <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 truncate max-w-[120px]">
+                                            {job.company}
+                                        </span>
+                                        {job.fraternityRole && (
+                                            <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-purple-500/10 text-purple-600 dark:text-purple-300 border border-purple-500/20">
+                                                {job.fraternityRole}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <h4 className="text-xs font-bold text-zinc-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors line-clamp-1 leading-snug">
+                                        {job.title}
+                                    </h4>
+                                    <div className="flex items-center gap-2 text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">
+                                        <span>{job.location}</span>
+                                        {job.salary && (
+                                            <>
+                                                <span>•</span>
+                                                <span className="font-semibold text-zinc-700 dark:text-zinc-300">{job.salary}</span>
+                                            </>
+                                        )}
+                                        {job.postedAt && (
+                                            <>
+                                                <span>•</span>
+                                                <span>{formatJobTimeAgo(job.postedAt)}</span>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSelectedJobModal(job);
+                                    }}
+                                    className="p-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500 text-amber-600 hover:text-black transition-all shrink-0 group-hover:bg-amber-500 group-hover:text-black"
+                                    title="View Job"
+                                >
+                                    <span className="material-symbols-outlined text-sm">visibility</span>
+                                </button>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="text-center py-4 text-xs text-zinc-500 dark:text-zinc-400">
+                            Fraternity calls syncing...
                         </div>
                     )}
                 </div>
@@ -496,50 +610,180 @@ export default function Home() {
                             </button>
                         </div>
 
-                        {/* Live South Cinema Breaking RSS Ticker */}
-                        <BreakingTicker variant="home" />
+                        {/* Live South Cinema Breaking RSS Ticker with Jobs Arrivals & Instant Readers */}
+                        <BreakingTicker
+                            variant="home"
+                            onNewsClick={(item) => setSelectedNewsArticle(item)}
+                            onJobClick={(job) => setSelectedJobModal(job)}
+                        />
 
-                        {/* Quick Action Deck for Mobile & Tablet (hidden on xl desktop) */}
-                        <div className="xl:hidden">
-                            <QuickActionsGrid />
-                        </div>
 
-                        {/* Filmmaker On-Set Stories */}
-                        <section className="py-1">
-                            <div className="flex gap-3.5 overflow-x-auto no-scrollbar pb-1">
-                                {stories.map((story, index) => (
-                                    <div
-                                        key={index}
-                                        onClick={() => story.isUser ? navigate('/showreel/upload') : navigate('/showcase')}
-                                        className="flex flex-col items-center gap-1.5 shrink-0 cursor-pointer group"
-                                    >
-                                        <div className="relative">
-                                            <div className={`size-16 rounded-full p-[2px] transition-transform group-hover:scale-105 ${
-                                                story.isUser 
-                                                    ? 'border-2 border-dashed border-amber-500' 
-                                                    : 'bg-gradient-to-tr from-amber-500 via-yellow-400 to-amber-600'
-                                            }`}>
-                                                <div className="w-full h-full rounded-full overflow-hidden border-2 border-white dark:border-[#090A0C]">
-                                                    <PostMedia
-                                                        src={story.isUser ? (currentUser?.photoURL || story.image) : story.image}
-                                                        fallbackType="USER_MALE"
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                </div>
-                                            </div>
-                                            {story.isUser && (
-                                                <div className="absolute bottom-0 right-0 size-5 bg-amber-500 text-black rounded-full flex items-center justify-center border-2 border-white dark:border-[#090A0C] shadow-sm font-bold text-xs">
-                                                    <span className="material-symbols-outlined text-xs">add</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                        <span className="text-[11px] font-semibold text-zinc-800 dark:text-zinc-200 max-w-[68px] truncate text-center group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
-                                            {story.name}
-                                        </span>
+                        {/* Film News & Movie Reviews Section (Responsive News Headlines with Small Thumbnails) */}
+                        <section className="space-y-3">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <span className="size-2 rounded-full bg-amber-500 animate-pulse shrink-0" />
+                                        <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-1.5">
+                                            <span>Film News & Reviews</span>
+                                            <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                                                Top Stories
+                                            </span>
+                                        </h2>
                                     </div>
-                                ))}
+                                    <button
+                                        onClick={() => navigate('/south-cinema')}
+                                        className="sm:hidden text-xs font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors flex items-center gap-0.5"
+                                    >
+                                        <span>All Wire</span>
+                                        <span className="material-symbols-outlined text-sm">chevron_right</span>
+                                    </button>
+                                </div>
+
+                                {/* Filter Pills + Desktop View All */}
+                                <div className="flex items-center justify-between sm:justify-end gap-2">
+                                    <div className="flex items-center bg-zinc-100 dark:bg-white/[0.04] p-0.5 rounded-xl border border-zinc-200 dark:border-white/5 text-[11px] font-bold">
+                                        <button
+                                            onClick={() => setNewsFilter('all')}
+                                            className={`px-2.5 py-1 rounded-lg transition-all ${
+                                                newsFilter === 'all'
+                                                    ? 'bg-amber-500 text-black shadow-sm'
+                                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                                            }`}
+                                        >
+                                            All
+                                        </button>
+                                        <button
+                                            onClick={() => setNewsFilter('review')}
+                                            className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 ${
+                                                newsFilter === 'review'
+                                                    ? 'bg-amber-500 text-black shadow-sm'
+                                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                                            }`}
+                                        >
+                                            <span className="material-symbols-outlined text-[12px] filled">star</span>
+                                            <span>Reviews</span>
+                                        </button>
+                                        <button
+                                            onClick={() => setNewsFilter('news')}
+                                            className={`px-2.5 py-1 rounded-lg transition-all ${
+                                                newsFilter === 'news'
+                                                    ? 'bg-amber-500 text-black shadow-sm'
+                                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                                            }`}
+                                        >
+                                            News
+                                        </button>
+                                    </div>
+
+                                    <button
+                                        onClick={() => navigate('/south-cinema')}
+                                        className="hidden sm:flex text-xs font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors items-center gap-0.5"
+                                        title="Explore all cinema news"
+                                    >
+                                        <span>All Wire</span>
+                                        <span className="material-symbols-outlined text-sm">chevron_right</span>
+                                    </button>
+                                </div>
                             </div>
+
+                            {/* News Headlines with Small Thumbnails */}
+                            {newsLoading ? (
+                                <div className="rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 divide-y divide-zinc-100 dark:divide-white/5 overflow-hidden">
+                                    {[1, 2, 3, 4, 5].map(i => (
+                                        <div key={i} className="p-2.5 sm:p-3 flex items-center gap-3 animate-pulse">
+                                            <div className="size-14 sm:size-16 rounded-xl bg-zinc-200 dark:bg-white/5 shrink-0" />
+                                            <div className="flex-1 min-w-0 space-y-2">
+                                                <div className="h-3 bg-zinc-200 dark:bg-white/5 rounded w-1/4" />
+                                                <div className="h-3.5 bg-zinc-200 dark:bg-white/5 rounded w-4/5" />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : filteredNews.length > 0 ? (
+                                <div className="flex flex-col rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.06] divide-y divide-zinc-100 dark:divide-white/[0.05] overflow-hidden shadow-xs">
+                                    {filteredNews.slice(0, 5).map((item) => {
+                                        const isReview = item.category === 'review' || Boolean(item.rating);
+                                        return (
+                                            <article
+                                                key={item.id}
+                                                onClick={() => setSelectedNewsArticle(item)}
+                                                className="group flex items-center gap-3 p-2.5 sm:p-3 hover:bg-amber-500/[0.03] dark:hover:bg-white/[0.02] transition-colors cursor-pointer"
+                                            >
+                                                {/* Small Thumbnail */}
+                                                <div className="relative size-14 sm:size-16 rounded-xl overflow-hidden shrink-0 bg-black/60 border border-zinc-200 dark:border-white/10 shadow-xs">
+                                                    <img
+                                                        src={item.thumbnail || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=200&h=200&fit=crop'}
+                                                        alt={item.title}
+                                                        loading="lazy"
+                                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                                        onError={(e) => {
+                                                             (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=200&h=200&fit=crop';
+                                                        }}
+                                                    />
+                                                    {isReview && item.rating && (
+                                                        <div className="absolute inset-x-0 bottom-0 bg-amber-500 text-black font-black text-[9px] text-center leading-tight py-0.5 shadow-xs">
+                                                            ★ {item.rating}
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {/* News Headline & Info */}
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
+                                                        <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 truncate max-w-[120px]">
+                                                            {item.source}
+                                                        </span>
+                                                        <span className="text-[10px] text-zinc-400">•</span>
+                                                        <span className="text-[10px] text-zinc-500 dark:text-zinc-400">{formatNewsTimeAgo(item.timestamp)}</span>
+                                                        {isReview && !item.rating && (
+                                                            <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                                                                REVIEW
+                                                            </span>
+                                                        )}
+                                                    </div>
+
+                                                    <h3 className="font-bold text-xs sm:text-sm text-zinc-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors line-clamp-2 leading-snug">
+                                                        {item.title}
+                                                    </h3>
+                                                </div>
+
+                                                {/* Share Action */}
+                                                <button
+                                                    onClick={(e) => handleShareNews(item, e)}
+                                                    className="text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors shrink-0"
+                                                    title="Share story"
+                                                >
+                                                    <span className="material-symbols-outlined text-base">share</span>
+                                                </button>
+                                            </article>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                <div className="p-6 rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 text-center text-xs text-zinc-600 dark:text-zinc-400">
+                                    No stories found for this filter. Check back shortly!
+                                </div>
+                            )}
+
+                            {filteredNews.length > 5 && (
+                                <div className="text-center pt-1">
+                                    <button
+                                        onClick={() => navigate('/south-cinema')}
+                                        className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] border border-zinc-200 dark:border-white/10 text-xs font-bold text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-all inline-flex items-center justify-center gap-1.5"
+                                    >
+                                        <span>Browse Full Cinema Wire & Reviews ({filteredNews.length})</span>
+                                        <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                                    </button>
+                                </div>
+                            )}
                         </section>
+
+                        {/* On Mobile / Tablet: Prioritize Jobs & Featured Talent right after News & Reviews */}
+                        <div className="xl:hidden space-y-6">
+                            <TopJobsWidget />
+                            <FeaturedTalentSection />
+                        </div>
 
                         {/* Trending Showreels & BTS */}
                         <section>
@@ -595,259 +839,6 @@ export default function Home() {
                                         Loading filmmaker showreels...
                                     </div>
                                 )}
-                            </div>
-                        </section>
-
-                        {/* Film News & Movie Reviews Section */}
-                        <section className="space-y-3.5">
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                                <div className="flex items-center gap-2">
-                                    <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
-                                    <div>
-                                        <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
-                                            Film News & Movie Reviews
-                                            <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                                                Live Wire
-                                            </span>
-                                        </h2>
-                                        <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
-                                            Breaking scoops, trade updates & certified movie reviews
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* Filter Pills + View All */}
-                                <div className="flex items-center gap-2 self-start sm:self-auto">
-                                    <div className="flex items-center bg-zinc-100 dark:bg-white/[0.04] p-0.5 rounded-xl border border-zinc-200 dark:border-white/5 text-[11px] font-bold">
-                                        <button
-                                            onClick={() => setNewsFilter('all')}
-                                            className={`px-2.5 py-1 rounded-lg transition-all ${
-                                                newsFilter === 'all'
-                                                    ? 'bg-amber-500 text-black shadow-sm'
-                                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
-                                            }`}
-                                        >
-                                            All
-                                        </button>
-                                        <button
-                                            onClick={() => setNewsFilter('review')}
-                                            className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 ${
-                                                newsFilter === 'review'
-                                                    ? 'bg-amber-500 text-black shadow-sm'
-                                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
-                                            }`}
-                                        >
-                                            <span className="material-symbols-outlined text-[12px] filled">star</span>
-                                            <span>Reviews</span>
-                                        </button>
-                                        <button
-                                            onClick={() => setNewsFilter('news')}
-                                            className={`px-2.5 py-1 rounded-lg transition-all ${
-                                                newsFilter === 'news'
-                                                    ? 'bg-amber-500 text-black shadow-sm'
-                                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
-                                            }`}
-                                        >
-                                            News
-                                        </button>
-                                    </div>
-
-                                    <button
-                                        onClick={() => navigate('/south-cinema')}
-                                        className="text-xs font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors flex items-center gap-0.5"
-                                        title="Explore all cinema news"
-                                    >
-                                        <span className="hidden sm:inline">Wire</span>
-                                        <span className="material-symbols-outlined text-sm">chevron_right</span>
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* News Cards Grid */}
-                            {newsLoading ? (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                                    {[1, 2, 3, 4].map(i => (
-                                        <div key={i} className="h-64 rounded-2xl bg-white/[0.03] animate-pulse border border-white/5" />
-                                    ))}
-                                </div>
-                            ) : filteredNews.length > 0 ? (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                                    {filteredNews.slice(0, 4).map((item) => {
-                                        const isReview = item.category === 'review' || Boolean(item.rating);
-                                        return (
-                                            <article
-                                                key={item.id}
-                                                onClick={() => setSelectedNewsArticle(item)}
-                                                className="group relative flex flex-col rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.06] hover:border-amber-500/40 transition-all cursor-pointer overflow-hidden shadow-sm dark:shadow-md"
-                                            >
-                                                {/* Thumbnail */}
-                                                <div className="aspect-[16/9] w-full relative overflow-hidden bg-black">
-                                                    <img
-                                                        src={item.thumbnail || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&h=450&fit=crop'}
-                                                        alt={item.title}
-                                                        loading="lazy"
-                                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                                        onError={(e) => {
-                                                            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&h=450&fit=crop';
-                                                        }}
-                                                    />
-                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30 pointer-events-none" />
-
-                                                    {/* Top Badges */}
-                                                    <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 flex-wrap">
-                                                        {isReview ? (
-                                                            <span className="text-[10px] font-black px-2 py-0.5 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 text-black shadow-md flex items-center gap-1 tracking-wide">
-                                                                <span className="material-symbols-outlined text-[11px] filled">star</span>
-                                                                <span>{item.rating || 'REVIEW'}</span>
-                                                            </span>
-                                                        ) : (
-                                                            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-lg bg-blue-600 text-white backdrop-blur-md">
-                                                                FILM NEWS
-                                                            </span>
-                                                        )}
-                                                        <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-lg bg-black/70 text-white backdrop-blur-md border border-white/20">
-                                                            {item.industry}
-                                                        </span>
-                                                    </div>
-
-                                                    <div className="absolute top-2.5 right-2.5 bg-black/75 backdrop-blur-md px-2 py-0.5 rounded-md border border-white/20 text-[10px] font-medium text-white max-w-[130px] truncate">
-                                                        {item.source}
-                                                    </div>
-
-                                                    <div className="absolute bottom-2 right-2.5 text-[10px] font-medium text-white/90 bg-black/75 px-2 py-0.5 rounded-md backdrop-blur-sm">
-                                                        {formatNewsTimeAgo(item.timestamp)}
-                                                    </div>
-                                                </div>
-
-                                                {/* Text Content */}
-                                                <div className="p-3.5 flex flex-col flex-1 justify-between gap-2.5">
-                                                    <div>
-                                                        <h3 className="font-bold text-xs sm:text-sm text-zinc-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors line-clamp-2 leading-snug">
-                                                            {item.title}
-                                                        </h3>
-                                                        <p className="text-[11px] text-zinc-500 dark:text-zinc-400 line-clamp-2 mt-1 leading-relaxed">
-                                                            {item.description}
-                                                        </p>
-                                                    </div>
-
-                                                    <div className="pt-2 border-t border-zinc-100 dark:border-white/5 flex items-center justify-between text-xs font-semibold">
-                                                        <span className="text-amber-600 dark:text-amber-400 group-hover:text-amber-700 dark:group-hover:text-amber-300 flex items-center gap-0.5 text-[11px]">
-                                                            <span>Read Story</span>
-                                                            <span className="material-symbols-outlined text-xs group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
-                                                        </span>
-                                                        <div className="flex items-center gap-2">
-                                                            <button
-                                                                onClick={(e) => handleShareNews(item, e)}
-                                                                className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white p-1 rounded-md hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors"
-                                                                title="Share story"
-                                                            >
-                                                                <span className="material-symbols-outlined text-sm">share</span>
-                                                            </button>
-                                                            <span className="text-[10px] text-zinc-500 dark:text-zinc-400 flex items-center gap-1 max-w-[90px] truncate">
-                                                                <span className="material-symbols-outlined text-xs">public</span>
-                                                                {item.source}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </article>
-                                        );
-                                    })}
-                                </div>
-                            ) : (
-                                <div className="p-6 rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 text-center text-xs text-zinc-600 dark:text-zinc-400">
-                                    No stories found for this filter. Check back shortly!
-                                </div>
-                            )}
-
-                            {filteredNews.length > 4 && (
-                                <div className="text-center pt-1">
-                                    <button
-                                        onClick={() => navigate('/south-cinema')}
-                                        className="px-4 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] border border-zinc-200 dark:border-white/10 text-xs font-bold text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-all inline-flex items-center gap-1.5"
-                                    >
-                                        <span>Browse Full Cinema Wire & Reviews</span>
-                                        <span className="material-symbols-outlined text-sm">arrow_forward</span>
-                                    </button>
-                                </div>
-                            )}
-                        </section>
-
-                        {/* For You: Gigs & Casting Calls */}
-                        <section>
-                            <div className="flex items-center justify-between mb-3">
-                                <div className="flex items-center gap-2">
-                                    <span className="size-2 rounded-full bg-emerald-500" />
-                                    <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white tracking-tight">
-                                        For You: Gigs & Casting Calls
-                                    </h2>
-                                </div>
-                                <button
-                                    onClick={() => navigate('/jobs')}
-                                    className="text-xs font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors flex items-center gap-0.5"
-                                >
-                                    <span>Explore Gigs</span>
-                                    <span className="material-symbols-outlined text-sm">chevron_right</span>
-                                </button>
-                            </div>
-
-                            <div className="flex overflow-x-auto gap-3.5 no-scrollbar pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x">
-                                {jobs.map((job) => (
-                                    <div
-                                        key={job.id}
-                                        onClick={() => navigate(`/job/${job.id}`)}
-                                        className="min-w-[285px] sm:min-w-[320px] rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 p-4 shadow-sm hover:border-amber-500/30 snap-center transition-all cursor-pointer group flex flex-col justify-between"
-                                    >
-                                        <div>
-                                            <div className="flex items-center gap-3 mb-3">
-                                                <div className="size-11 rounded-full overflow-hidden shrink-0 border border-zinc-200 dark:border-white/10 bg-black">
-                                                    <PostMedia
-                                                        src={job.logo || ''}
-                                                        fallbackType="COMPANY_LOGO"
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                </div>
-                                                <div className="min-w-0 flex-1">
-                                                    <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 truncate block">
-                                                        {job.company}
-                                                    </span>
-                                                    <h3 className="text-sm font-bold text-zinc-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors truncate">
-                                                        {job.title}
-                                                    </h3>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex items-center gap-2 mb-2.5">
-                                                <span className="px-2.5 py-0.5 rounded-full bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-xs font-semibold text-zinc-700 dark:text-zinc-300">
-                                                    {job.location}
-                                                </span>
-                                                <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-xs font-semibold text-amber-600 dark:text-amber-400">
-                                                    {job.type}
-                                                </span>
-                                            </div>
-
-                                            <p className="text-xs text-zinc-600 dark:text-zinc-400 line-clamp-2 leading-relaxed mb-3">
-                                                {job.description || 'Production unit seeking passionate cinema professionals.'}
-                                            </p>
-                                        </div>
-
-                                        <div className="flex items-center justify-between pt-2.5 border-t border-zinc-100 dark:border-white/5">
-                                            <span className="text-xs font-bold text-zinc-900 dark:text-white">
-                                                ₹ {job.salary}
-                                            </span>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    navigate(`/job/${job.id}`);
-                                                }}
-                                                className="px-3 py-1 rounded-lg bg-amber-500 text-black text-xs font-bold hover:bg-amber-400 transition-all flex items-center gap-1 active:scale-95"
-                                            >
-                                                <span>Apply</span>
-                                                <span className="material-symbols-outlined text-sm">arrow_forward</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
                             </div>
                         </section>
 
@@ -933,9 +924,8 @@ export default function Home() {
                             </div>
                         </section>
 
-                        {/* On Mobile / Tablet, render remaining sections sequentially */}
+                        {/* On Mobile / Tablet, render remaining community sections sequentially */}
                         <div className="xl:hidden space-y-6">
-                            <FeaturedTalentSection />
                             <DailyPollSection />
                             <EditorialArticlesSection />
 
@@ -954,7 +944,7 @@ export default function Home() {
 
                     {/* DESKTOP RIGHT SIDEBAR (1 col on xl desktop) */}
                     <div className="hidden xl:flex flex-col gap-6">
-                        {/* Quick Actions Deck */}
+                        {/* 1. Creator Shortcuts */}
                         <div className="rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 p-4 shadow-sm dark:shadow-none">
                             <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-3">
                                 Creator Shortcuts
@@ -962,16 +952,19 @@ export default function Home() {
                             <QuickActionsGrid />
                         </div>
 
-                        {/* Top Film Reviews & Ratings (Desktop Companion) */}
+                        {/* 2. REVIEWS LISTS VIEW */}
                         <TopReviewsWidget />
 
-                        {/* Featured Talent Directory */}
+                        {/* 3. JOBS LISTS VIEW */}
+                        <TopJobsWidget />
+
+                        {/* 4. Featured Talent & Studios */}
                         <FeaturedTalentSection />
 
-                        {/* Industry Pulse (Daily Poll) */}
+                        {/* 5. Industry Pulse (Daily Poll) */}
                         <DailyPollSection />
 
-                        {/* Industry Insights & Editorial */}
+                        {/* 6. Industry Insights & Editorial */}
                         <EditorialArticlesSection />
 
                         {/* Footer Links & Copyright (Instagram Style) */}
@@ -1086,6 +1079,195 @@ export default function Home() {
                             >
                                 <span className="material-symbols-outlined text-base sm:text-lg">share</span>
                             </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* IN-APP FRATERNITY JOB & CASTING READER MODAL */}
+            {selectedJobModal && (
+                <div
+                    className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200"
+                    onClick={() => setSelectedJobModal(null)}
+                >
+                    <div
+                        className="w-full max-w-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/10 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Modal Header */}
+                        <div className="relative p-5 sm:p-6 border-b border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-white/[0.02] flex items-start justify-between gap-4 shrink-0">
+                            <div className="flex items-start gap-3.5">
+                                <div className="size-14 sm:size-16 rounded-2xl overflow-hidden border border-zinc-200 dark:border-white/10 shrink-0 bg-black">
+                                    <PostMedia
+                                        src={selectedJobModal.logo || ''}
+                                        fallbackType="COMPANY_LOGO"
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+                                <div>
+                                    <div className="flex items-center gap-2 flex-wrap mb-1">
+                                        <span className="text-xs font-bold text-amber-600 dark:text-amber-400">
+                                            {selectedJobModal.company}
+                                        </span>
+                                        {(selectedJobModal.user_details?.verification_tier || (selectedJobModal as any).verified) && (
+                                            <span className="material-symbols-outlined text-sm text-blue-500 filled" title="Verified Production House">
+                                                verified
+                                            </span>
+                                        )}
+                                        {selectedJobModal.isRss && (
+                                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                                                Live RSS Sync
+                                            </span>
+                                        )}
+                                    </div>
+                                    <h2 className="text-base sm:text-xl font-black text-zinc-900 dark:text-white leading-tight">
+                                        {selectedJobModal.title}
+                                    </h2>
+                                    <div className="flex items-center gap-2 mt-2 flex-wrap text-xs font-semibold text-zinc-500 dark:text-zinc-400">
+                                        {selectedJobModal.fraternityRole && (
+                                            <span className="px-2 py-0.5 rounded-md bg-purple-500/15 text-purple-600 dark:text-purple-300 font-bold border border-purple-500/20">
+                                                {selectedJobModal.fraternityRole}
+                                            </span>
+                                        )}
+                                        <span className="flex items-center gap-1">
+                                            <span className="material-symbols-outlined text-sm">location_on</span>
+                                            {selectedJobModal.location}
+                                        </span>
+                                        <span>•</span>
+                                        <span className="text-amber-600 dark:text-amber-400 font-bold">
+                                            {selectedJobModal.salary}
+                                        </span>
+                                        <span>•</span>
+                                        <span>{selectedJobModal.type}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button
+                                onClick={() => setSelectedJobModal(null)}
+                                className="size-9 rounded-full bg-zinc-200 dark:bg-white/10 hover:bg-zinc-300 dark:hover:bg-white/20 text-zinc-700 dark:text-white flex items-center justify-center transition-all shrink-0"
+                                aria-label="Close"
+                            >
+                                <span className="material-symbols-outlined text-lg">close</span>
+                            </button>
+                        </div>
+
+                        {/* Modal Body */}
+                        <div className="p-5 sm:p-6 overflow-y-auto space-y-5 flex-1 custom-scrollbar">
+                            <div>
+                                <h3 className="text-xs font-extrabold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-2">
+                                    Role & Production Details
+                                </h3>
+                                <div className="text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed whitespace-pre-line bg-zinc-50 dark:bg-white/[0.02] p-4 rounded-xl border border-zinc-200 dark:border-white/5">
+                                    {selectedJobModal.fullContent || selectedJobModal.description}
+                                </div>
+                            </div>
+
+                            {selectedJobModal.requirements && (
+                                <div>
+                                    <h3 className="text-xs font-extrabold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-2">
+                                        Key Qualifications & Software / Gear
+                                    </h3>
+                                    <div className="text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed bg-zinc-50 dark:bg-white/[0.02] p-4 rounded-xl border border-zinc-200 dark:border-white/5">
+                                        {selectedJobModal.requirements}
+                                    </div>
+                                </div>
+                            )}
+
+                            {(selectedJobModal.gender || selectedJobModal.ageRange || selectedJobModal.shootDate) && (
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-amber-500/5 border border-amber-500/20 p-3.5 rounded-xl text-xs">
+                                    {selectedJobModal.gender && (
+                                        <div>
+                                            <span className="text-zinc-400 block text-[10px] uppercase font-bold">Gender</span>
+                                            <span className="font-bold text-zinc-900 dark:text-white">{selectedJobModal.gender}</span>
+                                        </div>
+                                    )}
+                                    {selectedJobModal.ageRange && (
+                                        <div>
+                                            <span className="text-zinc-400 block text-[10px] uppercase font-bold">Age Group</span>
+                                            <span className="font-bold text-zinc-900 dark:text-white">{selectedJobModal.ageRange}</span>
+                                        </div>
+                                    )}
+                                    {selectedJobModal.shootDate && (
+                                        <div>
+                                            <span className="text-zinc-400 block text-[10px] uppercase font-bold">Shoot Schedule</span>
+                                            <span className="font-bold text-zinc-900 dark:text-white">{selectedJobModal.shootDate}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {selectedJobModal.deadline && (
+                                <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+                                    <span className="material-symbols-outlined text-sm text-amber-500">event_available</span>
+                                    <span>Application Deadline: <strong>{new Date(selectedJobModal.deadline).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</strong></span>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Modal Actions */}
+                        <div className="sticky bottom-0 z-20 flex flex-wrap items-center justify-between gap-3 p-4 sm:p-5 bg-zinc-50 dark:bg-[#15171B] border-t border-zinc-200 dark:border-white/5">
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={(e) => handleShareJob(selectedJobModal, e)}
+                                    className="p-2.5 rounded-xl border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 transition-all text-xs flex items-center gap-1 font-bold"
+                                    title="Share Opportunity"
+                                >
+                                    <span className="material-symbols-outlined text-base">share</span>
+                                    <span className="hidden sm:inline">Share</span>
+                                </button>
+
+                                <button
+                                    onClick={() => {
+                                        const id = selectedJobModal.id;
+                                        setSelectedJobModal(null);
+                                        navigate(`/job/${id}`);
+                                    }}
+                                    className="p-2.5 rounded-xl border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 transition-all text-xs flex items-center gap-1 font-bold"
+                                    title="Open Dedicated Page"
+                                >
+                                    <span className="material-symbols-outlined text-base">open_in_new</span>
+                                    <span className="hidden sm:inline">Full Page</span>
+                                </button>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                                {selectedJobModal.applicationEmail && (
+                                    <a
+                                        href={`mailto:${selectedJobModal.applicationEmail}?subject=${encodeURIComponent(`Application for ${selectedJobModal.title} - iFilmDirectory`)}&body=${encodeURIComponent(`Hi ${selectedJobModal.company} Team,\n\nI am writing to apply for the ${selectedJobModal.title} position on iFilmDirectory.\n\nPlease find my portfolio and credits attached.\n\nBest regards.`)}`}
+                                        className="px-4 py-2.5 rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-black font-bold text-xs flex items-center gap-1.5 hover:opacity-90 transition-opacity"
+                                    >
+                                        <span className="material-symbols-outlined text-sm">mail</span>
+                                        <span>Apply via Email</span>
+                                    </a>
+                                )}
+
+                                {selectedJobModal.sourceUrl && (
+                                    <a
+                                        href={selectedJobModal.sourceUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 hover:brightness-105 transition-all"
+                                    >
+                                        <span>Apply on Source</span>
+                                        <span className="material-symbols-outlined text-sm">launch</span>
+                                    </a>
+                                )}
+
+                                {!selectedJobModal.sourceUrl && !selectedJobModal.applicationEmail && (
+                                    <button
+                                        onClick={() => {
+                                            const id = selectedJobModal.id;
+                                            setSelectedJobModal(null);
+                                            navigate(`/job/${id}`);
+                                        }}
+                                        className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 hover:brightness-105 transition-all"
+                                    >
+                                        <span>Apply in iFilm</span>
+                                        <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
