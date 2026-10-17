@@ -160,7 +160,7 @@ export default function Notifications() {
                                 className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
                                     isActive
                                         ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-black border-amber-400 shadow-md shadow-amber-500/20'
-                                        : 'bg-[#121316] text-zinc-400 border-white/[0.06] hover:text-white hover:border-white/20'
+                                        : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-white/[0.06] hover:text-zinc-900 dark:hover:text-white hover:border-zinc-300 dark:hover:border-white/20 shadow-sm'
                                 }`}
                             >
                                 {tab.label}
@@ -179,7 +179,7 @@ export default function Notifications() {
                             </p>
                         </div>
                     ) : filteredNotifications.length > 0 ? (
-                        <div className="flex flex-col divide-y divide-white/[0.05] bg-[#121316] rounded-2xl border border-white/[0.08] overflow-hidden shadow-xl">
+                        <div className="flex flex-col divide-y divide-zinc-200 dark:divide-white/[0.05] bg-white dark:bg-[#121316] rounded-2xl border border-zinc-200 dark:border-white/[0.08] overflow-hidden shadow-sm dark:shadow-xl">
                             {filteredNotifications.map((notification) => {
                                 const badge = getNotificationIcon(notification.type);
 
@@ -189,14 +189,14 @@ export default function Notifications() {
                                         onClick={() => handleNotificationClick(notification)}
                                         className={`flex items-start gap-4 p-4.5 sm:p-5 text-left transition-all cursor-pointer group ${
                                             notification.isRead
-                                                ? 'hover:bg-white/[0.02]'
-                                                : 'bg-amber-500/[0.04] hover:bg-amber-500/[0.08]'
+                                                ? 'hover:bg-zinc-50 dark:hover:bg-white/[0.02]'
+                                                : 'bg-amber-500/[0.06] hover:bg-amber-500/[0.1]'
                                         }`}
                                     >
                                         <div className="relative shrink-0">
                                             {notification.image ? (
                                                 <div
-                                                    className="w-12 h-12 rounded-xl bg-cover bg-center border border-white/10 group-hover:border-amber-500/40 transition-colors shadow-md"
+                                                    className="w-12 h-12 rounded-xl bg-cover bg-center border border-zinc-200 dark:border-white/10 group-hover:border-amber-500/40 transition-colors shadow-md"
                                                     style={{ backgroundImage: `url(${notification.image})` }}
                                                 />
                                             ) : (
@@ -207,20 +207,20 @@ export default function Notifications() {
                                                 </div>
                                             )}
                                             {!notification.isRead && (
-                                                <span className="absolute -top-1 -right-1 w-3 h-3 bg-amber-500 rounded-full border-2 border-[#121316]" />
+                                                <span className="absolute -top-1 -right-1 w-3 h-3 bg-amber-500 rounded-full border-2 border-white dark:border-[#121316]" />
                                             )}
                                         </div>
 
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center justify-between gap-2 mb-1">
-                                                <p className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors truncate">
+                                                <p className="text-sm font-bold text-zinc-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors truncate">
                                                     {notification.title}
                                                 </p>
                                                 <span className="text-[11px] text-zinc-500 font-medium shrink-0">
                                                     {formatTimeAgo(notification.createdAt)}
                                                 </span>
                                             </div>
-                                            <p className="text-xs text-zinc-300 leading-relaxed line-clamp-2 mb-1.5">
+                                            <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed line-clamp-2 mb-1.5">
                                                 {notification.message}
                                             </p>
                                         </div>
@@ -243,14 +243,14 @@ export default function Notifications() {
                             })}
                         </div>
                     ) : (
-                        <div className="flex flex-col items-center justify-center py-20 text-center px-4 rounded-2xl bg-[#121316] border border-white/[0.06]">
-                            <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-4 text-amber-400">
+                        <div className="flex flex-col items-center justify-center py-20 text-center px-4 rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.06] shadow-sm">
+                            <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-4 text-amber-500 dark:text-amber-400">
                                 <span className="material-symbols-outlined text-3xl">notifications_off</span>
                             </div>
-                            <h3 className="text-base font-bold text-white mb-1">
+                            <h3 className="text-base font-bold text-zinc-900 dark:text-white mb-1">
                                 No notifications yet
                             </h3>
-                            <p className="text-xs text-zinc-400 max-w-xs mb-4">
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-xs mb-4">
                                 When you receive casting callbacks, job matches, or collaborator messages, they'll show up here.
                             </p>
                             <button

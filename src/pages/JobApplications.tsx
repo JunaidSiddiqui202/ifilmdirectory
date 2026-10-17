@@ -120,31 +120,31 @@ export default function JobApplications() {
 
     if (loading) {
         return (
-            <div className="flex min-h-[100dvh] items-center justify-center bg-[#090A0C]">
+            <div className="flex min-h-[100dvh] items-center justify-center bg-slate-50 dark:bg-[#090A0C]">
                 <div className="h-10 w-10 animate-spin rounded-full border-4 border-amber-500 border-t-transparent"></div>
             </div>
         );
     }
 
     return (
-        <div className="relative flex min-h-[100dvh] w-full flex-col bg-[#090A0C] text-white overflow-x-hidden selection:bg-amber-500/30">
+        <div className="relative flex min-h-[100dvh] w-full flex-col bg-slate-50 dark:bg-[#090A0C] text-zinc-900 dark:text-white overflow-x-hidden selection:bg-amber-500/30 font-display transition-colors">
             {/* Top Navigation */}
-            <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-white/[0.08] bg-[#090A0C]/90 px-4 md:px-8 backdrop-blur-md">
+            <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-zinc-200 dark:border-white/[0.08] bg-white/95 dark:bg-[#090A0C]/90 px-4 md:px-8 backdrop-blur-md">
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => navigate(-1)}
-                        className="flex size-10 items-center justify-center rounded-xl bg-white/[0.04] border border-white/[0.08] text-white hover:bg-white/[0.08] transition-all"
+                        className="flex size-10 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] border border-zinc-200 dark:border-white/[0.08] text-zinc-700 dark:text-white transition-all"
                     >
                         <span className="material-symbols-outlined text-xl">arrow_back_ios_new</span>
                     </button>
                     <div>
-                        <h1 className="text-lg md:text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                        <h1 className="text-lg md:text-xl font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
                             <span>Candidate Applications</span>
-                            <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 font-medium">
+                            <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-medium">
                                 {applications.length} Received
                             </span>
                         </h1>
-                        <p className="text-xs text-zinc-400 truncate max-w-xs md:max-w-md">
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate max-w-xs md:max-w-md">
                             {job?.title} • {job?.company || 'Direct Production'}
                         </p>
                     </div>
@@ -152,7 +152,7 @@ export default function JobApplications() {
 
                 <button
                     onClick={() => navigate(`/job/${id}`)}
-                    className="hidden sm:flex items-center gap-2 text-xs font-semibold px-3.5 py-2 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-zinc-300 border border-white/[0.08] transition-all"
+                    className="hidden sm:flex items-center gap-2 text-xs font-semibold px-3.5 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/[0.08] transition-all"
                 >
                     <span className="material-symbols-outlined text-sm">visibility</span>
                     View Job Listing
@@ -221,13 +221,13 @@ export default function JobApplications() {
                                 onClick={() => setSelectedFilter(filter)}
                                 className={`px-4 py-2 rounded-xl text-xs font-semibold capitalize whitespace-nowrap transition-all flex items-center gap-2 border ${
                                     isSelected
-                                        ? 'bg-amber-500 text-black border-amber-400 shadow-lg shadow-amber-500/20'
-                                        : 'bg-[#121316] text-zinc-400 border-white/[0.06] hover:text-white hover:border-white/20'
+                                        ? 'bg-amber-500 text-black border-amber-400 shadow-md shadow-amber-500/20'
+                                        : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-white/[0.06] hover:text-zinc-900 dark:hover:text-white hover:border-zinc-300 dark:hover:border-white/20'
                                 }`}
                             >
                                 <span>{filter}</span>
                                 <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
-                                    isSelected ? 'bg-black/20 text-black' : 'bg-white/[0.06] text-zinc-400'
+                                    isSelected ? 'bg-black/20 text-black' : 'bg-zinc-100 dark:bg-white/[0.06] text-zinc-600 dark:text-zinc-400'
                                 }`}>
                                     {count}
                                 </span>
@@ -239,14 +239,14 @@ export default function JobApplications() {
                 {/* Applications Grid */}
                 <main className="flex-1">
                     {filteredApplications.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-20 px-4 text-center rounded-2xl bg-[#121316] border border-white/[0.06]">
+                        <div className="flex flex-col items-center justify-center py-20 px-4 text-center rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.06] shadow-sm dark:shadow-none">
                             <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-4">
-                                <span className="material-symbols-outlined text-3xl text-amber-400">group_off</span>
+                                <span className="material-symbols-outlined text-3xl text-amber-500 dark:text-amber-400">group_off</span>
                             </div>
-                            <h3 className="text-lg font-bold text-white mb-1">
+                            <h3 className="text-lg font-bold text-zinc-900 dark:text-white mb-1">
                                 {selectedFilter === 'all' ? 'No applications received yet' : `No ${selectedFilter} candidates`}
                             </h3>
-                            <p className="text-sm text-zinc-400 max-w-sm">
+                            <p className="text-sm text-zinc-500 dark:text-zinc-400 max-w-sm">
                                 {selectedFilter === 'all'
                                     ? 'Casting calls usually pick up traction within 24-48 hours of posting.'
                                     : `Try changing your filter to view pending or shortlisted applicants.`}
@@ -260,7 +260,7 @@ export default function JobApplications() {
                                 return (
                                     <div
                                         key={app.id}
-                                        className="rounded-2xl bg-[#121316] border border-white/[0.08] hover:border-amber-500/30 p-5 transition-all shadow-lg flex flex-col justify-between group"
+                                        className="rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.08] hover:border-amber-500/30 p-5 transition-all shadow-sm hover:shadow-md dark:shadow-lg flex flex-col justify-between group"
                                     >
                                         <div>
                                             {/* Candidate Header */}
@@ -270,22 +270,22 @@ export default function JobApplications() {
                                                         <img
                                                             src={app.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(app.name)}&background=1c1d22&color=f59e0b`}
                                                             alt={app.name}
-                                                            className="w-13 h-13 rounded-2xl object-cover shrink-0 cursor-pointer border border-white/10 group-hover:border-amber-500/40 transition-colors shadow-md"
+                                                            className="w-13 h-13 rounded-2xl object-cover shrink-0 cursor-pointer border border-zinc-200 dark:border-white/10 group-hover:border-amber-500/40 transition-colors shadow-sm"
                                                             onClick={() => navigate(`/profile/${app.applicantId}`)}
                                                         />
                                                     </div>
                                                     <div>
                                                         <h3
-                                                            className="font-bold text-white text-base cursor-pointer hover:text-amber-400 transition-colors flex items-center gap-1.5"
+                                                            className="font-bold text-zinc-900 dark:text-white text-base cursor-pointer hover:text-amber-600 dark:hover:text-amber-400 transition-colors flex items-center gap-1.5"
                                                             onClick={() => navigate(`/profile/${app.applicantId}`)}
                                                         >
                                                             {app.name}
-                                                            <span className="material-symbols-outlined text-amber-400 text-sm">verified</span>
+                                                            <span className="material-symbols-outlined text-amber-500 dark:text-amber-400 text-sm">verified</span>
                                                         </h3>
-                                                        <p className="text-xs text-zinc-400 font-medium">
+                                                        <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">
                                                             {app.role || 'Film Industry Professional'}
                                                         </p>
-                                                        <p className="text-[11px] text-zinc-500 flex items-center gap-1 mt-0.5">
+                                                        <p className="text-[11px] text-zinc-400 dark:text-zinc-500 flex items-center gap-1 mt-0.5">
                                                             <span className="material-symbols-outlined text-[12px]">schedule</span>
                                                             {formatDate(app.appliedAt)}
                                                         </p>
@@ -304,15 +304,15 @@ export default function JobApplications() {
                                                     </button>
 
                                                     {activeStatusMenu === app.id && (
-                                                        <div className="absolute right-0 top-full mt-2 w-44 bg-[#17191e] rounded-xl shadow-2xl border border-white/[0.12] z-30 p-1.5 backdrop-blur-xl">
+                                                        <div className="absolute right-0 top-full mt-2 w-44 bg-white dark:bg-[#17191e] rounded-xl shadow-2xl border border-zinc-200 dark:border-white/[0.12] z-30 p-1.5 backdrop-blur-xl">
                                                             {(['pending', 'reviewed', 'shortlisted', 'rejected'] as const).map((status) => {
                                                                 const statusConfig = getStatusBadge(status);
                                                                 return (
                                                                     <button
                                                                         key={status}
                                                                         onClick={() => handleUpdateStatus(app.id, status)}
-                                                                        className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold capitalize hover:bg-white/[0.08] flex items-center gap-2 transition-colors ${
-                                                                            app.status === status ? 'bg-white/[0.08] text-white' : 'text-zinc-300'
+                                                                        className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold capitalize hover:bg-zinc-100 dark:hover:bg-white/[0.08] flex items-center gap-2 transition-colors ${
+                                                                            app.status === status ? 'bg-zinc-100 dark:bg-white/[0.08] text-zinc-900 dark:text-white font-bold' : 'text-zinc-700 dark:text-zinc-300'
                                                                         }`}
                                                                     >
                                                                         <span className={`w-2 h-2 rounded-full ${statusConfig.dot}`} />

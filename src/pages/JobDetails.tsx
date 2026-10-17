@@ -139,18 +139,18 @@ export default function JobDetails() {
     };
 
     return (
-        <div className="relative flex min-h-[100dvh] w-full flex-col bg-[#090A0C] text-white pb-36 md:pb-28 overflow-x-hidden font-display transition-colors">
+        <div className="relative flex min-h-[100dvh] w-full flex-col bg-slate-50 dark:bg-[#090A0C] text-zinc-900 dark:text-white pb-36 md:pb-28 overflow-x-hidden font-display transition-colors">
             <div className="w-full max-w-4xl mx-auto flex flex-col flex-1 px-4 sm:px-6">
                 {/* Cinema Top Header */}
-                <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-white/[0.06] bg-[#090A0C]/90 -mx-4 sm:-mx-6 px-4 sm:px-6 backdrop-blur-2xl">
+                <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-zinc-200 dark:border-white/[0.06] bg-white/90 dark:bg-[#090A0C]/90 -mx-4 sm:-mx-6 px-4 sm:px-6 backdrop-blur-2xl">
                     <button
                         onClick={() => navigate(-1)}
-                        className="flex size-10 items-center justify-center rounded-xl bg-white/[0.04] text-zinc-300 hover:text-white hover:bg-white/10 transition-colors"
+                        className="flex size-10 items-center justify-center rounded-xl bg-zinc-100 dark:bg-white/[0.04] text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200 dark:hover:bg-white/10 transition-colors"
                         title="Back"
                     >
                         <span className="material-symbols-outlined text-xl">arrow_back</span>
                     </button>
-                    <h1 className="flex-1 text-center text-sm sm:text-base font-black tracking-tight text-white uppercase truncate px-3">
+                    <h1 className="flex-1 text-center text-sm sm:text-base font-black tracking-tight text-zinc-900 dark:text-white uppercase truncate px-3">
                         Call Details
                     </h1>
                     <div className="flex items-center gap-2">
@@ -158,8 +158,8 @@ export default function JobDetails() {
                             onClick={handleBookmark}
                             className={`flex size-10 items-center justify-center rounded-xl border transition-all ${
                                 isBookmarked
-                                    ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
-                                    : 'bg-white/[0.04] text-zinc-400 border-white/5 hover:text-white'
+                                    ? 'bg-amber-500/20 text-amber-500 dark:text-amber-400 border-amber-500/30'
+                                    : 'bg-white dark:bg-white/[0.04] text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-white/5 hover:text-zinc-900 dark:hover:text-white'
                             }`}
                             title={isBookmarked ? "Saved to Bookmarks" : "Save Job"}
                         >
@@ -173,49 +173,49 @@ export default function JobDetails() {
                 {/* Main Content */}
                 <main className="flex-1 pt-6 pb-20 space-y-6">
                     {/* Hero Title Section */}
-                    <section className="relative p-6 sm:p-8 rounded-3xl bg-[#121316] border border-white/[0.08] shadow-xl overflow-hidden">
+                    <section className="relative p-6 sm:p-8 rounded-3xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.08] shadow-sm dark:shadow-xl overflow-hidden">
                         <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
                         <div className="flex flex-col sm:flex-row sm:items-center gap-5 relative z-10">
-                            <div className="size-20 shrink-0 rounded-2xl border-2 border-white/10 shadow-2xl bg-black overflow-hidden">
+                            <div className="size-20 shrink-0 rounded-2xl border-2 border-zinc-200 dark:border-white/10 shadow-2xl bg-zinc-100 dark:bg-black overflow-hidden">
                                 <PostMedia src={job.logo || ''} fallbackType="COMPANY_LOGO" className="w-full h-full object-cover" />
                             </div>
                             <div className="flex-1 min-w-0">
                                 <button
                                     onClick={() => navigate(`/profile/${job.postedBy}`)}
-                                    className="text-amber-400 text-xs font-bold uppercase tracking-wider hover:underline flex items-center gap-1.5 mb-1.5"
+                                    className="text-amber-600 dark:text-amber-400 text-xs font-bold uppercase tracking-wider hover:underline flex items-center gap-1.5 mb-1.5"
                                 >
                                     <span>{job.company}</span>
                                     {renderVerificationBadge(job.user_details?.verification_tier)}
                                 </button>
-                                <h2 className="text-2xl sm:text-3xl font-black leading-tight tracking-tight text-white break-words">
+                                <h2 className="text-2xl sm:text-3xl font-black leading-tight tracking-tight text-zinc-900 dark:text-white break-words">
                                     {job.title}
                                 </h2>
                             </div>
                         </div>
 
                         {/* Metadata Badges */}
-                        <div className="flex flex-wrap items-center gap-2.5 pt-6 mt-6 border-t border-white/[0.06] relative z-10">
-                            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/10 text-xs text-zinc-300">
-                                <span className="material-symbols-outlined text-sm text-amber-400">location_on</span>
+                        <div className="flex flex-wrap items-center gap-2.5 pt-6 mt-6 border-t border-zinc-200 dark:border-white/[0.06] relative z-10">
+                            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-white/[0.04] border border-zinc-200 dark:border-white/10 text-xs text-zinc-700 dark:text-zinc-300">
+                                <span className="material-symbols-outlined text-sm text-amber-500 dark:text-amber-400">location_on</span>
                                 <span className="font-semibold">{job.location || 'India'}</span>
                             </div>
-                            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 text-amber-300 border border-amber-500/20 text-xs font-bold">
+                            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-300 border border-amber-500/20 text-xs font-bold">
                                 <span className="material-symbols-outlined text-sm">work</span>
                                 <span>{job.type}</span>
                             </div>
                             {job.salary && (
-                                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-bold">
+                                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-xs font-bold">
                                     <span className="material-symbols-outlined text-sm">payments</span>
                                     <span>₹ {job.salary}</span>
                                 </div>
                             )}
-                            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/10 text-xs text-zinc-400">
+                            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-white/[0.04] border border-zinc-200 dark:border-white/10 text-xs text-zinc-600 dark:text-zinc-400">
                                 <span className="material-symbols-outlined text-sm">schedule</span>
                                 <span>Posted {job.postedAt?.toDate ? job.postedAt.toDate().toLocaleDateString() : 'Recently'}</span>
                             </div>
                             {job.deadline && (
-                                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 text-xs font-bold ml-auto">
+                                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-500/10 text-red-500 dark:text-red-400 border border-red-500/20 text-xs font-bold ml-auto">
                                     <span className="material-symbols-outlined text-sm">event_busy</span>
                                     <span>Deadline: {job.deadline}</span>
                                 </div>
@@ -225,34 +225,34 @@ export default function JobDetails() {
 
                     {/* Audition Specific Details */}
                     {job.type === 'Audition' && (
-                        <section className="p-6 bg-[#121316] rounded-3xl border border-white/[0.06] shadow-lg">
-                            <h3 className="text-xs font-black text-amber-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                        <section className="p-6 bg-white dark:bg-[#121316] rounded-3xl border border-zinc-200 dark:border-white/[0.06] shadow-sm dark:shadow-lg">
+                            <h3 className="text-xs font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest mb-4 flex items-center gap-2">
                                 <span className="material-symbols-outlined text-sm">theater_comedy</span>
                                 <span>Casting & Character Specs</span>
                             </h3>
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                 {job.gender && (
-                                    <div className="p-3 rounded-2xl bg-white/[0.02] border border-white/5">
+                                    <div className="p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-200 dark:border-white/5">
                                         <p className="text-[10px] font-bold uppercase text-zinc-500 tracking-wider">Gender</p>
-                                        <p className="text-sm text-white font-bold mt-1">{job.gender}</p>
+                                        <p className="text-sm text-zinc-900 dark:text-white font-bold mt-1">{job.gender}</p>
                                     </div>
                                 )}
                                 {job.ageRange && (
-                                    <div className="p-3 rounded-2xl bg-white/[0.02] border border-white/5">
+                                    <div className="p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-200 dark:border-white/5">
                                         <p className="text-[10px] font-bold uppercase text-zinc-500 tracking-wider">Age Window</p>
-                                        <p className="text-sm text-white font-bold mt-1">{job.ageRange}</p>
+                                        <p className="text-sm text-zinc-900 dark:text-white font-bold mt-1">{job.ageRange}</p>
                                     </div>
                                 )}
                                 {job.shootDate && (
-                                    <div className="p-3 rounded-2xl bg-white/[0.02] border border-white/5">
+                                    <div className="p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-200 dark:border-white/5">
                                         <p className="text-[10px] font-bold uppercase text-zinc-500 tracking-wider">Tentative Shoot</p>
-                                        <p className="text-sm text-white font-bold mt-1">{new Date(job.shootDate).toLocaleDateString()}</p>
+                                        <p className="text-sm text-zinc-900 dark:text-white font-bold mt-1">{new Date(job.shootDate).toLocaleDateString()}</p>
                                     </div>
                                 )}
                                 {job.daysRequired && (
-                                    <div className="p-3 rounded-2xl bg-white/[0.02] border border-white/5">
+                                    <div className="p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-200 dark:border-white/5">
                                         <p className="text-[10px] font-bold uppercase text-zinc-500 tracking-wider">Shoot Schedule</p>
-                                        <p className="text-sm text-white font-bold mt-1">{job.daysRequired}</p>
+                                        <p className="text-sm text-zinc-900 dark:text-white font-bold mt-1">{job.daysRequired}</p>
                                     </div>
                                 )}
                             </div>
@@ -261,51 +261,51 @@ export default function JobDetails() {
 
                     {/* Reference Media */}
                     {job.videoUrl && (
-                        <section className="p-6 bg-[#121316] rounded-3xl border border-white/[0.06] shadow-lg">
-                            <h3 className="text-xs font-black text-zinc-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                                <span className="material-symbols-outlined text-sm text-amber-400">play_circle</span>
+                        <section className="p-6 bg-white dark:bg-[#121316] rounded-3xl border border-zinc-200 dark:border-white/[0.06] shadow-sm dark:shadow-lg">
+                            <h3 className="text-xs font-black text-zinc-600 dark:text-zinc-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                                <span className="material-symbols-outlined text-sm text-amber-500 dark:text-amber-400">play_circle</span>
                                 <span>Reference Mood Reel / Character Pitch</span>
                             </h3>
-                            <div className="rounded-2xl overflow-hidden bg-black aspect-video shadow-2xl border border-white/10">
+                            <div className="rounded-2xl overflow-hidden bg-black aspect-video shadow-2xl border border-zinc-200 dark:border-white/10">
                                 <video src={job.videoUrl} controls className="w-full h-full object-contain" />
                             </div>
                         </section>
                     )}
 
                     {/* Role Description */}
-                    <section className="p-6 sm:p-8 bg-[#121316] rounded-3xl border border-white/[0.06] shadow-lg space-y-4">
-                        <h3 className="text-lg font-black text-white flex items-center gap-2">
-                            <span className="material-symbols-outlined text-amber-400 text-xl">description</span>
+                    <section className="p-6 sm:p-8 bg-white dark:bg-[#121316] rounded-3xl border border-zinc-200 dark:border-white/[0.06] shadow-sm dark:shadow-lg space-y-4">
+                        <h3 className="text-lg font-black text-zinc-900 dark:text-white flex items-center gap-2">
+                            <span className="material-symbols-outlined text-amber-500 dark:text-amber-400 text-xl">description</span>
                             <span>Opportunity Overview</span>
                         </h3>
-                        <p className="text-sm leading-relaxed text-zinc-300 whitespace-pre-wrap font-normal">
+                        <p className="text-sm leading-relaxed text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap font-normal">
                             {job.description}
                         </p>
                     </section>
 
                     {/* Requirements */}
                     {job.requirements && (
-                        <section className="p-6 sm:p-8 bg-[#121316] rounded-3xl border border-white/[0.06] shadow-lg space-y-4">
-                            <h3 className="text-lg font-black text-white flex items-center gap-2">
-                                <span className="material-symbols-outlined text-amber-400 text-xl">checklist</span>
+                        <section className="p-6 sm:p-8 bg-white dark:bg-[#121316] rounded-3xl border border-zinc-200 dark:border-white/[0.06] shadow-sm dark:shadow-lg space-y-4">
+                            <h3 className="text-lg font-black text-zinc-900 dark:text-white flex items-center gap-2">
+                                <span className="material-symbols-outlined text-amber-500 dark:text-amber-400 text-xl">checklist</span>
                                 <span>Candidate Requirements & Skills</span>
                             </h3>
-                            <p className="text-sm leading-relaxed text-zinc-300 whitespace-pre-wrap font-normal">
+                            <p className="text-sm leading-relaxed text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap font-normal">
                                 {job.requirements}
                             </p>
                         </section>
                     )}
 
                     {/* Posted By Card */}
-                    <section className="p-6 bg-[#121316] rounded-3xl border border-white/[0.06] shadow-lg">
+                    <section className="p-6 bg-white dark:bg-[#121316] rounded-3xl border border-zinc-200 dark:border-white/[0.06] shadow-sm dark:shadow-lg">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                             <div className="flex items-center gap-4">
-                                <div className="size-14 shrink-0 rounded-2xl border border-white/10 overflow-hidden bg-black">
+                                <div className="size-14 shrink-0 rounded-2xl border border-zinc-200 dark:border-white/10 overflow-hidden bg-zinc-100 dark:bg-black">
                                     <PostMedia src={job.logo || ''} fallbackType="COMPANY_LOGO" className="w-full h-full object-cover" />
                                 </div>
                                 <div>
                                     <p className="text-xs font-bold uppercase tracking-wider text-zinc-500">Recruiter / Production</p>
-                                    <p className="text-base font-extrabold text-white flex items-center gap-1.5 mt-0.5">
+                                    <p className="text-base font-extrabold text-zinc-900 dark:text-white flex items-center gap-1.5 mt-0.5">
                                         <span>{job.company}</span>
                                         {renderVerificationBadge(job.user_details?.verification_tier)}
                                     </p>
@@ -313,7 +313,7 @@ export default function JobDetails() {
                             </div>
                             <button
                                 onClick={() => navigate(`/profile/${job.postedBy}`)}
-                                className="px-5 py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/10 text-white text-xs font-bold border border-white/10 transition-all self-start sm:self-auto"
+                                className="px-5 py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.06] dark:hover:bg-white/10 text-zinc-900 dark:text-white text-xs font-bold border border-zinc-200 dark:border-white/10 transition-all self-start sm:self-auto"
                             >
                                 View Creator Profile
                             </button>
@@ -322,7 +322,7 @@ export default function JobDetails() {
                 </main>
 
                 {/* Fixed Bottom Action Drawer */}
-                <div className="fixed bottom-0 left-0 z-30 w-full bg-[#090A0C]/95 backdrop-blur-xl border-t border-white/[0.08] p-4">
+                <div className="fixed bottom-0 left-0 z-30 w-full bg-white/95 dark:bg-[#090A0C]/95 backdrop-blur-xl border-t border-zinc-200 dark:border-white/[0.08] p-4">
                     <div className="max-w-4xl mx-auto flex items-center gap-3">
                         {isOwnJob ? (
                             <button
@@ -333,7 +333,7 @@ export default function JobDetails() {
                                 <span>Review Applications ({(job as any).applicationsCount || 0})</span>
                             </button>
                         ) : hasApplied ? (
-                            <div className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-sm font-extrabold">
+                            <div className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-sm font-extrabold">
                                 <span className="material-symbols-outlined text-lg">check_circle</span>
                                 <span>Application Submitted</span>
                             </div>
@@ -352,53 +352,53 @@ export default function JobDetails() {
                 {/* Apply Modal */}
                 {showApplyModal && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in" onClick={() => { setShowApplyModal(false); setDisclaimerAccepted(false); }}>
-                        <div className="bg-[#141519] border border-white/10 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto space-y-5 animate-in zoom-in-95" onClick={(e) => e.stopPropagation()}>
-                            <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-                                <div className="size-11 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30 shrink-0">
+                        <div className="bg-white dark:bg-[#141519] border border-zinc-200 dark:border-white/10 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto space-y-5 animate-in zoom-in-95" onClick={(e) => e.stopPropagation()}>
+                            <div className="flex items-center gap-3 border-b border-zinc-200 dark:border-white/10 pb-4">
+                                <div className="size-11 rounded-2xl bg-amber-500/20 text-amber-500 dark:text-amber-400 flex items-center justify-center border border-amber-500/30 shrink-0">
                                     <span className="material-symbols-outlined text-xl">send</span>
                                 </div>
                                 <div className="min-w-0">
-                                    <h3 className="text-base sm:text-lg font-black text-white truncate">Submit Application</h3>
-                                    <p className="text-xs text-zinc-400 truncate">{job.title} • {job.company}</p>
+                                    <h3 className="text-base sm:text-lg font-black text-zinc-900 dark:text-white truncate">Submit Application</h3>
+                                    <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">{job.title} • {job.company}</p>
                                 </div>
                             </div>
 
-                            <div className="p-4 rounded-2xl bg-black/50 border border-white/5 space-y-1.5 text-xs">
-                                <p className="text-zinc-400">
-                                    Applying as: <strong className="text-white">{currentUser?.displayName || 'Creator'}</strong>
+                            <div className="p-4 rounded-2xl bg-zinc-100 dark:bg-black/50 border border-zinc-200 dark:border-white/5 space-y-1.5 text-xs">
+                                <p className="text-zinc-600 dark:text-zinc-400">
+                                    Applying as: <strong className="text-zinc-900 dark:text-white">{currentUser?.displayName || 'Creator'}</strong>
                                 </p>
-                                <p className="text-zinc-400">
-                                    Direct Contact: <strong className="text-white">{currentUser?.email}</strong>
+                                <p className="text-zinc-600 dark:text-zinc-400">
+                                    Direct Contact: <strong className="text-zinc-900 dark:text-white">{currentUser?.email}</strong>
                                 </p>
                             </div>
 
                             <label className="block space-y-1.5">
-                                <span className="text-xs font-bold text-zinc-300">Note to Director / Recruiter (Optional)</span>
+                                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Note to Director / Recruiter (Optional)</span>
                                 <textarea
                                     value={applicationMessage}
                                     onChange={(e) => setApplicationMessage(e.target.value)}
                                     placeholder="Introduce yourself, mention key credits, or why you fit this role..."
-                                    className="w-full p-3.5 rounded-xl border border-white/10 bg-black/60 text-white placeholder:text-zinc-500 text-xs resize-none h-24 focus:outline-none focus:border-amber-500 transition-colors"
+                                    className="w-full p-3.5 rounded-xl border border-zinc-300 dark:border-white/10 bg-zinc-50 dark:bg-black/60 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 text-xs resize-none h-24 focus:outline-none focus:border-amber-500 transition-colors"
                                 />
                             </label>
 
                             {/* Safety Disclaimer */}
                             <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl text-xs space-y-2">
-                                <div className="flex items-center gap-2 text-amber-400 font-bold">
+                                <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold">
                                     <span className="material-symbols-outlined text-base">verified_user</span>
                                     <span>Film Professional Safety Notice</span>
                                 </div>
-                                <p className="text-[11px] text-zinc-300 leading-relaxed">
+                                <p className="text-[11px] text-zinc-700 dark:text-zinc-300 leading-relaxed">
                                     iFilmDirectory connects creative professionals. Never pay money upfront for auditions or role offers. Report any suspicious listings directly to support.
                                 </p>
-                                <label className="flex items-start gap-2.5 cursor-pointer pt-2 border-t border-white/10">
+                                <label className="flex items-start gap-2.5 cursor-pointer pt-2 border-t border-zinc-200 dark:border-white/10">
                                     <input
                                         type="checkbox"
                                         checked={disclaimerAccepted}
                                         onChange={(e) => setDisclaimerAccepted(e.target.checked)}
-                                        className="mt-0.5 size-4 rounded border-white/20 bg-black text-amber-500 focus:ring-amber-500 accent-amber-500"
+                                        className="mt-0.5 size-4 rounded border-zinc-300 dark:border-white/20 bg-white dark:bg-black text-amber-500 focus:ring-amber-500 accent-amber-500"
                                     />
-                                    <span className="text-[11px] text-zinc-300 font-semibold select-none leading-snug">
+                                    <span className="text-[11px] text-zinc-700 dark:text-zinc-300 font-semibold select-none leading-snug">
                                         I understand and accept independent responsibility for professional communications.
                                     </span>
                                 </label>
@@ -408,7 +408,7 @@ export default function JobDetails() {
                                 <button
                                     onClick={() => { setShowApplyModal(false); setDisclaimerAccepted(false); }}
                                     disabled={isApplying}
-                                    className="flex-1 py-3 px-4 rounded-xl border border-white/10 text-zinc-300 font-bold text-xs hover:bg-white/5 transition-all"
+                                    className="flex-1 py-3 px-4 rounded-xl border border-zinc-200 dark:border-white/10 text-zinc-700 dark:text-zinc-300 font-bold text-xs hover:bg-zinc-100 dark:hover:bg-white/5 transition-all"
                                 >
                                     Cancel
                                 </button>

@@ -137,13 +137,13 @@ export default function Jobs() {
                                 onClick={() => setShowVerifiedOnly(!showVerifiedOnly)}
                                 className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all border ${
                                     showVerifiedOnly
-                                        ? 'bg-amber-500/15 text-amber-400 border-amber-500/40 shadow-sm'
-                                        : 'bg-[#121316] text-zinc-400 border-white/10 hover:text-white'
+                                        ? 'bg-amber-500/15 text-amber-500 dark:text-amber-400 border-amber-500/40 shadow-sm'
+                                        : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-white/10 hover:text-zinc-900 dark:hover:text-white shadow-sm'
                                 }`}
                             >
                                 <span className="material-symbols-outlined text-sm filled" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
                                 <span>Verified Only</span>
-                                <span className={`size-2 rounded-full ${showVerifiedOnly ? 'bg-amber-400 animate-pulse' : 'bg-zinc-600'}`} />
+                                <span className={`size-2 rounded-full ${showVerifiedOnly ? 'bg-amber-400 animate-pulse' : 'bg-zinc-400 dark:bg-zinc-600'}`} />
                             </button>
                         </div>
                     </div>
@@ -162,7 +162,7 @@ export default function Jobs() {
                                 className={`whitespace-nowrap flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all ${
                                     filter === item.id
                                         ? 'bg-amber-500 text-black shadow-md shadow-amber-500/20'
-                                        : 'bg-[#121316] text-zinc-400 hover:text-white hover:bg-white/5 border border-white/5'
+                                        : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 border border-zinc-200 dark:border-white/5 shadow-sm'
                                 }`}
                             >
                                 <span className="material-symbols-outlined text-[15px]">{item.icon}</span>
@@ -173,7 +173,7 @@ export default function Jobs() {
                 </header>
 
                 {/* Sub-Filters: Departments */}
-                <div className="flex items-center gap-2 overflow-x-auto py-3 no-scrollbar border-b border-white/[0.04] text-[11px]">
+                <div className="flex items-center gap-2 overflow-x-auto py-3 no-scrollbar border-b border-zinc-200 dark:border-white/[0.04] text-[11px]">
                     <span className="text-zinc-500 font-bold uppercase tracking-wider shrink-0 text-[10px]">Filter Role:</span>
                     {['All', 'Actor', 'Director', 'Cinematographer', 'Editor', 'Sound', 'Producer', 'Writer'].map((role) => (
                         <button
@@ -181,8 +181,8 @@ export default function Jobs() {
                             onClick={() => setSubFilter(role)}
                             className={`px-3 py-1 rounded-lg font-semibold shrink-0 transition-colors ${
                                 subFilter === role
-                                    ? 'bg-white/10 text-white border border-white/20'
-                                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'
+                                    ? 'bg-zinc-200 dark:bg-white/10 text-zinc-900 dark:text-white border border-zinc-300 dark:border-white/20'
+                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-white/[0.04]'
                             }`}
                         >
                             {role}
@@ -191,12 +191,12 @@ export default function Jobs() {
                 </div>
 
                 {/* Counter Strip */}
-                <div className="flex items-center justify-between py-3 text-xs text-zinc-400">
+                <div className="flex items-center justify-between py-3 text-xs text-zinc-500 dark:text-zinc-400">
                     <span className="font-semibold">
-                        Showing <strong className="text-white">{filteredJobs.length}</strong> available film calls
+                        Showing <strong className="text-zinc-900 dark:text-white">{filteredJobs.length}</strong> available film calls
                     </span>
                     {searchQuery && (
-                        <span className="text-amber-400 font-medium">Matching &quot;{searchQuery}&quot;</span>
+                        <span className="text-amber-600 dark:text-amber-400 font-medium">Matching &quot;{searchQuery}&quot;</span>
                     )}
                 </div>
 
@@ -239,7 +239,7 @@ export default function Jobs() {
                                 <article
                                     key={job.id}
                                     onClick={() => navigate(`/job/${job.id}`)}
-                                    className="flex cursor-pointer flex-col justify-between rounded-2xl bg-[#121316] p-5 shadow-lg border border-white/[0.06] hover:border-amber-500/40 hover:-translate-y-1 transition-all duration-200 group relative overflow-hidden"
+                                    className="flex cursor-pointer flex-col justify-between rounded-2xl bg-white dark:bg-[#121316] p-5 shadow-sm dark:shadow-lg border border-zinc-200 dark:border-white/[0.06] hover:border-amber-500/50 hover:shadow-md hover:-translate-y-1 transition-all duration-200 group relative overflow-hidden"
                                 >
                                     {/* Top Accents */}
                                     <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/[0.03] rounded-full blur-2xl group-hover:bg-amber-500/[0.08] transition-colors" />
@@ -247,15 +247,15 @@ export default function Jobs() {
                                     <div>
                                         <div className="flex items-start justify-between gap-3 mb-3">
                                             <div className="flex items-center gap-3 min-w-0">
-                                                <div className="size-12 rounded-xl overflow-hidden shrink-0 border border-white/10 bg-black/60 shadow-inner">
+                                                <div className="size-12 rounded-xl overflow-hidden shrink-0 border border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-black/60 shadow-inner">
                                                     <PostMedia src={job.logo || ''} fallbackType="COMPANY_LOGO" className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                                                 </div>
                                                 <div className="min-w-0">
-                                                    <p className="text-xs font-bold text-zinc-400 truncate flex items-center gap-1">
+                                                    <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400 truncate flex items-center gap-1">
                                                         <span>{job.company}</span>
                                                         {renderVerificationBadge(job.user_details?.verification_tier)}
                                                     </p>
-                                                    <h3 className="font-extrabold text-white text-base tracking-tight leading-snug group-hover:text-amber-400 transition-colors line-clamp-1">
+                                                    <h3 className="font-extrabold text-zinc-900 dark:text-white text-base tracking-tight leading-snug group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors line-clamp-1">
                                                         {job.title}
                                                     </h3>
                                                 </div>
@@ -267,19 +267,19 @@ export default function Jobs() {
 
                                         {/* Description Snippet */}
                                         {job.description && (
-                                            <p className="text-xs text-zinc-400 line-clamp-2 leading-relaxed mb-3">
+                                            <p className="text-xs text-zinc-600 dark:text-zinc-400 line-clamp-2 leading-relaxed mb-3">
                                                 {job.description}
                                             </p>
                                         )}
 
                                         {/* Meta Chips */}
-                                        <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-400 mb-3">
-                                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/5">
-                                                <span className="material-symbols-outlined text-[13px] text-amber-400">location_on</span>
+                                        <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 mb-3">
+                                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-zinc-100 dark:bg-white/[0.04] border border-zinc-200 dark:border-white/5">
+                                                <span className="material-symbols-outlined text-[13px] text-amber-500 dark:text-amber-400">location_on</span>
                                                 <span className="truncate max-w-[130px]">{job.location || 'India'}</span>
                                             </span>
                                             {job.salary && (
-                                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-300 font-bold border border-amber-500/20">
+                                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-300 font-bold border border-amber-500/20">
                                                     <span className="material-symbols-outlined text-[13px]">payments</span>
                                                     <span>₹ {job.salary}</span>
                                                 </span>
@@ -288,12 +288,12 @@ export default function Jobs() {
                                     </div>
 
                                     {/* Footer Details */}
-                                    <div className="pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs mt-2">
-                                        <span className="text-[11px] text-zinc-500 flex items-center gap-1">
+                                    <div className="pt-3 border-t border-zinc-100 dark:border-white/[0.06] flex items-center justify-between text-xs mt-2">
+                                        <span className="text-[11px] text-zinc-400 dark:text-zinc-500 flex items-center gap-1">
                                             <span className="material-symbols-outlined text-[13px]">schedule</span>
                                             <span>Posted {formatTimeAgo(job.postedAt)}</span>
                                         </span>
-                                        <span className="font-black text-amber-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform text-xs">
+                                        <span className="font-black text-amber-600 dark:text-amber-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform text-xs">
                                             <span>Details & Apply</span>
                                             <span className="material-symbols-outlined text-sm">arrow_forward</span>
                                         </span>

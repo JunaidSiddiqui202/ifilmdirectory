@@ -464,7 +464,7 @@ export default function UserProfile() {
                                 <>
                                     <button
                                         onClick={() => setIsEditProfileModalOpen(true)}
-                                        className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition-all border border-white/10 active:scale-95"
+                                        className="px-4 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/10 dark:hover:bg-white/20 text-zinc-900 dark:text-white font-bold text-xs transition-all border border-zinc-200 dark:border-white/10 active:scale-95"
                                     >
                                         Edit Profile
                                     </button>
@@ -488,7 +488,7 @@ export default function UserProfile() {
                                     {isAdminUser && (
                                         <button
                                             onClick={() => navigate('/-admin')}
-                                            className="px-3 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold text-xs flex items-center gap-1.5 transition-all border border-white/10"
+                                            className="px-3 py-2 rounded-xl bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-300 font-bold text-xs flex items-center gap-1.5 transition-all border border-zinc-300 dark:border-white/10"
                                         >
                                             <span className="material-symbols-outlined text-[16px]">admin_panel_settings</span>
                                             Admin
@@ -501,7 +501,7 @@ export default function UserProfile() {
                                         onClick={handleToggleFollow}
                                         className={`px-5 py-2 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all active:scale-95 ${
                                             followed
-                                                ? 'bg-zinc-800 text-white border border-white/10 hover:bg-zinc-700'
+                                                ? 'bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-300 dark:bg-zinc-800 dark:text-white dark:border-white/10 dark:hover:bg-zinc-700'
                                                 : 'bg-amber-500 text-black hover:bg-amber-400 shadow-sm shadow-amber-500/25'
                                         }`}
                                     >
@@ -510,7 +510,7 @@ export default function UserProfile() {
                                     </button>
                                     <button
                                         onClick={() => navigate(`/chat/${profile.uid}`)}
-                                        className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center gap-1.5 transition-all border border-white/10"
+                                        className="px-4 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/10 dark:hover:bg-white/20 text-zinc-900 dark:text-white font-bold text-xs flex items-center gap-1.5 transition-all border border-zinc-200 dark:border-white/10"
                                     >
                                         <span className="material-symbols-outlined text-[16px]">mail</span>
                                         <span>Message</span>
@@ -523,42 +523,42 @@ export default function UserProfile() {
                     {/* Stats Row (Credits/Media, Followers, Following) */}
                     <div className="flex justify-center md:justify-start gap-8 md:gap-10 w-full mb-4">
                         <div className="text-center md:text-left">
-                            <span className="font-extrabold text-base md:text-lg text-white">
+                            <span className="font-extrabold text-base md:text-lg text-zinc-900 dark:text-white">
                                 {(profile?.gallery?.length || 0) + (profile?.experience?.length || 0)}
                             </span>
-                            <span className="text-xs text-zinc-400 font-medium ml-1.5">Credits</span>
+                            <span className="text-xs text-zinc-500 dark:text-zinc-400 font-medium ml-1.5">Credits</span>
                         </div>
                         <div
                             className="text-center md:text-left cursor-pointer hover:opacity-80 transition-opacity"
                             onClick={() => { setFollowListType('followers'); setIsFollowListModalOpen(true); }}
                         >
-                            <span className="font-extrabold text-base md:text-lg text-white">{followersCount}</span>
-                            <span className="text-xs text-zinc-400 font-medium ml-1.5">Followers</span>
+                            <span className="font-extrabold text-base md:text-lg text-zinc-900 dark:text-white">{followersCount}</span>
+                            <span className="text-xs text-zinc-500 dark:text-zinc-400 font-medium ml-1.5">Followers</span>
                         </div>
                         <div
                             className="text-center md:text-left cursor-pointer hover:opacity-80 transition-opacity"
                             onClick={() => { setFollowListType('following'); setIsFollowListModalOpen(true); }}
                         >
-                            <span className="font-extrabold text-base md:text-lg text-white">{followingCount}</span>
-                            <span className="text-xs text-zinc-400 font-medium ml-1.5">Following</span>
+                            <span className="font-extrabold text-base md:text-lg text-zinc-900 dark:text-white">{followingCount}</span>
+                            <span className="text-xs text-zinc-500 dark:text-zinc-400 font-medium ml-1.5">Following</span>
                         </div>
                     </div>
 
                     {/* Role & Location & Bio */}
                     <div className="space-y-1.5 mb-5 md:mb-0 max-w-xl">
                         <div className="flex items-center justify-center md:justify-start gap-2 flex-wrap">
-                            <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                            <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
                                 {profile?.role || 'Film Professional'}
                             </span>
                             {profile?.location && (
-                                <span className="text-xs text-zinc-400 flex items-center gap-1">
+                                <span className="text-xs text-zinc-500 dark:text-zinc-400 flex items-center gap-1">
                                     <span className="material-symbols-outlined text-sm text-amber-500">location_on</span>
                                     {profile.location}
                                 </span>
                             )}
                         </div>
                         {profile?.bio && (
-                            <p className="text-sm text-zinc-300 leading-relaxed pt-1">
+                            <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1">
                                 {profile.bio}
                             </p>
                         )}
@@ -570,7 +570,7 @@ export default function UserProfile() {
                             <>
                                 <button
                                     onClick={() => setIsEditProfileModalOpen(true)}
-                                    className="w-full h-11 rounded-xl bg-white/10 text-white font-bold text-sm flex items-center justify-center hover:bg-white/15 transition-all border border-white/10"
+                                    className="w-full h-11 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/10 text-zinc-900 dark:text-white font-bold text-sm flex items-center justify-center dark:hover:bg-white/15 transition-all border border-zinc-200 dark:border-white/10"
                                 >
                                     Edit Profile
                                 </button>
@@ -595,7 +595,7 @@ export default function UserProfile() {
                                 {isAdminUser && (
                                     <button
                                         onClick={() => navigate('/-admin')}
-                                        className="w-full h-11 rounded-xl bg-[#111827] text-white font-bold text-sm flex items-center justify-center gap-2 hover:bg-black transition-all border border-white/10"
+                                        className="w-full h-11 rounded-xl bg-zinc-200 hover:bg-zinc-300 dark:bg-[#111827] text-zinc-800 dark:text-white font-bold text-sm flex items-center justify-center gap-2 dark:hover:bg-black transition-all border border-zinc-300 dark:border-white/10"
                                     >
                                         <span className="material-symbols-outlined text-lg">admin_panel_settings</span>
                                         Admin Management
@@ -608,7 +608,7 @@ export default function UserProfile() {
                                     onClick={handleToggleFollow}
                                     className={`w-full h-11 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
                                         followed
-                                            ? 'bg-zinc-800 text-white border border-white/10'
+                                            ? 'bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-300 dark:bg-zinc-800 dark:text-white dark:border-white/10'
                                             : 'bg-amber-500 text-black hover:bg-amber-400'
                                     }`}
                                 >
@@ -617,7 +617,7 @@ export default function UserProfile() {
                                 </button>
                                 <button
                                     onClick={() => navigate(`/chat/${profile.uid}`)}
-                                    className="w-full h-11 rounded-xl bg-white/10 text-white font-bold text-sm flex items-center justify-center gap-2 border border-white/10"
+                                    className="w-full h-11 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-900 border border-zinc-200 dark:bg-white/10 dark:text-white font-bold text-sm flex items-center justify-center gap-2 dark:border-white/10"
                                 >
                                     <span className="material-symbols-outlined">mail</span>
                                     Message
@@ -629,7 +629,7 @@ export default function UserProfile() {
             </div>
 
             {/* Tab Navigation: Centered on desktop with icons, matching Instagram desktop */}
-            <div className="border-t border-white/10 mt-4 md:mt-6 overflow-x-auto no-scrollbar">
+            <div className="border-t border-zinc-200 dark:border-white/10 mt-4 md:mt-6 overflow-x-auto no-scrollbar">
                 <div className="flex w-full md:justify-center min-w-max px-4 gap-2 md:gap-8">
                     {[
                         { id: 'Portfolio', label: 'Portfolio', icon: 'grid_on' },
@@ -642,8 +642,8 @@ export default function UserProfile() {
                             onClick={() => setActiveTab(tab.id)}
                             className={`flex items-center gap-2 px-5 md:px-6 py-4 text-xs md:text-sm font-bold uppercase tracking-wider transition-all relative ${
                                 activeTab === tab.id
-                                    ? 'text-white border-t-2 border-amber-500 -mt-[1px]'
-                                    : 'text-zinc-500 hover:text-zinc-300'
+                                    ? 'text-zinc-900 dark:text-white border-t-2 border-amber-500 -mt-[1px]'
+                                    : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300'
                             }`}
                         >
                             <span className="material-symbols-outlined text-lg">{tab.icon}</span>
@@ -669,7 +669,7 @@ export default function UserProfile() {
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                                 {(profile?.gallery || []).slice(0, 4).map((url, idx) => (
                                     <div key={idx} className="flex flex-col gap-3">
-                                        <div className="aspect-[4/3] bg-zinc-900 rounded-2xl overflow-hidden relative group cursor-pointer shadow-sm border border-white/5">
+                                        <div className="aspect-[4/3] bg-zinc-100 dark:bg-zinc-900 rounded-2xl overflow-hidden relative group cursor-pointer shadow-sm border border-zinc-200 dark:border-white/5">
                                             <PostMedia src={url} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                                             <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
                                                 <div className="size-12 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center border border-white/20">
@@ -678,15 +678,15 @@ export default function UserProfile() {
                                             </div>
                                         </div>
                                         <div className="px-1">
-                                            <h3 className="font-bold text-base md:text-lg text-white truncate">{idx === 0 ? 'Drama Reel 2023' : idx === 1 ? 'Action Sequence' : 'Showreel Feature'}</h3>
-                                            <p className="text-zinc-400 text-xs md:text-sm font-medium">{idx === 0 ? 'My Showreel' : 'Compilation'}</p>
+                                            <h3 className="font-bold text-base md:text-lg text-zinc-900 dark:text-white truncate">{idx === 0 ? 'Drama Reel 2023' : idx === 1 ? 'Action Sequence' : 'Showreel Feature'}</h3>
+                                            <p className="text-zinc-500 dark:text-zinc-400 text-xs md:text-sm font-medium">{idx === 0 ? 'My Showreel' : 'Compilation'}</p>
                                         </div>
                                     </div>
                                 ))}
                                 {(profile?.gallery || []).length === 0 && (
-                                    <div className="col-span-full py-12 bg-zinc-900/50 rounded-2xl flex flex-col items-center justify-center border-2 border-dashed border-zinc-800 gap-2">
+                                    <div className="col-span-full py-12 bg-zinc-100/80 dark:bg-zinc-900/50 rounded-2xl flex flex-col items-center justify-center border-2 border-dashed border-zinc-300 dark:border-zinc-800 gap-2">
                                         <span className="material-symbols-outlined text-zinc-400 text-4xl">movie</span>
-                                        <p className="text-zinc-400 font-bold italic">No showreels added yet</p>
+                                        <p className="text-zinc-500 dark:text-zinc-400 font-bold italic">No showreels added yet</p>
                                     </div>
                                 )}
                             </div>
@@ -695,7 +695,7 @@ export default function UserProfile() {
                         {/* Photos Section */}
                         <section>
                             <div className="flex items-center justify-between mb-5">
-                                <h2 className="text-2xl font-bold text-white">Photos</h2>
+                                <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Photos</h2>
                                 <button
                                     onClick={() => setIsGalleryModalOpen(true)}
                                     className="flex items-center gap-1.5 text-amber-500 text-sm font-bold hover:brightness-90 transition-all"
@@ -707,13 +707,13 @@ export default function UserProfile() {
                             <div className="flex md:grid md:grid-cols-4 md:gap-4 overflow-x-auto md:overflow-visible no-scrollbar -mx-6 px-6 md:mx-0 md:px-0">
                                 {(profile?.gallery || []).length > 0 ? (
                                     profile.gallery?.map((url, idx) => (
-                                        <div key={idx} className="w-[140px] md:w-full aspect-square shrink-0 rounded-2xl overflow-hidden bg-zinc-900 shadow-sm border border-white/10 group">
+                                        <div key={idx} className="w-[140px] md:w-full aspect-square shrink-0 rounded-2xl overflow-hidden bg-zinc-100 dark:bg-zinc-900 shadow-sm border border-zinc-200 dark:border-white/10 group">
                                             <PostMedia src={url} className="w-full h-full object-cover grayscale active:grayscale-0 md:grayscale-0 md:group-hover:scale-105 transition-all duration-300" />
                                         </div>
                                     ))
                                 ) : (
-                                    <div className="w-full md:col-span-4 py-10 bg-zinc-900/50 rounded-2xl flex items-center justify-center border-2 border-dashed border-zinc-800">
-                                        <p className="text-zinc-400 font-bold italic">No photos added</p>
+                                    <div className="w-full md:col-span-4 py-10 bg-zinc-100/80 dark:bg-zinc-900/50 rounded-2xl flex items-center justify-center border-2 border-dashed border-zinc-300 dark:border-zinc-800">
+                                        <p className="text-zinc-500 dark:text-zinc-400 font-bold italic">No photos added</p>
                                     </div>
                                 )}
                             </div>
@@ -722,7 +722,7 @@ export default function UserProfile() {
                         {/* Skills Section */}
                         <section>
                             <div className="flex items-center justify-between mb-5">
-                                <h2 className="text-2xl font-bold text-white">Skills</h2>
+                                <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Skills</h2>
                                 <button
                                     onClick={() => setIsEditProfileModalOpen(true)}
                                     className="flex items-center gap-1.5 text-amber-500 text-sm font-bold hover:brightness-90 transition-all"
@@ -756,7 +756,7 @@ export default function UserProfile() {
                         {/* Experience Section */}
                         <section>
                             <div className="flex items-center justify-between mb-5">
-                                <h2 className="text-2xl font-bold text-white">Recent Projects</h2>
+                                <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Recent Projects</h2>
                                 <button
                                     onClick={() => setIsExperienceModalOpen(true)}
                                     className="flex items-center gap-1.5 text-amber-500 text-sm font-bold hover:brightness-90 transition-all"
@@ -771,25 +771,25 @@ export default function UserProfile() {
                                         <div
                                             key={exp.id}
                                             onClick={() => isMe && (setEditingExperience(exp), setIsExperienceModalOpen(true))}
-                                            className="flex gap-5 p-4 rounded-2xl bg-[#121316] border border-white/10 items-center cursor-pointer group hover:border-amber-500/40 transition-all shadow-sm"
+                                            className="flex gap-5 p-4 rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/10 items-center cursor-pointer group hover:border-amber-500/40 transition-all shadow-sm"
                                         >
-                                            <div className="w-14 h-18 bg-zinc-800 rounded-xl shrink-0 overflow-hidden flex items-center justify-center border border-white/10">
+                                            <div className="w-14 h-18 bg-zinc-100 dark:bg-zinc-800 rounded-xl shrink-0 overflow-hidden flex items-center justify-center border border-zinc-200 dark:border-white/10">
                                                 <span className="material-symbols-outlined text-zinc-400 text-3xl">
                                                     {exp.type === 'movie' ? 'movie' : exp.type === 'tv' ? 'tv' : 'theaters'}
                                                 </span>
                                             </div>
                                             <div className="flex flex-col flex-1 min-w-0">
                                                 <div className="flex justify-between items-center mb-1">
-                                                    <h3 className="text-lg font-bold truncate group-hover:text-amber-500 transition-colors text-white">{exp.title}</h3>
-                                                    <span className="text-sm font-bold text-zinc-400">{exp.year}</span>
+                                                    <h3 className="text-lg font-bold truncate group-hover:text-amber-600 dark:group-hover:text-amber-500 transition-colors text-zinc-900 dark:text-white">{exp.title}</h3>
+                                                    <span className="text-sm font-bold text-zinc-500 dark:text-zinc-400">{exp.year}</span>
                                                 </div>
                                                 <p className="text-amber-500 font-bold uppercase tracking-wider text-xs">{exp.role}</p>
                                             </div>
                                         </div>
                                     ))
                                 ) : (
-                                    <div className="py-12 bg-zinc-900/50 rounded-2xl flex items-center justify-center border-2 border-dashed border-zinc-800">
-                                        <p className="text-zinc-400 font-bold italic">No projects listed</p>
+                                    <div className="py-12 bg-zinc-100/80 dark:bg-zinc-900/50 rounded-2xl flex items-center justify-center border-2 border-dashed border-zinc-300 dark:border-zinc-800">
+                                        <p className="text-zinc-500 dark:text-zinc-400 font-bold italic">No projects listed</p>
                                     </div>
                                 )}
                             </div>
@@ -798,7 +798,7 @@ export default function UserProfile() {
                         {/* Under Production Section */}
                         <section>
                             <div className="flex items-center justify-between mb-5">
-                                <h2 className="text-2xl font-bold text-white">Under Production</h2>
+                                <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Under Production</h2>
                                 {isMe && (
                                     <button
                                         onClick={() => setIsEditProfileModalOpen(true)}
@@ -814,17 +814,17 @@ export default function UserProfile() {
                                     profile.underProductionProjects?.map((project) => (
                                         <div key={project.id} className="p-5 rounded-2xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/20 shadow-sm">
                                             <div className="flex justify-between items-start mb-2">
-                                                <h3 className="text-xl font-bold text-white line-clamp-1">{project.title}</h3>
+                                                <h3 className="text-xl font-bold text-zinc-900 dark:text-white line-clamp-1">{project.title}</h3>
                                                 <span className="px-2.5 py-1 rounded-full bg-purple-500/20 text-purple-400 text-[10px] font-black uppercase tracking-widest border border-purple-500/30 shrink-0">
                                                     {project.status}
                                                 </span>
                                             </div>
                                             <p className="text-sm font-bold text-amber-500 uppercase tracking-wider mb-2">{project.role}</p>
                                             {project.description && (
-                                                <p className="text-sm text-zinc-400 line-clamp-2 italic">"{project.description}"</p>
+                                                <p className="text-sm text-zinc-600 dark:text-zinc-400 line-clamp-2 italic">"{project.description}"</p>
                                             )}
                                             {project.expectedRelease && (
-                                                <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-zinc-400">
+                                                <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-zinc-500 dark:text-zinc-400">
                                                     <span className="material-symbols-outlined text-sm">event</span>
                                                     Expected: {project.expectedRelease}
                                                 </div>
@@ -832,8 +832,8 @@ export default function UserProfile() {
                                         </div>
                                     ))
                                 ) : (
-                                    <div className="col-span-full py-12 bg-zinc-900/50 rounded-2xl flex items-center justify-center border-2 border-dashed border-zinc-800">
-                                        <p className="text-zinc-400 font-bold italic">No under-production works listed</p>
+                                    <div className="col-span-full py-12 bg-zinc-100/80 dark:bg-zinc-900/50 rounded-2xl flex items-center justify-center border-2 border-dashed border-zinc-300 dark:border-zinc-800">
+                                        <p className="text-zinc-500 dark:text-zinc-400 font-bold italic">No under-production works listed</p>
                                     </div>
                                 )}
                             </div>
@@ -842,7 +842,7 @@ export default function UserProfile() {
                         {/* Past Works Section */}
                         <section>
                             <div className="flex items-center justify-between mb-5">
-                                <h2 className="text-2xl font-bold text-white">Past Works</h2>
+                                <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Past Works</h2>
                                 {isMe && (
                                     <button
                                         onClick={() => setIsEditProfileModalOpen(true)}
@@ -856,32 +856,32 @@ export default function UserProfile() {
                             <div className="flex flex-col gap-4">
                                 {(profile?.pastProjects || []).length > 0 ? (
                                     profile.pastProjects?.map((project) => (
-                                        <div key={project.id} className="flex gap-5 p-5 rounded-2xl bg-[#121316] border border-white/10 items-center shadow-sm">
-                                            <div className="w-14 h-14 bg-zinc-800 rounded-full shrink-0 flex items-center justify-center border border-white/10">
+                                        <div key={project.id} className="flex gap-5 p-5 rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/10 items-center shadow-sm">
+                                            <div className="w-14 h-14 bg-zinc-100 dark:bg-zinc-800 rounded-full shrink-0 flex items-center justify-center border border-zinc-200 dark:border-white/10">
                                                 <span className="material-symbols-outlined text-zinc-400 text-3xl">history</span>
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex justify-between items-center mb-1">
-                                                    <h3 className="text-lg font-bold truncate text-white">{project.title}</h3>
-                                                    <span className="text-sm font-bold text-zinc-400">{project.year}</span>
+                                                    <h3 className="text-lg font-bold truncate text-zinc-900 dark:text-white">{project.title}</h3>
+                                                    <span className="text-sm font-bold text-zinc-500 dark:text-zinc-400">{project.year}</span>
                                                 </div>
                                                 <div className="flex items-center gap-3">
                                                     <p className="text-sm font-bold text-amber-500 uppercase tracking-widest">{project.role}</p>
                                                     {project.link && (
-                                                        <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-xs text-sky-400 hover:underline flex items-center gap-0.5">
+                                                        <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-xs text-sky-500 dark:text-sky-400 hover:underline flex items-center gap-0.5">
                                                             View <span className="material-symbols-outlined text-xs">open_in_new</span>
                                                         </a>
                                                     )}
                                                 </div>
                                                 {project.description && (
-                                                    <p className="text-sm text-zinc-400 mt-2 line-clamp-1">{project.description}</p>
+                                                    <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-2 line-clamp-1">{project.description}</p>
                                                 )}
                                             </div>
                                         </div>
                                     ))
                                 ) : (
-                                    <div className="py-12 bg-zinc-900/50 rounded-2xl flex items-center justify-center border-2 border-dashed border-zinc-800">
-                                        <p className="text-zinc-400 font-bold italic">No past works listed</p>
+                                    <div className="py-12 bg-zinc-100/80 dark:bg-zinc-900/50 rounded-2xl flex items-center justify-center border-2 border-dashed border-zinc-300 dark:border-zinc-800">
+                                        <p className="text-zinc-500 dark:text-zinc-400 font-bold italic">No past works listed</p>
                                     </div>
                                 )}
                             </div>

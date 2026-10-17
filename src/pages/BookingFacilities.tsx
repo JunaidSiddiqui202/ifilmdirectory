@@ -120,12 +120,12 @@ export default function BookingFacilities() {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search sound stages, camera gear, editing suites, lighting trucks, cities..."
-                        className="w-full bg-[#121316] border border-white/[0.08] hover:border-white/20 focus:border-amber-500 rounded-2xl pl-12 pr-10 py-3 text-sm text-white placeholder:text-zinc-500 focus:outline-none transition-all shadow-lg"
+                        className="w-full bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.08] hover:border-zinc-300 dark:hover:border-white/20 focus:border-amber-500 rounded-2xl pl-12 pr-10 py-3 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none transition-all shadow-sm dark:shadow-lg"
                     />
                     {searchQuery && (
                         <button
                             onClick={() => setSearchQuery('')}
-                            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white"
+                            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 dark:hover:text-white"
                         >
                             <span className="material-symbols-outlined text-lg">close</span>
                         </button>
@@ -143,10 +143,10 @@ export default function BookingFacilities() {
                                 className={`flex h-10 shrink-0 items-center gap-2 rounded-xl px-4 text-xs font-bold transition-all border ${
                                     isActive
                                         ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-black border-amber-400 shadow-md shadow-amber-500/20'
-                                        : 'bg-[#121316] text-zinc-400 border-white/[0.06] hover:text-white hover:border-white/20'
+                                        : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-white/[0.06] hover:text-zinc-900 dark:hover:text-white hover:border-zinc-300 dark:hover:border-white/20'
                                 }`}
                             >
-                                <span className={`material-symbols-outlined text-base ${isActive ? 'text-black' : 'text-amber-400'}`}>
+                                <span className={`material-symbols-outlined text-base ${isActive ? 'text-black' : 'text-amber-500 dark:text-amber-400'}`}>
                                     {cat.icon}
                                 </span>
                                 <span>{cat.label}</span>
@@ -170,11 +170,11 @@ export default function BookingFacilities() {
                                 <div
                                     key={facility.id}
                                     onClick={() => navigate(`/booking/details/${facility.id}`)}
-                                    className="rounded-2xl bg-[#121316] border border-white/[0.08] hover:border-amber-500/40 overflow-hidden p-4 shadow-xl transition-all group cursor-pointer flex flex-col justify-between"
+                                    className="rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.08] hover:border-amber-500/40 overflow-hidden p-4 shadow-sm hover:shadow-md dark:shadow-xl transition-all group cursor-pointer flex flex-col justify-between"
                                 >
                                     <div>
                                         {/* Image Box */}
-                                        <div className="relative w-full aspect-[16/10] rounded-xl overflow-hidden bg-black mb-3.5 border border-white/5">
+                                        <div className="relative w-full aspect-[16/10] rounded-xl overflow-hidden bg-black mb-3.5 border border-zinc-200/50 dark:border-white/5">
                                             <PostMedia
                                                 src={facility.image || ''}
                                                 fallbackType="COMPANY_LOGO"
@@ -201,28 +201,28 @@ export default function BookingFacilities() {
                                             )}
                                         </div>
 
-                                        <h3 className="text-base font-bold text-white group-hover:text-amber-400 transition-colors truncate">
+                                        <h3 className="text-base font-bold text-zinc-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors truncate">
                                             {facility.name}
                                         </h3>
-                                        <p className="text-xs text-zinc-400 flex items-center gap-1 mt-1 truncate">
+                                        <p className="text-xs text-zinc-500 dark:text-zinc-400 flex items-center gap-1 mt-1 truncate">
                                             <span className="material-symbols-outlined text-xs text-amber-500">location_on</span>
                                             {facility.location || 'Pan-India Production Hub'}
                                         </p>
 
                                         {/* Specs tags if available */}
                                         <div className="flex items-center gap-2 mt-3 flex-wrap">
-                                            <span className="text-[10px] px-2 py-0.5 rounded-md bg-white/[0.04] text-zinc-300 border border-white/[0.06] flex items-center gap-1">
-                                                <span className="material-symbols-outlined text-[11px] text-amber-400">verified</span>
+                                            <span className="text-[10px] px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-white/[0.04] text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-white/[0.06] flex items-center gap-1">
+                                                <span className="material-symbols-outlined text-[11px] text-amber-500 dark:text-amber-400">verified</span>
                                                 Cine Certified
                                             </span>
-                                            <span className="text-[10px] px-2 py-0.5 rounded-md bg-white/[0.04] text-zinc-300 border border-white/[0.06]">
+                                            <span className="text-[10px] px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-white/[0.04] text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-white/[0.06]">
                                                 Direct Inquiries
                                             </span>
                                         </div>
                                     </div>
 
-                                    <div className="pt-3 border-t border-white/[0.06] mt-4 flex items-center justify-between gap-2">
-                                        <span className="text-xs text-zinc-400 font-medium">
+                                    <div className="pt-3 border-t border-zinc-200 dark:border-white/[0.06] mt-4 flex items-center justify-between gap-2">
+                                        <span className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">
                                             5MC Verified Facility
                                         </span>
                                         <button
@@ -240,14 +240,14 @@ export default function BookingFacilities() {
                             ))}
                         </div>
                     ) : (
-                        <div className="flex flex-col items-center justify-center py-20 text-center rounded-2xl bg-[#121316] border border-white/[0.06]">
+                        <div className="flex flex-col items-center justify-center py-20 text-center rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.06] shadow-sm dark:shadow-none">
                             <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-4">
-                                <span className="material-symbols-outlined text-3xl text-amber-400">location_off</span>
+                                <span className="material-symbols-outlined text-3xl text-amber-500 dark:text-amber-400">location_off</span>
                             </div>
-                            <h3 className="text-base font-bold text-white mb-1">
+                            <h3 className="text-base font-bold text-zinc-900 dark:text-white mb-1">
                                 No facilities found matching "{searchQuery}"
                             </h3>
-                            <p className="text-xs text-zinc-400 max-w-sm mb-4">
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-sm mb-4">
                                 Try adjusting your search query or switching to 'All Spaces' to explore all verified studios.
                             </p>
                             <button

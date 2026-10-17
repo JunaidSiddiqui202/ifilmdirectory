@@ -174,17 +174,17 @@ export default function MessagesList() {
 
                 {/* Search Bar */}
                 <div className="py-3">
-                    <div className="relative flex items-center bg-[#121316] border border-white/10 rounded-xl px-3 py-2.5 focus-within:border-amber-500/50 transition-colors">
+                    <div className="relative flex items-center bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/10 rounded-xl px-3 py-2.5 focus-within:border-amber-500/50 shadow-sm dark:shadow-none transition-colors">
                         <span className="material-symbols-outlined text-zinc-400 mr-2 text-xl">search</span>
                         <input
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder="Search filmmakers, crew, or discussions..."
-                            className="bg-transparent border-none outline-none text-sm w-full text-white placeholder:text-zinc-500"
+                            className="bg-transparent border-none outline-none text-sm w-full text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
                         />
                         {searchQuery && (
-                            <button onClick={() => setSearchQuery('')} className="text-zinc-500 hover:text-white">
+                            <button onClick={() => setSearchQuery('')} className="text-zinc-400 hover:text-zinc-700 dark:hover:text-white">
                                 <span className="material-symbols-outlined text-sm">close</span>
                             </button>
                         )}
@@ -192,27 +192,27 @@ export default function MessagesList() {
                 </div>
 
                 {/* Active Filmmakers & Collaborators Reel */}
-                <div className="py-3 border-b border-white/5">
+                <div className="py-3 border-b border-zinc-200 dark:border-white/5">
                     <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">Production Circle</span>
-                        <span className="text-[11px] text-amber-400/80 font-medium">Active Now</span>
+                        <span className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Production Circle</span>
+                        <span className="text-[11px] text-amber-600 dark:text-amber-400 font-medium">Active Now</span>
                     </div>
                     <div className="flex gap-4 overflow-x-auto no-scrollbar pb-1">
                         {/* Current User Status */}
                         <div className="flex flex-col items-center gap-1.5 shrink-0 cursor-pointer group">
                             <div className="relative">
-                                <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-white/10 group-hover:border-amber-500/50 transition-colors">
+                                <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-zinc-200 dark:border-white/10 group-hover:border-amber-500/50 transition-colors">
                                     <PostMedia
                                         src={userProfile?.photoURL || currentUser?.photoURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop"}
                                         fallbackType="USER_MALE"
                                         className="w-full h-full object-cover"
                                     />
                                 </div>
-                                <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-amber-500 text-black rounded-full flex items-center justify-center border-2 border-[#090A0C] shadow-sm">
+                                <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-amber-500 text-black rounded-full flex items-center justify-center border-2 border-white dark:border-[#090A0C] shadow-sm">
                                     <span className="material-symbols-outlined text-[13px] font-bold">add</span>
                                 </div>
                             </div>
-                            <span className="text-[11px] font-medium text-zinc-300">Your Status</span>
+                            <span className="text-[11px] font-semibold text-zinc-800 dark:text-zinc-200">Your Status</span>
                         </div>
 
                         {/* Recent Collaborators */}
@@ -224,7 +224,7 @@ export default function MessagesList() {
                             >
                                 <div className="relative">
                                     <div className="w-14 h-14 rounded-full p-[2px] bg-gradient-to-tr from-amber-500 via-yellow-400 to-amber-600">
-                                        <div className="w-full h-full rounded-full overflow-hidden border-2 border-[#090A0C]">
+                                        <div className="w-full h-full rounded-full overflow-hidden border-2 border-white dark:border-[#090A0C]">
                                             <PostMedia
                                                 src={creator.image}
                                                 fallbackType="USER_MALE"
@@ -232,9 +232,9 @@ export default function MessagesList() {
                                             />
                                         </div>
                                     </div>
-                                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#090A0C]" />
+                                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white dark:border-[#090A0C]" />
                                 </div>
-                                <span className="text-[11px] font-medium text-zinc-300 max-w-[64px] truncate text-center">
+                                <span className="text-[11px] font-semibold text-zinc-800 dark:text-zinc-200 max-w-[64px] truncate text-center">
                                     {creator.name.split(' ')[0]}
                                 </span>
                             </div>
@@ -246,30 +246,30 @@ export default function MessagesList() {
                 <div className="py-3 flex items-center gap-2 overflow-x-auto no-scrollbar">
                     <button
                         onClick={() => setActiveTab('primary')}
-                        className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
+                        className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap shadow-xs ${
                             activeTab === 'primary'
                                 ? 'bg-amber-500 text-black shadow-md shadow-amber-500/20'
-                                : 'bg-[#121316] text-zinc-400 border border-white/5 hover:text-white'
+                                : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-white/5 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >
                         Direct Messages
                     </button>
                     <button
                         onClick={() => setActiveTab('requests')}
-                        className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
+                        className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap shadow-xs ${
                             activeTab === 'requests'
                                 ? 'bg-amber-500 text-black shadow-md shadow-amber-500/20'
-                                : 'bg-[#121316] text-zinc-400 border border-white/5 hover:text-white'
+                                : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-white/5 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >
                         Gigs & Inquiries
                     </button>
                     <button
                         onClick={() => setActiveTab('general')}
-                        className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
+                        className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap shadow-xs ${
                             activeTab === 'general'
                                 ? 'bg-amber-500 text-black shadow-md shadow-amber-500/20'
-                                : 'bg-[#121316] text-zinc-400 border border-white/5 hover:text-white'
+                                : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-white/5 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >
                         Archive
@@ -284,12 +284,12 @@ export default function MessagesList() {
                             <span className="text-xs text-zinc-500 tracking-wider uppercase font-semibold">Loading Filmmaker Comms...</span>
                         </div>
                     ) : filteredChats.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center p-12 text-center bg-[#121316]/40 rounded-2xl border border-white/5 my-6">
-                            <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-4 text-amber-400">
+                        <div className="flex flex-col items-center justify-center p-12 text-center bg-white dark:bg-[#121316]/40 rounded-2xl border border-zinc-200 dark:border-white/5 my-6 shadow-sm dark:shadow-none">
+                            <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-4 text-amber-500">
                                 <span className="material-symbols-outlined text-3xl">forum</span>
                             </div>
-                            <h3 className="text-base font-bold text-white mb-1">No Active Threads Found</h3>
-                            <p className="text-xs text-zinc-400 max-w-xs mb-6">
+                            <h3 className="text-base font-bold text-zinc-900 dark:text-white mb-1">No Active Threads Found</h3>
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-xs mb-6">
                                 Connect with directors, cinematographers, and producers from the Discover hub.
                             </p>
                             <button
@@ -304,11 +304,11 @@ export default function MessagesList() {
                             <div
                                 key={chat.id}
                                 onClick={() => navigate(`/chat/${chat.id}`)}
-                                className="flex items-center justify-between p-3.5 rounded-2xl bg-[#121316]/70 border border-white/5 hover:border-amber-500/30 hover:bg-[#121316] cursor-pointer active:scale-[0.99] transition-all group"
+                                className="flex items-center justify-between p-3.5 rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 hover:border-amber-500/30 hover:bg-zinc-50 dark:hover:bg-[#16171b] cursor-pointer active:scale-[0.99] transition-all group shadow-sm dark:shadow-none"
                             >
                                 <div className="flex items-center gap-3.5 min-w-0 flex-1">
                                     <div className="relative shrink-0">
-                                        <div className="w-13 h-13 rounded-full overflow-hidden border border-white/10 group-hover:border-amber-500/40 transition-colors">
+                                        <div className="w-13 h-13 rounded-full overflow-hidden border border-zinc-200 dark:border-white/10 group-hover:border-amber-500/40 transition-colors">
                                             <PostMedia
                                                 src={chat.image}
                                                 fallbackType="USER_MALE"
@@ -316,30 +316,30 @@ export default function MessagesList() {
                                             />
                                         </div>
                                         {chat.unread && (
-                                            <span className="absolute top-0 right-0 w-3 h-3 bg-amber-500 rounded-full border-2 border-[#090A0C]" />
+                                            <span className="absolute top-0 right-0 w-3 h-3 bg-amber-500 rounded-full border-2 border-white dark:border-[#090A0C]" />
                                         )}
                                     </div>
                                     <div className="min-w-0 flex-1 pr-2">
                                         <div className="flex items-center justify-between mb-0.5">
-                                            <h3 className="font-bold text-sm text-white group-hover:text-amber-400 transition-colors truncate">
+                                            <h3 className="font-bold text-sm text-zinc-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors truncate">
                                                 {chat.name}
                                             </h3>
-                                            <span className="text-[11px] text-zinc-500 shrink-0 font-medium">
+                                            <span className="text-[11px] text-zinc-500 dark:text-zinc-400 shrink-0 font-medium">
                                                 {chat.time}
                                             </span>
                                         </div>
                                         {chat.role && (
-                                            <p className="text-[10px] text-amber-400/80 font-medium mb-1 uppercase tracking-wide truncate">
+                                            <p className="text-[10px] text-amber-600 dark:text-amber-400/90 font-bold mb-1 uppercase tracking-wide truncate">
                                                 {chat.role}
                                             </p>
                                         )}
-                                        <p className={`text-xs truncate ${chat.unread ? 'text-zinc-200 font-semibold' : 'text-zinc-400'}`}>
+                                        <p className={`text-xs truncate ${chat.unread ? 'text-zinc-900 dark:text-zinc-200 font-semibold' : 'text-zinc-600 dark:text-zinc-400'}`}>
                                             {chat.message}
                                         </p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2 pl-2 shrink-0">
-                                    <span className="material-symbols-outlined text-zinc-600 group-hover:text-zinc-300 text-lg transition-colors">
+                                    <span className="material-symbols-outlined text-zinc-400 group-hover:text-zinc-700 dark:group-hover:text-zinc-300 text-lg transition-colors">
                                         chevron_right
                                     </span>
                                 </div>

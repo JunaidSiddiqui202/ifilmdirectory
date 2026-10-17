@@ -320,38 +320,38 @@ export default function Messaging() {
     };
 
     return (
-        <div className="relative flex h-auto min-h-screen w-full flex-col bg-[#090A0C] text-white overflow-x-hidden">
+        <div className="relative flex h-auto min-h-screen w-full flex-col bg-slate-50 dark:bg-[#090A0C] text-zinc-900 dark:text-white overflow-x-hidden font-display transition-colors">
             <div className="flex flex-col flex-1 pb-28 w-full max-w-md md:max-w-3xl lg:max-w-4xl mx-auto">
                 {/* Top App Bar */}
-                <div className="sticky top-0 z-30 flex flex-col bg-[#090A0C]/90 backdrop-blur-md border-b border-white/[0.08]">
+                <div className="sticky top-0 z-30 flex flex-col bg-white/95 dark:bg-[#090A0C]/90 backdrop-blur-md border-b border-zinc-200 dark:border-white/[0.08]">
                     <div className="flex items-center px-4 py-3 justify-between gap-3">
                         <div className="flex items-center gap-3 min-w-0">
                             <button
                                 onClick={() => window.history.back()}
-                                className="flex size-9 items-center justify-center rounded-xl bg-white/[0.04] border border-white/[0.08] text-white hover:bg-white/[0.08] transition-all"
+                                className="flex size-9 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] border border-zinc-200 dark:border-white/[0.08] text-zinc-700 dark:text-white transition-all"
                             >
                                 <span className="material-symbols-outlined text-lg">arrow_back_ios_new</span>
                             </button>
                             <div className="relative">
-                                <div className="size-10 rounded-full overflow-hidden border border-white/10 bg-black">
+                                <div className="size-10 rounded-full overflow-hidden border border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-black">
                                     <PostMedia
                                         src={otherUserProfile?.photoURL || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop'}
                                         fallbackType="USER_MALE"
                                         className="w-full h-full object-cover"
                                     />
                                 </div>
-                                <span className="absolute bottom-0 right-0 size-2.5 rounded-full bg-emerald-400 border-2 border-[#090A0C]" />
+                                <span className="absolute bottom-0 right-0 size-2.5 rounded-full bg-emerald-500 border-2 border-white dark:border-[#090A0C]" />
                             </div>
                             <div className="min-w-0">
-                                <h2 className="text-white text-sm sm:text-base font-bold leading-tight truncate flex items-center gap-1.5">
+                                <h2 className="text-zinc-900 dark:text-white text-sm sm:text-base font-bold leading-tight truncate flex items-center gap-1.5">
                                     <span>{chatName}</span>
                                     {otherUserProfile?.verification?.isVerified && (
-                                        <span className="material-symbols-outlined text-amber-400 text-sm filled">
+                                        <span className="material-symbols-outlined text-amber-500 text-sm filled">
                                             verified
                                         </span>
                                     )}
                                 </h2>
-                                <p className="text-[11px] text-zinc-400 truncate">
+                                <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">
                                     {otherUserProfile?.role || 'Verified Filmmaker'} • Online
                                 </p>
                             </div>
@@ -368,8 +368,8 @@ export default function Messaging() {
                                 }}
                                 className={`flex items-center justify-center rounded-xl size-9 border transition-all ${
                                     allowCalls
-                                        ? 'bg-white/[0.05] border-white/[0.08] text-amber-400 hover:bg-amber-500/10 hover:border-amber-500/30'
-                                        : 'bg-white/[0.02] border-white/[0.04] text-zinc-600 cursor-not-allowed'
+                                        ? 'bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] border-zinc-200 dark:border-white/[0.08] text-amber-500 dark:text-amber-400 hover:border-amber-500/30'
+                                        : 'bg-zinc-100 dark:bg-white/[0.02] border-zinc-200 dark:border-white/[0.04] text-zinc-400 cursor-not-allowed'
                                 }`}
                                 title="Call"
                             >
@@ -378,7 +378,7 @@ export default function Messaging() {
 
                             <button
                                 onClick={() => setShowSettings(!showSettings)}
-                                className="flex items-center justify-center rounded-xl size-9 bg-white/[0.05] border border-white/[0.08] text-zinc-300 hover:text-white hover:bg-white/[0.1] transition-all"
+                                className="flex items-center justify-center rounded-xl size-9 bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] border border-zinc-200 dark:border-white/[0.08] text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white hover:bg-zinc-200 dark:hover:bg-white/[0.1] transition-all"
                                 title="Chat Options"
                             >
                                 <span className="material-symbols-outlined text-lg">more_vert</span>
@@ -386,16 +386,16 @@ export default function Messaging() {
 
                             {/* Chat Settings Dropdown */}
                             {showSettings && (
-                                <div className="absolute top-full right-0 mt-2 w-48 bg-[#17191e] rounded-xl shadow-2xl border border-white/[0.12] overflow-hidden z-50 p-1.5 backdrop-blur-xl animate-in fade-in zoom-in-95">
+                                <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-[#17191e] rounded-xl shadow-2xl border border-zinc-200 dark:border-white/[0.12] overflow-hidden z-50 p-1.5 backdrop-blur-xl animate-in fade-in zoom-in-95">
                                     <button
                                         onClick={() => {
                                             setAllowCalls(!allowCalls);
                                             setShowSettings(false);
                                         }}
-                                        className="flex items-center justify-between w-full px-3 py-2 text-xs font-semibold text-left hover:bg-white/[0.08] rounded-lg transition-colors text-zinc-200"
+                                        className="flex items-center justify-between w-full px-3 py-2 text-xs font-semibold text-left hover:bg-zinc-100 dark:hover:bg-white/[0.08] rounded-lg transition-colors text-zinc-700 dark:text-zinc-200"
                                     >
                                         <span>Allow Calls</span>
-                                        <div className={`w-8 h-4 rounded-full relative transition-colors ${allowCalls ? 'bg-amber-500' : 'bg-zinc-700'}`}>
+                                        <div className={`w-8 h-4 rounded-full relative transition-colors ${allowCalls ? 'bg-amber-500' : 'bg-zinc-300 dark:bg-zinc-700'}`}>
                                             <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-transform ${allowCalls ? 'left-4.5' : 'left-0.5'}`} />
                                         </div>
                                     </button>
@@ -406,7 +406,7 @@ export default function Messaging() {
                                                 setShowSettings(false);
                                             }
                                         }}
-                                        className="flex items-center gap-2 w-full px-3 py-2 text-xs font-semibold text-left text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
+                                        className="flex items-center gap-2 w-full px-3 py-2 text-xs font-semibold text-left text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-colors"
                                     >
                                         <span className="material-symbols-outlined text-base">delete_sweep</span>
                                         Clear History
@@ -420,7 +420,7 @@ export default function Messaging() {
                 {/* Messages Container */}
                 <div className="flex-1 px-4 py-4 space-y-4 overflow-y-auto no-scrollbar min-h-0">
                     <div className="text-center my-2">
-                        <span className="text-[11px] font-semibold text-zinc-400 bg-white/[0.05] border border-white/[0.08] px-3 py-1 rounded-full">
+                        <span className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 bg-white dark:bg-white/[0.05] border border-zinc-200 dark:border-white/[0.08] px-3 py-1 rounded-full shadow-xs">
                             Encrypted Production Comms
                         </span>
                     </div>
@@ -477,11 +477,11 @@ export default function Messaging() {
                         ) : (
                             <div key={message.id} className="flex items-start gap-2.5">
                                 <div className="flex flex-col gap-1 w-full max-w-[340px]">
-                                    <div className="flex flex-col leading-relaxed p-3.5 bg-[#14161a] border border-white/[0.08] text-white rounded-2xl rounded-tl-xs shadow-md">
+                                    <div className="flex flex-col leading-relaxed p-3.5 bg-white dark:bg-[#14161a] border border-zinc-200 dark:border-white/[0.08] text-zinc-900 dark:text-white rounded-2xl rounded-tl-xs shadow-sm dark:shadow-md">
                                         {message.type === 'audio' ? (
                                             <div className="flex items-center gap-2 min-w-[200px]">
                                                 {failedAudioIds.has(message.id) ? (
-                                                    <div className="flex items-center gap-2 text-zinc-400 text-xs italic py-1">
+                                                    <div className="flex items-center gap-2 text-zinc-500 dark:text-zinc-400 text-xs italic py-1">
                                                         <span className="material-symbols-outlined text-sm">error</span>
                                                         Audio expired
                                                     </div>
@@ -489,16 +489,16 @@ export default function Messaging() {
                                                     <>
                                                         <button
                                                             onClick={() => toggleMessageAudio(message.id, message.mediaUrl || '')}
-                                                            className="w-8 h-8 flex items-center justify-center bg-white/10 rounded-full hover:bg-white/20 transition-colors"
+                                                            className="w-8 h-8 flex items-center justify-center bg-zinc-100 hover:bg-zinc-200 dark:bg-white/10 dark:hover:bg-white/20 text-zinc-900 dark:text-white rounded-full transition-colors"
                                                         >
-                                                            <span className="material-symbols-outlined text-white">
+                                                            <span className="material-symbols-outlined">
                                                                 {playingMessageId === message.id ? 'pause' : 'play_arrow'}
                                                             </span>
                                                         </button>
-                                                        <div className="h-1 flex-1 bg-white/10 rounded-full overflow-hidden">
-                                                            <div className="h-full w-1/3 bg-amber-400 rounded-full" />
+                                                        <div className="h-1 flex-1 bg-zinc-200 dark:bg-white/10 rounded-full overflow-hidden">
+                                                            <div className="h-full w-1/3 bg-amber-500 dark:bg-amber-400 rounded-full" />
                                                         </div>
-                                                        <span className="text-xs text-zinc-400 font-mono">0:15</span>
+                                                        <span className="text-xs text-zinc-500 dark:text-zinc-400 font-mono">0:15</span>
                                                         <audio
                                                             id={`audio-${message.id}`}
                                                             src={message.mediaUrl}
@@ -510,7 +510,7 @@ export default function Messaging() {
                                                 )}
                                             </div>
                                         ) : (
-                                            <p className={`${isEmoji ? 'text-4xl' : 'text-sm'} text-zinc-100 font-normal`}>{message.text}</p>
+                                            <p className={`${isEmoji ? 'text-4xl' : 'text-sm'} text-zinc-800 dark:text-zinc-100 font-normal`}>{message.text}</p>
                                         )}
                                     </div>
                                     <span className="text-[11px] text-zinc-500 font-medium px-1">{message.time}</span>
@@ -525,35 +525,35 @@ export default function Messaging() {
                 {/* Message Input Area */}
                 <div className="fixed bottom-20 md:bottom-24 z-30 left-1/2 -translate-x-1/2 w-full max-w-md md:max-w-3xl lg:max-w-4xl px-4">
                     {showAttachments && (
-                        <div className="absolute bottom-full left-4 mb-2 flex flex-col gap-1 rounded-2xl bg-[#17191e] border border-white/[0.12] p-2 shadow-2xl animate-in slide-in-from-bottom-2 min-w-[210px] z-50">
+                        <div className="absolute bottom-full left-4 mb-2 flex flex-col gap-1 rounded-2xl bg-white dark:bg-[#17191e] border border-zinc-200 dark:border-white/[0.12] p-2 shadow-2xl animate-in slide-in-from-bottom-2 min-w-[210px] z-50">
                             <button
                                 onClick={() => {
                                     setShowEmojiPicker(true);
                                     setShowAttachments(false);
                                 }}
-                                className="flex items-center gap-3 rounded-xl px-3 py-2 text-xs font-semibold hover:bg-white/[0.08] transition-colors text-left text-zinc-200"
+                                className="flex items-center gap-3 rounded-xl px-3 py-2 text-xs font-semibold hover:bg-zinc-100 dark:hover:bg-white/[0.08] transition-colors text-left text-zinc-700 dark:text-zinc-200"
                             >
-                                <span className="material-symbols-outlined text-amber-400 text-lg">sentiment_satisfied</span>
+                                <span className="material-symbols-outlined text-amber-500 dark:text-amber-400 text-lg">sentiment_satisfied</span>
                                 <span>Add Emoji</span>
                             </button>
-                            <button className="flex items-center gap-3 rounded-xl px-3 py-2 text-xs font-semibold hover:bg-white/[0.08] transition-colors text-left text-zinc-200">
-                                <span className="material-symbols-outlined text-sky-400 text-lg">image</span>
+                            <button className="flex items-center gap-3 rounded-xl px-3 py-2 text-xs font-semibold hover:bg-zinc-100 dark:hover:bg-white/[0.08] transition-colors text-left text-zinc-700 dark:text-zinc-200">
+                                <span className="material-symbols-outlined text-sky-500 dark:text-sky-400 text-lg">image</span>
                                 <span>Stills & Clips</span>
                             </button>
-                            <button className="flex items-center gap-3 rounded-xl px-3 py-2 text-xs font-semibold hover:bg-white/[0.08] transition-colors text-left text-zinc-200">
-                                <span className="material-symbols-outlined text-purple-400 text-lg">description</span>
+                            <button className="flex items-center gap-3 rounded-xl px-3 py-2 text-xs font-semibold hover:bg-zinc-100 dark:hover:bg-white/[0.08] transition-colors text-left text-zinc-700 dark:text-zinc-200">
+                                <span className="material-symbols-outlined text-purple-500 dark:text-purple-400 text-lg">description</span>
                                 <span>Call Sheet / Script PDF</span>
                             </button>
                         </div>
                     )}
 
                     {showEmojiPicker && (
-                        <div className="absolute bottom-full right-4 mb-2 w-64 rounded-2xl bg-[#17191e] border border-white/[0.12] p-2.5 shadow-2xl animate-in slide-in-from-bottom-2 grid grid-cols-6 gap-1 h-60 overflow-y-auto scrollbar-none z-50">
+                        <div className="absolute bottom-full right-4 mb-2 w-64 rounded-2xl bg-white dark:bg-[#17191e] border border-zinc-200 dark:border-white/[0.12] p-2.5 shadow-2xl animate-in slide-in-from-bottom-2 grid grid-cols-6 gap-1 h-60 overflow-y-auto scrollbar-none z-50">
                             {emojis.map((emoji, index) => (
                                 <button
                                     key={index}
                                     onClick={() => handleEmojiClick(emoji)}
-                                    className="flex items-center justify-center p-1.5 hover:bg-white/[0.08] rounded-lg text-lg transition-colors"
+                                    className="flex items-center justify-center p-1.5 hover:bg-zinc-100 dark:hover:bg-white/[0.08] rounded-lg text-lg transition-colors"
                                 >
                                     {emoji}
                                 </button>
@@ -561,23 +561,23 @@ export default function Messaging() {
                         </div>
                     )}
 
-                    <div className="flex items-center gap-2 bg-[#121316]/95 backdrop-blur-xl p-2 rounded-2xl border border-white/[0.1] shadow-2xl min-h-[58px]">
+                    <div className="flex items-center gap-2 bg-white/95 dark:bg-[#121316]/95 backdrop-blur-xl p-2 rounded-2xl border border-zinc-200 dark:border-white/[0.1] shadow-xl dark:shadow-2xl min-h-[58px]">
                         {isRecording ? (
                             <div className="flex items-center w-full gap-3 animate-in fade-in px-2">
                                 <button
                                     onClick={cancelRecording}
-                                    className="p-2 rounded-xl hover:bg-rose-500/20 text-rose-400 transition-colors"
+                                    className="p-2 rounded-xl hover:bg-rose-500/20 text-rose-500 dark:text-rose-400 transition-colors"
                                 >
                                     <span className="material-symbols-outlined text-lg">delete</span>
                                 </button>
                                 <div className="flex-1 flex items-center justify-center gap-3 bg-rose-500/10 border border-rose-500/20 rounded-xl px-4 py-1.5">
                                     <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-                                    <span className="font-mono text-xs font-bold text-rose-400">{formatTime(recordingDuration)}</span>
+                                    <span className="font-mono text-xs font-bold text-rose-500 dark:text-rose-400">{formatTime(recordingDuration)}</span>
                                     <div className="flex items-center gap-1 h-4 min-w-0">
                                         {waveform.map((height, i) => (
                                             <div
                                                 key={i}
-                                                className="w-1 bg-rose-400 rounded-full transition-all duration-75 shrink-0"
+                                                className="w-1 bg-rose-500 dark:bg-rose-400 rounded-full transition-all duration-75 shrink-0"
                                                 style={{ height: `${height}px` }}
                                             />
                                         ))}
@@ -594,23 +594,23 @@ export default function Messaging() {
                             <div className="flex items-center w-full gap-3 animate-in fade-in px-2">
                                 <button
                                     onClick={cancelRecording}
-                                    className="p-2 rounded-xl hover:bg-rose-500/20 text-rose-400 transition-colors"
+                                    className="p-2 rounded-xl hover:bg-rose-500/20 text-rose-500 dark:text-rose-400 transition-colors"
                                 >
                                     <span className="material-symbols-outlined text-lg">delete</span>
                                 </button>
-                                <div className="flex-1 flex items-center gap-3 bg-black/40 border border-white/[0.08] rounded-xl px-3 py-1.5">
+                                <div className="flex-1 flex items-center gap-3 bg-zinc-100 dark:bg-black/40 border border-zinc-200 dark:border-white/[0.08] rounded-xl px-3 py-1.5">
                                     <button
                                         onClick={togglePreviewAudio}
-                                        className="w-7 h-7 flex items-center justify-center bg-white/10 rounded-full hover:bg-white/20 transition-colors"
+                                        className="w-7 h-7 flex items-center justify-center bg-zinc-200 dark:bg-white/10 rounded-full hover:bg-zinc-300 dark:hover:bg-white/20 transition-colors"
                                     >
                                         <span className="material-symbols-outlined text-sm">
                                             {isPreviewPlaying ? 'pause' : 'play_arrow'}
                                         </span>
                                     </button>
-                                    <div className="h-1 flex-1 bg-white/10 rounded-full overflow-hidden">
-                                        <div className="h-full w-0 bg-amber-400 rounded-full" />
+                                    <div className="h-1 flex-1 bg-zinc-200 dark:bg-white/10 rounded-full overflow-hidden">
+                                        <div className="h-full w-0 bg-amber-500 dark:bg-amber-400 rounded-full" />
                                     </div>
-                                    <span className="text-[11px] font-mono text-zinc-400">{formatTime(recordingDuration)}</span>
+                                    <span className="text-[11px] font-mono text-zinc-500 dark:text-zinc-400">{formatTime(recordingDuration)}</span>
                                 </div>
                                 <button
                                     onClick={sendAudioMessage}
@@ -626,14 +626,14 @@ export default function Messaging() {
                                         setShowAttachments(!showAttachments);
                                         setShowEmojiPicker(false);
                                     }}
-                                    className={`flex items-center justify-center h-9 w-9 rounded-xl transition-all ${showAttachments ? 'bg-amber-500 text-black' : 'text-zinc-400 hover:text-white hover:bg-white/[0.06]'}`}
+                                    className={`flex items-center justify-center h-9 w-9 rounded-xl transition-all ${showAttachments ? 'bg-amber-500 text-black' : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.06]'}`}
                                     title="Add Attachment"
                                 >
                                     <span className="material-symbols-outlined text-xl">add</span>
                                 </button>
 
                                 <input
-                                    className="flex w-full min-w-0 flex-1 bg-transparent border-none text-white focus:outline-none placeholder:text-zinc-500 text-xs sm:text-sm px-2"
+                                    className="flex w-full min-w-0 flex-1 bg-transparent border-none text-zinc-900 dark:text-white focus:outline-none placeholder:text-zinc-400 dark:placeholder:text-zinc-500 text-xs sm:text-sm px-2"
                                     placeholder="Discuss shoot dates, equipment, or scenes..."
                                     value={messageText}
                                     onChange={(e) => setMessageText(e.target.value)}
@@ -645,7 +645,7 @@ export default function Messaging() {
                                         setShowEmojiPicker(!showEmojiPicker);
                                         setShowAttachments(false);
                                     }}
-                                    className={`flex items-center justify-center h-9 w-9 rounded-xl transition-all ${showEmojiPicker ? 'text-amber-400' : 'text-zinc-400 hover:text-white'}`}
+                                    className={`flex items-center justify-center h-9 w-9 rounded-xl transition-all ${showEmojiPicker ? 'text-amber-500 dark:text-amber-400' : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white'}`}
                                     title="Emoji"
                                 >
                                     <span className="material-symbols-outlined text-xl">sentiment_satisfied</span>
@@ -662,7 +662,7 @@ export default function Messaging() {
                                 ) : (
                                     <button
                                         onClick={startRecording}
-                                        className="flex items-center justify-center h-9 w-9 rounded-xl text-zinc-400 hover:text-amber-400 hover:bg-white/[0.06] transition-colors"
+                                        className="flex items-center justify-center h-9 w-9 rounded-xl text-zinc-500 hover:text-amber-500 dark:text-zinc-400 dark:hover:text-amber-400 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors"
                                         title="Record Voice Note"
                                     >
                                         <span className="material-symbols-outlined text-xl">mic</span>

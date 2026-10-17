@@ -126,146 +126,158 @@ html:not(.dark) body {
   color: #0f172a !important;
 }
 
-/* Background surfaces that were hardcoded dark */
-html:not(.dark) .bg-\[\#090A0C\],
-html:not(.dark) .bg-\[\#090a0c\],
-html:not(.dark) .bg-\[\#0A0B0E\],
-html:not(.dark) .bg-\[\#0B0C0E\],
-html:not(.dark) .bg-\[\#08090B\],
-html:not(.dark) .bg-\[\#000000\] {
+/* Page canvas roots */
+html:not(.dark) [class*="min-h-screen"][class*="bg-[#090A0C]"],
+html:not(.dark) [class*="min-h-screen"][class*="bg-[#090a0c]"],
+html:not(.dark) [class*="min-h-screen"][class*="bg-[#0B0C0E]"],
+html:not(.dark) [class*="min-h-screen"][class*="bg-[#08090B]"],
+html:not(.dark) [class*="min-h-[100dvh]"][class*="bg-[#090A0C]"],
+html:not(.dark) [class*="min-h-[100dvh]"][class*="bg-[#090a0c]"],
+html:not(.dark) [class*="min-h-[100dvh]"][class*="bg-[#0B0C0E]"],
+html:not(.dark) [class*="min-h-[100dvh]"][class*="bg-[#08090B]"],
+html:not(.dark) [class*="min-h-[100dvh]"][class*="bg-[#000000]"] {
   background-color: #f8fafc !important;
-  color: #0f172a;
+  color: #0f172a !important;
 }
 
-/* Semi-transparent dark headers and navbars */
-html:not(.dark) header.bg-\[\#090A0C\]\/95,
-html:not(.dark) header.bg-\[\#090A0C\]\/90,
-html:not(.dark) header.bg-\[\#090A0C\]\/85,
-html:not(.dark) header.bg-\[\#090A0C\]\/80,
-html:not(.dark) header.bg-\[\#0B0C0E\]\/90,
-html:not(.dark) div.sticky.bg-\[\#090A0C\]\/95,
-html:not(.dark) div.sticky.bg-\[\#090A0C\]\/90,
-html:not(.dark) div.sticky.bg-\[\#090A0C\]\/85 {
-  background-color: rgba(255, 255, 255, 0.92) !important;
+/* Sticky App Bars, Headers, Navbars */
+html:not(.dark) header[class*="bg-[#"],
+html:not(.dark) nav[class*="bg-[#"],
+html:not(.dark) div.sticky[class*="bg-[#"] {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
   border-color: #e2e8f0 !important;
 }
 
-/* Gradients that were hardcoded dark */
-html:not(.dark) [class*="from-[#121316]"],
-html:not(.dark) [class*="from-[#14151a]"],
-html:not(.dark) [class*="from-[#0e0f13]"],
-html:not(.dark) [class*="from-[#090A0C]"],
-html:not(.dark) [class*="from-[#14161a]"] {
-  background-image: none !important;
-  background-color: #ffffff !important;
-}
-
-/* Cards and content blocks */
-html:not(.dark) .bg-\[\#121316\],
-html:not(.dark) .bg-\[\#14161a\],
-html:not(.dark) .bg-\[\#18191D\],
-html:not(.dark) .bg-\[\#1a1b1e\],
-html:not(.dark) .bg-\[\#16171b\],
-html:not(.dark) .bg-\[\#131418\],
-html:not(.dark) .bg-\[\#15171c\],
-html:not(.dark) .bg-\[\#0e0f12\],
-html:not(.dark) .bg-\[\#0e0f13\] {
+/* Cards, List Rows, Search Bars, Modals, Dropdowns, Sheets, Pill Filters */
+html:not(.dark) [class*="bg-[#121316]"],
+html:not(.dark) [class*="bg-[#14161a]"],
+html:not(.dark) [class*="bg-[#14151a]"],
+html:not(.dark) [class*="bg-[#141519]"],
+html:not(.dark) [class*="bg-[#16171b]"],
+html:not(.dark) [class*="bg-[#17191e]"],
+html:not(.dark) [class*="bg-[#18191D]"],
+html:not(.dark) [class*="bg-[#18191d]"],
+html:not(.dark) [class*="bg-[#1a1108]"],
+html:not(.dark) [class*="bg-[#1a1a1a]"],
+html:not(.dark) [class*="bg-[#1a1b1e]"],
+html:not(.dark) [class*="bg-[#1a1b20]"],
+html:not(.dark) [class*="bg-[#1a1c22]"],
+html:not(.dark) [class*="bg-[#1c1d22]"],
+html:not(.dark) [class*="bg-[#1c242e]"],
+html:not(.dark) [class*="bg-[#1e2026]"],
+html:not(.dark) [class*="bg-[#22242b]"],
+html:not(.dark) [class*="bg-[#231810]"],
+html:not(.dark) [class*="bg-[#342418]"],
+html:not(.dark) [class*="bg-[#493222]"],
+html:not(.dark) [class*="bg-[#0e0f12]"],
+html:not(.dark) [class*="bg-[#0e0f13]"],
+html:not(.dark) [class*="bg-[#111827]"],
+html:not(.dark) [class*="bg-[#0a0a0a]"],
+html:not(.dark) [class*="bg-[#0d0d0d]"],
+html:not(.dark) [class*="bg-[#090A0C]"]:not([class*="min-h-"]):not([class*="fixed inset-0"]):not(header):not(nav),
+html:not(.dark) [class*="bg-[#090a0c]"]:not([class*="min-h-"]):not([class*="fixed inset-0"]):not(header):not(nav),
+html:not(.dark) [class*="bg-[#0B0C0E]"]:not([class*="min-h-"]):not([class*="fixed inset-0"]):not(header):not(nav),
+html:not(.dark) [class*="bg-[#08090B]"]:not([class*="min-h-"]):not([class*="fixed inset-0"]):not(header):not(nav) {
   background-color: #ffffff !important;
   border-color: #e2e8f0 !important;
   color: #0f172a;
 }
 
 /* Subtle background fills */
-html:not(.dark) .bg-white\/\[0\.02\],
-html:not(.dark) .bg-white\/\[0\.03\],
-html:not(.dark) .bg-white\/\[0\.04\],
-html:not(.dark) .bg-white\/\[0\.05\],
-html:not(.dark) .bg-white\/\[0\.06\],
-html:not(.dark) .bg-white\/5 {
+html:not(.dark) [class*="bg-white/"]:not([class*="aspect-"] [class*="absolute"]):not([class*="bg-black/"]):not([class*="fixed inset-0"] *) {
   background-color: #f1f5f9 !important;
-}
-
-/* Dark borders to light borders */
-html:not(.dark) .border-white\/5,
-html:not(.dark) .border-white\/10,
-html:not(.dark) .border-white\/\[0\.04\],
-html:not(.dark) .border-white\/\[0\.05\],
-html:not(.dark) .border-white\/\[0\.06\],
-html:not(.dark) .border-white\/\[0\.07\],
-html:not(.dark) .border-white\/\[0\.08\],
-html:not(.dark) .border-white\/\[0\.1\] {
   border-color: #e2e8f0 !important;
 }
 
-/* Media Overlays & Badges: ALWAYS keep crisp white/bright text over images & dark overlays */
-html:not(.dark) [class*="aspect-"] .text-white,
-html:not(.dark) [class*="aspect-"] .text-white\/90,
-html:not(.dark) [class*="aspect-"] .text-zinc-100,
-html:not(.dark) [class*="aspect-"] .text-zinc-200,
-html:not(.dark) [class*="aspect-"] .text-zinc-300,
-html:not(.dark) [class*="aspect-"] .text-zinc-400,
-html:not(.dark) [class*="bg-black\/"] .text-white,
-html:not(.dark) [class*="bg-black\/"] .text-zinc-100,
-html:not(.dark) [class*="bg-black\/"] .text-zinc-200,
-html:not(.dark) [class*="bg-black\/"] .text-zinc-300,
-html:not(.dark) [class*="bg-black\/"] .text-zinc-400,
-html:not(.dark) [class*="bg-black"] .text-white,
-html:not(.dark) [class*="bg-black"] .text-zinc-200,
-html:not(.dark) [class*="bg-black"] .text-zinc-300,
-html:not(.dark) [class*="bg-black"] .text-zinc-400 {
+html:not(.dark) [class*="hover:bg-white/"]:not([class*="aspect-"] [class*="absolute"]):not([class*="bg-black/"]):hover {
+  background-color: #e2e8f0 !important;
+}
+
+/* Gradients that were hardcoded dark */
+html:not(.dark) [class*="from-[#121316]"]:not([class*="aspect-"] *),
+html:not(.dark) [class*="from-[#14151a]"]:not([class*="aspect-"] *),
+html:not(.dark) [class*="from-[#14161a]"]:not([class*="aspect-"] *),
+html:not(.dark) [class*="from-[#18191D]"]:not([class*="aspect-"] *),
+html:not(.dark) [class*="from-[#0e0f13]"]:not([class*="aspect-"] *),
+html:not(.dark) [class*="from-[#090A0C]"]:not([class*="aspect-"] *) {
+  background-image: none !important;
+  background-color: #ffffff !important;
+}
+
+/* Dark borders to light borders */
+html:not(.dark) [class*="border-white/"]:not([class*="aspect-"] [class*="absolute"]):not([class*="bg-black/"]),
+html:not(.dark) [class*="border-zinc-800"]:not([class*="aspect-"] [class*="absolute"]):not([class*="bg-black/"]),
+html:not(.dark) [class*="border-zinc-700"]:not([class*="aspect-"] [class*="absolute"]):not([class*="bg-black/"]),
+html:not(.dark) [class*="divide-white/"]:not([class*="aspect-"] [class*="absolute"]) > * {
+  border-color: #e2e8f0 !important;
+}
+
+/* Media Overlays: Keep crisp white/bright text ONLY over real media overlays & absolute tags */
+html:not(.dark) [class*="aspect-"] [class*="absolute"] .text-white,
+html:not(.dark) [class*="aspect-"] [class*="absolute"] .text-zinc-100,
+html:not(.dark) [class*="aspect-"] [class*="absolute"] .text-zinc-200,
+html:not(.dark) [class*="aspect-"] [class*="absolute"] .text-zinc-300,
+html:not(.dark) [class*="aspect-"] [class*="absolute"].text-white,
+html:not(.dark) [class*="bg-black/80"] .text-white,
+html:not(.dark) [class*="bg-black/75"] .text-white,
+html:not(.dark) [class*="bg-black/90"] .text-white,
+html:not(.dark) [class*="bg-gradient-to-t"][class*="from-black"] .text-white,
+html:not(.dark) [class*="bg-gradient-to-t"][class*="from-black"] .text-zinc-200,
+html:not(.dark) [class*="fixed inset-0"][class*="bg-black"] .text-white,
+html:not(.dark) [class*="fixed inset-0"][class*="bg-black"] .text-zinc-200,
+html:not(.dark) [class*="fixed inset-0"][class*="bg-black"] .text-zinc-300,
+html:not(.dark) video ~ * .text-white,
+html:not(.dark) figure .text-white {
   color: #ffffff !important;
 }
 
-/* Ensure rating chips with black text keep black text */
-html:not(.dark) .bg-amber-500.text-black,
-html:not(.dark) .bg-amber-500 .text-black,
-html:not(.dark) [class*="aspect-"] .bg-amber-500.text-black,
-html:not(.dark) [class*="aspect-"] .bg-amber-500 .text-black {
+/* Ensure amber buttons with black text keep black text */
+html:not(.dark) [class*="bg-amber-"].text-black,
+html:not(.dark) [class*="bg-amber-"] .text-black,
+html:not(.dark) button[class*="bg-amber-"],
+html:not(.dark) [class*="bg-amber-500"].text-black {
   color: #000000 !important;
 }
 
 /* General Headings and Titles on cards/pages */
-html:not(.dark) h1.text-white:not([class*="bg-"]):not([class*="aspect-"] *):not([class*="bg-black"] *),
-html:not(.dark) h2.text-white:not([class*="bg-"]):not([class*="aspect-"] *):not([class*="bg-black"] *),
-html:not(.dark) h3.text-white:not([class*="bg-"]):not([class*="aspect-"] *):not([class*="bg-black"] *),
-html:not(.dark) h4.text-white:not([class*="bg-"]):not([class*="aspect-"] *):not([class*="bg-black"] *),
-html:not(.dark) h5.text-white:not([class*="bg-"]):not([class*="aspect-"] *):not([class*="bg-black"] *) {
+html:not(.dark) h1.text-white:not([class*="aspect-"] [class*="absolute"] *),
+html:not(.dark) h2.text-white:not([class*="aspect-"] [class*="absolute"] *),
+html:not(.dark) h3.text-white:not([class*="aspect-"] [class*="absolute"] *),
+html:not(.dark) h4.text-white:not([class*="aspect-"] [class*="absolute"] *),
+html:not(.dark) h5.text-white:not([class*="aspect-"] [class*="absolute"] *),
+html:not(.dark) h6.text-white:not([class*="aspect-"] [class*="absolute"] *) {
   color: #0f172a !important;
 }
 
 /* Body / Secondary Text on light cards */
-html:not(.dark) p.text-white:not([class*="bg-"]):not([class*="aspect-"] *):not([class*="bg-black"] *) {
-  color: #1e293b !important;
+html:not(.dark) p.text-white:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-amber-"] *):not([class*="bg-primary"] *):not([class*="btn-primary"] *):not([class*="bg-gradient-"] *):not([class*="bg-red-"] *):not([class*="bg-blue-"] *):not([class*="bg-black/"] *),
+html:not(.dark) span.text-white:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-amber-"] *):not([class*="bg-primary"] *):not([class*="btn-primary"] *):not([class*="bg-gradient-"] *):not([class*="bg-red-"] *):not([class*="bg-emerald-"] *):not([class*="bg-blue-"] *):not([class*="bg-purple-"] *):not([class*="bg-black/"] *),
+html:not(.dark) strong.text-white:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-amber-"] *):not([class*="bg-primary"] *):not([class*="btn-primary"] *):not([class*="bg-gradient-"] *):not([class*="bg-black/"] *),
+html:not(.dark) b.text-white:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-amber-"] *):not([class*="bg-primary"] *):not([class*="btn-primary"] *):not([class*="bg-gradient-"] *):not([class*="bg-black/"] *),
+html:not(.dark) li.text-white:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-amber-"] *):not([class*="bg-primary"] *):not([class*="btn-primary"] *):not([class*="bg-gradient-"] *):not([class*="bg-black/"] *),
+html:not(.dark) div.text-white:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-amber-"] *):not([class*="bg-primary"] *):not([class*="btn-primary"] *):not([class*="bg-gradient-"] *):not([class*="bg-black/"] *),
+html:not(.dark) label.text-white:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-amber-"] *):not([class*="bg-black/"] *),
+html:not(.dark) a.text-white:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-amber-"] *):not([class*="bg-primary"] *):not([class*="btn-primary"] *):not([class*="bg-black/"] *) {
+  color: #0f172a !important;
 }
 
-html:not(.dark) span.text-white:not([class*="bg-"]):not([class*="rounded-"]):not([class*="aspect-"] *):not([class*="bg-black"] *) {
-  color: #1e293b !important;
+/* Secondary / muted text in Day theme (zinc-300 / zinc-400 / zinc-500) */
+html:not(.dark) .text-zinc-300:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-black/"] *),
+html:not(.dark) .text-zinc-400:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-black/"] *) {
+  color: #475569 !important;
 }
 
-/* Secondary muted text */
-html:not(.dark) .bg-white .text-zinc-400,
-html:not(.dark) .bg-slate-50 .text-zinc-400,
-html:not(.dark) [class*="bg-white"] .text-zinc-400 {
-  color: #64748b;
-}
-
-/* Ensure colored pills, tags, badges, buttons, and media overlays stay bright */
-html:not(.dark) [class*="bg-amber-"] *,
-html:not(.dark) [class*="bg-gradient-"] *,
-html:not(.dark) [class*="bg-blue-"] *,
-html:not(.dark) [class*="bg-emerald-"] *,
-html:not(.dark) [class*="bg-red-"] *,
-html:not(.dark) [class*="bg-purple-"] * {
-  color: inherit;
+html:not(.dark) .text-zinc-500:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-black/"] *) {
+  color: #64748b !important;
 }
 
 /* Form inputs & textareas in day theme */
-html:not(.dark) input.bg-\[\#121316\],
-html:not(.dark) input.bg-\[\#14161a\],
-html:not(.dark) input.bg-\[\#090A0C\],
-html:not(.dark) textarea.bg-\[\#121316\],
-html:not(.dark) textarea.bg-\[\#14161a\] {
-  background-color: #f8fafc !important;
+html:not(.dark) input[class*="bg-[#"],
+html:not(.dark) textarea[class*="bg-[#"],
+html:not(.dark) select[class*="bg-[#"] {
+  background-color: #ffffff !important;
   color: #0f172a !important;
   border-color: #cbd5e1 !important;
 }

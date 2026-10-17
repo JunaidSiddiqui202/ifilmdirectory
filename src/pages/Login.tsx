@@ -290,14 +290,14 @@ export default function Login() {
     };
 
     return (
-        <div className="relative min-h-[100dvh] w-full bg-[#090A0C] text-white font-sans overflow-x-hidden flex flex-col justify-between selection:bg-amber-500 selection:text-black">
+        <div className="relative min-h-[100dvh] w-full bg-slate-50 dark:bg-[#090A0C] text-zinc-900 dark:text-white font-sans overflow-x-hidden flex flex-col justify-between selection:bg-amber-500 selection:text-black transition-colors">
             {/* Ambient Cinema Lighting Glows */}
             <div className="pointer-events-none fixed -top-40 left-1/4 w-[700px] h-[450px] bg-amber-500/10 blur-[160px] rounded-full z-0" />
             <div className="pointer-events-none fixed top-1/2 -right-40 w-[600px] h-[500px] bg-purple-500/5 blur-[160px] rounded-full z-0" />
             <div className="pointer-events-none fixed bottom-0 left-10 w-[600px] h-[400px] bg-blue-500/5 blur-[150px] rounded-full z-0" />
 
             {/* Top Navigation Bar */}
-            <header className="relative z-20 w-full border-b border-white/[0.06] bg-[#090A0C]/80 backdrop-blur-xl">
+            <header className="relative z-20 w-full border-b border-zinc-200 dark:border-white/[0.06] bg-white/80 dark:bg-[#090A0C]/80 backdrop-blur-xl">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
                     <div
                         onClick={() => navigate('/welcome')}
@@ -306,16 +306,16 @@ export default function Login() {
                         <Logo size="lg" showText={true} />
                     </div>
 
-                    <div className="hidden lg:flex items-center gap-6 text-xs text-zinc-400 font-medium">
-                        <span className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/5">
+                    <div className="hidden lg:flex items-center gap-6 text-xs text-zinc-500 dark:text-zinc-400 font-medium">
+                        <span className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/5">
                             <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
                             Over 10,000+ Film Creators
                         </span>
-                        <span className="text-zinc-600">•</span>
+                        <span className="text-zinc-300 dark:text-zinc-600">•</span>
                         <span>Auditions & Castings</span>
-                        <span className="text-zinc-600">•</span>
+                        <span className="text-zinc-300 dark:text-zinc-600">•</span>
                         <span>Talent Directory</span>
-                        <span className="text-zinc-600">•</span>
+                        <span className="text-zinc-300 dark:text-zinc-600">•</span>
                         <span>Showreels & Reviews</span>
                     </div>
 
@@ -332,7 +332,7 @@ export default function Login() {
                             <button
                                 onClick={() => { setView('login'); setSubmitted(false); }}
                                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
-                                    view === 'login' ? 'text-amber-400 bg-amber-500/10' : 'text-zinc-400 hover:text-white'
+                                    view === 'login' ? 'text-amber-500 dark:text-amber-400 bg-amber-500/10' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                 }`}
                             >
                                 Sign In
@@ -356,27 +356,27 @@ export default function Login() {
                         {/* LEFT COLUMN (7 COLS): Welcome Hero & Cinematic Feature Showcase */}
                         <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left space-y-6">
                             {/* Pill Badge */}
-                            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold tracking-wide uppercase shadow-sm">
+                            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-500 dark:text-amber-400 text-xs font-bold tracking-wide uppercase shadow-sm">
                                 <span className="material-symbols-outlined text-sm">movie_filter</span>
                                 The Global Film Industry Network
                             </div>
 
                             {/* Main Title */}
-                            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] text-white">
+                            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] text-zinc-900 dark:text-white">
                                 Where Cinema Creators,{' '}
-                                <span className="bg-gradient-to-r from-amber-400 via-amber-300 to-orange-400 bg-clip-text text-transparent">
+                                <span className="bg-gradient-to-r from-amber-500 via-amber-400 to-orange-500 bg-clip-text text-transparent">
                                     Cast & Crew
                                 </span>{' '}
                                 Connect.
                             </h1>
 
-                            <p className="text-sm sm:text-base lg:text-lg text-zinc-400 max-w-xl leading-relaxed">
+                            <p className="text-sm sm:text-base lg:text-lg text-zinc-600 dark:text-zinc-400 max-w-xl leading-relaxed">
                                 Join verified directors, actors, cinematographers, sound designers, studios, and production houses collaborate, cast, and launch feature projects.
                             </p>
 
                             {/* Active Feature Slide Deck (Interactive) */}
                             <div className="w-full max-w-xl space-y-3 pt-2">
-                                <div className="grid grid-cols-3 gap-2 p-1 rounded-xl bg-white/[0.03] border border-white/5">
+                                <div className="grid grid-cols-3 gap-2 p-1 rounded-xl bg-zinc-100 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/5">
                                     {onboardingSlides.map((slide, idx) => (
                                         <button
                                             key={idx}
@@ -384,7 +384,7 @@ export default function Login() {
                                             className={`py-2 px-2.5 rounded-lg text-xs font-bold transition-all text-center truncate ${
                                                 activeSlide === idx
                                                     ? 'bg-amber-500 text-black shadow-md'
-                                                    : 'text-zinc-400 hover:text-white'
+                                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                             }`}
                                         >
                                             {slide.tag}
@@ -392,21 +392,21 @@ export default function Login() {
                                     ))}
                                 </div>
 
-                                <div className="p-4 sm:p-5 rounded-2xl bg-[#121316] border border-white/5 relative overflow-hidden transition-all text-left">
+                                <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 relative overflow-hidden transition-all text-left shadow-sm">
                                     <div className="flex items-center justify-between mb-2">
                                         <div className="flex items-center gap-2">
                                             <span className={`material-symbols-outlined text-xl ${onboardingSlides[activeSlide].iconColor}`}>
                                                 {onboardingSlides[activeSlide].icon}
                                             </span>
-                                            <span className="text-xs font-bold uppercase tracking-wider text-white">
+                                            <span className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-white">
                                                 {onboardingSlides[activeSlide].title}
                                             </span>
                                         </div>
-                                        <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                        <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 dark:text-amber-400 border border-amber-500/20">
                                             {onboardingSlides[activeSlide].badge}
                                         </span>
                                     </div>
-                                    <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
+                                    <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">
                                         {onboardingSlides[activeSlide].description}
                                     </p>
                                 </div>
@@ -415,13 +415,13 @@ export default function Login() {
                             {/* 4 Feature Cards Grid */}
                             <div className="grid grid-cols-2 gap-3 w-full max-w-xl pt-2">
                                 {featureHighlights.map((feat, i) => (
-                                    <div key={i} className="p-3 rounded-xl bg-white/[0.02] border border-white/5 flex items-start gap-2.5 text-left">
-                                        <span className="material-symbols-outlined text-amber-400 text-lg shrink-0 mt-0.5">
+                                    <div key={i} className="p-3 rounded-xl bg-white dark:bg-white/[0.02] border border-zinc-200 dark:border-white/5 flex items-start gap-2.5 text-left shadow-sm">
+                                        <span className="material-symbols-outlined text-amber-500 dark:text-amber-400 text-lg shrink-0 mt-0.5">
                                             {feat.icon}
                                         </span>
                                         <div>
-                                            <h4 className="text-xs font-bold text-white">{feat.title}</h4>
-                                            <p className="text-[11px] text-zinc-400 line-clamp-2 mt-0.5 leading-snug">{feat.desc}</p>
+                                            <h4 className="text-xs font-bold text-zinc-900 dark:text-white">{feat.title}</h4>
+                                            <p className="text-[11px] text-zinc-500 dark:text-zinc-400 line-clamp-2 mt-0.5 leading-snug">{feat.desc}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -430,14 +430,14 @@ export default function Login() {
 
                         {/* RIGHT COLUMN (5 COLS): The Auth Card (Login / Sign Up / Request Access) */}
                         <div className="lg:col-span-5 w-full max-w-md mx-auto">
-                            <div className="relative rounded-3xl bg-[#121316]/95 border border-white/10 p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
+                            <div className="relative rounded-3xl bg-white dark:bg-[#121316]/95 border border-zinc-200 dark:border-white/10 p-6 sm:p-8 shadow-2xl backdrop-blur-xl text-zinc-900 dark:text-white">
                                 
                                 {/* Current User Quick Switcher Banner */}
                                 {currentUser && (
                                     <div className="mb-5 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-between text-xs">
                                         <div className="truncate pr-2">
-                                            <span className="text-zinc-400">Signed in as </span>
-                                            <strong className="text-white">{currentUser.displayName || currentUser.email}</strong>
+                                            <span className="text-zinc-500 dark:text-zinc-400">Signed in as </span>
+                                            <strong className="text-zinc-900 dark:text-white">{currentUser.displayName || currentUser.email}</strong>
                                         </div>
                                         <button
                                             onClick={() => navigate('/home')}
@@ -449,13 +449,13 @@ export default function Login() {
                                 )}
 
                                 {/* Auth Mode Segmented Control */}
-                                <div className="flex h-11 items-center justify-center rounded-xl bg-black/40 p-1 border border-white/10 mb-5">
+                                <div className="flex h-11 items-center justify-center rounded-xl bg-zinc-100 dark:bg-black/40 p-1 border border-zinc-200 dark:border-white/10 mb-5">
                                     <button
                                         onClick={() => { setView('login'); setSubmitted(false); }}
                                         className={`flex h-full grow items-center justify-center rounded-lg px-2 text-xs font-extrabold transition-all ${
                                             view === 'login'
                                                 ? 'bg-amber-500 text-black shadow-md'
-                                                : 'text-zinc-400 hover:text-white'
+                                                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                         }`}
                                     >
                                         Sign In
@@ -465,7 +465,7 @@ export default function Login() {
                                         className={`flex h-full grow items-center justify-center rounded-lg px-2 text-xs font-extrabold transition-all ${
                                             view === 'signup'
                                                 ? 'bg-amber-500 text-black shadow-md'
-                                                : 'text-zinc-400 hover:text-white'
+                                                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                         }`}
                                     >
                                         Sign Up
@@ -475,7 +475,7 @@ export default function Login() {
                                         className={`flex h-full grow items-center justify-center rounded-lg px-2 text-xs font-extrabold transition-all ${
                                             view === 'request'
                                                 ? 'bg-amber-500 text-black shadow-md'
-                                                : 'text-zinc-400 hover:text-white'
+                                                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                         }`}
                                     >
                                         Request Access
@@ -484,12 +484,12 @@ export default function Login() {
 
                                 {/* Form Title & Subtitle */}
                                 <div className="mb-5 text-left">
-                                    <h3 className="text-xl font-black text-white tracking-tight">
+                                    <h3 className="text-xl font-black text-zinc-900 dark:text-white tracking-tight">
                                         {view === 'login' && 'Welcome Back'}
                                         {view === 'signup' && 'Create Creator Account'}
                                         {view === 'request' && 'Request Industry Invitation'}
                                     </h3>
-                                    <p className="text-xs text-zinc-400 mt-1">
+                                    <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
                                         {view === 'login' && 'Enter your verified cinema credentials to continue.'}
                                         {view === 'signup' && 'Register your profile to connect with directors and gigs.'}
                                         {view === 'request' && 'Submit your work or union proof for manual editorial vetting.'}
@@ -498,7 +498,7 @@ export default function Login() {
 
                                 {/* Error Alert */}
                                 {error && (
-                                    <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs text-left flex items-start gap-2">
+                                    <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-500 dark:text-red-400 text-xs text-left flex items-start gap-2">
                                         <span className="material-symbols-outlined text-base shrink-0 mt-0.5">error</span>
                                         <span className="leading-snug">{error}</span>
                                     </div>
@@ -507,11 +507,11 @@ export default function Login() {
                                 {/* Submitted State for Request Access */}
                                 {submitted ? (
                                     <div className="py-8 px-2 text-center space-y-4 animate-in zoom-in-95 duration-300">
-                                        <div className="size-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto border border-emerald-500/30">
+                                        <div className="size-16 rounded-full bg-emerald-500/20 text-emerald-500 dark:text-emerald-400 flex items-center justify-center mx-auto border border-emerald-500/30">
                                             <span className="material-symbols-outlined text-3xl">verified</span>
                                         </div>
-                                        <h3 className="text-lg font-bold text-white">Application Received</h3>
-                                        <p className="text-xs text-zinc-300 leading-relaxed max-w-sm mx-auto">
+                                        <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Application Received</h3>
+                                        <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed max-w-sm mx-auto">
                                             Thank you for applying. We are vetting your profile to maintain the highest industry standards. 
                                             <strong> Check your inbox and spam folder</strong> for your invitation code.
                                         </p>
@@ -530,7 +530,7 @@ export default function Login() {
                                                 ? 'bg-amber-500/15 border-amber-500/80 shadow-lg shadow-amber-500/10 ring-1 ring-amber-500'
                                                 : termsAccepted
                                                 ? 'bg-emerald-500/5 border-emerald-500/30'
-                                                : 'bg-white/[0.03] border-white/10 hover:border-amber-500/30'
+                                                : 'bg-zinc-50 dark:bg-white/[0.03] border-zinc-200 dark:border-white/10 hover:border-amber-500/30'
                                         }`}>
                                             <label className="flex items-start gap-2.5 cursor-pointer select-none">
                                                 <input
@@ -538,17 +538,17 @@ export default function Login() {
                                                     id="login-terms-tick"
                                                     checked={termsAccepted}
                                                     onChange={(e) => handleToggleTerms(e.target.checked)}
-                                                    className="mt-0.5 size-4 rounded bg-black/60 border-white/20 text-amber-500 focus:ring-amber-500 focus:ring-offset-0 cursor-pointer accent-amber-500 shrink-0"
+                                                    className="mt-0.5 size-4 rounded bg-white dark:bg-black/60 border-zinc-300 dark:border-white/20 text-amber-500 focus:ring-amber-500 focus:ring-offset-0 cursor-pointer accent-amber-500 shrink-0"
                                                 />
                                                 <div className="flex-1">
-                                                    <span className="text-[11px] sm:text-xs text-zinc-300 leading-snug">
+                                                    <span className="text-[11px] sm:text-xs text-zinc-600 dark:text-zinc-300 leading-snug">
                                                         I agree to the{' '}
                                                         <Link
                                                             to="/terms"
                                                             target="_blank"
                                                             rel="noopener noreferrer"
                                                             onClick={(e) => e.stopPropagation()}
-                                                            className="text-amber-400 hover:underline font-bold inline-flex items-center gap-0.5"
+                                                            className="text-amber-500 dark:text-amber-400 hover:underline font-bold inline-flex items-center gap-0.5"
                                                         >
                                                             <span>Terms of Service</span>
                                                             <span className="material-symbols-outlined text-[10px]">open_in_new</span>
@@ -559,7 +559,7 @@ export default function Login() {
                                                             target="_blank"
                                                             rel="noopener noreferrer"
                                                             onClick={(e) => e.stopPropagation()}
-                                                            className="text-amber-400 hover:underline font-bold inline-flex items-center gap-0.5"
+                                                            className="text-amber-500 dark:text-amber-400 hover:underline font-bold inline-flex items-center gap-0.5"
                                                         >
                                                             <span>Privacy Policy</span>
                                                             <span className="material-symbols-outlined text-[10px]">open_in_new</span>
@@ -567,13 +567,13 @@ export default function Login() {
                                                         (A property of 5M Collective Services Pvt. Ltd. / 5MC).
                                                     </span>
                                                     {termsError && (
-                                                        <p className="text-[11px] text-amber-400 font-bold mt-1.5 flex items-center gap-1">
+                                                        <p className="text-[11px] text-amber-500 dark:text-amber-400 font-bold mt-1.5 flex items-center gap-1">
                                                             <span className="material-symbols-outlined text-xs">info</span>
                                                             <span>Please tick this box to approve before proceeding.</span>
                                                         </p>
                                                     )}
                                                     {termsAccepted && (
-                                                         <p className="text-[10px] text-emerald-400 font-medium mt-1 flex items-center gap-1">
+                                                         <p className="text-[10px] text-emerald-500 dark:text-emerald-400 font-medium mt-1 flex items-center gap-1">
                                                              <span className="material-symbols-outlined text-xs">check_circle</span>
                                                              <span>Terms & Privacy Policy approved.</span>
                                                          </p>
@@ -588,10 +588,10 @@ export default function Login() {
                                                 <button
                                                     onClick={handleGoogleLogin}
                                                     disabled={googleLoading}
-                                                    className="w-full h-11 rounded-xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white flex items-center justify-center gap-2.5 text-xs font-bold transition-all disabled:opacity-50 active:scale-95 shadow-sm"
+                                                    className="w-full h-11 rounded-xl border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-white/[0.04] hover:bg-zinc-100 dark:hover:bg-white/[0.08] text-zinc-800 dark:text-white flex items-center justify-center gap-2.5 text-xs font-bold transition-all disabled:opacity-50 active:scale-95 shadow-sm"
                                                 >
                                                     {googleLoading ? (
-                                                        <span className="material-symbols-outlined text-base animate-spin text-amber-400">progress_activity</span>
+                                                        <span className="material-symbols-outlined text-base animate-spin text-amber-500 dark:text-amber-400">progress_activity</span>
                                                     ) : (
                                                         <svg className="size-4" viewBox="0 0 24 24">
                                                             <path d="M21.9999 12.2158C21.9999 11.3934 21.9263 10.5898 21.7894 9.81818H12.2178V14.4076H17.7595C17.5218 15.8202 16.7118 17.0652 15.5327 17.8761V20.6695H19.4586C21.0859 19.1834 21.9999 16.9461 21.9999 14.2158V12.2158Z" fill="#4285F4" />
@@ -604,9 +604,9 @@ export default function Login() {
                                                 </button>
 
                                                 <div className="flex items-center gap-3 my-4">
-                                                    <div className="h-px bg-white/10 flex-1" />
-                                                    <span className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider">or with email</span>
-                                                    <div className="h-px bg-white/10 flex-1" />
+                                                    <div className="h-px bg-zinc-200 dark:bg-white/10 flex-1" />
+                                                    <span className="text-[10px] uppercase font-bold text-zinc-400 dark:text-zinc-500 tracking-wider">or with email</span>
+                                                    <div className="h-px bg-zinc-200 dark:bg-white/10 flex-1" />
                                                 </div>
                                             </div>
                                         )}
@@ -616,7 +616,7 @@ export default function Login() {
                                             {/* Full Name */}
                                             {(view === 'signup' || view === 'request') && (
                                                 <div>
-                                                    <label className="block text-xs font-bold text-zinc-300 mb-1">
+                                                    <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">
                                                         Full Name
                                                     </label>
                                                     <input
@@ -625,7 +625,7 @@ export default function Login() {
                                                         onChange={(e) => setFullName(e.target.value)}
                                                         placeholder="e.g. Christopher Nolan"
                                                         required
-                                                        className="w-full h-11 px-3.5 rounded-xl bg-black/40 border border-white/10 text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-amber-500 transition-colors"
+                                                        className="w-full h-11 px-3.5 rounded-xl bg-zinc-50 dark:bg-black/40 border border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 text-xs focus:outline-none focus:border-amber-500 transition-colors"
                                                     />
                                                 </div>
                                             )}
@@ -633,13 +633,13 @@ export default function Login() {
                                             {/* Role for Request Access */}
                                             {view === 'request' && (
                                                 <div>
-                                                    <label className="block text-xs font-bold text-zinc-300 mb-1">
+                                                    <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">
                                                         Primary Cinema Craft / Role
                                                     </label>
                                                     <select
                                                         value={role}
                                                         onChange={(e) => setRole(e.target.value as any)}
-                                                        className="w-full h-11 px-3 rounded-xl bg-black/40 border border-white/10 text-white text-xs focus:outline-none focus:border-amber-500 transition-colors"
+                                                        className="w-full h-11 px-3 rounded-xl bg-zinc-50 dark:bg-black/40 border border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white text-xs focus:outline-none focus:border-amber-500 transition-colors"
                                                     >
                                                         <option value="actor">Actor / Model / Performer</option>
                                                         <option value="director">Director / Writer / Producer</option>
@@ -654,7 +654,7 @@ export default function Login() {
                                             {/* Portfolio Link for Request Access */}
                                             {view === 'request' && (
                                                 <div>
-                                                    <label className="block text-xs font-bold text-zinc-300 mb-1">
+                                                    <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">
                                                         Work Profile Link (IMDb, Instagram, YouTube)
                                                     </label>
                                                     <input
@@ -663,7 +663,7 @@ export default function Login() {
                                                         onChange={(e) => setPortfolioLink(e.target.value)}
                                                         placeholder="https://imdb.com/name/..."
                                                         required
-                                                        className="w-full h-11 px-3.5 rounded-xl bg-black/40 border border-white/10 text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-amber-500 transition-colors"
+                                                        className="w-full h-11 px-3.5 rounded-xl bg-zinc-50 dark:bg-black/40 border border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 text-xs focus:outline-none focus:border-amber-500 transition-colors"
                                                     />
                                                 </div>
                                             )}
@@ -671,12 +671,12 @@ export default function Login() {
                                             {/* Union Card / ID Proof Uploads for Request Access */}
                                             {view === 'request' && (
                                                 <div className="space-y-1.5">
-                                                    <label className="block text-xs font-bold text-zinc-300">
+                                                    <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300">
                                                         Union Card / Professional ID (Optional Photos)
                                                     </label>
                                                     <div className="grid grid-cols-2 gap-2.5">
                                                         <div className={`relative flex items-center justify-center border border-dashed rounded-xl h-20 transition-all cursor-pointer overflow-hidden ${
-                                                            unionCardFrontFile ? 'border-amber-500 bg-amber-500/10' : 'border-white/15 bg-black/30 hover:border-white/30'
+                                                            unionCardFrontFile ? 'border-amber-500 bg-amber-500/10' : 'border-zinc-300 dark:border-white/15 bg-zinc-50 dark:bg-black/30 hover:border-zinc-400 dark:hover:border-white/30'
                                                         }`}>
                                                             <input
                                                                 type="file"
@@ -685,12 +685,12 @@ export default function Login() {
                                                                 className="absolute inset-0 opacity-0 z-10 cursor-pointer"
                                                             />
                                                             {unionCardFrontFile ? (
-                                                                <div className="flex flex-col items-center text-amber-400">
+                                                                <div className="flex flex-col items-center text-amber-500 dark:text-amber-400">
                                                                     <span className="material-symbols-outlined text-xl">check_circle</span>
                                                                     <span className="text-[10px] font-bold truncate max-w-[90px]">Front Attached</span>
                                                                 </div>
                                                             ) : (
-                                                                <div className="flex flex-col items-center text-zinc-500">
+                                                                <div className="flex flex-col items-center text-zinc-400 dark:text-zinc-500">
                                                                     <span className="material-symbols-outlined text-lg">badge</span>
                                                                     <span className="text-[10px] font-medium mt-0.5">Front Side</span>
                                                                 </div>
@@ -698,7 +698,7 @@ export default function Login() {
                                                         </div>
 
                                                         <div className={`relative flex items-center justify-center border border-dashed rounded-xl h-20 transition-all cursor-pointer overflow-hidden ${
-                                                            unionCardBackFile ? 'border-amber-500 bg-amber-500/10' : 'border-white/15 bg-black/30 hover:border-white/30'
+                                                            unionCardBackFile ? 'border-amber-500 bg-amber-500/10' : 'border-zinc-300 dark:border-white/15 bg-zinc-50 dark:bg-black/30 hover:border-zinc-400 dark:hover:border-white/30'
                                                         }`}>
                                                             <input
                                                                 type="file"
@@ -707,12 +707,12 @@ export default function Login() {
                                                                 className="absolute inset-0 opacity-0 z-10 cursor-pointer"
                                                             />
                                                             {unionCardBackFile ? (
-                                                                <div className="flex flex-col items-center text-amber-400">
+                                                                <div className="flex flex-col items-center text-amber-500 dark:text-amber-400">
                                                                     <span className="material-symbols-outlined text-xl">check_circle</span>
                                                                     <span className="text-[10px] font-bold truncate max-w-[90px]">Back Attached</span>
                                                                 </div>
                                                             ) : (
-                                                                <div className="flex flex-col items-center text-zinc-500">
+                                                                <div className="flex flex-col items-center text-zinc-400 dark:text-zinc-500">
                                                                     <span className="material-symbols-outlined text-lg">credit_card</span>
                                                                     <span className="text-[10px] font-medium mt-0.5">Back Side</span>
                                                                 </div>
@@ -724,7 +724,7 @@ export default function Login() {
 
                                             {/* Email Address */}
                                             <div>
-                                                <label className="block text-xs font-bold text-zinc-300 mb-1">
+                                                <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">
                                                     Email Address
                                                 </label>
                                                 <input
@@ -733,7 +733,7 @@ export default function Login() {
                                                     onChange={(e) => setEmail(e.target.value)}
                                                     placeholder="director@studio.com"
                                                     required
-                                                    className="w-full h-11 px-3.5 rounded-xl bg-black/40 border border-white/10 text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-amber-500 transition-colors"
+                                                    className="w-full h-11 px-3.5 rounded-xl bg-zinc-50 dark:bg-black/40 border border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 text-xs focus:outline-none focus:border-amber-500 transition-colors"
                                                 />
                                             </div>
 
@@ -741,7 +741,7 @@ export default function Login() {
                                             {(view === 'login' || view === 'signup') && (
                                                 <div>
                                                     <div className="flex items-center justify-between mb-1">
-                                                        <label className="text-xs font-bold text-zinc-300">
+                                                        <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
                                                             {view === 'signup' ? 'Create Password' : 'Password'}
                                                         </label>
                                                         {view === 'login' && (
@@ -759,7 +759,7 @@ export default function Login() {
                                                                         setError(err.message || 'Failed to send reset email.');
                                                                     }
                                                                 }}
-                                                                className="text-[11px] text-amber-400 hover:underline font-semibold"
+                                                                className="text-[11px] text-amber-500 dark:text-amber-400 hover:underline font-semibold"
                                                             >
                                                                 Forgot Password?
                                                             </button>
@@ -772,12 +772,12 @@ export default function Login() {
                                                             onChange={(e) => setPassword(e.target.value)}
                                                             placeholder={view === 'signup' ? 'Min 6 characters' : 'Enter your password'}
                                                             required
-                                                            className="w-full h-11 pl-3.5 pr-10 rounded-xl bg-black/40 border border-white/10 text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-amber-500 transition-colors"
+                                                            className="w-full h-11 pl-3.5 pr-10 rounded-xl bg-zinc-50 dark:bg-black/40 border border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 text-xs focus:outline-none focus:border-amber-500 transition-colors"
                                                         />
                                                         <button
                                                             type="button"
                                                             onClick={() => setShowPassword(!showPassword)}
-                                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white"
+                                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 dark:hover:text-white"
                                                             aria-label="Toggle password visibility"
                                                         >
                                                             <span className="material-symbols-outlined text-base">
@@ -791,7 +791,7 @@ export default function Login() {
                                             {/* Confirm Password (Signup only) */}
                                             {view === 'signup' && (
                                                 <div>
-                                                    <label className="block text-xs font-bold text-zinc-300 mb-1">
+                                                    <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">
                                                         Confirm Password
                                                     </label>
                                                     <input
@@ -800,7 +800,7 @@ export default function Login() {
                                                         onChange={(e) => setConfirmPassword(e.target.value)}
                                                         placeholder="Re-enter password"
                                                         required
-                                                        className="w-full h-11 px-3.5 rounded-xl bg-black/40 border border-white/10 text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-amber-500 transition-colors"
+                                                        className="w-full h-11 px-3.5 rounded-xl bg-zinc-50 dark:bg-black/40 border border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 text-xs focus:outline-none focus:border-amber-500 transition-colors"
                                                     />
                                                 </div>
                                             )}
@@ -843,18 +843,18 @@ export default function Login() {
                                 )}
 
                                 {/* Legal Disclaimers & Links to Updated Terms */}
-                                <div className="mt-6 pt-4 border-t border-white/10 text-center space-y-2">
-                                    <p className="text-[11px] text-zinc-400 leading-relaxed">
+                                <div className="mt-6 pt-4 border-t border-zinc-200 dark:border-white/10 text-center space-y-2">
+                                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed">
                                         By signing in or creating an account, you agree to our{' '}
-                                        <Link to="/terms" className="text-amber-400 hover:underline font-semibold">
+                                        <Link to="/terms" className="text-amber-500 dark:text-amber-400 hover:underline font-semibold">
                                             Terms of Service
                                         </Link>{' '}
                                         and{' '}
-                                        <Link to="/privacy" className="text-amber-400 hover:underline font-semibold">
+                                        <Link to="/privacy" className="text-amber-500 dark:text-amber-400 hover:underline font-semibold">
                                             Privacy Policy
                                         </Link>.
                                     </p>
-                                    <p className="text-[10px] text-zinc-500">
+                                    <p className="text-[10px] text-zinc-400 dark:text-zinc-500">
                                         A property of 5M Collective Services Pvt. Ltd. (5MC) • Hyderabad, India
                                     </p>
                                 </div>
@@ -865,17 +865,17 @@ export default function Login() {
             </main>
 
             {/* Bottom Footer */}
-            <footer className="relative z-10 w-full border-t border-white/[0.06] bg-[#090A0C]/90 py-5 text-center text-xs text-zinc-500">
+            <footer className="relative z-10 w-full border-t border-zinc-200 dark:border-white/[0.06] bg-white/90 dark:bg-[#090A0C]/90 py-5 text-center text-xs text-zinc-500">
                 <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
                     <p className="text-[11px]">
                         © 2026 iFilmDirectory. A property of 5M Collective Services Pvt. Ltd. (5MC). All rights reserved.
                     </p>
                     <div className="flex items-center gap-4 text-[11px]">
-                        <Link to="/privacy" className="hover:text-zinc-300 transition-colors">Privacy</Link>
+                        <Link to="/privacy" className="hover:text-zinc-900 dark:hover:text-zinc-300 transition-colors">Privacy</Link>
                         <span>•</span>
-                        <Link to="/terms" className="hover:text-zinc-300 transition-colors">Terms of Service</Link>
+                        <Link to="/terms" className="hover:text-zinc-900 dark:hover:text-zinc-300 transition-colors">Terms of Service</Link>
                         <span>•</span>
-                        <a href="mailto:ifilmdirectory@gmail.com" className="hover:text-zinc-300 transition-colors">Support</a>
+                        <a href="mailto:ifilmdirectory@gmail.com" className="hover:text-zinc-900 dark:hover:text-zinc-300 transition-colors">Support</a>
                     </div>
                 </div>
             </footer>

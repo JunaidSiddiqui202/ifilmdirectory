@@ -441,7 +441,7 @@ export default function BrowseProfiles() {
                                 className={`size-9 rounded-xl flex items-center justify-center transition-all ${
                                     viewMode === 'directory'
                                         ? 'bg-amber-500 text-black shadow-md'
-                                        : 'bg-[#121316] text-zinc-300 border border-white/10 hover:text-white'
+                                        : 'bg-white dark:bg-[#121316] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/10 hover:text-zinc-900 dark:hover:text-white'
                                 }`}
                                 title={viewMode === 'grid' ? "Switch to Directory List" : "Switch to Grid View"}
                             >
@@ -452,7 +452,7 @@ export default function BrowseProfiles() {
                         )}
                         <button
                             onClick={() => setShowMap(true)}
-                            className="size-9 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/25 flex items-center justify-center active:scale-95 transition-all"
+                            className="size-9 rounded-xl bg-amber-500/10 text-amber-500 dark:text-amber-400 border border-amber-500/25 flex items-center justify-center active:scale-95 transition-all"
                             title="Interactive Map Discovery"
                         >
                             <span className="material-symbols-outlined text-xl">map</span>
@@ -463,7 +463,7 @@ export default function BrowseProfiles() {
                                 className={`size-9 rounded-xl flex items-center justify-center relative transition-all ${
                                     activeFilterCount > 0
                                         ? 'bg-amber-500 text-black font-bold'
-                                        : 'bg-[#121316] text-zinc-300 border border-white/10'
+                                        : 'bg-white dark:bg-[#121316] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/10'
                                 }`}
                                 title="Filters"
                             >
@@ -486,9 +486,9 @@ export default function BrowseProfiles() {
                                 <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
                                 Certified Cinema Directory & Production Network
                             </span>
-                            <h1 className="text-2xl lg:text-3xl font-black text-white tracking-tight flex items-center gap-2.5">
+                            <h1 className="text-2xl lg:text-3xl font-black text-zinc-900 dark:text-white tracking-tight flex items-center gap-2.5">
                                 <span>Discover Industry Talent & Studios</span>
-                                <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/25 tracking-normal">
+                                <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/25 tracking-normal">
                                     {pillar === 'talent' ? `${filteredProfiles.length} Creators` : pillar === 'guilds' ? `${guilds.length} Guilds` : `${facilities.length} Studios`}
                                 </span>
                             </h1>
@@ -497,13 +497,13 @@ export default function BrowseProfiles() {
                         {/* Top Right Desktop Controls */}
                         <div className="flex items-center gap-2.5">
                             {pillar === 'talent' && (
-                                <div className="flex items-center bg-[#121316] p-1 rounded-xl border border-white/10">
+                                <div className="flex items-center bg-white dark:bg-[#121316] p-1 rounded-xl border border-zinc-200 dark:border-white/10 shadow-sm">
                                     <button
                                         onClick={() => setViewMode('grid')}
                                         className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
                                             viewMode === 'grid'
                                                 ? 'bg-amber-500 text-black shadow-sm'
-                                                : 'text-zinc-400 hover:text-white'
+                                                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                         }`}
                                     >
                                         <span className="material-symbols-outlined text-base">grid_view</span>
@@ -514,7 +514,7 @@ export default function BrowseProfiles() {
                                         className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
                                             viewMode === 'directory'
                                                 ? 'bg-amber-500 text-black shadow-sm'
-                                                : 'text-zinc-400 hover:text-white'
+                                                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                         }`}
                                     >
                                         <span className="material-symbols-outlined text-base">format_list_bulleted</span>
@@ -525,7 +525,7 @@ export default function BrowseProfiles() {
 
                             <button
                                 onClick={() => setShowMap(true)}
-                                className="px-3.5 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/25 text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 shadow-sm"
+                                className="px-3.5 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/25 text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 shadow-sm"
                             >
                                 <span className="material-symbols-outlined text-base">map</span>
                                 <span>Interactive Map</span>
@@ -536,18 +536,18 @@ export default function BrowseProfiles() {
 
                 {/* 3. THREE-PILLAR MASTER SWITCHER (Talent • Film Guilds • Studios & Gear) */}
                 <div className="pt-3 pb-3">
-                    <div className="grid grid-cols-3 bg-[#121316] p-1.5 rounded-2xl border border-white/10 shadow-lg">
+                    <div className="grid grid-cols-3 bg-zinc-100 dark:bg-[#121316] p-1.5 rounded-2xl border border-zinc-200 dark:border-white/10 shadow-sm dark:shadow-lg">
                         <button
                             onClick={() => { setPillar('talent'); setSearchQuery(''); }}
                             className={`py-2.5 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${
                                 pillar === 'talent'
                                     ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-black font-extrabold shadow-md shadow-amber-500/20'
-                                    : 'text-zinc-400 hover:text-white'
+                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                             }`}
                         >
                             <span className="material-symbols-outlined text-base">person</span>
                             <span>Key Talent</span>
-                            <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${pillar === 'talent' ? 'bg-black/20 text-black font-black' : 'bg-white/10 text-zinc-300'}`}>
+                            <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${pillar === 'talent' ? 'bg-black/20 text-black font-black' : 'bg-black/5 dark:bg-white/10 text-zinc-700 dark:text-zinc-300'}`}>
                                 {profiles.length}
                             </span>
                         </button>
@@ -601,12 +601,12 @@ export default function BrowseProfiles() {
                                     ? "Search cinema associations, unions & societies (WICA, SWA, FWICE)..."
                                     : "Search sound stages, camera rental houses, dubbing suites..."
                             }
-                            className="w-full bg-[#121316] border border-white/10 rounded-2xl pl-11 pr-10 py-3 text-xs sm:text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-amber-500 focus:border-amber-500/50 transition-all shadow-inner"
+                            className="w-full bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/10 rounded-2xl pl-11 pr-10 py-3 text-xs sm:text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-amber-500 focus:border-amber-500/50 transition-all shadow-sm dark:shadow-inner"
                         />
                         {searchQuery && (
                             <button
                                 onClick={() => setSearchQuery('')}
-                                className="absolute right-3.5 text-zinc-400 hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors"
+                                className="absolute right-3.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-white p-1 rounded-full hover:bg-zinc-100 dark:hover:bg-white/10 transition-colors"
                             >
                                 <span className="material-symbols-outlined text-base">close</span>
                             </button>
@@ -626,7 +626,7 @@ export default function BrowseProfiles() {
                                 className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all shrink-0 ${
                                     activeLocation === hub.value
                                         ? 'bg-amber-500 text-black font-bold shadow-md'
-                                        : 'bg-[#121316] text-zinc-400 hover:text-white border border-white/5'
+                                        : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/5 shadow-xs'
                                 }`}
                             >
                                 {hub.label}
@@ -638,14 +638,14 @@ export default function BrowseProfiles() {
                     {pillar === 'talent' && (
                         <div className="space-y-2.5 pt-1">
                             {/* All Filmmakers vs My Circle */}
-                            <div className="flex items-center justify-between border-b border-white/5 pb-2">
+                            <div className="flex items-center justify-between border-b border-zinc-200 dark:border-white/5 pb-2">
                                 <div className="flex gap-4">
                                     <button
                                         onClick={() => setActiveTab('discover')}
                                         className={`pb-1 text-xs sm:text-sm font-bold transition-all relative ${
                                             activeTab === 'discover'
-                                                ? 'text-amber-400 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-amber-400'
-                                                : 'text-zinc-400 hover:text-white'
+                                                ? 'text-amber-600 dark:text-amber-400 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-amber-500 dark:after:bg-amber-400 font-extrabold'
+                                                : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                         }`}
                                     >
                                         All Filmmakers
@@ -654,8 +654,8 @@ export default function BrowseProfiles() {
                                         onClick={() => setActiveTab('connections')}
                                         className={`pb-1 text-xs sm:text-sm font-bold transition-all relative ${
                                             activeTab === 'connections'
-                                                ? 'text-amber-400 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-amber-400'
-                                                : 'text-zinc-400 hover:text-white'
+                                                ? 'text-amber-600 dark:text-amber-400 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-amber-500 dark:after:bg-amber-400 font-extrabold'
+                                                : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                         }`}
                                     >
                                         My Circle ({profiles.filter(p => p.isFollowing).length})
@@ -669,10 +669,10 @@ export default function BrowseProfiles() {
                                         className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition-all ${
                                             availabilityOnly
                                                 ? 'bg-emerald-500 text-black shadow-sm'
-                                                : 'bg-white/5 text-zinc-400 hover:text-white border border-white/10'
+                                                : 'bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/10'
                                         }`}
                                     >
-                                        <span className={`size-1.5 rounded-full ${availabilityOnly ? 'bg-black' : 'bg-emerald-400 animate-pulse'}`} />
+                                        <span className={`size-1.5 rounded-full ${availabilityOnly ? 'bg-black' : 'bg-emerald-500 animate-pulse'}`} />
                                         <span>Available Now</span>
                                     </button>
 
@@ -681,7 +681,7 @@ export default function BrowseProfiles() {
                                         className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition-all ${
                                             verifiedOnly
                                                 ? 'bg-amber-500 text-black shadow-sm'
-                                                : 'bg-white/5 text-zinc-400 hover:text-white border border-white/10'
+                                                : 'bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/10'
                                         }`}
                                     >
                                         <span className="material-symbols-outlined text-[13px] filled">verified</span>
@@ -699,7 +699,7 @@ export default function BrowseProfiles() {
                                         className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${
                                             activeCraft === craft.value
                                                 ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-black font-extrabold shadow-md'
-                                                : 'bg-[#121316] text-zinc-400 hover:text-white border border-white/5'
+                                                : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/5 shadow-xs'
                                         }`}
                                     >
                                         <span className="material-symbols-outlined text-sm">{craft.icon}</span>
@@ -716,14 +716,14 @@ export default function BrowseProfiles() {
                     loading ? (
                         <div className="flex flex-col items-center justify-center py-24">
                             <div className="size-10 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
-                            <p className="mt-3 text-xs font-bold text-zinc-400 tracking-wide uppercase">
+                            <p className="mt-3 text-xs font-bold text-zinc-500 dark:text-zinc-400 tracking-wide uppercase">
                                 Loading Verified Cinema Directory...
                             </p>
                         </div>
                     ) : error ? (
-                        <div className="flex flex-col items-center justify-center py-20 text-center px-4 bg-[#121316] rounded-2xl border border-red-500/20">
+                        <div className="flex flex-col items-center justify-center py-20 text-center px-4 bg-white dark:bg-[#121316] rounded-2xl border border-red-500/20 shadow-sm">
                             <span className="material-symbols-outlined text-4xl text-red-500 mb-2">error</span>
-                            <p className="text-sm text-red-400 font-semibold">{error}</p>
+                            <p className="text-sm text-red-500 font-semibold">{error}</p>
                             <button
                                 onClick={() => window.location.reload()}
                                 className="mt-4 px-4 py-2 bg-amber-500 text-black font-bold rounded-xl text-xs hover:bg-amber-400 transition-colors"
@@ -732,7 +732,7 @@ export default function BrowseProfiles() {
                             </button>
                         </div>
                     ) : filteredProfiles.length === 0 ? (
-                        <div className="py-16 px-4 bg-[#121316] rounded-2xl border border-white/5 my-4">
+                        <div className="py-16 px-4 bg-white dark:bg-[#121316] rounded-2xl border border-zinc-200 dark:border-white/5 my-4 shadow-sm">
                             <EmptyState
                                 message={activeTab === 'connections' ? "No connections in your circle yet" : "No film professionals found"}
                                 subMessage={activeTab === 'connections' ? "Discover and follow filmmakers across India to build your production circle!" : "Try adjusting your craft role, location filter, or search query."}
@@ -760,7 +760,7 @@ export default function BrowseProfiles() {
                                         <article
                                             key={profile.uid}
                                             onClick={() => handleProfileClick(profile)}
-                                            className="group relative flex flex-col justify-between rounded-2xl bg-[#121316] border border-white/[0.07] hover:border-amber-500/40 p-3 sm:p-3.5 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-amber-500/10"
+                                            className="group relative flex flex-col justify-between rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.07] hover:border-amber-500/40 p-3 sm:p-3.5 transition-all duration-300 cursor-pointer shadow-sm hover:shadow-lg dark:shadow-md dark:hover:shadow-amber-500/10"
                                         >
                                             <div>
                                                 {/* Headshot / Portfolio Visual */}
@@ -823,7 +823,7 @@ export default function BrowseProfiles() {
                                                 {/* Profile Details */}
                                                 <div className="space-y-1">
                                                     <div className="flex items-center justify-between gap-1">
-                                                        <h3 className="text-white text-sm font-bold truncate group-hover:text-amber-400 transition-colors flex items-center gap-1">
+                                                        <h3 className="text-zinc-900 dark:text-white text-sm font-bold truncate group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors flex items-center gap-1">
                                                             <span className="truncate">{profile.displayName || 'Filmmaker'}</span>
                                                             {renderVerificationBadge(tier)}
                                                         </h3>
@@ -831,13 +831,13 @@ export default function BrowseProfiles() {
 
                                                     {/* Primary Craft Pill */}
                                                     <div className="flex items-center gap-1">
-                                                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20 truncate capitalize">
+                                                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 truncate capitalize">
                                                             {profile.role || 'Cinema Professional'}
                                                         </span>
                                                     </div>
 
                                                     {/* Experience Credits / Skills */}
-                                                    <p className="text-[11px] text-zinc-400 line-clamp-1 pt-0.5">
+                                                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400 line-clamp-1 pt-0.5">
                                                         {profile.experience?.length
                                                             ? `${profile.experience.length} Notable Credits`
                                                             : profile.skills?.length
@@ -848,10 +848,10 @@ export default function BrowseProfiles() {
                                             </div>
 
                                             {/* Action Bar */}
-                                            <div className="mt-3 pt-2.5 border-t border-white/5 flex items-center justify-between gap-1.5">
+                                            <div className="mt-3 pt-2.5 border-t border-zinc-100 dark:border-white/5 flex items-center justify-between gap-1.5">
                                                 <button
                                                     onClick={(e) => handleDirectMessage(e, profile)}
-                                                    className="flex-1 py-1 px-2 rounded-lg bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border border-white/10 text-xs font-semibold flex items-center justify-center gap-1 transition-all"
+                                                    className="flex-1 py-1 px-2 rounded-lg bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/10 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/10 text-xs font-semibold flex items-center justify-center gap-1 transition-all"
                                                     title="Send Direct Message"
                                                 >
                                                     <span className="material-symbols-outlined text-xs">chat</span>
@@ -860,7 +860,7 @@ export default function BrowseProfiles() {
 
                                                 <button
                                                     onClick={() => handleProfileClick(profile)}
-                                                    className="py-1 px-2.5 rounded-lg bg-amber-500/10 hover:bg-amber-500 hover:text-black text-amber-400 border border-amber-500/20 text-xs font-bold flex items-center justify-center gap-0.5 transition-all"
+                                                    className="py-1 px-2.5 rounded-lg bg-amber-500/10 hover:bg-amber-500 hover:text-black text-amber-600 dark:text-amber-400 border border-amber-500/20 text-xs font-bold flex items-center justify-center gap-0.5 transition-all"
                                                 >
                                                     <span>View</span>
                                                     <span className="material-symbols-outlined text-xs">arrow_forward</span>
@@ -872,7 +872,7 @@ export default function BrowseProfiles() {
                             </div>
                         ) : (
                             /* PRODUCTION DIRECTORY LIST VIEW (High-density scannability for line producers) */
-                            <div className="flex flex-col divide-y divide-white/5 bg-[#121316] rounded-2xl border border-white/[0.08] overflow-hidden shadow-xl">
+                            <div className="flex flex-col divide-y divide-zinc-200 dark:divide-white/5 bg-white dark:bg-[#121316] rounded-2xl border border-zinc-200 dark:border-white/[0.08] overflow-hidden shadow-sm dark:shadow-xl">
                                 {filteredProfiles.map((profile) => {
                                     const tier = profile.verification_tier || profile.user_details?.verification_tier;
                                     const isAvailable = (profile.availabilityStatus || 'available') === 'available';
@@ -881,11 +881,11 @@ export default function BrowseProfiles() {
                                         <div
                                             key={profile.uid}
                                             onClick={() => handleProfileClick(profile)}
-                                            className="p-3.5 sm:p-4 hover:bg-white/[0.02] transition-colors cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 group"
+                                            className="p-3.5 sm:p-4 hover:bg-zinc-50 dark:hover:bg-white/[0.02] transition-colors cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 group"
                                         >
                                             <div className="flex items-center gap-3.5 min-w-0">
                                                 {/* Avatar */}
-                                                <div className="relative size-12 sm:size-14 rounded-xl overflow-hidden shrink-0 border border-white/10 group-hover:border-amber-500/40 transition-colors bg-black">
+                                                <div className="relative size-12 sm:size-14 rounded-xl overflow-hidden shrink-0 border border-zinc-200 dark:border-white/10 group-hover:border-amber-500/40 transition-colors bg-black">
                                                     <PostMedia
                                                         src={profile.photoURL || ''}
                                                         fallbackType="USER_MALE"
@@ -896,20 +896,20 @@ export default function BrowseProfiles() {
 
                                                 <div className="min-w-0 flex-1">
                                                     <div className="flex items-center gap-2 flex-wrap">
-                                                        <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-amber-400 transition-colors truncate flex items-center gap-1">
+                                                        <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors truncate flex items-center gap-1">
                                                             <span>{profile.displayName || 'Filmmaker'}</span>
                                                             {renderVerificationBadge(tier)}
                                                         </h3>
-                                                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20 capitalize">
+                                                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 capitalize">
                                                             {profile.role || 'Cinema Professional'}
                                                         </span>
-                                                        <span className="text-xs text-zinc-400 flex items-center gap-1">
+                                                        <span className="text-xs text-zinc-500 dark:text-zinc-400 flex items-center gap-1">
                                                             <span className="material-symbols-outlined text-xs text-amber-500">location_on</span>
                                                             {profile.location || 'India'}
                                                         </span>
                                                     </div>
 
-                                                    <p className="text-xs text-zinc-400 truncate mt-1">
+                                                    <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-1">
                                                         {profile.bio || (profile.experience?.length ? `${profile.experience.length} Production Credits` : 'Certified Guild Member')}
                                                     </p>
 
@@ -917,7 +917,7 @@ export default function BrowseProfiles() {
                                                     {profile.skills && profile.skills.length > 0 && (
                                                         <div className="hidden sm:flex items-center gap-1.5 mt-1.5 flex-wrap">
                                                             {profile.skills.slice(0, 3).map((skill: string, i: number) => (
-                                                                <span key={i} className="text-[10px] px-2 py-0.5 rounded-md bg-white/5 text-zinc-300 border border-white/10">
+                                                                <span key={i} className="text-[10px] px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-white/5 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/10">
                                                                     {skill}
                                                                 </span>
                                                             ))}
@@ -930,7 +930,7 @@ export default function BrowseProfiles() {
                                             <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
                                                 <button
                                                     onClick={(e) => handleDirectMessage(e, profile)}
-                                                    className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border border-white/10 text-xs font-semibold flex items-center gap-1 transition-all"
+                                                    className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/10 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/10 text-xs font-semibold flex items-center gap-1 transition-all"
                                                     title="Message"
                                                 >
                                                     <span className="material-symbols-outlined text-sm">chat</span>
@@ -939,7 +939,7 @@ export default function BrowseProfiles() {
 
                                                 <button
                                                     onClick={(e) => handleShortlist(e, profile)}
-                                                    className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border border-white/10 text-xs font-semibold flex items-center gap-1 transition-all"
+                                                    className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/10 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/10 text-xs font-semibold flex items-center gap-1 transition-all"
                                                     title="Add to Project Shortlist"
                                                 >
                                                     <span className="material-symbols-outlined text-sm">playlist_add</span>
@@ -982,7 +982,7 @@ export default function BrowseProfiles() {
                             </p>
                         </div>
                     ) : filteredGuilds.length === 0 ? (
-                        <div className="py-16 px-4 bg-[#121316] rounded-2xl border border-white/5 my-4">
+                        <div className="py-16 px-4 bg-white dark:bg-[#121316] rounded-2xl border border-zinc-200 dark:border-white/5 my-4 shadow-sm">
                             <EmptyState
                                 message="No guilds or unions found"
                                 subMessage="Try searching with a different term like Directing, Camera, Writers, or Workers."
@@ -997,31 +997,31 @@ export default function BrowseProfiles() {
                                 <div
                                     key={guild.id}
                                     onClick={() => navigate('/guilds')}
-                                    className="rounded-2xl bg-[#121316] border border-white/[0.08] hover:border-amber-500/40 p-4 shadow-lg hover:shadow-amber-500/10 transition-all cursor-pointer group flex flex-col justify-between"
+                                    className="rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.08] hover:border-amber-500/40 p-4 shadow-sm hover:shadow-lg dark:shadow-md dark:hover:shadow-amber-500/10 transition-all cursor-pointer group flex flex-col justify-between"
                                 >
                                     <div>
                                         <div className="flex items-center justify-between gap-3 mb-3">
-                                            <div className="size-12 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-400 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
+                                            <div className="size-12 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-500 dark:text-amber-400 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
                                                 <span className="material-symbols-outlined text-2xl">
                                                     {guild.icon || 'groups'}
                                                 </span>
                                             </div>
-                                            <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-white/5 text-zinc-300 border border-white/10">
+                                            <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-zinc-100 dark:bg-white/5 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/10">
                                                 {guild.category}
                                             </span>
                                         </div>
 
-                                        <h3 className="text-base font-bold text-white group-hover:text-amber-400 transition-colors leading-snug">
+                                        <h3 className="text-base font-bold text-zinc-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors leading-snug">
                                             {guild.name}
                                         </h3>
-                                        <p className="text-xs text-zinc-400 line-clamp-2 mt-1.5 leading-relaxed">
+                                        <p className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2 mt-1.5 leading-relaxed">
                                             {guild.description}
                                         </p>
                                     </div>
 
-                                    <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
-                                        <span className="text-xs font-semibold text-zinc-400 flex items-center gap-1.5">
-                                            <span className="size-2 rounded-full bg-emerald-400 animate-pulse" />
+                                    <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-white/5 flex items-center justify-between">
+                                        <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+                                            <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
                                             <span>{guild.memberCount || 140} Active Members</span>
                                         </span>
                                         <button
@@ -1029,7 +1029,7 @@ export default function BrowseProfiles() {
                                                 e.stopPropagation();
                                                 navigate('/guilds');
                                             }}
-                                            className="px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500 hover:text-black text-amber-400 border border-amber-500/20 text-xs font-bold transition-all flex items-center gap-1"
+                                            className="px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500 hover:text-black text-amber-600 dark:text-amber-400 border border-amber-500/20 text-xs font-bold transition-all flex items-center gap-1"
                                         >
                                             <span>Enter Guild</span>
                                             <span className="material-symbols-outlined text-xs">arrow_forward</span>
@@ -1046,12 +1046,12 @@ export default function BrowseProfiles() {
                     facilitiesLoading ? (
                         <div className="flex flex-col items-center justify-center py-24">
                             <div className="size-10 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
-                            <p className="mt-3 text-xs font-bold text-zinc-400 tracking-wide uppercase">
+                            <p className="mt-3 text-xs font-bold text-zinc-500 dark:text-zinc-400 tracking-wide uppercase">
                                 Loading Studios & Equipment Facilities...
                             </p>
                         </div>
                     ) : filteredFacilities.length === 0 ? (
-                        <div className="py-16 px-4 bg-[#121316] rounded-2xl border border-white/5 my-4">
+                        <div className="py-16 px-4 bg-white dark:bg-[#121316] rounded-2xl border border-zinc-200 dark:border-white/5 my-4 shadow-sm">
                             <EmptyState
                                 message="No studios or camera houses found"
                                 subMessage="Try searching for Sound Stage, Alexa 35, Dubbing, or Chroma Floor in your preferred city."
@@ -1066,10 +1066,10 @@ export default function BrowseProfiles() {
                                 <div
                                     key={facility.id}
                                     onClick={() => navigate(`/booking/details/${facility.id}`)}
-                                    className="rounded-2xl bg-[#121316] border border-white/[0.08] hover:border-amber-500/40 p-3.5 shadow-lg hover:shadow-amber-500/10 transition-all cursor-pointer group flex flex-col justify-between"
+                                    className="rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.08] hover:border-amber-500/40 p-3.5 shadow-sm hover:shadow-lg dark:shadow-md dark:hover:shadow-amber-500/10 transition-all cursor-pointer group flex flex-col justify-between"
                                 >
                                     <div>
-                                        <div className="relative w-full aspect-[16/9] rounded-xl overflow-hidden bg-black mb-3 border border-white/10">
+                                        <div className="relative w-full aspect-[16/9] rounded-xl overflow-hidden bg-black mb-3 border border-zinc-200 dark:border-white/10">
                                             <PostMedia
                                                 src={facility.image || ''}
                                                 fallbackType="COMPANY_LOGO"
@@ -1088,20 +1088,20 @@ export default function BrowseProfiles() {
                                             )}
                                         </div>
 
-                                        <h3 className="text-sm sm:text-base font-bold text-white truncate group-hover:text-amber-400 transition-colors">
+                                        <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-white truncate group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors">
                                             {facility.name}
                                         </h3>
-                                        <p className="text-xs text-zinc-400 truncate mt-1 flex items-center gap-1">
+                                        <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-1 flex items-center gap-1">
                                             <span className="material-symbols-outlined text-xs text-amber-500">location_on</span>
                                             <span>{facility.location}</span>
                                         </p>
                                     </div>
 
-                                    <div className="mt-3.5 pt-3 border-t border-white/5 flex items-center justify-between">
-                                        <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-300">
-                                            <span className="material-symbols-outlined text-amber-400 text-sm filled" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                                            <span className="text-white font-bold">{facility.rating || 4.9}</span>
-                                            <span className="text-zinc-500">({facility.reviews || 42} reviews)</span>
+                                    <div className="mt-3.5 pt-3 border-t border-zinc-100 dark:border-white/5 flex items-center justify-between">
+                                        <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+                                            <span className="material-symbols-outlined text-amber-500 text-sm filled" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                                            <span className="text-zinc-900 dark:text-white font-bold">{facility.rating || 4.9}</span>
+                                            <span className="text-zinc-400 dark:text-zinc-500">({facility.reviews || 42} reviews)</span>
                                         </div>
 
                                         <button
@@ -1155,21 +1155,21 @@ export default function BrowseProfiles() {
                     onClick={() => setShowFilterModal(false)}
                 >
                     <div
-                        className="w-full max-w-lg bg-[#121316] border border-white/10 rounded-t-3xl shadow-2xl animate-in slide-in-from-bottom-full duration-300 max-h-[85vh] flex flex-col"
+                        className="w-full max-w-lg bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/10 rounded-t-3xl shadow-2xl animate-in slide-in-from-bottom-full duration-300 max-h-[85vh] flex flex-col"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Drawer Header */}
-                        <div className="flex items-center justify-between p-5 border-b border-white/10 shrink-0">
+                        <div className="flex items-center justify-between p-5 border-b border-zinc-200 dark:border-white/10 shrink-0">
                             <div>
-                                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                                <h3 className="text-lg font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                                     <span className="material-symbols-outlined text-amber-500">tune</span>
                                     <span>Filter Cinema Directory</span>
                                 </h3>
-                                <p className="text-xs text-zinc-400">Refine by craft role, cinema hub, and availability</p>
+                                <p className="text-xs text-zinc-500 dark:text-zinc-400">Refine by craft role, cinema hub, and availability</p>
                             </div>
                             <button
                                 onClick={() => setShowFilterModal(false)}
-                                className="p-2 hover:bg-white/10 rounded-full transition-colors text-zinc-400 hover:text-white"
+                                className="p-2 hover:bg-zinc-100 dark:hover:bg-white/10 rounded-full transition-colors text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
                             >
                                 <span className="material-symbols-outlined text-xl">close</span>
                             </button>
@@ -1179,7 +1179,7 @@ export default function BrowseProfiles() {
                         <div className="p-5 overflow-y-auto space-y-5 custom-scrollbar">
                             {/* Role Filters */}
                             <div>
-                                <h4 className="text-xs font-bold uppercase tracking-wider text-amber-400 mb-2.5">
+                                <h4 className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-2.5">
                                     Craft Role
                                 </h4>
                                 <div className="grid grid-cols-2 gap-2">
@@ -1190,7 +1190,7 @@ export default function BrowseProfiles() {
                                             className={`flex items-center justify-between p-3 rounded-xl text-xs font-semibold transition-all border ${
                                                 activeCraft === craft.value
                                                     ? 'bg-amber-500 text-black border-amber-500 font-bold'
-                                                    : 'bg-white/[0.03] text-zinc-300 border-white/5 hover:border-white/20'
+                                                    : 'bg-zinc-100 dark:bg-white/[0.03] text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-white/5 hover:border-zinc-300 dark:hover:border-white/20'
                                             }`}
                                         >
                                             <span className="flex items-center gap-2">
@@ -1207,7 +1207,7 @@ export default function BrowseProfiles() {
 
                             {/* Location Filters */}
                             <div>
-                                <h4 className="text-xs font-bold uppercase tracking-wider text-amber-400 mb-2.5">
+                                <h4 className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-2.5">
                                     Production Hub / City
                                 </h4>
                                 <div className="grid grid-cols-2 gap-2">
@@ -1218,7 +1218,7 @@ export default function BrowseProfiles() {
                                             className={`p-2.5 rounded-xl text-xs font-semibold transition-all text-left border ${
                                                 activeLocation === hub.value
                                                     ? 'bg-amber-500 text-black border-amber-500 font-bold'
-                                                    : 'bg-white/[0.03] text-zinc-300 border-white/5 hover:border-white/20'
+                                                    : 'bg-zinc-100 dark:bg-white/[0.03] text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-white/5 hover:border-zinc-300 dark:hover:border-white/20'
                                             }`}
                                         >
                                             {hub.label}
@@ -1228,37 +1228,37 @@ export default function BrowseProfiles() {
                             </div>
 
                             {/* Toggles */}
-                            <div className="space-y-2 pt-2 border-t border-white/5">
-                                <label className="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-white/5 cursor-pointer">
-                                    <span className="text-xs font-bold text-white flex items-center gap-2">
-                                        <span className="size-2 rounded-full bg-emerald-400 animate-pulse" />
+                            <div className="space-y-2 pt-2 border-t border-zinc-200 dark:border-white/5">
+                                <label className="flex items-center justify-between p-3 rounded-xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/5 cursor-pointer">
+                                    <span className="text-xs font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+                                        <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
                                         <span>Available for Shoots Only</span>
                                     </span>
                                     <input
                                         type="checkbox"
                                         checked={availabilityOnly}
                                         onChange={(e) => setAvailabilityOnly(e.target.checked)}
-                                        className="rounded text-amber-500 focus:ring-amber-500 size-4 bg-black/40 border-white/20"
+                                        className="rounded text-amber-500 focus:ring-amber-500 size-4 bg-zinc-100 dark:bg-black/40 border-zinc-300 dark:border-white/20"
                                     />
                                 </label>
 
-                                <label className="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-white/5 cursor-pointer">
-                                    <span className="text-xs font-bold text-white flex items-center gap-2">
-                                        <span className="material-symbols-outlined text-amber-400 text-base filled">verified</span>
+                                <label className="flex items-center justify-between p-3 rounded-xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/5 cursor-pointer">
+                                    <span className="text-xs font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+                                        <span className="material-symbols-outlined text-amber-500 text-base filled">verified</span>
                                         <span>Verified Pros & Studios Only</span>
                                     </span>
                                     <input
                                         type="checkbox"
                                         checked={verifiedOnly}
                                         onChange={(e) => setVerifiedOnly(e.target.checked)}
-                                        className="rounded text-amber-500 focus:ring-amber-500 size-4 bg-black/40 border-white/20"
+                                        className="rounded text-amber-500 focus:ring-amber-500 size-4 bg-zinc-100 dark:bg-black/40 border-zinc-300 dark:border-white/20"
                                     />
                                 </label>
                             </div>
                         </div>
 
                         {/* Drawer Footer */}
-                        <div className="p-4 border-t border-white/10 flex items-center gap-3 shrink-0 bg-[#0e0f12]">
+                        <div className="p-4 border-t border-zinc-200 dark:border-white/10 flex items-center gap-3 shrink-0 bg-slate-50 dark:bg-[#0e0f12]">
                             <button
                                 onClick={() => {
                                     setActiveCraft('All');
@@ -1268,7 +1268,7 @@ export default function BrowseProfiles() {
                                     setSearchQuery('');
                                     setShowFilterModal(false);
                                 }}
-                                className="flex-1 py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border border-white/10 font-bold text-xs transition-all"
+                                className="flex-1 py-3 px-4 rounded-xl bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/10 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/10 font-bold text-xs transition-all"
                             >
                                 Reset All
                             </button>

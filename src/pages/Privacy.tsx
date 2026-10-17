@@ -83,13 +83,13 @@ export default function Privacy() {
     ];
 
     return (
-        <div className="min-h-screen bg-[#090A0C] text-zinc-100 font-sans selection:bg-amber-500 selection:text-black">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#090A0C] text-zinc-900 dark:text-zinc-100 font-sans selection:bg-amber-500 selection:text-black transition-colors">
             {/* Top Navigation Bar */}
-            <div className="sticky top-0 z-40 bg-[#090A0C]/90 backdrop-blur-md border-b border-white/10 px-4 sm:px-8 py-3.5">
+            <div className="sticky top-0 z-40 bg-white/90 dark:bg-[#090A0C]/90 backdrop-blur-md border-b border-zinc-200 dark:border-white/10 px-4 sm:px-8 py-3.5">
                 <div className="max-w-5xl mx-auto flex items-center justify-between gap-4">
                     <button
                         onClick={() => navigate(-1)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-zinc-300 hover:text-white transition-all active:scale-95"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/10 border border-zinc-200 dark:border-white/10 text-xs font-bold text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-all active:scale-95"
                     >
                         <span className="material-symbols-outlined text-base">arrow_back</span>
                         <span>Back</span>
@@ -97,7 +97,7 @@ export default function Privacy() {
 
                     <div className="flex items-center gap-2">
                         {hasAgreed ? (
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold">
                                 <span className="material-symbols-outlined text-sm filled" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
                                 <span>Policy Acknowledged</span>
                             </span>
@@ -115,7 +115,7 @@ export default function Privacy() {
                         )}
                         <button
                             onClick={() => window.print()}
-                            className="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-zinc-300"
+                            className="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/10 border border-zinc-200 dark:border-white/10 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white"
                             title="Print or Save PDF"
                         >
                             <span className="material-symbols-outlined text-base">print</span>
@@ -126,45 +126,45 @@ export default function Privacy() {
             </div>
 
             {/* Main Header / Banner */}
-            <header className="relative border-b border-white/10 bg-gradient-to-b from-[#121316] to-[#090A0C] px-4 sm:px-8 pt-10 pb-12 overflow-hidden">
+            <header className="relative border-b border-zinc-200 dark:border-white/10 bg-gradient-to-b from-zinc-100 dark:from-[#121316] to-slate-50 dark:to-[#090A0C] px-4 sm:px-8 pt-10 pb-12 overflow-hidden">
                 <div className="max-w-5xl mx-auto relative z-10">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold uppercase tracking-wider mb-4">
-                        <span className="size-2 rounded-full bg-amber-400 animate-pulse" />
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs font-bold uppercase tracking-wider mb-4">
+                        <span className="size-2 rounded-full bg-amber-500 dark:bg-amber-400 animate-pulse" />
                         Official Legal Document • iFilmDirectory.com
                     </div>
 
-                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white mb-3">
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-zinc-900 dark:text-white mb-3">
                         Privacy Policy
                     </h1>
 
-                    <p className="text-zinc-400 text-sm sm:text-base max-w-3xl leading-relaxed mb-6">
+                    <p className="text-zinc-600 dark:text-zinc-400 text-sm sm:text-base max-w-3xl leading-relaxed mb-6">
                         This Privacy Policy outlines how <strong>5M Collective Services Private Limited (5MC)</strong> collects, uses, protects, and handles personal and professional data across the iFilmDirectory platform.
                     </p>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-                        <div className="p-3 rounded-xl bg-white/[0.03] border border-white/10">
+                        <div className="p-3 rounded-xl bg-white dark:bg-white/[0.03] border border-zinc-200 dark:border-white/10 shadow-sm dark:shadow-none">
                             <span className="text-zinc-500 block text-[10px] uppercase font-bold tracking-wider">A Property Of</span>
-                            <span className="text-white font-semibold mt-0.5 block">5M Collective Services Pvt. Ltd. (5MC)</span>
+                            <span className="text-zinc-900 dark:text-white font-semibold mt-0.5 block">5M Collective Services Pvt. Ltd. (5MC)</span>
                         </div>
-                        <div className="p-3 rounded-xl bg-white/[0.03] border border-white/10">
+                        <div className="p-3 rounded-xl bg-white dark:bg-white/[0.03] border border-zinc-200 dark:border-white/10 shadow-sm dark:shadow-none">
                             <span className="text-zinc-500 block text-[10px] uppercase font-bold tracking-wider">Effective & Updated</span>
-                            <span className="text-white font-semibold mt-0.5 block">October 15, 2026</span>
+                            <span className="text-zinc-900 dark:text-white font-semibold mt-0.5 block">October 15, 2026</span>
                         </div>
-                        <div className="p-3 rounded-xl bg-white/[0.03] border border-white/10">
+                        <div className="p-3 rounded-xl bg-white dark:bg-white/[0.03] border border-zinc-200 dark:border-white/10 shadow-sm dark:shadow-none">
                             <span className="text-zinc-500 block text-[10px] uppercase font-bold tracking-wider">Privacy Contact</span>
-                            <a href="mailto:ifilmdirectory@gmail.com" className="text-amber-400 font-semibold mt-0.5 block hover:underline truncate">
+                            <a href="mailto:ifilmdirectory@gmail.com" className="text-amber-600 dark:text-amber-400 font-semibold mt-0.5 block hover:underline truncate">
                                 ifilmdirectory@gmail.com
                             </a>
                         </div>
-                        <div className="p-3 rounded-xl bg-white/[0.03] border border-white/10">
+                        <div className="p-3 rounded-xl bg-white dark:bg-white/[0.03] border border-zinc-200 dark:border-white/10 shadow-sm dark:shadow-none">
                             <span className="text-zinc-500 block text-[10px] uppercase font-bold tracking-wider">Governing Framework</span>
-                            <span className="text-white font-semibold mt-0.5 block">DPDPA 2023 & IT Act 2000 (India)</span>
+                            <span className="text-zinc-900 dark:text-white font-semibold mt-0.5 block">DPDPA 2023 & IT Act 2000 (India)</span>
                         </div>
                     </div>
 
                     {/* Registered Address */}
-                    <div className="mt-3.5 p-3 rounded-xl bg-amber-500/5 border border-amber-500/20 text-xs text-zinc-300 flex items-start gap-2">
-                        <span className="material-symbols-outlined text-amber-400 text-base shrink-0 mt-0.5">location_on</span>
+                    <div className="mt-3.5 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-zinc-700 dark:text-zinc-300 flex items-start gap-2">
+                        <span className="material-symbols-outlined text-amber-500 dark:text-amber-400 text-base shrink-0 mt-0.5">location_on</span>
                         <span>
                             <strong>Correspondence Address:</strong> 105, First Floor, Sahiti Sri Vidya Petals, Street No. 1, Patrika Nagar, HITEC City, Hyderabad, Telangana 500081, India
                         </span>
@@ -175,8 +175,8 @@ export default function Privacy() {
             {/* Content Body */}
             <main className="max-w-5xl mx-auto px-4 sm:px-8 py-10">
                 {/* Table of Contents Pill Bar */}
-                <div className="mb-12 p-5 rounded-2xl bg-[#121316] border border-white/10">
-                    <h2 className="text-xs font-bold uppercase tracking-wider text-amber-400 mb-3 flex items-center gap-1.5">
+                <div className="mb-12 p-5 rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/10 shadow-sm dark:shadow-none">
+                    <h2 className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-3 flex items-center gap-1.5">
                         <span className="material-symbols-outlined text-sm">toc</span>
                         <span>Table of Contents (21 Sections)</span>
                     </h2>
@@ -185,7 +185,7 @@ export default function Privacy() {
                             <a
                                 key={s.id}
                                 href={`#${s.id}`}
-                                className="text-zinc-400 hover:text-amber-300 hover:bg-white/5 px-2 py-1.5 rounded-lg transition-colors truncate block"
+                                className="text-zinc-600 dark:text-zinc-400 hover:text-amber-600 dark:hover:text-amber-300 hover:bg-zinc-100 dark:hover:bg-white/5 px-2 py-1.5 rounded-lg transition-colors truncate block"
                             >
                                 {s.title}
                             </a>
@@ -194,11 +194,11 @@ export default function Privacy() {
                 </div>
 
                 {/* All 21 Detailed Privacy Policy Sections */}
-                <div className="space-y-12 text-zinc-300 text-sm leading-relaxed">
+                <div className="space-y-12 text-zinc-700 dark:text-zinc-300 text-sm leading-relaxed">
 
                     {/* Section 1 */}
-                    <section id="s1" className="scroll-mt-24 p-6 rounded-2xl bg-[#121316]/50 border border-white/5 space-y-4">
-                        <h2 className="text-xl font-bold text-white flex items-center gap-2 border-b border-white/10 pb-3">
+                    <section id="s1" className="scroll-mt-24 p-6 rounded-2xl bg-white dark:bg-[#121316]/50 border border-zinc-200 dark:border-white/5 shadow-sm dark:shadow-none space-y-4">
+                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2 border-b border-zinc-200 dark:border-white/10 pb-3">
                             <span className="text-amber-400">1.</span> Introduction
                         </h2>
                         <p><strong>1.1.</strong> iFilmDirectory (&quot;iFilmDirectory&quot;, &quot;Platform&quot;, &quot;Website&quot;, &quot;we&quot;, &quot;us&quot; or &quot;our&quot;) is a digital platform designed for film-industry professionals, production companies, artists, technicians, casting professionals, studios, equipment providers and members of the entertainment community.</p>
@@ -211,15 +211,15 @@ export default function Privacy() {
                     </section>
 
                     {/* Section 2 */}
-                    <section id="s2" className="scroll-mt-24 p-6 rounded-2xl bg-[#121316]/50 border border-white/5 space-y-4">
-                        <h2 className="text-xl font-bold text-white flex items-center gap-2 border-b border-white/10 pb-3">
+                    <section id="s2" className="scroll-mt-24 p-6 rounded-2xl bg-white dark:bg-[#121316]/50 border border-zinc-200 dark:border-white/5 shadow-sm dark:shadow-none space-y-4">
+                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2 border-b border-zinc-200 dark:border-white/10 pb-3">
                             <span className="text-amber-400">2.</span> Information We Collect
                         </h2>
                         <p>We collect information necessary to operate the Platform, provide its features, communicate with users, maintain security and comply with applicable law.</p>
 
                         <div className="space-y-4 pl-2">
                             <div>
-                                <h3 className="font-bold text-white text-base mb-1.5">2.1. Account and Registration Information</h3>
+                                <h3 className="font-bold text-zinc-900 dark:text-white text-base mb-1.5">2.1. Account and Registration Information</h3>
                                 <p className="mb-2">When users register or maintain accounts, we may collect:</p>
                                 <ul className="list-disc list-inside space-y-1 text-zinc-400 pl-2">
                                     <li>Full name or professional display name.</li>
@@ -234,7 +234,7 @@ export default function Privacy() {
                             </div>
 
                             <div>
-                                <h3 className="font-bold text-white text-base mb-1.5">2.2. Professional Profile Information</h3>
+                                <h3 className="font-bold text-zinc-900 dark:text-white text-base mb-1.5">2.2. Professional Profile Information</h3>
                                 <p className="mb-2">Members may voluntarily provide professional information, including:</p>
                                 <ul className="list-disc list-inside space-y-1 text-zinc-400 pl-2">
                                     <li>Occupation, designation and professional category.</li>
@@ -252,45 +252,45 @@ export default function Privacy() {
                             </div>
 
                             <div>
-                                <h3 className="font-bold text-white text-base mb-1.5">2.3. User-Generated Content</h3>
+                                <h3 className="font-bold text-zinc-900 dark:text-white text-base mb-1.5">2.3. User-Generated Content</h3>
                                 <p className="mb-2">We may process content submitted through the Platform, including posts, comments, images, videos, stories, showreels, film reviews and ratings, guild/forum discussions, casting listings, and equipment listings. Users are responsible for ensuring that their submissions do not unlawfully disclose personal information about other individuals.</p>
                             </div>
 
                             <div>
-                                <h3 className="font-bold text-white text-base mb-1.5">2.4. Film Projects and Professional Collaboration Information</h3>
+                                <h3 className="font-bold text-zinc-900 dark:text-white text-base mb-1.5">2.4. Film Projects and Professional Collaboration Information</h3>
                                 <p>Where supported by the Platform, we may process film project titles, crew requirements, collaboration invitations, job applications, and shared production materials. Access depends on configured permission settings. Users should not assume that voluntarily sharing information with another member prevents that recipient from independently retaining or redisclosing it.</p>
                             </div>
 
                             <div>
-                                <h3 className="font-bold text-white text-base mb-1.5">2.5. Messages and Communications</h3>
+                                <h3 className="font-bold text-zinc-900 dark:text-white text-base mb-1.5">2.5. Messages and Communications</h3>
                                 <p>Where the Platform provides direct or group messaging, we process sender and recipient account identifiers, message content, attachments, and timestamps. Messages are not publicly displayed merely because they are transmitted through the Platform. Authorized access may occur where reasonably necessary for security, abuse investigations, or lawful requests. We do not represent that messages are end-to-end encrypted unless expressly identified.</p>
                             </div>
 
                             <div>
-                                <h3 className="font-bold text-white text-base mb-1.5">2.6. Jobs, Casting and Recruitment Information</h3>
+                                <h3 className="font-bold text-zinc-900 dark:text-white text-base mb-1.5">2.6. Jobs, Casting and Recruitment Information</h3>
                                 <p>Where users apply for opportunities or advertise professional engagements, we process applicant identity, resumes, portfolios, and application communications. Information submitted to recruiters or prospective employers may be accessible to those receiving parties, who are responsible for their own subsequent handling under applicable law.</p>
                             </div>
 
                             <div>
-                                <h3 className="font-bold text-white text-base mb-1.5">2.7. Technical and Usage Information</h3>
+                                <h3 className="font-bold text-zinc-900 dark:text-white text-base mb-1.5">2.7. Technical and Usage Information</h3>
                                 <p>When users access the Platform, technical information may be collected automatically, including IP address, browser type and version, operating system, device identifiers, pages viewed, session navigation, and security logs.</p>
                             </div>
 
                             <div>
-                                <h3 className="font-bold text-white text-base mb-1.5">2.8. Payment and Billing Information</h3>
+                                <h3 className="font-bold text-zinc-900 dark:text-white text-base mb-1.5">2.8. Payment and Billing Information</h3>
                                 <p>We have not confirmed that integrated payments are currently enabled. If paid features are offered, information necessary to invoice or confirm payment may be collected, and a separate payment provider may process transaction details. Before such processing begins, checkout flows will identify the relevant provider. Users should not submit card numbers or bank credentials in profiles or messages.</p>
                             </div>
 
                             <div>
-                                <h3 className="font-bold text-white text-base mb-1.5">2.9. Support, Complaints and Verification</h3>
+                                <h3 className="font-bold text-zinc-900 dark:text-white text-base mb-1.5">2.9. Support, Complaints and Verification</h3>
                                 <p>When contacting support, submitting a complaint, or seeking professional verification, we process the correspondence, account identifiers, and evidence supplied. We encourage users not to submit unnecessary identification documents or sensitive personal information.</p>
                             </div>
                         </div>
                     </section>
 
                     {/* Section 3 */}
-                    <section id="s3" className="scroll-mt-24 p-6 rounded-2xl bg-[#121316]/50 border border-white/5 space-y-4">
-                        <h2 className="text-xl font-bold text-white flex items-center gap-2 border-b border-white/10 pb-3">
+                    <section id="s3" className="scroll-mt-24 p-6 rounded-2xl bg-white dark:bg-[#121316]/50 border border-zinc-200 dark:border-white/5 shadow-sm dark:shadow-none space-y-4">
+                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2 border-b border-zinc-200 dark:border-white/10 pb-3">
                             <span className="text-amber-400">3.</span> How We Use Personal Information
                         </h2>
                         <p>We process personal information for lawful and relevant purposes:</p>
@@ -318,8 +318,8 @@ export default function Privacy() {
                     </section>
 
                     {/* Section 4 */}
-                    <section id="s4" className="scroll-mt-24 p-6 rounded-2xl bg-[#121316]/50 border border-white/5 space-y-3">
-                        <h2 className="text-xl font-bold text-white flex items-center gap-2 border-b border-white/10 pb-3">
+                    <section id="s4" className="scroll-mt-24 p-6 rounded-2xl bg-white dark:bg-[#121316]/50 border border-zinc-200 dark:border-white/5 shadow-sm dark:shadow-none space-y-3">
+                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2 border-b border-zinc-200 dark:border-white/10 pb-3">
                             <span className="text-amber-400">4.</span> Lawful Processing and Consent
                         </h2>
                         <p><strong>4.1.</strong> We process personal information only where a valid legal basis exists under applicable law.</p>
@@ -332,8 +332,8 @@ export default function Privacy() {
                     </section>
 
                     {/* Section 5 */}
-                    <section id="s5" className="scroll-mt-24 p-6 rounded-2xl bg-[#121316]/50 border border-white/5 space-y-3">
-                        <h2 className="text-xl font-bold text-white flex items-center gap-2 border-b border-white/10 pb-3">
+                    <section id="s5" className="scroll-mt-24 p-6 rounded-2xl bg-white dark:bg-[#121316]/50 border border-zinc-200 dark:border-white/5 shadow-sm dark:shadow-none space-y-3">
+                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2 border-b border-zinc-200 dark:border-white/10 pb-3">
                             <span className="text-amber-400">5.</span> Public Profiles and Information Visibility
                         </h2>
                         <p><strong>5.1.</strong> iFilmDirectory is designed to facilitate professional visibility and networking in the film community.</p>
@@ -346,8 +346,8 @@ export default function Privacy() {
                     </section>
 
                     {/* Section 6 */}
-                    <section id="s6" className="scroll-mt-24 p-6 rounded-2xl bg-[#121316]/50 border border-white/5 space-y-3">
-                        <h2 className="text-xl font-bold text-white flex items-center gap-2 border-b border-white/10 pb-3">
+                    <section id="s6" className="scroll-mt-24 p-6 rounded-2xl bg-white dark:bg-[#121316]/50 border border-zinc-200 dark:border-white/5 shadow-sm dark:shadow-none space-y-3">
+                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2 border-b border-zinc-200 dark:border-white/10 pb-3">
                             <span className="text-amber-400">6.</span> Sharing and Disclosure of Information
                         </h2>
                         <p>We do not treat access to the Platform as unrestricted authorization to disclose personal data. Disclosures occur only in defined circumstances:</p>
@@ -362,8 +362,8 @@ export default function Privacy() {
                     </section>
 
                     {/* Section 7 */}
-                    <section id="s7" className="scroll-mt-24 p-6 rounded-2xl bg-[#121316]/50 border border-white/5 space-y-3">
-                        <h2 className="text-xl font-bold text-white flex items-center gap-2 border-b border-white/10 pb-3">
+                    <section id="s7" className="scroll-mt-24 p-6 rounded-2xl bg-white dark:bg-[#121316]/50 border border-zinc-200 dark:border-white/5 shadow-sm dark:shadow-none space-y-3">
+                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2 border-b border-zinc-200 dark:border-white/10 pb-3">
                             <span className="text-amber-400">7.</span> Firebase and Google Analytics
                         </h2>
                         <p><strong>7.1.</strong> Firebase is utilized for authentication, cloud storage, real-time sync, and notification delivery. While Firebase provides infrastructure security, effective data protection also relies on the Company&apos;s configured security rules.</p>
@@ -378,8 +378,8 @@ export default function Privacy() {
                     </section>
 
                     {/* Section 8 */}
-                    <section id="s8" className="scroll-mt-24 p-6 rounded-2xl bg-[#121316]/50 border border-white/5 space-y-3">
-                        <h2 className="text-xl font-bold text-white flex items-center gap-2 border-b border-white/10 pb-3">
+                    <section id="s8" className="scroll-mt-24 p-6 rounded-2xl bg-white dark:bg-[#121316]/50 border border-zinc-200 dark:border-white/5 shadow-sm dark:shadow-none space-y-3">
+                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2 border-b border-zinc-200 dark:border-white/10 pb-3">
                             <span className="text-amber-400">8.</span> Cookies and Similar Technologies
                         </h2>
                         <p><strong>8.1.</strong> iFilmDirectory uses cookies, local browser storage, and session tokens for authentication, site preferences, and analytics.</p>
@@ -388,8 +388,8 @@ export default function Privacy() {
                     </section>
 
                     {/* Section 9 */}
-                    <section id="s9" className="scroll-mt-24 p-6 rounded-2xl bg-[#121316]/50 border border-white/5 space-y-3">
-                        <h2 className="text-xl font-bold text-white flex items-center gap-2 border-b border-white/10 pb-3">
+                    <section id="s9" className="scroll-mt-24 p-6 rounded-2xl bg-white dark:bg-[#121316]/50 border border-zinc-200 dark:border-white/5 shadow-sm dark:shadow-none space-y-3">
+                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2 border-b border-zinc-200 dark:border-white/10 pb-3">
                             <span className="text-amber-400">9.</span> Data Security
                         </h2>
                         <p><strong>9.1.</strong> The Company implements reasonable technical and organizational safeguards appropriate to the sensitivity of personal information.</p>
@@ -399,8 +399,8 @@ export default function Privacy() {
                     </section>
 
                     {/* Section 10 */}
-                    <section id="s10" className="scroll-mt-24 p-6 rounded-2xl bg-[#121316]/50 border border-white/5 space-y-3">
-                        <h2 className="text-xl font-bold text-white flex items-center gap-2 border-b border-white/10 pb-3">
+                    <section id="s10" className="scroll-mt-24 p-6 rounded-2xl bg-white dark:bg-[#121316]/50 border border-zinc-200 dark:border-white/5 shadow-sm dark:shadow-none space-y-3">
+                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2 border-b border-zinc-200 dark:border-white/10 pb-3">
                             <span className="text-amber-400">10.</span> Data Retention
                         </h2>
                         <p><strong>10.1.</strong> Personal information is retained only as long as necessary for the operational purposes for which it was gathered.</p>
@@ -410,8 +410,8 @@ export default function Privacy() {
                     </section>
 
                     {/* Section 11 */}
-                    <section id="s11" className="scroll-mt-24 p-6 rounded-2xl bg-[#121316]/50 border border-white/5 space-y-3">
-                        <h2 className="text-xl font-bold text-white flex items-center gap-2 border-b border-white/10 pb-3">
+                    <section id="s11" className="scroll-mt-24 p-6 rounded-2xl bg-white dark:bg-[#121316]/50 border border-zinc-200 dark:border-white/5 shadow-sm dark:shadow-none space-y-3">
+                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2 border-b border-zinc-200 dark:border-white/10 pb-3">
                             <span className="text-amber-400">11.</span> User Rights and Privacy Requests
                         </h2>
                         <p>Under applicable Indian data protection laws, members are entitled to:</p>
@@ -423,16 +423,16 @@ export default function Privacy() {
                             <li><strong>11.5. Grievance Redressal:</strong> Submit formal privacy complaints to our designated officer.</li>
                         </ul>
                         <div className="mt-3 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/25">
-                            <p className="text-xs text-white">
+                            <p className="text-xs text-zinc-900 dark:text-white">
                                 <strong>Submitting a Privacy Request:</strong> Send your request along with account verification to{' '}
-                                <a href="mailto:ifilmdirectory@gmail.com" className="text-amber-400 font-bold underline">ifilmdirectory@gmail.com</a>. Requests are handled within statutory timelines.
+                                <a href="mailto:ifilmdirectory@gmail.com" className="text-amber-500 dark:text-amber-400 font-bold underline">ifilmdirectory@gmail.com</a>. Requests are handled within statutory timelines.
                             </p>
                         </div>
                     </section>
 
                     {/* Section 12 */}
-                    <section id="s12" className="scroll-mt-24 p-6 rounded-2xl bg-[#121316]/50 border border-white/5 space-y-3">
-                        <h2 className="text-xl font-bold text-white flex items-center gap-2 border-b border-white/10 pb-3">
+                    <section id="s12" className="scroll-mt-24 p-6 rounded-2xl bg-white dark:bg-[#121316]/50 border border-zinc-200 dark:border-white/5 shadow-sm dark:shadow-none space-y-3">
+                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2 border-b border-zinc-200 dark:border-white/10 pb-3">
                             <span className="text-amber-400">12.</span> Account Deletion
                         </h2>
                         <p><strong>12.1.</strong> Users can request account closure or data erasure by writing to <a href="mailto:ifilmdirectory@gmail.com" className="text-amber-400 underline">ifilmdirectory@gmail.com</a>.</p>
@@ -441,8 +441,8 @@ export default function Privacy() {
                     </section>
 
                     {/* Section 13 */}
-                    <section id="s13" className="scroll-mt-24 p-6 rounded-2xl bg-[#121316]/50 border border-white/5 space-y-3">
-                        <h2 className="text-xl font-bold text-white flex items-center gap-2 border-b border-white/10 pb-3">
+                    <section id="s13" className="scroll-mt-24 p-6 rounded-2xl bg-white dark:bg-[#121316]/50 border border-zinc-200 dark:border-white/5 shadow-sm dark:shadow-none space-y-3">
+                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2 border-b border-zinc-200 dark:border-white/10 pb-3">
                             <span className="text-amber-400">13.</span> Children&apos;s Privacy
                         </h2>
                         <p><strong>13.1.</strong> Account registration on iFilmDirectory is restricted to individuals aged <strong>18 years or older</strong>.</p>
@@ -451,8 +451,8 @@ export default function Privacy() {
                     </section>
 
                     {/* Section 14 */}
-                    <section id="s14" className="scroll-mt-24 p-6 rounded-2xl bg-[#121316]/50 border border-white/5 space-y-3">
-                        <h2 className="text-xl font-bold text-white flex items-center gap-2 border-b border-white/10 pb-3">
+                    <section id="s14" className="scroll-mt-24 p-6 rounded-2xl bg-white dark:bg-[#121316]/50 border border-zinc-200 dark:border-white/5 shadow-sm dark:shadow-none space-y-3">
+                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2 border-b border-zinc-200 dark:border-white/10 pb-3">
                             <span className="text-amber-400">14.</span> International Data Processing and Transfers
                         </h2>
                         <p><strong>14.1.</strong> The Company operates from India. Technology providers (including Firebase/Google Cloud) may maintain servers across global infrastructure.</p>
@@ -460,8 +460,8 @@ export default function Privacy() {
                     </section>
 
                     {/* Section 15 */}
-                    <section id="s15" className="scroll-mt-24 p-6 rounded-2xl bg-[#121316]/50 border border-white/5 space-y-3">
-                        <h2 className="text-xl font-bold text-white flex items-center gap-2 border-b border-white/10 pb-3">
+                    <section id="s15" className="scroll-mt-24 p-6 rounded-2xl bg-white dark:bg-[#121316]/50 border border-zinc-200 dark:border-white/5 shadow-sm dark:shadow-none space-y-3">
+                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2 border-b border-zinc-200 dark:border-white/10 pb-3">
                             <span className="text-amber-400">15.</span> Artificial Intelligence and Automated Features
                         </h2>
                         <p><strong>15.1.</strong> Automated algorithms may assist in search indexing, recommendations, and spam detection.</p>
@@ -469,8 +469,8 @@ export default function Privacy() {
                     </section>
 
                     {/* Section 16 */}
-                    <section id="s16" className="scroll-mt-24 p-6 rounded-2xl bg-[#121316]/50 border border-white/5 space-y-3">
-                        <h2 className="text-xl font-bold text-white flex items-center gap-2 border-b border-white/10 pb-3">
+                    <section id="s16" className="scroll-mt-24 p-6 rounded-2xl bg-white dark:bg-[#121316]/50 border border-zinc-200 dark:border-white/5 shadow-sm dark:shadow-none space-y-3">
+                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2 border-b border-zinc-200 dark:border-white/10 pb-3">
                             <span className="text-amber-400">16.</span> Third-Party Websites and External Content
                         </h2>
                         <p><strong>16.1.</strong> iFilmDirectory aggregates cinema news, trade updates, and links to external industry portals.</p>
@@ -478,8 +478,8 @@ export default function Privacy() {
                     </section>
 
                     {/* Section 17 */}
-                    <section id="s17" className="scroll-mt-24 p-6 rounded-2xl bg-[#121316]/50 border border-white/5 space-y-3">
-                        <h2 className="text-xl font-bold text-white flex items-center gap-2 border-b border-white/10 pb-3">
+                    <section id="s17" className="scroll-mt-24 p-6 rounded-2xl bg-white dark:bg-[#121316]/50 border border-zinc-200 dark:border-white/5 shadow-sm dark:shadow-none space-y-3">
+                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2 border-b border-zinc-200 dark:border-white/10 pb-3">
                             <span className="text-amber-400">17.</span> Data Breaches and Security Incidents
                         </h2>
                         <p><strong>17.1.</strong> Suspected security events are subject to technical investigation and immediate remediation.</p>
@@ -487,8 +487,8 @@ export default function Privacy() {
                     </section>
 
                     {/* Section 18 */}
-                    <section id="s18" className="scroll-mt-24 p-6 rounded-2xl bg-[#121316]/50 border border-white/5 space-y-3">
-                        <h2 className="text-xl font-bold text-white flex items-center gap-2 border-b border-white/10 pb-3">
+                    <section id="s18" className="scroll-mt-24 p-6 rounded-2xl bg-white dark:bg-[#121316]/50 border border-zinc-200 dark:border-white/5 shadow-sm dark:shadow-none space-y-3">
+                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2 border-b border-zinc-200 dark:border-white/10 pb-3">
                             <span className="text-amber-400">18.</span> Changes to This Privacy Policy
                         </h2>
                         <p><strong>18.1.</strong> The Company may revise this Privacy Policy to reflect technical upgrades, new features, or legislative changes.</p>
@@ -496,22 +496,22 @@ export default function Privacy() {
                     </section>
 
                     {/* Section 19 */}
-                    <section id="s19" className="scroll-mt-24 p-6 rounded-2xl bg-[#121316]/50 border border-white/5 space-y-4">
-                        <h2 className="text-xl font-bold text-white flex items-center gap-2 border-b border-white/10 pb-3">
+                    <section id="s19" className="scroll-mt-24 p-6 rounded-2xl bg-white dark:bg-[#121316]/50 border border-zinc-200 dark:border-white/5 shadow-sm dark:shadow-none space-y-4">
+                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2 border-b border-zinc-200 dark:border-white/10 pb-3">
                             <span className="text-amber-400">19.</span> Privacy Grievances and Contact Details
                         </h2>
                         <p>For inquiries, privacy requests, or complaints relating to personal data processing:</p>
-                        <div className="p-4 rounded-xl bg-black/40 border border-white/10 space-y-2 text-xs">
+                        <div className="p-4 rounded-xl bg-zinc-50 dark:bg-black/40 border border-zinc-200 dark:border-white/10 space-y-2 text-xs text-zinc-800 dark:text-zinc-200">
                             <p><strong>Company / Owner:</strong> 5M Collective Services Private Limited (5MC)</p>
                             <p><strong>Platform:</strong> iFilmDirectory</p>
-                            <p><strong>Privacy Contact:</strong> <a href="mailto:ifilmdirectory@gmail.com" className="text-amber-400 underline font-semibold">ifilmdirectory@gmail.com</a></p>
+                            <p><strong>Privacy Contact:</strong> <a href="mailto:ifilmdirectory@gmail.com" className="text-amber-500 dark:text-amber-400 underline font-semibold">ifilmdirectory@gmail.com</a></p>
                             <p><strong>Registered Correspondence Address:</strong> 105, First Floor, Sahiti Sri Vidya Petals, Street No. 1, Patrika Nagar, HITEC City, Hyderabad, Telangana 500081, India</p>
                         </div>
                     </section>
 
                     {/* Section 20 */}
-                    <section id="s20" className="scroll-mt-24 p-6 rounded-2xl bg-[#121316]/50 border border-white/5 space-y-3">
-                        <h2 className="text-xl font-bold text-white flex items-center gap-2 border-b border-white/10 pb-3">
+                    <section id="s20" className="scroll-mt-24 p-6 rounded-2xl bg-white dark:bg-[#121316]/50 border border-zinc-200 dark:border-white/5 shadow-sm dark:shadow-none space-y-3">
+                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2 border-b border-zinc-200 dark:border-white/10 pb-3">
                             <span className="text-amber-400">20.</span> Privacy Notice and Rights Under Phased Legislation
                         </h2>
                         <p><strong>20.1.</strong> Indian personal-data law is evolving through phased commencement of the Digital Personal Data Protection Act, 2023 and Digital Personal Data Protection Rules, 2025. We implement obligations as they come into statutory force.</p>
@@ -519,8 +519,8 @@ export default function Privacy() {
                     </section>
 
                     {/* Section 21 */}
-                    <section id="s21" className="scroll-mt-24 p-6 rounded-2xl bg-[#121316]/50 border border-white/5 space-y-3">
-                        <h2 className="text-xl font-bold text-white flex items-center gap-2 border-b border-white/10 pb-3">
+                    <section id="s21" className="scroll-mt-24 p-6 rounded-2xl bg-white dark:bg-[#121316]/50 border border-zinc-200 dark:border-white/5 shadow-sm dark:shadow-none space-y-3">
+                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2 border-b border-zinc-200 dark:border-white/10 pb-3">
                             <span className="text-amber-400">21.</span> Final Notice
                         </h2>
                         <p>iFilmDirectory is built to empower filmmakers, artists, technicians, and production companies to connect, collaborate, and create cinema. Users remain responsible for deciding what details they voluntarily publish. 5M Collective Services Private Limited (5MC) assumes legal responsibility under applicable laws for its processing activities as the platform owner and operator.</p>
@@ -534,27 +534,27 @@ export default function Privacy() {
                 {/* USER ACKNOWLEDGEMENT & ACCEPTANCE DRAWER */}
                 <div
                     id="user-acknowledgement"
-                    className="mt-16 p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-[#18191D] to-[#121316] border border-amber-500/30 shadow-2xl relative overflow-hidden"
+                    className="mt-16 p-6 sm:p-8 rounded-3xl bg-white dark:bg-gradient-to-br dark:from-[#18191D] dark:to-[#121316] border border-amber-500/30 shadow-xl dark:shadow-2xl relative overflow-hidden"
                 >
                     <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative z-10">
                         <div className="space-y-2 max-w-xl">
-                            <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-400">
+                            <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-500 dark:text-amber-400">
                                 <span className="material-symbols-outlined text-sm">verified_user</span>
                                 <span>Consent & Privacy Acknowledgment</span>
                             </span>
 
-                            <h3 className="text-xl sm:text-2xl font-bold text-white">
+                            <h3 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-white">
                                 {hasAgreed ? "You have acknowledged this Privacy Policy" : "Review and Acknowledge the Privacy Policy"}
                             </h3>
 
-                            <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+                            <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
                                 By acknowledging, you confirm you have reviewed how 5M Collective Services Private Limited (5MC) collects, safeguards, and handles your information on iFilmDirectory.
                             </p>
 
                             {hasAgreed && formattedAgreedDate && (
-                                <p className="text-xs text-emerald-400 font-medium flex items-center gap-1.5 pt-1">
+                                <p className="text-xs text-emerald-500 dark:text-emerald-400 font-medium flex items-center gap-1.5 pt-1">
                                     <span className="material-symbols-outlined text-sm filled" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
                                     <span>Acknowledged on {formattedAgreedDate}</span>
                                 </p>
@@ -563,12 +563,12 @@ export default function Privacy() {
 
                         <div className="w-full sm:w-auto flex flex-col items-stretch sm:items-end gap-3 shrink-0">
                             {!hasAgreed && (
-                                <label className="flex items-center gap-2.5 text-xs text-zinc-300 cursor-pointer select-none">
+                                <label className="flex items-center gap-2.5 text-xs text-zinc-700 dark:text-zinc-300 cursor-pointer select-none">
                                     <input
                                         type="checkbox"
                                         checked={isChecked}
                                         onChange={(e) => setIsChecked(e.target.checked)}
-                                        className="size-4 rounded bg-black/60 border-white/20 text-amber-500 focus:ring-amber-500 focus:ring-offset-0 cursor-pointer accent-amber-500"
+                                        className="size-4 rounded bg-white dark:bg-black/60 border-zinc-300 dark:border-white/20 text-amber-500 focus:ring-amber-500 focus:ring-offset-0 cursor-pointer accent-amber-500"
                                     />
                                     <span>I have read and agree to this Privacy Policy</span>
                                 </label>
@@ -579,10 +579,10 @@ export default function Privacy() {
                                 disabled={hasAgreed || !isChecked}
                                 className={`px-6 py-3 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 shadow-lg active:scale-95 ${
                                     hasAgreed
-                                        ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 cursor-default"
+                                        ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 cursor-default"
                                         : isChecked
                                         ? "bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black shadow-amber-500/20 cursor-pointer"
-                                        : "bg-white/10 text-zinc-500 border border-white/10 cursor-not-allowed"
+                                        : "bg-zinc-200 dark:bg-white/10 text-zinc-400 dark:text-zinc-500 border border-zinc-300 dark:border-white/10 cursor-not-allowed"
                                 }`}
                             >
                                 <span className="material-symbols-outlined text-base">
@@ -597,11 +597,11 @@ export default function Privacy() {
                 {/* Return to App Bar */}
                 <div className="mt-12 text-center text-xs text-zinc-500 space-y-3">
                     <div className="flex justify-center gap-4 text-xs font-semibold">
-                        <Link to="/terms" className="text-zinc-400 hover:text-white transition-colors">Terms of Service</Link>
+                        <Link to="/terms" className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">Terms of Service</Link>
                         <span>•</span>
-                        <Link to="/home" className="text-amber-400 hover:underline">Return to Home</Link>
+                        <Link to="/home" className="text-amber-500 dark:text-amber-400 hover:underline">Return to Home</Link>
                         <span>•</span>
-                        <Link to="/login" className="text-zinc-400 hover:text-white transition-colors">Sign In</Link>
+                        <Link to="/login" className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">Sign In</Link>
                     </div>
                     <p className="text-[11px] text-zinc-600">
                         © 2026 iFilmDirectory. A property of 5M Collective Services Pvt. Ltd. (5MC). All rights reserved.
