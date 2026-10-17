@@ -1,121 +1,77 @@
-// Dark/Light Mode Toggle Component
+// Dark/Light Mode Toggle Component (Connected to ThemeContext)
 
-import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useTheme } from '../context/ThemeContext';
 
 export const ThemeToggle = ({ className = '' }: { className?: string }) => {
-    const [isDark, setIsDark] = useState(true);
-
-    useEffect(() => {
-        // Check system preference or localStorage
-        const savedTheme = localStorage.getItem('theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-        const shouldBeDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
-        setIsDark(shouldBeDark);
-
-        // Apply theme
-        if (shouldBeDark) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-    }, []);
-
-    const toggleTheme = () => {
-        const newTheme = !isDark;
-        setIsDark(newTheme);
-
-        if (newTheme) {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('theme', 'light');
-        }
-    };
+    const { isDarkMode, toggleDarkMode } = useTheme();
 
     return (
         <button
-            onClick={toggleTheme}
+            onClick={toggleDarkMode}
+            type="button"
             className={`
-        relative w-14 h-7 rounded-full p-1
-        bg-gray-300 dark:bg-gray-700
-        transition-colors duration-300
-        ${className}
-      `}
+                relative w-14 h-7 rounded-full p-1
+                bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-white/10
+                transition-colors duration-300 cursor-pointer focus:outline-none select-none
+                ${className}
+            `}
+            title={isDarkMode ? "Switch to Day Theme (Studio Light)" : "Switch to Night Theme (Cinematic Dark)"}
             aria-label="Toggle theme"
         >
             {/* Toggle circle */}
             <motion.div
-                className="w-5 h-5 rounded-full bg-white dark:bg-gray-900 shadow-md flex items-center justify-center"
+                className="w-5 h-5 rounded-full bg-white dark:bg-amber-400 shadow-md flex items-center justify-center text-zinc-800 dark:text-black"
                 animate={{
-                    x: isDark ? 28 : 0,
+                    x: isDarkMode ? 28 : 0,
                 }}
                 transition={{ type: 'spring', stiffness: 500, damping: 30 }}
             >
                 {/* Icon */}
                 <span className="material-symbols-outlined text-xs">
-                    {isDark ? 'dark_mode' : 'light_mode'}
+                    {isDarkMode ? 'dark_mode' : 'light_mode'}
                 </span>
             </motion.div>
         </button>
     );
 };
 
-// Alternative: Icon-based toggle
-export const ThemeToggleIcon = ({ className = '' }: { className?: string }) => {
-    const [isDark, setIsDark] = useState(true);
-
-    useEffect(() => {
-        const savedTheme = localStorage.getItem('theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const shouldBeDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
-        setIsDark(shouldBeDark);
-
-        if (shouldBeDark) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-    }, []);
-
-    const toggleTheme = () => {
-        const newTheme = !isDark;
-        setIsDark(newTheme);
-
-        if (newTheme) {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('theme', 'light');
-        }
-    };
+// Alternative: Icon-based toggle with optional label
+export const ThemeToggleIcon = ({ className = '', showLabel = false }: { className?: string; showLabel?: boolean }) => {
+    const { isDarkMode, toggleDarkMode } = useTheme();
 
     return (
         <motion.button
-            onClick={toggleTheme}
+            onClick={toggleDarkMode}
+            type="button"
             className={`
-        p-2 rounded-full
-        hover:bg-gray-100 dark:hover:bg-gray-800
-        transition-colors
-        ${className}
-      `}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+                flex items-center gap-1.5 p-2 rounded-xl
+                hover:bg-zinc-100 dark:hover:bg-white/[0.08]
+                text-zinc-700 dark:text-zinc-200
+                transition-colors cursor-pointer select-none
+                ${className}
+            `}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            title={isDarkMode ? "Switch to Day Theme (Studio Light)" : "Switch to Night Theme (Cinematic Dark)"}
             aria-label="Toggle theme"
         >
             <motion.span
-                className="material-symbols-outlined text-2xl"
+                className={`material-symbols-outlined text-xl ${isDarkMode ? 'text-amber-400' : 'text-amber-600'}`}
                 initial={false}
-                animate={{ rotate: isDark ? 0 : 180 }}
+                animate={{ rotate: isDarkMode ? 0 : 180 }}
                 transition={{ duration: 0.3 }}
             >
-                {isDark ? 'dark_mode' : 'light_mode'}
+                {isDarkMode ? 'light_mode' : 'dark_mode'}
             </motion.span>
+            {showLabel && (
+                <span className="text-xs font-bold font-display uppercase tracking-wider text-zinc-900 dark:text-white">
+                    {isDarkMode ? 'Day' : 'Night'}
+                </span>
+            )}
         </motion.button>
     );
 };
 
 export default ThemeToggle;
+

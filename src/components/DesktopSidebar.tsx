@@ -1,5 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import Logo from './Logo';
 import PostMedia from './PostMedia';
 
@@ -12,6 +13,7 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
     const navigate = useNavigate();
     const location = useLocation();
     const { currentUser } = useAuth();
+    const { isDarkMode, toggleDarkMode } = useTheme();
 
     const isActive = (path: string) => {
         if (path === '/home') return location.pathname === '/home';
@@ -140,13 +142,38 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                 </nav>
             </div>
 
-            {/* Bottom: Settings & User Identity */}
+            {/* Bottom: Theme, Settings & User Identity */}
             <div className="flex flex-col gap-1.5 relative mt-auto pt-4 shrink-0">
+                {/* Handy Day / Night Theme Toggle */}
+                <button
+                    onClick={toggleDarkMode}
+                    type="button"
+                    title={isDarkMode ? 'Switch to Day Theme (Studio Light)' : 'Switch to Night Theme (Cinematic Dark)'}
+                    className="group relative flex items-center justify-center xl:justify-start gap-4 px-3 py-2.5 rounded-2xl transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.05] cursor-pointer"
+                    aria-label="Toggle theme"
+                >
+                    <div className="relative flex items-center justify-center shrink-0">
+                        <span className={`material-symbols-outlined text-[24px] transition-transform duration-200 group-hover:scale-110 ${isDarkMode ? 'text-amber-400' : 'text-amber-600'}`}>
+                            {isDarkMode ? 'light_mode' : 'dark_mode'}
+                        </span>
+                    </div>
+                    <span className="hidden xl:inline text-sm font-medium text-zinc-700 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-white">
+                        {isDarkMode ? 'Day Theme' : 'Night Theme'}
+                    </span>
+                    <span className="hidden xl:inline-block ml-auto text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                        {isDarkMode ? 'Night' : 'Day'}
+                    </span>
+                    {/* Tooltip on collapsed tablet/desktop (md - lg) */}
+                    <span className="xl:hidden opacity-0 pointer-events-none group-hover:opacity-100 absolute left-full ml-3 px-2.5 py-1 bg-zinc-900 text-white dark:bg-[#18191D] dark:text-white border border-zinc-700 dark:border-white/10 text-xs font-semibold rounded-lg shadow-xl whitespace-nowrap z-50 transition-opacity">
+                        {isDarkMode ? 'Switch to Day Theme' : 'Switch to Night Theme'}
+                    </span>
+                </button>
+
                 {/* Settings Item */}
                 <button
                     onClick={() => navigate('/settings')}
                     title="Settings"
-                    className={`group flex items-center justify-center xl:justify-start gap-4 px-3 py-2.5 rounded-2xl transition-all ${
+                    className={`group relative flex items-center justify-center xl:justify-start gap-4 px-3 py-2.5 rounded-2xl transition-all cursor-pointer ${
                         isActive('/settings')
                             ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold border border-amber-500/30 dark:border-amber-500/20'
                             : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.05]'

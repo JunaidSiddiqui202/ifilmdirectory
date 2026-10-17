@@ -5,6 +5,7 @@ import { signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPass
 import { collection, addDoc } from 'firebase/firestore';
 import { createUserProfile, triggerEmail } from '../services/userService';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import Logo from '../components/Logo';
 import { useToast } from '../context/ToastContext';
 
@@ -66,12 +67,26 @@ export default function Login() {
     const [searchParams] = useSearchParams();
     const toast = useToast();
     const { currentUser } = useAuth();
+    const { isDarkMode, toggleDarkMode } = useTheme();
 
     // Initialize tab state based on URL parameter
     const initialTab = searchParams.get('tab');
     const [view, setView] = useState<'login' | 'signup' | 'request'>(
         initialTab === 'request' ? 'request' : initialTab === 'signup' ? 'signup' : 'login'
     );
+
+    const scrollToAuthBox = (targetView?: 'login' | 'signup' | 'request') => {
+        if (targetView) {
+            setView(targetView);
+            setSubmitted(false);
+        }
+        setTimeout(() => {
+            const el = document.getElementById('auth-box');
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 60);
+    };
     const [showPassword, setShowPassword] = useState(false);
     const [fullName, setFullName] = useState('');
     const [portfolioLink, setPortfolioLink] = useState('');
@@ -319,32 +334,52 @@ export default function Login() {
                         <span>Showreels & Reviews</span>
                     </div>
 
-                    {currentUser ? (
+                    <div className="flex items-center gap-2 sm:gap-3">
+                        {/* Handy Day / Night Theme Toggle */}
                         <button
-                            onClick={() => navigate('/home')}
-                            className="px-4 sm:px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs sm:text-sm shadow-lg shadow-amber-500/20 transition-all flex items-center gap-1.5"
+                            type="button"
+                            onClick={toggleDarkMode}
+                            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.08] dark:hover:bg-white/[0.15] text-zinc-700 dark:text-amber-400 border border-zinc-200 dark:border-white/10 transition-all active:scale-95 cursor-pointer shadow-sm select-none"
+                            title={isDarkMode ? "Switch to Day Theme (Studio Light)" : "Switch to Night Theme (Cinematic Dark)"}
+                            aria-label="Toggle theme"
                         >
-                            <span>Enter App</span>
-                            <span className="material-symbols-outlined text-base">arrow_forward</span>
+                            <span className="material-symbols-outlined text-base sm:text-lg">
+                                {isDarkMode ? 'light_mode' : 'dark_mode'}
+                            </span>
+                            <span className="text-xs font-bold uppercase tracking-wider font-display text-zinc-900 dark:text-white">
+                                {isDarkMode ? 'Day' : 'Night'}
+                            </span>
                         </button>
-                    ) : (
-                        <div className="flex items-center gap-2">
+
+                        {currentUser ? (
                             <button
-                                onClick={() => { setView('login'); setSubmitted(false); }}
-                                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
-                                    view === 'login' ? 'text-amber-500 dark:text-amber-400 bg-amber-500/10' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
-                                }`}
+                                onClick={() => navigate('/home')}
+                                className="px-4 sm:px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs sm:text-sm shadow-lg shadow-amber-500/20 transition-all flex items-center gap-1.5 cursor-pointer"
                             >
-                                Sign In
+                                <span>Enter App</span>
+                                <span className="material-symbols-outlined text-base">arrow_forward</span>
                             </button>
-                            <button
-                                onClick={() => { setView('signup'); setSubmitted(false); }}
-                                className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs transition-all shadow-sm"
-                            >
-                                Sign Up
-                            </button>
-                        </div>
-                    )}
+                        ) : (
+                            <div className="flex items-center gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => scrollToAuthBox('login')}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                                        view === 'login' ? 'text-amber-500 dark:text-amber-400 bg-amber-500/10' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                                    }`}
+                                >
+                                    Sign In
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => scrollToAuthBox('signup')}
+                                    className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs transition-all shadow-sm cursor-pointer"
+                                >
+                                    Sign Up
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </header>
 
@@ -429,7 +464,7 @@ export default function Login() {
                         </div>
 
                         {/* RIGHT COLUMN (5 COLS): The Auth Card (Login / Sign Up / Request Access) */}
-                        <div className="lg:col-span-5 w-full max-w-md mx-auto">
+                        <div id="auth-box" className="lg:col-span-5 w-full max-w-md mx-auto scroll-mt-24">
                             <div className="relative rounded-3xl bg-white dark:bg-[#121316]/95 border border-zinc-200 dark:border-white/10 p-6 sm:p-8 shadow-2xl backdrop-blur-xl text-zinc-900 dark:text-white">
                                 
                                 {/* Current User Quick Switcher Banner */}
@@ -837,6 +872,44 @@ export default function Login() {
                                                         </>
                                                     )}
                                                 </button>
+                                            </div>
+
+                                            {/* Quick Switch between Login & Signup */}
+                                            <div className="pt-2 text-center">
+                                                {view === 'login' ? (
+                                                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                                                        Don't have an account?{' '}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => scrollToAuthBox('signup')}
+                                                            className="text-amber-500 dark:text-amber-400 font-bold hover:underline cursor-pointer"
+                                                        >
+                                                            Sign up for free
+                                                        </button>
+                                                    </p>
+                                                ) : view === 'signup' ? (
+                                                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                                                        Already have an account?{' '}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => scrollToAuthBox('login')}
+                                                            className="text-amber-500 dark:text-amber-400 font-bold hover:underline cursor-pointer"
+                                                        >
+                                                            Sign In
+                                                        </button>
+                                                    </p>
+                                                ) : (
+                                                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                                                        Already registered?{' '}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => scrollToAuthBox('login')}
+                                                            className="text-amber-500 dark:text-amber-400 font-bold hover:underline cursor-pointer"
+                                                        >
+                                                            Sign In
+                                                        </button>
+                                                    </p>
+                                                )}
                                             </div>
                                         </form>
                                     </>

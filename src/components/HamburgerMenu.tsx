@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import Logo from './Logo';
 
 export default function HamburgerMenu() {
@@ -11,6 +12,7 @@ export default function HamburgerMenu() {
     const location = useLocation();
 
     const { currentUser, logout } = useAuth();
+    const { isDarkMode, toggleDarkMode } = useTheme();
 
     const toggleMenu = () => {
         setIsOpen(!isOpen);
@@ -90,12 +92,26 @@ export default function HamburgerMenu() {
                             <div className="p-5 border-b border-zinc-100 dark:border-white/5">
                                 <div className="flex items-center justify-between mb-4">
                                     <Logo size="sm" />
-                                    <button
-                                        onClick={() => setIsOpen(false)}
-                                        className="size-8 rounded-full bg-zinc-100 dark:bg-white/5 flex items-center justify-center text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors"
-                                    >
-                                        <span className="material-symbols-outlined text-lg">close</span>
-                                    </button>
+                                    <div className="flex items-center gap-2">
+                                        {/* Handy Theme Toggle */}
+                                        <button
+                                            type="button"
+                                            onClick={toggleDarkMode}
+                                            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.08] dark:hover:bg-white/[0.15] text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-white/10 text-xs font-bold font-display cursor-pointer transition-all active:scale-95 shadow-sm"
+                                            title={isDarkMode ? 'Switch to Day Theme' : 'Switch to Night Theme'}
+                                        >
+                                            <span className={`material-symbols-outlined text-base ${isDarkMode ? 'text-amber-400' : 'text-amber-600'}`}>
+                                                {isDarkMode ? 'light_mode' : 'dark_mode'}
+                                            </span>
+                                            <span>{isDarkMode ? 'Day' : 'Night'}</span>
+                                        </button>
+                                        <button
+                                            onClick={() => setIsOpen(false)}
+                                            className="size-8 rounded-full bg-zinc-100 dark:bg-white/5 flex items-center justify-center text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer"
+                                        >
+                                            <span className="material-symbols-outlined text-lg">close</span>
+                                        </button>
+                                    </div>
                                 </div>
                                 {currentUser && (
                                     <div
@@ -152,11 +168,35 @@ export default function HamburgerMenu() {
                                 ))}
                             </div>
 
-                            {/* Footer / Logout */}
-                            <div className="border-t border-zinc-100 dark:border-white/5 p-4 pb-safe">
+                            {/* Footer / Theme & Logout */}
+                            <div className="border-t border-zinc-100 dark:border-white/5 p-4 pb-safe space-y-2">
+                                {/* Theme Switcher Card */}
+                                <div className="p-2.5 rounded-2xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/5 flex items-center justify-between">
+                                    <div className="flex items-center gap-2.5">
+                                        <span className={`material-symbols-outlined text-xl ${isDarkMode ? 'text-amber-400' : 'text-amber-600'}`}>
+                                            {isDarkMode ? 'light_mode' : 'dark_mode'}
+                                        </span>
+                                        <div className="text-left">
+                                            <p className="text-xs font-bold text-zinc-900 dark:text-white">
+                                                {isDarkMode ? 'Night Theme' : 'Day Theme'}
+                                            </p>
+                                            <p className="text-[10px] text-zinc-500 dark:text-zinc-400">
+                                                {isDarkMode ? 'Cinematic Dark' : 'Studio Light'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={toggleDarkMode}
+                                        className="px-2.5 py-1 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/20 text-[11px] font-bold tracking-wider uppercase transition-all active:scale-95 cursor-pointer"
+                                    >
+                                        To {isDarkMode ? 'Day' : 'Night'}
+                                    </button>
+                                </div>
+
                                 <button
                                     onClick={handleLogout}
-                                    className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-red-500 hover:bg-red-500/10 transition-colors"
+                                    className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
                                 >
                                     <span className="material-symbols-outlined text-xl">logout</span>
                                     <span className="text-xs font-bold">Sign Out</span>
