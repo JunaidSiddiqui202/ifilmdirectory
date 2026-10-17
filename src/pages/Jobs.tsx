@@ -71,10 +71,10 @@ export default function Jobs() {
     };
 
     return (
-        <div className="relative flex min-h-[100dvh] w-full flex-col bg-[#090A0C] text-white pb-36 md:pb-24 overflow-x-hidden font-display transition-colors">
+        <div className="relative flex min-h-[100dvh] w-full flex-col bg-slate-50 dark:bg-[#090A0C] text-zinc-900 dark:text-white pb-36 md:pb-24 overflow-x-hidden font-display transition-colors">
             <div className="w-full max-w-7xl mx-auto flex flex-col flex-1 px-3 sm:px-6 lg:px-8">
                 {/* Cinema Top Header */}
-                <header className="sticky top-0 z-40 flex flex-col bg-[#090A0C]/90 backdrop-blur-2xl border-b border-white/[0.06] -mx-3 sm:-mx-6 lg:-mx-8 px-3 sm:px-6 lg:px-8 py-3.5 gap-3">
+                <header className="sticky top-0 z-40 flex flex-col bg-white/90 dark:bg-[#090A0C]/90 backdrop-blur-2xl border-b border-zinc-200 dark:border-white/[0.06] -mx-3 sm:-mx-6 lg:-mx-8 px-3 sm:px-6 lg:px-8 py-3.5 gap-3">
                     <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3 min-w-0">
                             <div className="md:hidden flex items-center gap-2 cursor-pointer select-none" onClick={() => navigate('/home')}>
@@ -82,17 +82,17 @@ export default function Jobs() {
                                 <Logo size="sm" showText={true} />
                             </div>
                             <div className="hidden md:flex items-center gap-2.5">
-                                <div className="size-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center">
+                                <div className="size-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-500 dark:text-amber-400 flex items-center justify-center">
                                     <span className="material-symbols-outlined text-xl">work</span>
                                 </div>
                                 <div>
-                                    <h1 className="text-lg font-black text-white tracking-tight flex items-center gap-2">
+                                    <h1 className="text-lg font-black text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
                                         <span>Castings & Crew Calls</span>
-                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">
                                             Live Board
                                         </span>
                                     </h1>
-                                    <p className="text-[11px] text-zinc-400">Direct hiring by verified production houses & indie filmmakers</p>
+                                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400">Direct hiring by verified production houses & indie filmmakers</p>
                                 </div>
                             </div>
                         </div>
@@ -111,7 +111,7 @@ export default function Jobs() {
                     {/* Integrated Search & Quick Controls */}
                     <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5 pt-1">
                         <div className="sm:col-span-8 relative flex items-center">
-                            <span className="material-symbols-outlined absolute left-3.5 text-zinc-500 text-lg pointer-events-none">
+                            <span className="material-symbols-outlined absolute left-3.5 text-zinc-400 dark:text-zinc-500 text-lg pointer-events-none">
                                 search
                             </span>
                             <input
@@ -119,7 +119,7 @@ export default function Jobs() {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder="Search by role, character, camera, production house, city..."
-                                className="w-full bg-[#121316] border border-white/10 rounded-xl pl-10 pr-9 py-2.5 text-xs text-white placeholder:text-zinc-500 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/30 transition-all"
+                                className="w-full bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/10 rounded-xl pl-10 pr-9 py-2.5 text-xs text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/30 transition-all shadow-sm dark:shadow-none"
                             />
                             {searchQuery && (
                                 <button

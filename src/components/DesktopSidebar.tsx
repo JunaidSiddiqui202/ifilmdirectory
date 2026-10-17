@@ -46,7 +46,7 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
     ];
 
     return (
-        <aside className="hidden md:flex flex-col fixed left-0 top-0 bottom-0 z-40 bg-[#090A0C] border-r border-white/[0.08] w-20 xl:w-64 select-none px-3 py-4 font-display transition-all duration-300 overflow-y-auto overscroll-contain custom-scrollbar">
+        <aside className="hidden md:flex flex-col fixed left-0 top-0 bottom-0 z-40 bg-white dark:bg-[#090A0C] border-r border-zinc-200 dark:border-white/[0.08] w-20 xl:w-64 select-none px-3 py-4 font-display transition-colors duration-200 overflow-y-auto overscroll-contain custom-scrollbar">
             {/* Top: Brand Header & Navigation */}
             <div className="flex flex-col gap-4 shrink-0">
                 {/* Logo */}
@@ -74,15 +74,15 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                                 title={item.label}
                                 className={`relative group flex items-center justify-center xl:justify-start gap-4 px-3 py-2.5 rounded-2xl transition-all duration-200 ${
                                     active
-                                        ? 'bg-amber-500/10 text-amber-400 font-bold border border-amber-500/20 shadow-sm'
-                                        : 'text-zinc-400 hover:text-white hover:bg-white/[0.05]'
+                                        ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold border border-amber-500/30 dark:border-amber-500/20 shadow-sm'
+                                        : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.05]'
                                 }`}
                                 aria-current={active ? 'page' : undefined}
                             >
                                 {/* Icon */}
                                 <div className="relative flex items-center justify-center shrink-0">
                                     {item.isProfile ? (
-                                        <div className={`size-7 rounded-full overflow-hidden border-2 transition-all ${active ? 'border-amber-500 ring-2 ring-amber-500/30' : 'border-white/20 group-hover:border-white/50'}`}>
+                                        <div className={`size-7 rounded-full overflow-hidden border-2 transition-all ${active ? 'border-amber-500 ring-2 ring-amber-500/30' : 'border-zinc-300 dark:border-white/20 group-hover:border-zinc-500 dark:group-hover:border-white/50'}`}>
                                             <PostMedia
                                                 src={currentUser?.photoURL || ''}
                                                 fallbackType="USER_MALE"
@@ -92,7 +92,7 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                                     ) : (
                                         <span
                                             className={`material-symbols-outlined text-[24px] transition-transform duration-200 group-hover:scale-110 ${
-                                                active ? 'filled text-amber-400' : 'text-zinc-400 group-hover:text-white'
+                                                active ? 'filled text-amber-500 dark:text-amber-400' : 'text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white'
                                             }`}
                                             style={active ? { fontVariationSettings: "'FILL' 1" } : undefined}
                                         >
@@ -107,12 +107,12 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                                 </div>
 
                                 {/* Label (Visible on xl) */}
-                                <span className={`hidden xl:inline text-sm tracking-tight truncate ${active ? 'font-bold text-white' : 'font-medium'}`}>
+                                <span className={`hidden xl:inline text-sm tracking-tight truncate ${active ? 'font-bold text-zinc-900 dark:text-white' : 'font-medium text-zinc-700 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-white'}`}>
                                     {item.label}
                                 </span>
 
                                 {/* Tooltip on collapsed tablet/desktop (md - lg) */}
-                                <span className="xl:hidden opacity-0 pointer-events-none group-hover:opacity-100 absolute left-full ml-3 px-2.5 py-1 bg-[#18191D] border border-white/10 text-white text-xs font-semibold rounded-lg shadow-xl whitespace-nowrap z-50 transition-opacity">
+                                <span className="xl:hidden opacity-0 pointer-events-none group-hover:opacity-100 absolute left-full ml-3 px-2.5 py-1 bg-zinc-900 text-white dark:bg-[#18191D] dark:text-white border border-zinc-700 dark:border-white/10 text-xs font-semibold rounded-lg shadow-xl whitespace-nowrap z-50 transition-opacity">
                                     {item.label}
                                 </span>
                             </button>
@@ -132,7 +132,7 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                             </span>
 
                             {/* Tooltip on collapsed */}
-                            <span className="xl:hidden opacity-0 pointer-events-none group-hover:opacity-100 absolute left-full ml-3 px-2.5 py-1 bg-[#18191D] border border-white/10 text-white text-xs font-semibold rounded-lg shadow-xl whitespace-nowrap z-50 transition-opacity">
+                            <span className="xl:hidden opacity-0 pointer-events-none group-hover:opacity-100 absolute left-full ml-3 px-2.5 py-1 bg-zinc-900 text-white dark:bg-[#18191D] dark:text-white border border-zinc-700 dark:border-white/10 text-xs font-semibold rounded-lg shadow-xl whitespace-nowrap z-50 transition-opacity">
                                 Create New
                             </span>
                         </button>
@@ -148,13 +148,13 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                     title="Settings"
                     className={`group flex items-center justify-center xl:justify-start gap-4 px-3 py-2.5 rounded-2xl transition-all ${
                         isActive('/settings')
-                            ? 'bg-amber-500/10 text-amber-400 font-bold border border-amber-500/20'
-                            : 'text-zinc-400 hover:text-white hover:bg-white/[0.05]'
+                            ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold border border-amber-500/30 dark:border-amber-500/20'
+                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.05]'
                     }`}
                 >
-                    <span className="material-symbols-outlined text-[24px]">settings</span>
-                    <span className="hidden xl:inline text-sm font-medium">Settings</span>
-                    <span className="xl:hidden opacity-0 pointer-events-none group-hover:opacity-100 absolute left-full ml-3 px-2.5 py-1 bg-[#18191D] border border-white/10 text-white text-xs font-semibold rounded-lg shadow-xl whitespace-nowrap z-50 transition-opacity">
+                    <span className={`material-symbols-outlined text-[24px] ${isActive('/settings') ? 'text-amber-500 dark:text-amber-400' : 'text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white'}`}>settings</span>
+                    <span className={`hidden xl:inline text-sm ${isActive('/settings') ? 'font-bold text-zinc-900 dark:text-white' : 'font-medium text-zinc-700 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-white'}`}>Settings</span>
+                    <span className="xl:hidden opacity-0 pointer-events-none group-hover:opacity-100 absolute left-full ml-3 px-2.5 py-1 bg-zinc-900 text-white dark:bg-[#18191D] dark:text-white border border-zinc-700 dark:border-white/10 text-xs font-semibold rounded-lg shadow-xl whitespace-nowrap z-50 transition-opacity">
                         Settings
                     </span>
                 </button>
@@ -163,9 +163,9 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                 <div
                     onClick={() => navigate('/profile')}
                     title="My Profile"
-                    className="hidden xl:flex items-center gap-3 p-2 mt-0.5 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-amber-500/30 transition-all cursor-pointer group"
+                    className="hidden xl:flex items-center gap-3 p-2 mt-0.5 rounded-2xl bg-zinc-100 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/5 hover:border-amber-500/40 transition-all cursor-pointer group"
                 >
-                    <div className="size-9 rounded-full overflow-hidden border border-white/20 group-hover:border-amber-500 transition-colors shrink-0">
+                    <div className="size-9 rounded-full overflow-hidden border border-zinc-300 dark:border-white/20 group-hover:border-amber-500 transition-colors shrink-0">
                         <PostMedia
                             src={currentUser?.photoURL || ''}
                             fallbackType="USER_MALE"
@@ -173,14 +173,14 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                         />
                     </div>
                     <div className="min-w-0 flex-1">
-                        <p className="text-xs font-bold text-white group-hover:text-amber-400 transition-colors truncate">
+                        <p className="text-xs font-bold text-zinc-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors truncate">
                             {currentUser?.displayName || 'Filmmaker'}
                         </p>
-                        <p className="text-[10px] text-zinc-400 truncate">
+                        <p className="text-[10px] text-zinc-500 dark:text-zinc-400 truncate">
                             {currentUser?.email?.split('@')[0] || 'Creator'}
                         </p>
                     </div>
-                    <span className="material-symbols-outlined text-zinc-500 group-hover:text-white text-base">chevron_right</span>
+                    <span className="material-symbols-outlined text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-800 dark:group-hover:text-white text-base">chevron_right</span>
                 </div>
             </div>
         </aside>

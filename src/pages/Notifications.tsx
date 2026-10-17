@@ -101,18 +101,18 @@ export default function Notifications() {
     };
 
     return (
-        <div className="relative flex min-h-screen w-full flex-col bg-[#090A0C] text-white overflow-x-hidden font-display selection:bg-amber-500/30 pb-28">
+        <div className="relative flex min-h-screen w-full flex-col bg-slate-50 dark:bg-[#090A0C] text-zinc-900 dark:text-white overflow-x-hidden font-display selection:bg-amber-500/30 pb-28 transition-colors">
             {/* Top Navigation */}
-            <header className="sticky top-0 z-40 bg-[#090A0C]/90 backdrop-blur-xl border-b border-white/[0.08] px-4 md:px-8 py-3.5 flex items-center justify-between gap-4">
+            <header className="sticky top-0 z-40 bg-white/90 dark:bg-[#090A0C]/90 backdrop-blur-xl border-b border-zinc-200 dark:border-white/[0.08] px-4 md:px-8 py-3.5 flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3 min-w-0">
                     <button
                         onClick={() => navigate(-1)}
-                        className="flex size-9 items-center justify-center rounded-xl bg-white/[0.04] border border-white/[0.08] text-white hover:bg-white/[0.08] transition-all"
+                        className="flex size-9 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.04] border border-zinc-200 dark:border-white/[0.08] text-zinc-700 dark:text-white transition-all"
                     >
                         <span className="material-symbols-outlined text-lg">arrow_back_ios_new</span>
                     </button>
                     <div>
-                        <h1 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2">
+                        <h1 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
                             <span>Notifications</span>
                             {unreadCount > 0 && (
                                 <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-500 text-black font-extrabold shadow-sm">
@@ -120,7 +120,7 @@ export default function Notifications() {
                                 </span>
                             )}
                         </h1>
-                        <p className="text-xs text-zinc-400 hidden sm:block">
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 hidden sm:block">
                             Casting calls, project requests, and industry network alerts
                         </p>
                     </div>
@@ -130,14 +130,14 @@ export default function Notifications() {
                     {unreadCount > 0 && (
                         <button
                             onClick={handleMarkAllRead}
-                            className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-zinc-300 hover:text-white border border-white/[0.08] transition-all"
+                            className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/[0.08] transition-all"
                         >
                             Mark All Read
                         </button>
                     )}
                     <button
                         onClick={() => navigate('/settings')}
-                        className="size-9 rounded-xl bg-white/[0.04] border border-white/[0.08] text-zinc-300 hover:text-white flex items-center justify-center transition-all"
+                        className="size-9 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.04] border border-zinc-200 dark:border-white/[0.08] text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white flex items-center justify-center transition-all"
                     >
                         <span className="material-symbols-outlined text-lg">settings</span>
                     </button>

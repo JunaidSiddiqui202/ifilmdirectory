@@ -111,3 +111,133 @@
     animation-play-state: paused;
   }
 }
+
+/* ========================================================
+   DAY THEME ENGINE (Studio Light Mode)
+   Transforms dark cinema theme into crisp light studio UI
+   when 'dark' class is absent from <html>
+   ======================================================== */
+html:not(.dark) {
+  color-scheme: light;
+}
+
+html:not(.dark) body {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+/* Background surfaces that were hardcoded dark */
+html:not(.dark) .bg-\[\#090A0C\],
+html:not(.dark) .bg-\[\#090a0c\],
+html:not(.dark) .bg-\[\#0A0B0E\],
+html:not(.dark) .bg-\[\#0B0C0E\],
+html:not(.dark) .bg-\[\#08090B\],
+html:not(.dark) .bg-\[\#000000\] {
+  background-color: #f8fafc !important;
+  color: #0f172a;
+}
+
+/* Semi-transparent dark headers and navbars */
+html:not(.dark) header.bg-\[\#090A0C\]\/95,
+html:not(.dark) header.bg-\[\#090A0C\]\/90,
+html:not(.dark) header.bg-\[\#090A0C\]\/85,
+html:not(.dark) header.bg-\[\#090A0C\]\/80,
+html:not(.dark) header.bg-\[\#0B0C0E\]\/90,
+html:not(.dark) div.sticky.bg-\[\#090A0C\]\/95,
+html:not(.dark) div.sticky.bg-\[\#090A0C\]\/90,
+html:not(.dark) div.sticky.bg-\[\#090A0C\]\/85 {
+  background-color: rgba(255, 255, 255, 0.92) !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Cards and content blocks */
+html:not(.dark) .bg-\[\#121316\],
+html:not(.dark) .bg-\[\#14161a\],
+html:not(.dark) .bg-\[\#18191D\],
+html:not(.dark) .bg-\[\#1a1b1e\],
+html:not(.dark) .bg-\[\#16171b\],
+html:not(.dark) .bg-\[\#131418\],
+html:not(.dark) .bg-\[\#15171c\] {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  color: #0f172a;
+}
+
+/* Subtle background fills */
+html:not(.dark) .bg-white\/\[0\.02\],
+html:not(.dark) .bg-white\/\[0\.03\],
+html:not(.dark) .bg-white\/\[0\.04\],
+html:not(.dark) .bg-white\/\[0\.05\],
+html:not(.dark) .bg-white\/\[0\.06\],
+html:not(.dark) .bg-white\/5 {
+  background-color: #f1f5f9 !important;
+}
+
+/* Dark borders to light borders */
+html:not(.dark) .border-white\/5,
+html:not(.dark) .border-white\/10,
+html:not(.dark) .border-white\/\[0\.04\],
+html:not(.dark) .border-white\/\[0\.05\],
+html:not(.dark) .border-white\/\[0\.06\],
+html:not(.dark) .border-white\/\[0\.07\],
+html:not(.dark) .border-white\/\[0\.08\],
+html:not(.dark) .border-white\/\[0\.1\] {
+  border-color: #e2e8f0 !important;
+}
+
+/* General Headings and Titles (except colored buttons, badges, gradients, and video overlays) */
+html:not(.dark) h1.text-white:not([class*="bg-amber"]):not([class*="bg-gradient"]),
+html:not(.dark) h2.text-white:not([class*="bg-amber"]):not([class*="bg-gradient"]),
+html:not(.dark) h3.text-white:not([class*="bg-amber"]):not([class*="bg-gradient"]),
+html:not(.dark) h4.text-white:not([class*="bg-amber"]):not([class*="bg-gradient"]),
+html:not(.dark) h5.text-white:not([class*="bg-amber"]):not([class*="bg-gradient"]) {
+  color: #0f172a !important;
+}
+
+/* Body / Secondary Text */
+html:not(.dark) p.text-white:not([class*="bg-amber"]):not([class*="bg-gradient"]):not(.aspect-\[9\/16\] *):not(.aspect-video *),
+html:not(.dark) span.text-white:not([class*="bg-"]):not([class*="rounded-full"]):not([class*="rounded-lg"]):not(.aspect-\[9\/16\] *):not(.aspect-video *) {
+  color: #1e293b !important;
+}
+
+html:not(.dark) .text-zinc-100,
+html:not(.dark) .text-zinc-200,
+html:not(.dark) .text-zinc-300 {
+  color: #334155 !important;
+}
+
+html:not(.dark) .text-zinc-400 {
+  color: #64748b !important;
+}
+
+/* Ensure colored pills, tags, badges, buttons, and media overlays stay bright */
+html:not(.dark) [class*="bg-amber-"] *,
+html:not(.dark) [class*="bg-gradient-"] *,
+html:not(.dark) [class*="bg-blue-"] *,
+html:not(.dark) [class*="bg-emerald-"] *,
+html:not(.dark) [class*="bg-red-"] *,
+html:not(.dark) [class*="bg-purple-"] * {
+  color: inherit;
+}
+
+html:not(.dark) .aspect-\[9\/16\] .text-white,
+html:not(.dark) .aspect-video .text-white,
+html:not(.dark) [class*="bg-black\/"] .text-white {
+  color: #ffffff !important;
+}
+
+/* Form inputs & textareas in day theme */
+html:not(.dark) input.bg-\[\#121316\],
+html:not(.dark) input.bg-\[\#14161a\],
+html:not(.dark) input.bg-\[\#090A0C\],
+html:not(.dark) textarea.bg-\[\#121316\],
+html:not(.dark) textarea.bg-\[\#14161a\] {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+html:not(.dark) input::placeholder,
+html:not(.dark) textarea::placeholder {
+  color: #94a3b8 !important;
+}

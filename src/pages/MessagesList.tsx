@@ -128,26 +128,26 @@ export default function MessagesList() {
     );
 
     return (
-        <div className="flex min-h-[100dvh] w-full flex-col bg-[#090A0C] text-white pb-24 font-display">
+        <div className="flex min-h-[100dvh] w-full flex-col bg-slate-50 dark:bg-[#090A0C] text-zinc-900 dark:text-white pb-24 font-display transition-colors">
             <div className="w-full max-w-md md:max-w-2xl lg:max-w-3xl xl:max-w-5xl mx-auto flex flex-col flex-1 px-4">
                 
                 {/* Cinema Top Header */}
-                <div className="flex items-center justify-between py-4 sticky top-0 bg-[#090A0C]/95 backdrop-blur-md z-20 border-b border-white/5">
+                <div className="flex items-center justify-between py-4 sticky top-0 bg-white/95 dark:bg-[#090A0C]/95 backdrop-blur-md z-20 border-b border-zinc-200 dark:border-white/5">
                     <div className="flex items-center gap-3">
                         <button 
                             onClick={() => navigate(-1)} 
-                            className="p-1.5 -ml-1.5 rounded-xl hover:bg-white/10 text-zinc-400 hover:text-white transition-colors"
+                            className="p-1.5 -ml-1.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-white/10 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors"
                             aria-label="Back"
                         >
                             <span className="material-symbols-outlined text-2xl">arrow_back</span>
                         </button>
                         <div className="md:hidden flex items-center gap-2 cursor-pointer select-none" onClick={() => navigate('/home')}>
                             <Logo size="sm" showText={true} />
-                            <span className="hidden sm:inline-block text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                            <span className="hidden sm:inline-block text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
                                 Messages
                             </span>
                         </div>
-                        <h1 className="hidden md:flex items-center gap-2 text-base font-bold text-white">
+                        <h1 className="hidden md:flex items-center gap-2 text-base font-bold text-zinc-900 dark:text-white">
                             <span className="material-symbols-outlined text-amber-500 text-xl">chat_bubble</span>
                             <span>Direct Messages</span>
                         </h1>
@@ -156,7 +156,7 @@ export default function MessagesList() {
                     <div className="flex items-center gap-2">
                         <button 
                             onClick={() => navigate('/notifications')} 
-                            className="relative p-2 rounded-xl bg-[#121316] border border-white/10 text-zinc-300 hover:text-white hover:border-amber-500/30 transition-all"
+                            className="relative p-2 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:border-amber-500/30 transition-all"
                             aria-label="Notifications"
                         >
                             <span className="material-symbols-outlined text-xl">notifications</span>

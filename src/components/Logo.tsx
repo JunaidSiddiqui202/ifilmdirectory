@@ -35,7 +35,7 @@ export default function Logo({ className = '', size = 'md', showText = true }: L
                 className={`${sizeClasses[size]} w-auto object-contain antialiased select-none`}
             />
             {showText && (
-                <span className={`font-black tracking-tight text-white ${textSizes[size]} font-display`}>
+                <span className={`font-black tracking-tight text-zinc-900 dark:text-white ${textSizes[size]} font-display`}>
                     iFilm<span className="text-amber-500">Directory</span>
                 </span>
             )}

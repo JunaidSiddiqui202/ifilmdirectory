@@ -397,19 +397,19 @@ export default function UserProfile() {
     const isAdminUser = isMe && currentUser && (['junaid202@gmail.com', 'junaid202@hotmail.com'].includes(currentUser.email || '') || (profile?.role as string) === 'admin' || profile?.adminRole === 'super_admin');
 
     return (
-        <div className="relative flex h-auto min-h-[100dvh] w-full flex-col overflow-x-hidden bg-[#090A0C] font-display text-white antialiased pb-36 md:pb-24">
+        <div className="relative flex h-auto min-h-[100dvh] w-full flex-col overflow-x-hidden bg-slate-50 dark:bg-[#090A0C] font-display text-zinc-900 dark:text-white antialiased pb-36 md:pb-24 transition-colors">
             <div className="w-full max-w-md md:max-w-2xl lg:max-w-4xl xl:max-w-5xl mx-auto flex flex-col flex-1">
             {/* Top Navigation Bar: Mobile only (Desktop uses sidebar + direct profile header) */}
-            <div className="md:hidden flex items-center justify-between p-4 bg-[#090A0C]/90 backdrop-blur-md sticky top-0 z-50 border-b border-white/5">
+            <div className="md:hidden flex items-center justify-between p-4 bg-white/95 dark:bg-[#090A0C]/90 backdrop-blur-md sticky top-0 z-50 border-b border-zinc-200 dark:border-white/5">
                 <div className="flex items-center gap-3">
-                    <button onClick={() => navigate(-1)} className="p-2 rounded-xl bg-[#121316] border border-white/10 hover:border-amber-500/30 text-zinc-300 hover:text-white transition-colors">
+                    <button onClick={() => navigate(-1)} className="p-2 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 hover:border-amber-500/30 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors">
                         <span className="material-symbols-outlined text-xl">arrow_back</span>
                     </button>
                     <div className="flex items-center gap-2 cursor-pointer select-none" onClick={() => navigate('/home')}>
                         <Logo size="sm" showText={true} />
                     </div>
                 </div>
-                <button className="p-2 rounded-xl bg-[#121316] border border-white/10 hover:border-amber-500/30 text-zinc-300 hover:text-white transition-colors">
+                <button className="p-2 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 hover:border-amber-500/30 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors">
                     <span className="material-symbols-outlined text-xl">share</span>
                 </button>
             </div>
@@ -654,7 +654,7 @@ export default function UserProfile() {
             </div>
 
             {/* Content Section */}
-            <div className="flex-1 bg-[#090A0C] min-h-[400px]">
+            <div className="flex-1 bg-slate-50 dark:bg-[#090A0C] min-h-[400px]">
                 {activeTab === 'Portfolio' && (
                     <div className="p-6 pb-32 flex flex-col gap-10">
                         {/* Showreels Section */}

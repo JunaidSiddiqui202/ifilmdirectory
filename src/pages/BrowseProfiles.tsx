@@ -424,11 +424,11 @@ export default function BrowseProfiles() {
     const activeFilterCount = (activeCraft !== 'All' ? 1 : 0) + (activeLocation !== 'All' ? 1 : 0) + (availabilityOnly ? 1 : 0) + (verifiedOnly ? 1 : 0);
 
     return (
-        <div className="relative flex min-h-[100dvh] w-full flex-col bg-[#090A0C] text-white pb-36 md:pb-24 overflow-x-hidden font-display select-none">
+        <div className="relative flex min-h-[100dvh] w-full flex-col bg-slate-50 dark:bg-[#090A0C] text-zinc-900 dark:text-white pb-36 md:pb-24 overflow-x-hidden font-display select-none transition-colors">
             <div className="w-full max-w-md md:max-w-3xl lg:max-w-5xl xl:max-w-6xl 2xl:max-w-7xl mx-auto flex flex-col flex-1 px-4 sm:px-6">
 
                 {/* 1. CINEMA DIRECTORY TOP HEADER (Mobile View) */}
-                <header className="md:hidden sticky top-0 z-40 bg-[#090A0C]/95 backdrop-blur-md border-b border-white/5 py-3 -mx-4 px-4 flex items-center justify-between gap-3">
+                <header className="md:hidden sticky top-0 z-40 bg-white/95 dark:bg-[#090A0C]/95 backdrop-blur-md border-b border-zinc-200 dark:border-white/5 py-3 -mx-4 px-4 flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2.5">
                         <HamburgerMenu />
                         <Logo size="sm" showText={true} />

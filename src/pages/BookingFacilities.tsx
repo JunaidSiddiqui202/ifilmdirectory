@@ -59,26 +59,26 @@ export default function BookingFacilities() {
     });
 
     return (
-        <div className="relative flex min-h-screen w-full flex-col bg-[#090A0C] text-white overflow-x-hidden font-display selection:bg-amber-500/30">
+        <div className="relative flex min-h-screen w-full flex-col bg-slate-50 dark:bg-[#090A0C] text-zinc-900 dark:text-white overflow-x-hidden font-display selection:bg-amber-500/30 transition-colors">
             {/* Top Navigation */}
-            <header className="sticky top-0 z-40 bg-[#090A0C]/90 backdrop-blur-xl border-b border-white/[0.08] px-4 md:px-8 py-3.5 flex items-center justify-between gap-4">
+            <header className="sticky top-0 z-40 bg-white/90 dark:bg-[#090A0C]/90 backdrop-blur-xl border-b border-zinc-200 dark:border-white/[0.08] px-4 md:px-8 py-3.5 flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3 min-w-0">
                     <div className="md:hidden flex items-center gap-2.5 cursor-pointer select-none" onClick={() => navigate('/home')}>
                         <HamburgerMenu />
                         <Logo size="sm" showText={true} />
                     </div>
                     <div className="hidden md:flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                        <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 dark:text-amber-400">
                             <span className="material-symbols-outlined text-xl">apartment</span>
                         </div>
                         <div>
-                            <h1 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
+                            <h1 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
                                 <span>Film Studios & Production Facilities</span>
-                                <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 font-medium">
+                                <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-medium">
                                     {facilities.length} Verified
                                 </span>
                             </h1>
-                            <p className="text-xs text-zinc-400">
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400">
                                 Pre-book sound stages, post suites, cine gear houses, and shoot sets across India
                             </p>
                         </div>
@@ -88,7 +88,7 @@ export default function BookingFacilities() {
                 <div className="flex items-center gap-2.5">
                     <button
                         onClick={() => setShowMap(true)}
-                        className="px-3.5 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/25 text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 shadow-sm"
+                        className="px-3.5 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/25 text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 shadow-sm"
                     >
                         <span className="material-symbols-outlined text-base">map</span>
                         <span className="hidden sm:inline">Interactive Map</span>
@@ -99,13 +99,13 @@ export default function BookingFacilities() {
             <div className="w-full max-w-7xl mx-auto flex flex-col flex-1 px-4 md:px-8 py-6 pb-28">
                 {/* Hero Spotlight Header on Mobile / Tablet */}
                 <div className="md:hidden mb-4">
-                    <h1 className="text-xl font-black text-white tracking-tight flex items-center gap-2">
+                    <h1 className="text-xl font-black text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
                         <span>Film Studios & Gear</span>
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold">
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-bold">
                             {facilities.length}
                         </span>
                     </h1>
-                    <p className="text-xs text-zinc-400 mt-1">
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
                         Sound stages, editing bays, and cine equipment
                     </p>
                 </div>

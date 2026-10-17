@@ -185,15 +185,15 @@ export default function SouthCinemaNews() {
     };
 
     return (
-        <div className="relative flex min-h-[100dvh] w-full flex-col bg-[#090A0C] text-white pb-36 md:pb-24 overflow-x-hidden font-display">
+        <div className="relative flex min-h-[100dvh] w-full flex-col bg-slate-50 dark:bg-[#090A0C] text-zinc-900 dark:text-white pb-36 md:pb-24 overflow-x-hidden font-display transition-colors">
             <div className="w-full max-w-md md:max-w-3xl lg:max-w-5xl xl:max-w-6xl 2xl:max-w-7xl mx-auto flex flex-col flex-1 px-4 sm:px-6">
                 
                 {/* 1. TOP HEADER (Mobile) */}
-                <header className="md:hidden sticky top-0 z-30 flex items-center justify-between py-3.5 bg-[#090A0C]/95 backdrop-blur-md border-b border-white/5">
+                <header className="md:hidden sticky top-0 z-30 flex items-center justify-between py-3.5 bg-white/95 dark:bg-[#090A0C]/95 backdrop-blur-md border-b border-zinc-200 dark:border-white/5">
                     <div className="flex items-center gap-2.5">
                         <button
                             onClick={() => navigate('/home')}
-                            className="p-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white transition-colors"
+                            className="p-1.5 rounded-xl bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/10 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors"
                             title="Back to Home"
                         >
                             <span className="material-symbols-outlined text-xl">arrow_back</span>
@@ -204,14 +204,14 @@ export default function SouthCinemaNews() {
                     <div className="flex items-center gap-2">
                         <button
                             onClick={handleManualRefresh}
-                            className={`p-2 rounded-xl bg-[#121316] border border-white/10 text-zinc-300 hover:text-white transition-all ${isRefreshing ? 'animate-spin text-amber-400' : ''}`}
+                            className={`p-2 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-all ${isRefreshing ? 'animate-spin text-amber-500' : ''}`}
                             title="Refresh Feeds"
                         >
                             <span className="material-symbols-outlined text-xl">refresh</span>
                         </button>
                         <button
                             onClick={() => setIsFeedModalOpen(true)}
-                            className="p-2 rounded-xl bg-[#121316] border border-white/10 text-zinc-300 hover:text-amber-400 transition-all"
+                            className="p-2 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:text-amber-500 transition-all"
                             title="Manage RSS Feeds"
                         >
                             <span className="material-symbols-outlined text-xl">rss_feed</span>

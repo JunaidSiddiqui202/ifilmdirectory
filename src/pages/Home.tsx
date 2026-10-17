@@ -414,11 +414,11 @@ export default function Home() {
     };
 
     return (
-        <div className="relative flex min-h-[100dvh] w-full flex-col bg-[#090A0C] text-white pb-36 md:pb-24 overflow-x-hidden font-display">
+        <div className="relative flex min-h-[100dvh] w-full flex-col bg-slate-50 dark:bg-[#090A0C] text-zinc-900 dark:text-white pb-36 md:pb-24 overflow-x-hidden font-display transition-colors">
             <div className="w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-6xl 2xl:max-w-7xl mx-auto flex flex-col flex-1 px-4 sm:px-6">
                 
                 {/* 1. CINEMA TOP HEADER: Official Logo + Quick Search + Comms (Mobile Only; on desktop the left sidebar provides full nav and branding) */}
-                <header className="md:hidden sticky top-0 z-30 flex items-center justify-between py-3.5 bg-[#090A0C]/95 backdrop-blur-md border-b border-white/5">
+                <header className="md:hidden sticky top-0 z-30 flex items-center justify-between py-3.5 bg-white/95 dark:bg-[#090A0C]/95 backdrop-blur-md border-b border-zinc-200 dark:border-white/5">
                     <div className="flex items-center gap-3">
                         <HamburgerMenu />
                         <Logo size="sm" showText={true} />
@@ -427,14 +427,14 @@ export default function Home() {
                     <div className="flex items-center gap-2">
                         <button
                             onClick={() => navigate('/search')}
-                            className="p-2 rounded-xl bg-[#121316] border border-white/10 text-zinc-300 hover:text-white hover:border-amber-500/30 transition-all active:scale-95"
+                            className="p-2 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:border-amber-500/30 transition-all active:scale-95"
                             aria-label="Search"
                         >
                             <span className="material-symbols-outlined text-xl">search</span>
                         </button>
                         <button
                             onClick={() => navigate('/notifications')}
-                            className="relative p-2 rounded-xl bg-[#121316] border border-white/10 text-zinc-300 hover:text-white hover:border-amber-500/30 transition-all active:scale-95"
+                            className="relative p-2 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:border-amber-500/30 transition-all active:scale-95"
                             aria-label="Notifications"
                         >
                             <span className="material-symbols-outlined text-xl">notifications</span>
@@ -442,14 +442,14 @@ export default function Home() {
                         </button>
                         <button
                             onClick={() => navigate('/messaging')}
-                            className="p-2 rounded-xl bg-[#121316] border border-white/10 text-zinc-300 hover:text-white hover:border-amber-500/30 transition-all active:scale-95"
+                            className="p-2 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:border-amber-500/30 transition-all active:scale-95"
                             aria-label="Messages"
                         >
                             <span className="material-symbols-outlined text-xl">chat_bubble</span>
                         </button>
                         <div
                             onClick={() => navigate('/profile')}
-                            className="size-9 rounded-full overflow-hidden border border-white/20 ml-1 cursor-pointer hover:border-amber-500 transition-colors shrink-0"
+                            className="size-9 rounded-full overflow-hidden border border-zinc-300 dark:border-white/20 ml-1 cursor-pointer hover:border-amber-500 transition-colors shrink-0"
                             title="My Profile"
                         >
                             <PostMedia
