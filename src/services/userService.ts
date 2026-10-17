@@ -100,7 +100,7 @@ export interface UserProfile {
         submittedAt?: string;
         rejectionReason?: string;
     };
-    adminRole?: 'super_admin' | 'user_manager' | 'ad_manager'; // Admin roles
+    adminRole?: AdminRoleType; // Admin roles
     abuseReports?: number;
     accountStatus?: 'active' | 'suspended' | 'blocked';
     verification_tier?: 'gold' | 'blue' | 'gray'; // Added verification tier
@@ -108,10 +108,44 @@ export interface UserProfile {
     type?: 'user' | 'service'; // Differentiate between normal users and service providers/studios
 }
 
-const SUPER_ADMIN_EMAILS = ['junaid202@gmail.com', 'junaid202@hotmail.com'];
+export type AdminRoleType = 'super_admin' | 'admin' | 'moderator' | 'commercial_manager' | 'user_manager' | 'ad_manager';
 
-export const isSuperAdmin = (email: string | null | undefined) => {
-    return email && SUPER_ADMIN_EMAILS.includes(email);
+export const SUPER_ADMIN_EMAILS = [
+    'junaid202@gmail.com',
+    'junaid202@hotmail.com',
+    'ifilmdirectory@gmail.com',
+    'contact@ifilmdirectory.com'
+];
+
+export const isSuperAdmin = (email: string | null | undefined, profile?: UserProfile | null) => {
+    if (profile?.adminRole === 'super_admin') return true;
+    if (!email) return false;
+    const cleanEmail = email.toLowerCase().trim();
+    return SUPER_ADMIN_EMAILS.some(e => e.toLowerCase().trim() === cleanEmail);
+};
+
+export const hasAdminPrivileges = (profile?: UserProfile | null, email?: string | null) => {
+    if (isSuperAdmin(email, profile)) return true;
+    if ((profile?.role as string) === 'admin') return true;
+    const role = profile?.adminRole;
+    return Boolean(role && ['super_admin', 'admin', 'moderator', 'commercial_manager', 'user_manager', 'ad_manager'].includes(role));
+};
+
+export const claimSuperAdmin = async (uid: string) => {
+    try {
+        const userRef = doc(db, 'users', uid);
+        await updateDoc(userRef, {
+            role: 'admin',
+            adminRole: 'super_admin',
+            verification_tier: 'gold',
+            'verification.status': 'verified',
+            'verification.isVerified': true
+        });
+        return true;
+    } catch (error) {
+        console.error("Error claiming super admin status:", error);
+        throw error;
+    }
 };
 
 export const createUserProfile = async (user: User, additionalData?: any) => {
@@ -287,10 +321,13 @@ export const generateUsernameFromName = (displayName: string): string => {
         .substring(0, 30); // Limit length
 };
 
-export const updateUserRole = async (uid: string, newRole: 'super_admin' | 'user_manager' | 'ad_manager' | undefined) => {
+export const updateUserRole = async (uid: string, newRole: AdminRoleType | undefined) => {
     try {
         const userRef = doc(db, 'users', uid);
-        await updateDoc(userRef, { adminRole: newRole || null }); // Use null to remove the field in Firestore if undefined
+        await updateDoc(userRef, {
+            adminRole: newRole || null,
+            role: newRole ? 'admin' : 'user'
+        });
     } catch (error) {
         console.error("Error updating user role:", error);
         throw error;

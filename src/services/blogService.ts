@@ -36,6 +36,13 @@ export interface BlogPost {
     likes: number;
     date: any; // Timestamp
     updatedAt?: any;
+    status?: 'pending' | 'published' | 'rejected' | 'flagged';
+    rejectionReason?: string;
+    reviewedBy?: string;
+    reviewedAt?: any;
+    authorName?: string;
+    coverImage?: string;
+    createdAt?: any;
 }
 
 export const blogService = {
@@ -84,7 +91,8 @@ export const blogService = {
                 date: Timestamp.now(),
                 eventDetails: blogData.eventDetails || null,
                 views: 0,
-                likes: 0
+                likes: 0,
+                status: 'published' // Default published or available for review
             });
 
             // Also create a social post so the blog appears in the main feed
@@ -185,10 +193,12 @@ export const blogService = {
                 q = query(collection(db, 'blogs'), where('category', '==', category), orderBy('date', 'desc'));
             }
             const snapshot = await getDocs(q);
-            return snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            })) as BlogPost[];
+            return snapshot.docs
+                .map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }))
+                .filter((blog: any) => blog.status !== 'rejected') as BlogPost[];
         } catch (error) {
             console.error("Error fetching blogs:", error);
             return [];
@@ -234,5 +244,88 @@ export const blogService = {
         } catch (error) {
             console.error("Error toggling like:", error);
         }
+    },
+
+    // Admin Editorial & Check Methods
+    getAllBlogsForAdmin: async (statusFilter?: 'all' | 'pending' | 'published' | 'rejected'): Promise<BlogPost[]> => {
+        try {
+            const q = query(collection(db, 'blogs'), orderBy('date', 'desc'));
+            const snapshot = await getDocs(q);
+            const all = snapshot.docs.map(doc => {
+                const data = doc.data();
+                return {
+                    id: doc.id,
+                    ...data,
+                    authorName: data.authorName || data.author || 'Filmmaker',
+                    coverImage: data.coverImage || data.image || '',
+                    createdAt: data.createdAt || data.date?.toDate?.() || data.date || new Date().toISOString()
+                };
+            }) as BlogPost[];
+
+            if (!statusFilter || statusFilter === 'all') {
+                return all;
+            }
+
+            return all.filter(b => {
+                const s = b.status || 'published'; // Legacy posts treated as published
+                return s === statusFilter;
+            });
+        } catch (error) {
+            console.error("Error fetching admin blogs:", error);
+            return [];
+        }
+    },
+
+    approveBlog: async (blogId: string, reviewerId?: string) => {
+        try {
+            const blogRef = doc(db, 'blogs', blogId);
+            await updateDoc(blogRef, {
+                status: 'published',
+                reviewedBy: reviewerId || 'Super Admin',
+                reviewedAt: Timestamp.now(),
+                rejectionReason: null
+            });
+            return { success: true };
+        } catch (error) {
+            console.error("Error approving blog:", error);
+            return { success: false, error };
+        }
+    },
+
+    rejectBlog: async (blogId: string, reason: string, reviewerId?: string) => {
+        try {
+            const blogRef = doc(db, 'blogs', blogId);
+            await updateDoc(blogRef, {
+                status: 'rejected',
+                rejectionReason: reason,
+                reviewedBy: reviewerId || 'Super Admin',
+                reviewedAt: Timestamp.now()
+            });
+            return { success: true };
+        } catch (error) {
+            console.error("Error rejecting blog:", error);
+            return { success: false, error };
+        }
+    },
+
+    takeDownBlog: async (blogId: string, reason?: string) => {
+        try {
+            const blogRef = doc(db, 'blogs', blogId);
+            await updateDoc(blogRef, {
+                status: 'flagged',
+                rejectionReason: reason || 'Taken down by Administrator',
+                updatedAt: Timestamp.now()
+            });
+            return { success: true };
+        } catch (error) {
+            console.error("Error taking down blog:", error);
+            return { success: false, error };
+        }
     }
 };
+
+export const getAllBlogsForAdmin = blogService.getAllBlogsForAdmin;
+export const approveBlog = blogService.approveBlog;
+export const rejectBlog = blogService.rejectBlog;
+export const takeDownBlog = blogService.takeDownBlog;
+

@@ -33,6 +33,8 @@ export default function HamburgerMenu() {
         }
     };
 
+    const isAdmin = currentUser?.email && ['junaid202@gmail.com', 'junaid202@hotmail.com', 'ifilmdirectory@gmail.com', 'contact@ifilmdirectory.com'].includes(currentUser.email);
+
     const sections = [
         {
             title: 'Production & Discovery',
@@ -56,6 +58,7 @@ export default function HamburgerMenu() {
         {
             title: 'Account',
             items: [
+                ...(isAdmin ? [{ icon: 'admin_panel_settings', label: 'Admin Command HQ', path: '/-admin' }] : []),
                 { icon: 'settings', label: 'Settings & Privacy', path: '/settings' },
             ]
         }

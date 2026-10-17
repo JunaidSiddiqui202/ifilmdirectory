@@ -19,7 +19,8 @@ import {
     isFollowing,
     getFollowersCount,
     getFollowingCount,
-    getUserByUsername
+    getUserByUsername,
+    hasAdminPrivileges
 } from '../services/userService';
 import GalleryUploadModal from '../components/GalleryUploadModal';
 import PrivacySettingsModal from '../components/PrivacySettingsModal';
@@ -394,7 +395,7 @@ export default function UserProfile() {
 
 
 
-    const isAdminUser = isMe && currentUser && (['junaid202@gmail.com', 'junaid202@hotmail.com'].includes(currentUser.email || '') || (profile?.role as string) === 'admin' || profile?.adminRole === 'super_admin');
+    const isAdminUser = isMe && currentUser && hasAdminPrivileges(profile, currentUser.email);
 
     return (
         <div className="relative flex h-auto min-h-[100dvh] w-full flex-col overflow-x-hidden bg-slate-50 dark:bg-[#090A0C] font-display text-zinc-900 dark:text-white antialiased pb-36 md:pb-24 transition-colors">

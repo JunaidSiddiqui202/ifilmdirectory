@@ -169,6 +169,25 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                     </span>
                 </button>
 
+                {/* Admin Command Center */}
+                {currentUser?.email && ['junaid202@gmail.com', 'junaid202@hotmail.com', 'ifilmdirectory@gmail.com', 'contact@ifilmdirectory.com'].includes(currentUser.email) && (
+                    <button
+                        onClick={() => navigate('/-admin')}
+                        title="Admin Command Center"
+                        className={`group relative flex items-center justify-center xl:justify-start gap-4 px-3 py-2.5 rounded-2xl transition-all cursor-pointer ${
+                            isActive('/-admin')
+                                ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold border border-amber-500/30'
+                                : 'text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 border border-amber-500/20'
+                        }`}
+                    >
+                        <span className="material-symbols-outlined text-[24px]">admin_panel_settings</span>
+                        <span className="hidden xl:inline text-sm font-black tracking-wide">Admin HQ</span>
+                        <span className="xl:hidden opacity-0 pointer-events-none group-hover:opacity-100 absolute left-full ml-3 px-2.5 py-1 bg-zinc-900 text-white dark:bg-[#18191D] border border-amber-500/30 text-xs font-bold rounded-lg shadow-xl whitespace-nowrap z-50 transition-opacity">
+                            Admin HQ
+                        </span>
+                    </button>
+                )}
+
                 {/* Settings Item */}
                 <button
                     onClick={() => navigate('/settings')}
