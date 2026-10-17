@@ -26,6 +26,7 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
         if (path === '/projects') return location.pathname === '/projects' || location.pathname.startsWith('/project/');
         if (path === '/saved') return location.pathname === '/saved';
         if (path === '/profile') return location.pathname === '/profile' || location.pathname === `/profile/${currentUser?.uid}`;
+        if (path === '/settings') return location.pathname.startsWith('/settings');
         return location.pathname === path;
     };
 

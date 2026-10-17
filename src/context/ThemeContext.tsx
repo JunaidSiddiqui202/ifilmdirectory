@@ -1,26 +1,23 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-// Triggering re-process to fix potential hook issues in dev server
 
-type Theme = 'gold' | 'blue' | 'red' | 'green' | 'purple';
+export type ThemeMode = 'day' | 'night';
 
 interface ThemeContextType {
     isDarkMode: boolean;
+    themeMode: ThemeMode;
     toggleDarkMode: () => void;
-    theme: Theme;
-    setTheme: (theme: Theme) => void;
+    setThemeMode: (mode: ThemeMode) => void;
+    theme: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setTheme: (theme: any) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-    const [isDarkMode, setIsDarkMode] = useState(() => {
+    const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
         const saved = localStorage.getItem('isDarkMode');
-        return saved ? JSON.parse(saved) : true; // Default to dark
-    });
-
-    const [theme, setThemeState] = useState<Theme>(() => {
-        const saved = localStorage.getItem('theme');
-        return (saved as Theme) || 'gold';
+        return saved ? JSON.parse(saved) : true; // Default to Night/Dark mode
     });
 
     useEffect(() => {
@@ -30,25 +27,24 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         } else {
             root.classList.remove('dark');
         }
+        // Purge legacy color accent classes
+        root.classList.remove('theme-blue', 'theme-red', 'theme-green', 'theme-purple', 'theme-gold');
         localStorage.setItem('isDarkMode', JSON.stringify(isDarkMode));
+        localStorage.setItem('themeMode', isDarkMode ? 'night' : 'day');
     }, [isDarkMode]);
 
-    useEffect(() => {
-        const root = window.document.documentElement;
-        // Remove all theme classes
-        root.classList.remove('theme-gold', 'theme-blue', 'theme-red', 'theme-green', 'theme-purple');
-        // Add current theme class (if not default gold, though gold is default in CSS, adding class ensures specificity if needed, or we can skip for gold)
-        if (theme !== 'gold') {
-            root.classList.add(`theme-${theme}`);
-        }
-        localStorage.setItem('theme', theme);
-    }, [theme]);
-
-    const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
-    const setTheme = (newTheme: Theme) => setThemeState(newTheme);
+    const toggleDarkMode = () => setIsDarkMode(prev => !prev);
+    const setThemeMode = (mode: ThemeMode) => setIsDarkMode(mode === 'night');
 
     return (
-        <ThemeContext.Provider value={{ isDarkMode, toggleDarkMode, theme, setTheme }}>
+        <ThemeContext.Provider value={{
+            isDarkMode,
+            themeMode: isDarkMode ? 'night' : 'day',
+            toggleDarkMode,
+            setThemeMode,
+            theme: isDarkMode ? 'night' : 'day',
+            setTheme: (t: any) => setIsDarkMode(t === 'night' || t === 'dark')
+        }}>
             {children}
         </ThemeContext.Provider>
     );
@@ -61,3 +57,4 @@ export function useTheme() {
     }
     return context;
 }
+
