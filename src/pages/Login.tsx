@@ -313,12 +313,19 @@ export default function Login() {
 
             {/* Top Navigation Bar */}
             <header className="relative z-20 w-full border-b border-zinc-200 dark:border-white/[0.06] bg-white/80 dark:bg-[#090A0C]/80 backdrop-blur-xl">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+                <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2">
                     <div
                         onClick={() => navigate('/welcome')}
-                        className="cursor-pointer group flex items-center gap-2"
+                        className="cursor-pointer group flex items-center gap-2 shrink-0 min-w-0"
                     >
-                        <Logo size="lg" showText={true} />
+                        {/* Compact emblem logo on mobile (< sm) to prevent overlapping */}
+                        <div className="sm:hidden flex items-center">
+                            <Logo size="sm" showText={false} />
+                        </div>
+                        {/* Full branded logo on tablets & desktop (>= sm) */}
+                        <div className="hidden sm:flex items-center">
+                            <Logo size="md" showText={true} />
+                        </div>
                     </div>
 
                     <div className="hidden lg:flex items-center gap-6 text-xs text-zinc-500 dark:text-zinc-400 font-medium">
@@ -334,19 +341,19 @@ export default function Login() {
                         <span>Showreels & Reviews</span>
                     </div>
 
-                    <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
                         {/* Handy Day / Night Theme Toggle */}
                         <button
                             type="button"
                             onClick={toggleDarkMode}
-                            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.08] dark:hover:bg-white/[0.15] text-zinc-700 dark:text-amber-400 border border-zinc-200 dark:border-white/10 transition-all active:scale-95 cursor-pointer shadow-sm select-none"
+                            className="size-9 sm:size-auto sm:px-3 sm:py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.08] dark:hover:bg-white/[0.15] text-zinc-700 dark:text-amber-400 border border-zinc-200 dark:border-white/10 transition-all active:scale-95 cursor-pointer shadow-sm select-none flex items-center justify-center gap-1.5"
                             title={isDarkMode ? "Switch to Day Theme (Studio Light)" : "Switch to Night Theme (Cinematic Dark)"}
                             aria-label="Toggle theme"
                         >
-                            <span className="material-symbols-outlined text-base sm:text-lg">
+                            <span className="material-symbols-outlined text-lg sm:text-xl">
                                 {isDarkMode ? 'light_mode' : 'dark_mode'}
                             </span>
-                            <span className="text-xs font-bold uppercase tracking-wider font-display text-zinc-900 dark:text-white">
+                            <span className="hidden sm:inline text-xs font-bold uppercase tracking-wider font-display text-zinc-900 dark:text-white">
                                 {isDarkMode ? 'Day' : 'Night'}
                             </span>
                         </button>
@@ -354,17 +361,17 @@ export default function Login() {
                         {currentUser ? (
                             <button
                                 onClick={() => navigate('/home')}
-                                className="px-4 sm:px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs sm:text-sm shadow-lg shadow-amber-500/20 transition-all flex items-center gap-1.5 cursor-pointer"
+                                className="px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs sm:text-sm shadow-lg shadow-amber-500/20 transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
                             >
                                 <span>Enter App</span>
                                 <span className="material-symbols-outlined text-base">arrow_forward</span>
                             </button>
                         ) : (
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1.5 sm:gap-2">
                                 <button
                                     type="button"
                                     onClick={() => scrollToAuthBox('login')}
-                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                                    className={`px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer whitespace-nowrap ${
                                         view === 'login' ? 'text-amber-500 dark:text-amber-400 bg-amber-500/10' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                     }`}
                                 >
@@ -373,7 +380,7 @@ export default function Login() {
                                 <button
                                     type="button"
                                     onClick={() => scrollToAuthBox('signup')}
-                                    className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs transition-all shadow-sm cursor-pointer"
+                                    className="px-3 sm:px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs transition-all shadow-sm cursor-pointer whitespace-nowrap"
                                 >
                                     Sign Up
                                 </button>
