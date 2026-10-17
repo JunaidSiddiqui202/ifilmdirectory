@@ -23,17 +23,17 @@ let notificationBadgeCount = 0;
 export const registerFCMToken = async (userId: string): Promise<string | null> => {
     try {
         // Check if browser supports notifications
-        if (!('Notification' in window)) {
+        if (typeof window === 'undefined' || !('Notification' in window) || typeof window.Notification === 'undefined') {
             console.log('This browser does not support notifications');
             return null;
         }
 
         // Check current permission status
-        let permission = Notification.permission;
+        let permission = window.Notification.permission;
 
         // Request notification permission if not already granted
         if (permission === 'default') {
-            permission = await Notification.requestPermission();
+            permission = await window.Notification.requestPermission();
         }
 
         if (permission !== 'granted') {
@@ -108,20 +108,22 @@ export const listenForMessages = (callback: (payload: any) => void) => {
                     data: payload.data,
                 } as any; // Using 'as any' for browser-specific notification features
 
-                // Show the notification
-                const notification = new Notification(
-                    payload.notification.title || 'New Notification',
-                    notificationOptions
-                );
+                if (typeof window !== 'undefined' && 'Notification' in window && typeof window.Notification !== 'undefined') {
+                    // Show the notification
+                    const notification = new window.Notification(
+                        payload.notification.title || 'New Notification',
+                        notificationOptions
+                    );
 
-                // Handle notification click
-                notification.onclick = (event) => {
-                    event.preventDefault();
-                    const clickAction = payload.data?.click_action || '/';
-                    window.focus();
-                    window.location.href = clickAction;
-                    notification.close();
-                };
+                    // Handle notification click
+                    notification.onclick = (event) => {
+                        event.preventDefault();
+                        const clickAction = payload.data?.click_action || '/';
+                        window.focus();
+                        window.location.href = clickAction;
+                        notification.close();
+                    };
+                }
 
                 // Play sound
                 playNotificationSound();
@@ -216,8 +218,15 @@ export const checkNotificationSupport = (): {
     supported: boolean;
     permission: NotificationPermission;
 } => {
-    const supported = 'Notification' in window;
-    const permission = supported ? Notification.permission : 'denied';
+    const supported = typeof window !== 'undefined' && 'Notification' in window && typeof window.Notification !== 'undefined';
+    let permission: NotificationPermission = 'denied';
+    if (supported) {
+        try {
+            permission = window.Notification.permission;
+        } catch {
+            permission = 'denied';
+        }
+    }
 
     return { supported, permission };
 };

@@ -13,9 +13,17 @@ export default function NotificationListener() {
     useEffect(() => {
         if (!currentUser) return;
 
-        // Ensure we request permission for system notifications
-        if (Notification.permission === 'default') {
-            Notification.requestPermission();
+        // Safely check if browser Notification API is supported (iOS Safari / WebKit compatibility)
+        const isNotificationSupported = typeof window !== 'undefined' && 'Notification' in window && typeof window.Notification !== 'undefined';
+
+        if (isNotificationSupported) {
+            try {
+                if (window.Notification.permission === 'default') {
+                    window.Notification.requestPermission().catch(() => {});
+                }
+            } catch (e) {
+                console.warn('[NotificationListener] Could not request notification permission:', e);
+            }
         }
 
         const unsubscribe = subscribeToNotifications(
@@ -31,18 +39,28 @@ export default function NotificationListener() {
                 if (latestTime > lastNotifTimeRef.current) {
                     lastNotifTimeRef.current = latestTime;
 
-                    // Trigger effects
-                    playNotificationSound();
+                    // Trigger sound safely
+                    try {
+                        playNotificationSound();
+                    } catch (e) {
+                        // Ignore autoplay audio restriction
+                    }
                     setToast(latest);
 
-                    // Show system notification
-                    if (Notification.permission === 'granted') {
-                        new Notification(latest.title, {
-                            body: latest.message,
-                            icon: '/logo.png',
-                            badge: '/logo.png',
-                            tag: latest.id // Prevent dupes
-                        });
+                    // Show system notification safely if supported
+                    if (isNotificationSupported) {
+                        try {
+                            if (window.Notification.permission === 'granted') {
+                                new window.Notification(latest.title, {
+                                    body: latest.message,
+                                    icon: '/logo.png',
+                                    badge: '/logo.png',
+                                    tag: latest.id // Prevent dupes
+                                });
+                            }
+                        } catch (e) {
+                            console.warn('[NotificationListener] Error displaying system notification:', e);
+                        }
                     }
 
                     // Auto hide toast
