@@ -4,7 +4,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { jobService, type Job } from '../services/jobService';
 import { useAuth } from '../context/AuthContext';
 import { useAuthModal } from '../context/AuthModalContext';
-import { getUserProfile } from '../services/userService';
 import PostMedia from '../components/PostMedia';
 import { useToast } from '../context/ToastContext';
 
@@ -18,10 +17,6 @@ export default function JobDetails() {
     const [job, setJob] = useState<Job | null>(null);
     const [loading, setLoading] = useState(true);
     const [hasApplied, setHasApplied] = useState(false);
-    const [isApplying, setIsApplying] = useState(false);
-    const [showApplyModal, setShowApplyModal] = useState(false);
-    const [applicationMessage, setApplicationMessage] = useState('');
-    const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
 
     useEffect(() => {
         const fetchJob = async () => {
@@ -43,63 +38,6 @@ export default function JobDetails() {
         };
         fetchJob();
     }, [id, currentUser]);
-
-    const handleApply = async () => {
-        if (!currentUser) {
-            openAuthModal('Sign in to submit your casting or job application');
-            return;
-        }
-
-        if (!job?.id) return;
-
-        // Check if it's the job creator trying to apply
-        if (job.postedBy === currentUser.uid) {
-            toast.error("You cannot apply to your own job posting.");
-            return;
-        }
-
-        setShowApplyModal(true);
-    };
-
-    const confirmApplication = async () => {
-        if (!currentUser || !job?.id) return;
-
-        setIsApplying(true);
-        try {
-            // Get user profile for application data
-            const userProfile = await getUserProfile(currentUser.uid);
-
-            const result = await jobService.applyForJob(job.id, currentUser.uid, {
-                name: userProfile?.displayName || currentUser.displayName || 'Anonymous',
-                email: currentUser.email || '',
-                photoURL: userProfile?.photoURL || currentUser.photoURL || '',
-                role: userProfile?.role || 'Professional',
-                message: applicationMessage.trim() || undefined
-            });
-
-            if (result.success) {
-                setHasApplied(true);
-                setShowApplyModal(false);
-
-                // Show success message
-                toast.success(`Application sent to ${job.company}! They will contact you at ${currentUser.email}`);
-
-                // Also open email if applicationEmail exists
-                if (job.applicationEmail) {
-                    const emailSubject = `Application for ${job.title} - ${userProfile?.displayName || currentUser.displayName}`;
-                    const emailBody = `Hi,\n\nI am interested in the ${job.title} position at ${job.company}.\n\n${applicationMessage ? `Additional Message:\n${applicationMessage}\n\n` : ''}You can view my profile at: ${window.location.origin}/profile/${currentUser.uid}\n\nThank you for considering my application.\n\nBest regards,\n${userProfile?.displayName || currentUser.displayName}`;
-                    window.open(`mailto:${job.applicationEmail}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`);
-                }
-            } else {
-                toast.error(result.error || 'Failed to submit application.');
-            }
-        } catch (error) {
-            console.error('Application error:', error);
-            toast.error('Failed to submit application. Please try again.');
-        } finally {
-            setIsApplying(false);
-        }
-    };
 
     const handleBookmark = async () => {
         if (!currentUser) {
@@ -350,7 +288,7 @@ export default function JobDetails() {
                     </section>
 
                     {/* CASTING & RECRUITMENT SAFETY DISCLAIMER */}
-                    <section className="rounded-3xl bg-amber-50/90 dark:bg-[#1a1714] border border-amber-300/80 dark:border-amber-500/30 p-5 sm:p-6 space-y-3 shadow-xs">
+                    <section className="rounded-3xl bg-amber-50/90 dark:bg-[#1a1714] border border-amber-300/80 dark:border-amber-500/30 p-5 sm:p-6 space-y-3.5 shadow-xs">
                         <div className="flex items-center gap-2.5">
                             <span className="material-symbols-outlined text-amber-800 dark:text-amber-400 text-xl">verified_user</span>
                             <h3 className="text-sm font-extrabold text-amber-950 dark:text-white">
@@ -360,6 +298,18 @@ export default function JobDetails() {
                         <p className="text-xs text-zinc-800 dark:text-zinc-200 leading-relaxed font-normal">
                             iFilmDirectory is an open directory for film fraternity opportunities. <strong>Never pay money for auditions, registration, security deposits, or artist cards.</strong> Legitimate productions and casting directors never charge talent. Always verify production banners independently before attending private auditions or sharing sensitive personal data.
                         </p>
+                        <div className="p-3.5 rounded-2xl bg-amber-100/70 dark:bg-black/50 border border-amber-300/70 dark:border-amber-500/20 text-xs text-zinc-900 dark:text-zinc-200 space-y-1.5 leading-relaxed">
+                            <div className="flex items-center gap-1.5 font-bold text-amber-900 dark:text-amber-400 text-xs">
+                                <span className="material-symbols-outlined text-base">info</span>
+                                <span>Platform Disclaimer: Automated Feed & Transactions</span>
+                            </div>
+                            <p className="text-[11px] text-zinc-800 dark:text-zinc-300">
+                                • <strong>Financial Transactions:</strong> iFilmDirectory is <strong>not responsible for any money transactions</strong> between users, applicants, recruiters, or production banners.
+                            </p>
+                            <p className="text-[11px] text-zinc-800 dark:text-zinc-300">
+                                • <strong>Automated Feed:</strong> Please note this is an <strong>automated feed</strong> and directory aggregation; iFilmDirectory is <strong>not responsible for external apply links workings, availability, or third-party website redirects</strong>.
+                            </p>
+                        </div>
                         <div className="pt-2 border-t border-amber-300/50 dark:border-amber-500/20 flex flex-wrap items-center justify-between gap-3 text-xs">
                             <div className="flex items-center gap-1.5 text-zinc-700 dark:text-zinc-300 text-[11px]">
                                 <span className="material-symbols-outlined text-sm text-red-600 dark:text-red-400">report</span>
@@ -404,119 +354,40 @@ export default function JobDetails() {
                                         href={job.sourceUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="flex-1 flex h-12 items-center justify-center gap-2 rounded-2xl bg-zinc-100 dark:bg-white/10 hover:bg-zinc-200 dark:hover:bg-white/15 text-zinc-900 dark:text-white text-xs sm:text-sm font-bold border border-zinc-200 dark:border-white/10 transition-all"
+                                        className="flex-1 flex h-12 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 !text-white text-xs sm:text-sm font-black shadow-lg shadow-amber-500/20 transition-all active:scale-95"
+                                        style={{ color: '#ffffff' }}
                                     >
-                                        <span>Apply on Source</span>
-                                        <span className="material-symbols-outlined text-sm">launch</span>
+                                        <span className="!text-white font-extrabold" style={{ color: '#ffffff' }}>Apply on Source</span>
+                                        <span className="material-symbols-outlined text-sm !text-white" style={{ color: '#ffffff' }}>launch</span>
                                     </a>
                                 )}
 
                                 {job.applicationEmail && (
                                     <a
                                         href={`mailto:${job.applicationEmail}?subject=${encodeURIComponent(`Application for ${job.title} - iFilmDirectory`)}&body=${encodeURIComponent(`Hi ${job.company} Team,\n\nI am applying for the ${job.title} role posted on iFilmDirectory.\n\nPlease find my showreel and profile attached.\n\nBest regards.`)}`}
-                                        className="flex-1 flex h-12 items-center justify-center gap-2 rounded-2xl bg-zinc-800 hover:bg-zinc-700 text-white text-xs sm:text-sm font-bold transition-all"
+                                        className="flex-1 flex h-12 items-center justify-center gap-2 rounded-2xl bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-800 dark:hover:bg-zinc-700 !text-white text-xs sm:text-sm font-black border border-zinc-800 dark:border-white/10 shadow-lg transition-all active:scale-95"
+                                        style={{ color: '#ffffff' }}
                                     >
-                                        <span className="material-symbols-outlined text-sm">mail</span>
-                                        <span>Email Studio</span>
+                                        <span className="material-symbols-outlined text-base !text-white" style={{ color: '#ffffff' }}>mail</span>
+                                        <span className="!text-white font-black" style={{ color: '#ffffff' }}>Email Studio</span>
                                     </a>
                                 )}
 
-                                <button
-                                    onClick={handleApply}
-                                    className="flex-1 flex h-12 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white text-xs sm:text-sm font-black shadow-xl shadow-amber-500/20 transition-all active:scale-95"
-                                >
-                                    <span className="material-symbols-outlined text-lg">send</span>
-                                    <span>Apply in iFilm</span>
-                                </button>
+                                {!job.sourceUrl && !job.applicationEmail && (
+                                    <a
+                                        href={`mailto:jobs@ifilmdirectory.com?subject=${encodeURIComponent(`Inquiry for ${job.title} (${job.company}) - iFilmDirectory`)}`}
+                                        className="flex-1 flex h-12 items-center justify-center gap-2 rounded-2xl bg-zinc-950 hover:bg-zinc-800 !text-white text-xs sm:text-sm font-black transition-all"
+                                        style={{ color: '#ffffff' }}
+                                    >
+                                        <span className="material-symbols-outlined text-base !text-white" style={{ color: '#ffffff' }}>mail</span>
+                                        <span className="!text-white font-black" style={{ color: '#ffffff' }}>Contact via Support</span>
+                                    </a>
+                                )}
                             </div>
                         )}
                     </div>
                 </div>
 
-                {/* Apply Modal */}
-                {showApplyModal && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in" onClick={() => { setShowApplyModal(false); setDisclaimerAccepted(false); }}>
-                        <div className="bg-white dark:bg-[#141519] border border-zinc-200 dark:border-white/10 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto space-y-5 animate-in zoom-in-95" onClick={(e) => e.stopPropagation()}>
-                            <div className="flex items-center gap-3 border-b border-zinc-200 dark:border-white/10 pb-4">
-                                <div className="size-11 rounded-2xl bg-amber-500/20 text-amber-500 dark:text-amber-400 flex items-center justify-center border border-amber-500/30 shrink-0">
-                                    <span className="material-symbols-outlined text-xl">send</span>
-                                </div>
-                                <div className="min-w-0">
-                                    <h3 className="text-base sm:text-lg font-black text-zinc-900 dark:text-white truncate">Submit Application</h3>
-                                    <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">{job.title} • {job.company}</p>
-                                </div>
-                            </div>
-
-                            <div className="p-4 rounded-2xl bg-zinc-100 dark:bg-black/50 border border-zinc-200 dark:border-white/5 space-y-1.5 text-xs">
-                                <p className="text-zinc-600 dark:text-zinc-400">
-                                    Applying as: <strong className="text-zinc-900 dark:text-white">{currentUser?.displayName || 'Creator'}</strong>
-                                </p>
-                                <p className="text-zinc-600 dark:text-zinc-400">
-                                    Direct Contact: <strong className="text-zinc-900 dark:text-white">{currentUser?.email}</strong>
-                                </p>
-                            </div>
-
-                            <label className="block space-y-1.5">
-                                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Note to Director / Recruiter (Optional)</span>
-                                <textarea
-                                    value={applicationMessage}
-                                    onChange={(e) => setApplicationMessage(e.target.value)}
-                                    placeholder="Introduce yourself, mention key credits, or why you fit this role..."
-                                    className="w-full p-3.5 rounded-xl border border-zinc-300 dark:border-white/10 bg-zinc-50 dark:bg-black/60 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 text-xs resize-none h-24 focus:outline-none focus:border-amber-500 transition-colors"
-                                />
-                            </label>
-
-                            {/* Safety Disclaimer */}
-                            <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl text-xs space-y-2">
-                                <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold">
-                                    <span className="material-symbols-outlined text-base">verified_user</span>
-                                    <span>Film Professional Safety Notice</span>
-                                </div>
-                                <p className="text-[11px] text-zinc-700 dark:text-zinc-300 leading-relaxed">
-                                    iFilmDirectory connects creative professionals. Never pay money upfront for auditions or role offers. Report any suspicious listings directly to support.
-                                </p>
-                                <label className="flex items-start gap-2.5 cursor-pointer pt-2 border-t border-zinc-200 dark:border-white/10">
-                                    <input
-                                        type="checkbox"
-                                        checked={disclaimerAccepted}
-                                        onChange={(e) => setDisclaimerAccepted(e.target.checked)}
-                                        className="mt-0.5 size-4 rounded border-zinc-300 dark:border-white/20 bg-white dark:bg-black text-amber-500 focus:ring-amber-500 accent-amber-500"
-                                    />
-                                    <span className="text-[11px] text-zinc-700 dark:text-zinc-300 font-semibold select-none leading-snug">
-                                        I understand and accept independent responsibility for professional communications.
-                                    </span>
-                                </label>
-                            </div>
-
-                            <div className="flex gap-3 pt-2">
-                                <button
-                                    onClick={() => { setShowApplyModal(false); setDisclaimerAccepted(false); }}
-                                    disabled={isApplying}
-                                    className="flex-1 py-3 px-4 rounded-xl border border-zinc-200 dark:border-white/10 text-zinc-700 dark:text-zinc-300 font-bold text-xs hover:bg-zinc-100 dark:hover:bg-white/5 transition-all"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={confirmApplication}
-                                    disabled={isApplying || !disclaimerAccepted}
-                                    className="flex-1 py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-white font-black text-xs disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20"
-                                >
-                                    {isApplying ? (
-                                        <>
-                                            <span className="material-symbols-outlined animate-spin text-base">progress_activity</span>
-                                            <span>Sending...</span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <span className="material-symbols-outlined text-base">check</span>
-                                            <span>Confirm & Send</span>
-                                        </>
-                                    )}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )}
             </div>
 
             <BottomNav />

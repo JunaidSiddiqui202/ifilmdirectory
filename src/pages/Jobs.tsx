@@ -483,8 +483,8 @@ export default function Jobs() {
                                     Official
                                 </span>
                             </h3>
-                            <p className="text-xs text-zinc-800 dark:text-zinc-300 leading-relaxed font-normal">
-                                iFilmDirectory provides an open networking and discovery directory connecting creative talent with film & media productions.
+                            <p className="text-xs text-zinc-800 dark:text-zinc-200 leading-relaxed font-normal">
+                                iFilmDirectory is an open directory for film fraternity opportunities. <strong>Never pay money for auditions, registration, security deposits, or artist cards.</strong> Legitimate productions and casting directors never charge talent. Always verify production banners independently before attending private auditions or sharing sensitive personal data.
                             </p>
                         </div>
                     </div>
@@ -496,17 +496,17 @@ export default function Jobs() {
                                 <span>Zero Tolerance: Never Pay Money</span>
                             </div>
                             <p className="text-[11px] text-zinc-800 dark:text-zinc-300 leading-relaxed">
-                                Genuine filmmakers, casting directors, and studios <strong>never</strong> charge money for auditions, registration, security deposits, or artist cards. Never send money to anyone claiming to guarantee a film or commercial role.
+                                Genuine filmmakers, casting directors, and studios <strong>never charge talent</strong> for auditions, registration, security deposits, or artist cards. iFilmDirectory is <strong>not responsible for any money transactions</strong> between users, applicants, recruiters, or production banners.
                             </p>
                         </div>
 
                         <div className="p-3.5 rounded-xl bg-white dark:bg-[#121316] border border-amber-200/80 dark:border-white/5 space-y-1.5 shadow-xs">
                             <div className="flex items-center gap-1.5 font-extrabold text-amber-800 dark:text-amber-400">
-                                <span className="material-symbols-outlined text-sm">security</span>
-                                <span>Independent Verification</span>
+                                <span className="material-symbols-outlined text-sm">rss_feed</span>
+                                <span>Automated Feed & External Links</span>
                             </div>
                             <p className="text-[11px] text-zinc-800 dark:text-zinc-300 leading-relaxed">
-                                Job listings aggregated from external feeds or posted by third parties are provided for informational discovery. Always independently verify production banners and audition premises before attending private tests.
+                                Please note that this is an <strong>automated feed and directory aggregation</strong>. iFilmDirectory is <strong>not responsible for external apply links workings, availability, or third-party website redirects</strong>. Always independently verify production banners and audition premises before attending private tests.
                             </p>
                         </div>
                     </div>
@@ -663,16 +663,13 @@ export default function Jobs() {
                             <div className="p-3.5 rounded-xl bg-amber-50/90 dark:bg-[#1a1714] border border-amber-300/80 dark:border-amber-500/30 text-xs space-y-1.5">
                                 <div className="flex items-center gap-1.5 font-extrabold text-amber-900 dark:text-amber-400">
                                     <span className="material-symbols-outlined text-sm">verified_user</span>
-                                    <span>Safety Notice: Never pay for auditions or roles</span>
+                                    <span>Casting & Opportunity Safety Notice</span>
                                 </div>
                                 <p className="text-[11px] text-zinc-800 dark:text-zinc-200 leading-relaxed font-normal">
-                                    Legitimate productions never charge talent. If asked for any payment or if you suspect fraud, report immediately to{' '}
-                                    <a
-                                        href={`mailto:jobs@ifilmdirectory.com?subject=${encodeURIComponent(`Report Suspicious Listing: ${selectedJobModal.title}`)}`}
-                                        className="font-extrabold text-amber-800 dark:text-amber-400 hover:underline"
-                                    >
-                                        jobs@ifilmdirectory.com
-                                    </a>.
+                                    iFilmDirectory is an open directory for film fraternity opportunities. <strong>Never pay money for auditions, registration, security deposits, or artist cards.</strong> Legitimate productions and casting directors never charge talent. Always verify production banners independently before attending private auditions or sharing sensitive personal data.
+                                </p>
+                                <p className="text-[10px] text-zinc-600 dark:text-zinc-400 leading-relaxed pt-1 border-t border-amber-300/40 dark:border-amber-500/20">
+                                    • We are <strong>not responsible for any money transactions</strong>. This is an <strong>automated feed</strong>; we are <strong>not responsible for external apply links workings or availability</strong>.
                                 </p>
                             </div>
                         </div>
@@ -707,10 +704,11 @@ export default function Jobs() {
                                 {selectedJobModal.applicationEmail && (
                                     <a
                                         href={`mailto:${selectedJobModal.applicationEmail}?subject=${encodeURIComponent(`Application for ${selectedJobModal.title} - iFilmDirectory`)}&body=${encodeURIComponent(`Hi ${selectedJobModal.company} Team,\n\nI am writing to apply for the ${selectedJobModal.title} position posted on iFilmDirectory.\n\nPlease find my portfolio and credits attached.\n\nBest regards.`)}`}
-                                        className="px-4 py-2.5 rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-black font-bold text-xs flex items-center gap-1.5 hover:opacity-90 transition-opacity"
+                                        className="px-4 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-800 dark:hover:bg-zinc-700 !text-white font-black text-xs flex items-center gap-1.5 transition-all shadow-md active:scale-95"
+                                        style={{ color: '#ffffff' }}
                                     >
-                                        <span className="material-symbols-outlined text-sm">mail</span>
-                                        <span>Apply via Email</span>
+                                        <span className="material-symbols-outlined text-sm !text-white" style={{ color: '#ffffff' }}>mail</span>
+                                        <span className="!text-white font-black" style={{ color: '#ffffff' }}>Apply via Email</span>
                                     </a>
                                 )}
 
@@ -718,28 +716,26 @@ export default function Jobs() {
                                     <button
                                         type="button"
                                         onClick={() => openSourcePopup(selectedJobModal.sourceUrl!, selectedJobModal.title)}
-                                        className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 hover:brightness-105 transition-all cursor-pointer"
+                                        className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 !text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 hover:brightness-105 transition-all cursor-pointer"
+                                        style={{ color: '#ffffff' }}
                                     >
-                                        <span className="text-white">Apply on Source</span>
-                                        <span className="material-symbols-outlined text-sm text-white">launch</span>
+                                        <span className="!text-white font-black" style={{ color: '#ffffff' }}>Apply on Source</span>
+                                        <span className="material-symbols-outlined text-sm !text-white" style={{ color: '#ffffff' }}>launch</span>
                                     </button>
                                 )}
 
                                 {!selectedJobModal.sourceUrl && !selectedJobModal.applicationEmail && (
                                     <button
                                         onClick={() => {
-                                            if (!currentUser) {
-                                                openAuthModal('Sign in to apply for this role in iFilm');
-                                                return;
-                                            }
                                             const id = selectedJobModal.id;
                                             setSelectedJobModal(null);
                                             navigate(`/job/${id}`);
                                         }}
-                                        className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 hover:brightness-105 transition-all"
+                                        className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 !text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 hover:brightness-105 transition-all"
+                                        style={{ color: '#ffffff' }}
                                     >
-                                        <span>Apply in iFilm</span>
-                                        <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                                        <span className="!text-white font-black" style={{ color: '#ffffff' }}>View Listing</span>
+                                        <span className="material-symbols-outlined text-sm !text-white" style={{ color: '#ffffff' }}>arrow_forward</span>
                                     </button>
                                 )}
                             </div>

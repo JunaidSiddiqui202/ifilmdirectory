@@ -1574,7 +1574,10 @@ export default function Home() {
                                     </a>
                                 </div>
                                 <p className="text-[11px] text-zinc-800 dark:text-zinc-200 leading-relaxed font-normal">
-                                    iFilmDirectory never charges fees for auditions or applications. Never pay anyone for roles, screen tests, or job processing. Legitimate productions never charge talent. Verify producer credentials before attending private auditions.
+                                    iFilmDirectory is an open directory for film fraternity opportunities. Never pay money for auditions, registration, security deposits, or artist cards. Legitimate productions and casting directors never charge talent. Always verify production banners independently before attending private auditions or sharing sensitive personal data.
+                                </p>
+                                <p className="text-[10px] text-zinc-600 dark:text-zinc-400 leading-relaxed pt-1 border-t border-amber-300/40 dark:border-amber-500/20">
+                                    • We are <strong>not responsible for any money transactions</strong>. This is an <strong>automated feed</strong>; we are <strong>not responsible for external apply links workings or availability</strong>.
                                 </p>
                                 <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] border-t border-amber-300/50 dark:border-amber-500/20">
                                     <span className="text-zinc-700 dark:text-zinc-300 font-medium">Fraud Helpline:</span>
@@ -1626,10 +1629,11 @@ export default function Home() {
                                             }
                                             window.location.href = `mailto:${selectedJobModal.applicationEmail}?subject=${encodeURIComponent(`Application for ${selectedJobModal.title} - iFilmDirectory`)}&body=${encodeURIComponent(`Hi ${selectedJobModal.company} Team,\n\nI am writing to apply for the ${selectedJobModal.title} position on iFilmDirectory.\n\nPlease find my portfolio and credits attached.\n\nBest regards.`)}`;
                                         }}
-                                        className="px-4 py-2.5 rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-black font-bold text-xs flex items-center gap-1.5 hover:opacity-90 transition-opacity cursor-pointer"
+                                        className="px-4 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-800 dark:hover:bg-zinc-700 !text-white font-black text-xs flex items-center gap-1.5 transition-all shadow-md cursor-pointer active:scale-95"
+                                        style={{ color: '#ffffff' }}
                                     >
-                                        <span className="material-symbols-outlined text-sm">mail</span>
-                                        <span>Apply via Email</span>
+                                        <span className="material-symbols-outlined text-sm !text-white" style={{ color: '#ffffff' }}>mail</span>
+                                        <span className="!text-white font-black" style={{ color: '#ffffff' }}>Apply via Email</span>
                                     </button>
                                 )}
 
@@ -1643,10 +1647,11 @@ export default function Home() {
                                             }
                                             openSourcePopup(selectedJobModal.sourceUrl!, selectedJobModal.title);
                                         }}
-                                        className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 hover:brightness-105 transition-all cursor-pointer"
+                                        className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 !text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 hover:brightness-105 transition-all cursor-pointer"
+                                        style={{ color: '#ffffff' }}
                                     >
-                                        <span className="text-white">Apply on Source</span>
-                                        <span className="material-symbols-outlined text-sm text-white">launch</span>
+                                        <span className="!text-white font-black" style={{ color: '#ffffff' }}>Apply on Source</span>
+                                        <span className="material-symbols-outlined text-sm !text-white" style={{ color: '#ffffff' }}>launch</span>
                                     </button>
                                 )}
 
@@ -1657,10 +1662,11 @@ export default function Home() {
                                             setSelectedJobModal(null);
                                             navigate(`/job/${id}`);
                                         }}
-                                        className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 hover:brightness-105 transition-all"
+                                        className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 !text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 hover:brightness-105 transition-all"
+                                        style={{ color: '#ffffff' }}
                                     >
-                                        <span className="text-white">Apply in iFilm</span>
-                                        <span className="material-symbols-outlined text-sm text-white">arrow_forward</span>
+                                        <span className="!text-white font-black" style={{ color: '#ffffff' }}>View Details</span>
+                                        <span className="material-symbols-outlined text-sm !text-white" style={{ color: '#ffffff' }}>arrow_forward</span>
                                     </button>
                                 )}
                             </div>
