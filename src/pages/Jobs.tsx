@@ -40,6 +40,32 @@ export default function Jobs() {
     // Full Content Reader Modal (like news & reviews)
     const [selectedJobModal, setSelectedJobModal] = useState<Job | null>(null);
 
+    // Platform Disclaimer Modal (1st time check)
+    const [showDisclaimerModal, setShowDisclaimerModal] = useState(false);
+    const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
+    const [disclaimerConfirmed, setDisclaimerConfirmed] = useState(true);
+
+    const executeWithDisclaimer = (action: () => void) => {
+        const isAccepted = typeof localStorage !== 'undefined' && localStorage.getItem('ifilm_job_disclaimer_accepted') === 'true';
+        if (isAccepted) {
+            action();
+        } else {
+            setPendingAction(() => action);
+            setShowDisclaimerModal(true);
+        }
+    };
+
+    const handleConfirmDisclaimer = () => {
+        if (typeof localStorage !== 'undefined') {
+            localStorage.setItem('ifilm_job_disclaimer_accepted', 'true');
+        }
+        setShowDisclaimerModal(false);
+        if (pendingAction) {
+            pendingAction();
+            setPendingAction(null);
+        }
+    };
+
     const openSourcePopup = (url: string, _title?: string) => {
         if (!url) return;
         const width = Math.min(1060, Math.max(680, Math.floor(window.innerWidth * 0.88)));
@@ -511,17 +537,7 @@ export default function Jobs() {
                         </div>
                     </div>
 
-                    <div className="pt-2 border-t border-amber-300/50 dark:border-amber-500/20 flex flex-wrap items-center justify-between gap-3 text-xs">
-                        <div className="flex items-center gap-2 text-zinc-700 dark:text-zinc-300 text-[11px]">
-                            <span className="material-symbols-outlined text-sm text-amber-700 dark:text-amber-400">mail</span>
-                            <span className="font-medium">Report fraud or suspicious recruiters:</span>
-                            <a
-                                href="mailto:jobs@ifilmdirectory.com?subject=Report%20Suspicious%20Job%20Listing%20-%20iFilmDirectory"
-                                className="font-extrabold text-amber-800 dark:text-amber-400 hover:underline"
-                            >
-                                jobs@ifilmdirectory.com
-                            </a>
-                        </div>
+                    <div className="pt-2 border-t border-amber-300/50 dark:border-amber-500/20 flex flex-wrap items-center justify-end gap-3 text-xs">
                         <div className="flex items-center gap-3 text-[11px] font-semibold text-zinc-600 dark:text-zinc-400">
                             <a href="mailto:support@ifilmdirectory.com" className="hover:text-amber-600 transition-colors">
                                 Support Desk
@@ -702,20 +718,29 @@ export default function Jobs() {
 
                             <div className="flex items-center gap-2">
                                 {selectedJobModal.applicationEmail && (
-                                    <a
-                                        href={`mailto:${selectedJobModal.applicationEmail}?subject=${encodeURIComponent(`Application for ${selectedJobModal.title} - iFilmDirectory`)}&body=${encodeURIComponent(`Hi ${selectedJobModal.company} Team,\n\nI am writing to apply for the ${selectedJobModal.title} position posted on iFilmDirectory.\n\nPlease find my portfolio and credits attached.\n\nBest regards.`)}`}
-                                        className="px-4 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-800 dark:hover:bg-zinc-700 !text-white font-black text-xs flex items-center gap-1.5 transition-all shadow-md active:scale-95"
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            executeWithDisclaimer(() => {
+                                                window.location.href = `mailto:${selectedJobModal.applicationEmail}?subject=${encodeURIComponent(`Application for ${selectedJobModal.title} - iFilmDirectory`)}&body=${encodeURIComponent(`Hi ${selectedJobModal.company} Team,\n\nI am writing to apply for the ${selectedJobModal.title} position posted on iFilmDirectory.\n\nPlease find my portfolio and credits attached.\n\nBest regards.`)}`;
+                                            });
+                                        }}
+                                        className="px-4 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-800 dark:hover:bg-zinc-700 !text-white font-black text-xs flex items-center gap-1.5 transition-all shadow-md active:scale-95 cursor-pointer"
                                         style={{ color: '#ffffff' }}
                                     >
                                         <span className="material-symbols-outlined text-sm !text-white" style={{ color: '#ffffff' }}>mail</span>
                                         <span className="!text-white font-black" style={{ color: '#ffffff' }}>Apply via Email</span>
-                                    </a>
+                                    </button>
                                 )}
 
                                 {selectedJobModal.sourceUrl && (
                                     <button
                                         type="button"
-                                        onClick={() => openSourcePopup(selectedJobModal.sourceUrl!, selectedJobModal.title)}
+                                        onClick={() => {
+                                            executeWithDisclaimer(() => {
+                                                openSourcePopup(selectedJobModal.sourceUrl!, selectedJobModal.title);
+                                            });
+                                        }}
                                         className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 !text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 hover:brightness-105 transition-all cursor-pointer"
                                         style={{ color: '#ffffff' }}
                                     >
@@ -739,6 +764,84 @@ export default function Jobs() {
                                     </button>
                                 )}
                             </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* PLATFORM SAFETY DISCLAIMER MODAL (1st Time Only) */}
+            {showDisclaimerModal && (
+                <div 
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in"
+                    onClick={() => setShowDisclaimerModal(false)}
+                >
+                    <div 
+                        className="bg-white dark:bg-[#141519] border border-amber-300/60 dark:border-amber-500/30 rounded-3xl p-6 sm:p-7 max-w-lg w-full shadow-2xl space-y-5 animate-scale-in"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Header */}
+                        <div className="flex items-center gap-3 border-b border-zinc-200 dark:border-white/10 pb-4">
+                            <div className="size-11 rounded-2xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-500/30 shrink-0">
+                                <span className="material-symbols-outlined text-2xl">verified_user</span>
+                            </div>
+                            <div>
+                                <h3 className="text-base sm:text-lg font-black text-zinc-900 dark:text-white leading-tight">
+                                    Casting & Opportunity Safety Notice
+                                </h3>
+                                <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                                    Please review before continuing to external portal or recruiter
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Disclaimer Content */}
+                        <div className="space-y-3 text-xs leading-relaxed text-zinc-800 dark:text-zinc-200">
+                            <p className="font-normal">
+                                iFilmDirectory is an open directory for film fraternity opportunities. <strong>Never pay money for auditions, registration, security deposits, or artist cards.</strong> Legitimate productions and casting directors never charge talent. Always verify production banners independently before attending private auditions or sharing sensitive personal data.
+                            </p>
+
+                            <div className="p-3.5 rounded-2xl bg-amber-50 dark:bg-black/40 border border-amber-300/70 dark:border-amber-500/20 space-y-2 text-[11px] text-zinc-700 dark:text-zinc-300">
+                                <div className="flex items-center gap-1.5 font-bold text-amber-900 dark:text-amber-400">
+                                    <span className="material-symbols-outlined text-sm">info</span>
+                                    <span>Important Platform Notice:</span>
+                                </div>
+                                <ul className="space-y-1 list-disc list-inside">
+                                    <li>We are <strong>not responsible for any money transactions</strong> between users, applicants, recruiters, or production banners.</li>
+                                    <li>This is an <strong>automated feed</strong>; we are <strong>not responsible for external apply links workings, availability, or third-party web redirects</strong>.</li>
+                                </ul>
+                            </div>
+
+                            <label className="flex items-start gap-2.5 cursor-pointer pt-2 border-t border-zinc-200 dark:border-white/10">
+                                <input
+                                    type="checkbox"
+                                    checked={disclaimerConfirmed}
+                                    onChange={(e) => setDisclaimerConfirmed(e.target.checked)}
+                                    className="mt-0.5 size-4 rounded border-zinc-300 dark:border-white/20 bg-white dark:bg-black text-amber-500 focus:ring-amber-500 accent-amber-500"
+                                />
+                                <span className="text-[11px] text-zinc-700 dark:text-zinc-300 font-semibold select-none leading-snug">
+                                    I understand and agree to the platform safety disclaimer (Do not show again).
+                                </span>
+                            </label>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex items-center gap-3 pt-2">
+                            <button
+                                type="button"
+                                onClick={() => setShowDisclaimerModal(false)}
+                                className="flex-1 py-3 px-4 rounded-xl border border-zinc-200 dark:border-white/10 text-zinc-700 dark:text-zinc-300 font-bold text-xs hover:bg-zinc-100 dark:hover:bg-white/5 transition-all"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleConfirmDisclaimer}
+                                disabled={!disclaimerConfirmed}
+                                className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white font-black text-xs disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-1.5 shadow-lg shadow-amber-500/20 active:scale-95"
+                            >
+                                <span>Accept & Continue</span>
+                                <span className="material-symbols-outlined text-base">arrow_forward</span>
+                            </button>
                         </div>
                     </div>
                 </div>
