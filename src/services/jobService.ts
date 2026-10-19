@@ -138,7 +138,7 @@ export const jobService = {
                 console.warn("Firestore jobs fetch error (falling back to RSS jobs):", fsErr);
             }
 
-            // 2. Fetch live Film Fraternity RSS jobs (auto-synced every 30m)
+            // 2. Fetch live Film Fraternity RSS jobs (auto-synced every 90m)
             let rssJobs: (Job & { postedAtDate: Date })[] = [];
             try {
                 const { rssJobService } = await import('./rssJobService');
@@ -186,6 +186,11 @@ export const jobService = {
                     return true;
                 })
                 .sort((a, b) => {
+                    const isSeedA = a.id?.startsWith('seed_job_') ? 1 : 0;
+                    const isSeedB = b.id?.startsWith('seed_job_') ? 1 : 0;
+                    if (isSeedA !== isSeedB) {
+                        return isSeedA - isSeedB; // Live extracted & user jobs ALWAYS above seed fallback jobs
+                    }
                     const timeA = a.postedAtDate ? a.postedAtDate.getTime() : 0;
                     const timeB = b.postedAtDate ? b.postedAtDate.getTime() : 0;
                     return timeB - timeA; // STRICT newest jobs at the top

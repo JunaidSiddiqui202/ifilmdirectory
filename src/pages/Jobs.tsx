@@ -40,6 +40,23 @@ export default function Jobs() {
     // Full Content Reader Modal (like news & reviews)
     const [selectedJobModal, setSelectedJobModal] = useState<Job | null>(null);
 
+    const openSourcePopup = (url: string, _title?: string) => {
+        if (!url) return;
+        const width = Math.min(1060, Math.max(680, Math.floor(window.innerWidth * 0.88)));
+        const height = Math.min(900, Math.max(600, Math.floor(window.innerHeight * 0.90)));
+        const left = Math.max(0, Math.floor((window.screen.width - width) / 2));
+        const top = Math.max(0, Math.floor((window.screen.height - height) / 2));
+
+        const popupFeatures = `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes,status=no,toolbar=no,menubar=no,location=yes`;
+        const popup = window.open(url, 'FilmJobSourcePopup', popupFeatures);
+
+        if (popup) {
+            popup.focus();
+        } else {
+            window.open(url, '_blank', 'noopener,noreferrer');
+        }
+    };
+
     const loadJobs = async (force: boolean = false) => {
         if (force) setIsSyncing(true);
         else setLoading(true);
@@ -71,10 +88,10 @@ export default function Jobs() {
     useEffect(() => {
         loadJobs();
 
-        // 30-minute background auto-refresh timer check
+        // 90-minute background auto-refresh timer check
         const interval = setInterval(() => {
             if (rssJobService.isCacheStale()) {
-                console.log('30-minute interval elapsed: refreshing film fraternity jobs...');
+                console.log('90-minute interval elapsed: refreshing film fraternity jobs...');
                 loadJobs(true);
             } else {
                 const lastSync = rssJobService.getLastSyncTime();
@@ -248,7 +265,7 @@ export default function Jobs() {
                         <div className="sm:col-span-4 flex items-center justify-between sm:justify-end gap-2.5 px-1">
                             <div className="text-[11px] text-zinc-500 dark:text-zinc-400 flex items-center gap-1">
                                 <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-                                <span>Auto-syncs 30m</span>
+                                <span>Auto-syncs 90m</span>
                             </div>
 
                             <button
@@ -346,7 +363,7 @@ export default function Jobs() {
                         <div className="col-span-full py-16">
                             <EmptyState
                                 message="No fraternity opportunities found"
-                                subMessage={showVerifiedOnly || searchQuery || subFilter !== 'All' ? "Try clearing role filters or search query to see more openings." : "New jobs pull every 30 minutes. You can also post an opening!"}
+                                subMessage={showVerifiedOnly || searchQuery || subFilter !== 'All' ? "Try clearing role filters or search query to see more openings." : "New jobs pull every 90 minutes. You can also post an opening!"}
                                 icon="work_off"
                                 actionLabel={showVerifiedOnly || searchQuery || subFilter !== 'All' ? "Reset Filters" : "Post a Call"}
                                 onAction={() => {
@@ -613,15 +630,14 @@ export default function Jobs() {
                                 )}
 
                                 {selectedJobModal.sourceUrl && (
-                                    <a
-                                        href={selectedJobModal.sourceUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 hover:brightness-105 transition-all"
+                                    <button
+                                        type="button"
+                                        onClick={() => openSourcePopup(selectedJobModal.sourceUrl!, selectedJobModal.title)}
+                                        className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 hover:brightness-105 transition-all cursor-pointer"
                                     >
                                         <span className="text-white">Apply on Source</span>
                                         <span className="material-symbols-outlined text-sm text-white">launch</span>
-                                    </a>
+                                    </button>
                                 )}
 
                                 {!selectedJobModal.sourceUrl && !selectedJobModal.applicationEmail && (

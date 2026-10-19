@@ -120,21 +120,43 @@ export default function Home() {
         loadHomeData();
     }, []);
 
+    /**
+     * Opens original news or job article in a focused pop-up window over the current page.
+     * When finished reading, the user can simply close the popup to return to iFilmDirectory.
+     */
+    const openSourcePopup = (url?: string, _title?: string) => {
+        if (!url) return;
+        const width = Math.min(1060, Math.max(680, Math.floor(window.innerWidth * 0.88)));
+        const height = Math.min(900, Math.max(600, Math.floor(window.innerHeight * 0.90)));
+        const left = Math.max(0, Math.floor((window.screen.width - width) / 2));
+        const top = Math.max(0, Math.floor((window.screen.height - height) / 2));
+
+        const popupFeatures = `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes,status=no,toolbar=no,menubar=no,location=yes`;
+        const popup = window.open(url, 'CinemaNewsSourcePopup', popupFeatures);
+
+        if (popup) {
+            popup.focus();
+        } else {
+            window.open(url, '_blank', 'noopener,noreferrer');
+        }
+    };
+
     const handleShareNews = async (item: NewsItem, e: React.MouseEvent) => {
         e.stopPropagation();
+        const siteLink = `${window.location.origin}/south-cinema?id=${encodeURIComponent(item.id)}`;
         if (navigator.share) {
             try {
                 await navigator.share({
                     title: item.title,
-                    text: `${item.title} — via iFilmDirectory`,
-                    url: item.link || window.location.href,
+                    text: `${item.title} — via iFilmDirectory South Cinema Wire`,
+                    url: siteLink,
                 });
             } catch {
                 // user cancelled
             }
         } else {
-            await navigator.clipboard.writeText(item.link || window.location.href);
-            toast.success('Link copied to clipboard!');
+            await navigator.clipboard.writeText(siteLink);
+            toast.success('iFilmDirectory news link copied to clipboard!');
         }
     };
 
@@ -430,7 +452,18 @@ export default function Home() {
                                         <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 truncate">
                                             {item.rating ? '★ Review' : 'Film Scoop'}
                                         </span>
-                                        <span className="text-[10px] text-zinc-500 dark:text-zinc-400">• {item.source}</span>
+                                        <button
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                openSourcePopup(item.link, item.title);
+                                            }}
+                                            className="text-[10px] text-zinc-500 hover:text-amber-500 dark:text-zinc-400 dark:hover:text-amber-400 transition-colors flex items-center gap-0.5 cursor-pointer"
+                                            title={`Open ${item.source} in pop-up window`}
+                                        >
+                                            <span>• {item.source}</span>
+                                            <span className="material-symbols-outlined text-[10px]">open_in_new</span>
+                                        </button>
                                     </div>
                                     <h4 className="text-xs font-bold text-zinc-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors line-clamp-2 leading-snug">
                                         {item.title}
@@ -762,9 +795,18 @@ export default function Home() {
                                                 {/* News Headline & Info */}
                                                 <div className="min-w-0 flex-1">
                                                     <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
-                                                        <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 truncate max-w-[120px]">
-                                                            {item.source}
-                                                        </span>
+                                                        <button
+                                                            type="button"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                openSourcePopup(item.link, item.title);
+                                                            }}
+                                                            className="text-[10px] font-bold uppercase tracking-wider text-amber-600 hover:text-amber-500 dark:text-amber-400 dark:hover:text-amber-300 truncate max-w-[120px] flex items-center gap-0.5 hover:underline"
+                                                            title={`Open ${item.source} in pop-up window`}
+                                                        >
+                                                            <span>{item.source}</span>
+                                                            <span className="material-symbols-outlined text-[10px]">open_in_new</span>
+                                                        </button>
                                                         <span className="text-[10px] text-zinc-400">•</span>
                                                         <span className="text-[10px] text-zinc-500 dark:text-zinc-400">{formatNewsTimeAgo(item.timestamp)}</span>
                                                         {isReview && !item.rating && (
@@ -1064,9 +1106,16 @@ export default function Home() {
                                         {selectedNewsArticle.industry}
                                     </span>
                                 </div>
-                                <span className="text-white text-[11px] font-medium bg-black/70 px-2 py-0.5 rounded-md backdrop-blur-md">
-                                    {selectedNewsArticle.source} • {formatNewsTimeAgo(selectedNewsArticle.timestamp)}
-                                </span>
+                                <button
+                                    type="button"
+                                    onClick={() => openSourcePopup(selectedNewsArticle.link, selectedNewsArticle.title)}
+                                    className="text-white text-[11px] font-medium bg-black/70 hover:bg-black/90 px-2 py-0.5 rounded-md backdrop-blur-md flex items-center gap-1 transition-all cursor-pointer border border-white/10 hover:border-amber-400/50"
+                                    title={`Open ${selectedNewsArticle.source} in pop-up window`}
+                                >
+                                    <span>{selectedNewsArticle.source}</span>
+                                    <span className="material-symbols-outlined text-[12px]">open_in_new</span>
+                                    <span>• {formatNewsTimeAgo(selectedNewsArticle.timestamp)}</span>
+                                </button>
                             </div>
                         </div>
 
@@ -1097,15 +1146,14 @@ export default function Home() {
 
                         {/* Sticky Action Footer */}
                         <div className="p-4 sm:px-6 bg-slate-50 dark:bg-[#0e0f12] border-t border-zinc-200 dark:border-white/10 flex items-center gap-3 shrink-0">
-                            <a
-                                href={selectedNewsArticle.link}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex-1 py-2.5 sm:py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-xs sm:text-sm text-center flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95"
+                            <button
+                                type="button"
+                                onClick={() => openSourcePopup(selectedNewsArticle.link, selectedNewsArticle.title)}
+                                className="flex-1 py-2.5 sm:py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-xs sm:text-sm text-center flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 cursor-pointer"
                             >
-                                <span>Read Full Story on {selectedNewsArticle.source}</span>
+                                <span>Read Full Story on {selectedNewsArticle.source} (Pop-up)</span>
                                 <span className="material-symbols-outlined text-base">open_in_new</span>
-                            </a>
+                            </button>
 
                             <button
                                 onClick={(e) => handleShareNews(selectedNewsArticle, e)}
@@ -1278,15 +1326,14 @@ export default function Home() {
                                 )}
 
                                 {selectedJobModal.sourceUrl && (
-                                    <a
-                                        href={selectedJobModal.sourceUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 hover:brightness-105 transition-all"
+                                    <button
+                                        type="button"
+                                        onClick={() => openSourcePopup(selectedJobModal.sourceUrl!, selectedJobModal.title)}
+                                        className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 hover:brightness-105 transition-all cursor-pointer"
                                     >
                                         <span className="text-white">Apply on Source</span>
                                         <span className="material-symbols-outlined text-sm text-white">launch</span>
-                                    </a>
+                                    </button>
                                 )}
 
                                 {!selectedJobModal.sourceUrl && !selectedJobModal.applicationEmail && (

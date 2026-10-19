@@ -10,7 +10,8 @@
  * - Artists, Actors & Casting Calls / Auditions
  * - Makeup Artists, Hair Stylists & Costume Designers
  * 
- * Auto-syncs every 30 minutes, caches in localStorage, and provides full details view.
+ * Auto-syncs every 90 minutes, caches in localStorage, and provides full details view.
+ * Freshly extracted live RSS jobs are always strictly sorted to the top.
  */
 
 import { type Job } from './jobService';
@@ -34,10 +35,10 @@ export interface RSSJobFeedSource {
 }
 
 const STORAGE_KEYS = {
-    CACHE: 'ifilm_rss_jobs_cache_v1',
+    CACHE: 'ifilm_rss_jobs_cache_v2',
     LAST_SYNC: 'ifilm_rss_jobs_last_sync_timestamp',
     FEEDS: 'ifilm_rss_jobs_feeds_v1',
-    SYNC_INTERVAL_MINS: 30
+    SYNC_INTERVAL_MINS: 90
 };
 
 // 7 granular feeds dedicated to film and media fraternity departments
@@ -93,7 +94,10 @@ export const DEFAULT_JOB_FEEDS: RSSJobFeedSource[] = [
     }
 ];
 
-// Curated high-production base seed jobs for all fraternity roles so the board is immediately full
+// Curated high-production base seed jobs for all fraternity roles so the board is immediately full.
+// Base time set 7 days ago so freshly extracted live RSS jobs always sort above them at the top!
+const SEED_BASE_TIME = Date.now() - (7 * 24 * 60 * 60 * 1000);
+
 const SEED_FRATERNITY_JOBS: Job[] = [
     {
         id: 'seed_job_editor_1',
@@ -114,8 +118,8 @@ Responsibilities:
         deadline: '2026-12-15',
         type: 'Post-Production',
         postedBy: 'mythri_production',
-        postedAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
-        postedAtDate: new Date(Date.now() - 15 * 60 * 1000),
+        postedAt: new Date(SEED_BASE_TIME - 1 * 3600000).toISOString(),
+        postedAtDate: new Date(SEED_BASE_TIME - 1 * 3600000),
         applicationEmail: 'post@mythriofficial.com',
         logo: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=120&h=120&fit=crop',
         user_details: {
@@ -158,8 +162,8 @@ The candidate will work directly alongside the Director of Photography (DOP) to 
         deadline: '2026-11-30',
         type: 'Crew',
         postedBy: 'hombale_films',
-        postedAt: new Date(Date.now() - 35 * 60 * 1000).toISOString(),
-        postedAtDate: new Date(Date.now() - 35 * 60 * 1000),
+        postedAt: new Date(SEED_BASE_TIME - 2 * 3600000).toISOString(),
+        postedAtDate: new Date(SEED_BASE_TIME - 2 * 3600000),
         applicationEmail: 'camera.crew@hombale.com',
         logo: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=120&h=120&fit=crop',
         user_details: {
@@ -198,8 +202,8 @@ Role entails seamless integration of live-action plates with CGI creatures, comp
         deadline: '2026-12-31',
         type: 'Post-Production',
         postedBy: 'red_chillies_vfx',
-        postedAt: new Date(Date.now() - 55 * 60 * 1000).toISOString(),
-        postedAtDate: new Date(Date.now() - 55 * 60 * 1000),
+        postedAt: new Date(SEED_BASE_TIME - 3 * 3600000).toISOString(),
+        postedAtDate: new Date(SEED_BASE_TIME - 3 * 3600000),
         applicationEmail: 'vfxcareers@redchillies.com',
         logo: 'https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?w=120&h=120&fit=crop',
         user_details: {
@@ -232,8 +236,8 @@ You will be responsible for creating custom atmospheric soundscapes, Foley recor
         deadline: '2026-11-25',
         type: 'Post-Production',
         postedBy: 'annapurna_studios',
-        postedAt: new Date(Date.now() - 75 * 60 * 1000).toISOString(),
-        postedAtDate: new Date(Date.now() - 75 * 60 * 1000),
+        postedAt: new Date(SEED_BASE_TIME - 4 * 3600000).toISOString(),
+        postedAtDate: new Date(SEED_BASE_TIME - 4 * 3600000),
         applicationEmail: 'sound@annapurnastudios.com',
         logo: 'https://images.unsplash.com/photo-1590602847861-f357a9332bbc?w=120&h=120&fit=crop',
         user_details: {
@@ -269,8 +273,8 @@ Work with renowned music directors to arrange live orchestra strings, synthesize
         deadline: '2026-12-10',
         type: 'Post-Production',
         postedBy: 'sun_pictures',
-        postedAt: new Date(Date.now() - 95 * 60 * 1000).toISOString(),
-        postedAtDate: new Date(Date.now() - 95 * 60 * 1000),
+        postedAt: new Date(SEED_BASE_TIME - 5 * 3600000).toISOString(),
+        postedAtDate: new Date(SEED_BASE_TIME - 5 * 3600000),
         applicationEmail: 'music@sunnetwork.in',
         logo: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=120&h=120&fit=crop',
         user_details: {
@@ -307,8 +311,8 @@ Seeking fresh and experienced actors:
         deadline: '2026-11-20',
         type: 'Audition',
         postedBy: 'dharma_casting',
-        postedAt: new Date(Date.now() - 110 * 60 * 1000).toISOString(),
-        postedAtDate: new Date(Date.now() - 110 * 60 * 1000),
+        postedAt: new Date(SEED_BASE_TIME - 6 * 3600000).toISOString(),
+        postedAtDate: new Date(SEED_BASE_TIME - 6 * 3600000),
         applicationEmail: 'casting@dharmaproductions.com',
         logo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop',
         user_details: {
@@ -345,8 +349,8 @@ You will design character looks, period hair styling, prosthetic ageing, battle 
         deadline: '2026-12-05',
         type: 'Crew',
         postedBy: 'vyjayanthi_movies',
-        postedAt: new Date(Date.now() - 140 * 60 * 1000).toISOString(),
-        postedAtDate: new Date(Date.now() - 140 * 60 * 1000),
+        postedAt: new Date(SEED_BASE_TIME - 7 * 3600000).toISOString(),
+        postedAtDate: new Date(SEED_BASE_TIME - 7 * 3600000),
         applicationEmail: 'makeup@vyjayanthimovies.com',
         logo: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=120&h=120&fit=crop',
         user_details: {
@@ -379,8 +383,8 @@ Expertise in dynamic typography, sound sync cuts, speed ramps, and DaVinci color
         deadline: '2026-12-20',
         type: 'Post-Production',
         postedBy: 'prime_digital',
-        postedAt: new Date(Date.now() - 170 * 60 * 1000).toISOString(),
-        postedAtDate: new Date(Date.now() - 170 * 60 * 1000),
+        postedAt: new Date(SEED_BASE_TIME - 8 * 3600000).toISOString(),
+        postedAtDate: new Date(SEED_BASE_TIME - 8 * 3600000),
         applicationEmail: 'jobs@primecinemamedia.com',
         logo: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=120&h=120&fit=crop',
         user_details: {
@@ -423,7 +427,7 @@ class RSSJobService {
     }
 
     /**
-     * Checks if 30 minutes have elapsed since last sync
+     * Checks if 90 minutes have elapsed since last sync
      */
     isCacheStale(): boolean {
         const lastSync = this.getLastSyncTime();
@@ -434,6 +438,7 @@ class RSSJobService {
 
     /**
      * Get cached jobs from localStorage (with fallback to seed jobs)
+     * Strictly sorts live extracted jobs to the top above seed fallback jobs.
      */
     getCachedJobs(): Job[] {
         try {
@@ -441,10 +446,18 @@ class RSSJobService {
             if (raw) {
                 const parsed: any[] = JSON.parse(raw);
                 if (Array.isArray(parsed) && parsed.length > 0) {
-                    return parsed.map(j => ({
+                    const jobs = parsed.map(j => ({
                         ...j,
                         postedAtDate: j.postedAtDate ? new Date(j.postedAtDate) : new Date(j.postedAt || Date.now())
                     }));
+                    return jobs.sort((a, b) => {
+                        const isSeedA = a.id?.startsWith('seed_job_') ? 1 : 0;
+                        const isSeedB = b.id?.startsWith('seed_job_') ? 1 : 0;
+                        if (isSeedA !== isSeedB) return isSeedA - isSeedB;
+                        const timeA = a.postedAtDate ? a.postedAtDate.getTime() : new Date(a.postedAt || 0).getTime();
+                        const timeB = b.postedAtDate ? b.postedAtDate.getTime() : new Date(b.postedAt || 0).getTime();
+                        return timeB - timeA;
+                    });
                 }
             }
         } catch (e) {
@@ -515,8 +528,13 @@ class RSSJobService {
             }
         }
 
-        // Sort descending by timestamp so newest jobs show at the top!
+        // Sort descending: Freshly extracted live RSS jobs ALWAYS show at the very top!
         deduplicated.sort((a, b) => {
+            const isSeedA = a.id?.startsWith('seed_job_') ? 1 : 0;
+            const isSeedB = b.id?.startsWith('seed_job_') ? 1 : 0;
+            if (isSeedA !== isSeedB) {
+                return isSeedA - isSeedB; // Live extracted jobs ALWAYS appear above seed fallback jobs
+            }
             const timeA = a.postedAtDate ? a.postedAtDate.getTime() : new Date(a.postedAt || 0).getTime();
             const timeB = b.postedAtDate ? b.postedAtDate.getTime() : new Date(b.postedAt || 0).getTime();
             return timeB - timeA;
