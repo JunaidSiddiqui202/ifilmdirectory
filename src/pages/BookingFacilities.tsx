@@ -6,6 +6,7 @@ import PostMedia from '../components/PostMedia';
 import { useNavigate } from 'react-router-dom';
 import { facilityService, type Facility } from '../services/facilityService';
 import MapDiscovery from '../components/MapDiscovery';
+import SEO from '../components/SEO';
 
 export default function BookingFacilities() {
     const navigate = useNavigate();
@@ -60,6 +61,21 @@ export default function BookingFacilities() {
 
     return (
         <div className="relative flex min-h-screen w-full flex-col bg-slate-50 dark:bg-[#090A0C] text-zinc-900 dark:text-white overflow-x-hidden font-display selection:bg-amber-500/30 transition-colors">
+            <SEO
+                title="Film Studios & Facilities | Shooting Floors, Stages & Suites"
+                description="Book film shooting floors, sound stages, Dolby Atmos dubbing suites, VFX editing facilities, and cinema camera equipment across India."
+                keywords={[
+                    'film studio booking',
+                    'shooting floors',
+                    'sound stage rental',
+                    'dubbing studio',
+                    'preview theater',
+                    'camera rental',
+                    'cine equipment',
+                    'hyderabad film studios',
+                    'mumbai shoot locations'
+                ]}
+            />
             {/* Top Navigation */}
             <header className="sticky top-0 z-40 bg-white/90 dark:bg-[#090A0C]/90 backdrop-blur-xl border-b border-zinc-200 dark:border-white/[0.08] px-4 md:px-8 py-3.5 flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3 min-w-0">

@@ -3,8 +3,10 @@
 
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+
   <!-- AUTOMATIC BLANK SCREEN RECOVERY: Nukes stale Service Workers and Caches -->
   <script>
     (function () {
@@ -31,37 +33,87 @@
       });
     })();
   </script>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>iFilmDirectory - The Hub for Film Professionals</title>
 
-  <!-- PWA Meta Tags -->
+  <!-- Primary SEO Meta Tags (Rank #1 Optimization) -->
+  <title>iFilmDirectory | Film Industry Directory, Auditions, Casting Calls & Crew Network</title>
+  <meta name="title" content="iFilmDirectory | Film Industry Directory, Auditions, Casting Calls & Crew Network" />
   <meta name="description"
-    content="The ultimate platform connecting film professionals, cast, crew, and production houses worldwide">
-  <meta name="theme-color" content="#da620b">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="iFilmDirectory">
+    content="iFilmDirectory is the premier open directory for the film fraternity. Discover verified auditions, casting calls, filmmakers, actors, directors, cinematographers, film studios, rental equipment, and cinema news across Tollywood, Bollywood, Kollywood, Mollywood, Sandalwood & global cinema." />
+  <meta name="keywords"
+    content="iFilmDirectory, film directory, cinema directory, casting calls, auditions, film jobs, movie auditions, actors directory, directors directory, cinematographer portfolio, film crew hire, south cinema news, tollywood auditions, bollywood casting call, kollywood film jobs, mollywood cinema, sandalwood, camera rental, film studio booking, cine equipment, film fraternity network, indian film industry, casting director contact, movie crew network" />
+  <meta name="author" content="iFilmDirectory" />
+  <meta name="application-name" content="iFilmDirectory" />
+  <link rel="canonical" href="https://ifilmdirectory.com/" />
 
-  <!-- PWA Manifest -->
-  <link rel="manifest" href="/manifest.json">
+  <!-- Browser Search Prediction & OpenSearch Autodiscovery -->
+  <link rel="search" type="application/opensearchdescription+xml" title="iFilmDirectory Search" href="/opensearch.xml" />
 
-  <!-- App Icons -->
-  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512x512.png">
-  <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+  <!-- Search Engine Robots Directive -->
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+  <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+
+  <!-- Open Graph / Facebook / WhatsApp / LinkedIn -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="iFilmDirectory" />
+  <meta property="og:url" content="https://ifilmdirectory.com/" />
+  <meta property="og:title" content="iFilmDirectory | Film Industry Directory, Auditions, Casting Calls & Crew Network" />
+  <meta property="og:description"
+    content="The open professional directory for the film fraternity. Connect with verified actors, directors, cinematographers, and production houses. Discover live casting calls, studio bookings, and South Cinema news." />
+  <meta property="og:image" content="https://ifilmdirectory.com/logo.png" />
+  <meta property="og:image:secure_url" content="https://ifilmdirectory.com/logo.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="iFilmDirectory - The Premier Film Fraternity Hub" />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@ifilmdirectory" />
+  <meta name="twitter:creator" content="@ifilmdirectory" />
+  <meta name="twitter:title" content="iFilmDirectory | Film Industry Directory, Auditions & Crew Network" />
+  <meta name="twitter:description"
+    content="Discover verified movie auditions, casting calls, filmmaker profiles, production facilities, and cinema updates on iFilmDirectory." />
+  <meta name="twitter:image" content="https://ifilmdirectory.com/logo.png" />
+  <meta name="twitter:image:alt" content="iFilmDirectory - The Hub for Film Professionals" />
+
+  <!-- Geographic and Cultural Targeting -->
+  <meta name="geo.region" content="IN" />
+  <meta name="geo.placename" content="Hyderabad, Mumbai, Chennai, Bengaluru, Kochi, Delhi" />
+  <meta name="geo.position" content="17.3850;78.4867" />
+  <meta name="ICBM" content="17.3850, 78.4867" />
+  <meta name="rating" content="general" />
+  <meta name="revisit-after" content="1 days" />
+
+  <!-- PWA & Mobile Meta Tags -->
+  <meta name="theme-color" content="#da620b" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="iFilmDirectory" />
+
+  <!-- PWA Manifest & App Icons -->
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512x512.png" />
+  <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+
+  <!-- Preconnects for Core Web Vitals & Instant Load -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="dns-prefetch" href="https://firestore.googleapis.com" />
+  <link rel="dns-prefetch" href="https://firebasestorage.googleapis.com" />
 
   <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
     href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Spline+Sans:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Noto+Sans:wght@400;500;700&display=swap"
-    rel="stylesheet">
+    rel="stylesheet" />
 
   <!-- Material Symbols -->
   <link
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
-    rel="stylesheet">
+    rel="stylesheet" />
 
   <!-- Leaflet CSS for Maps -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -69,28 +121,248 @@
 
   <style>
     .material-symbols-outlined {
-      font-variation-settings:
-        'FILL' 0,
-        'wght' 400,
-        'GRAD' 0,
-        'opsz' 24
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
     }
-
     .material-symbols-outlined.filled {
-      font-variation-settings:
-        'FILL' 1
+      font-variation-settings: 'FILL' 1;
     }
   </style>
+
+  <!-- ========================================================================= -->
+  <!-- STRUCTURED DATA (JSON-LD) FOR SEARCH PREDICTION & ANSWER ENGINE (AEO)    -->
+  <!-- ========================================================================= -->
+
+  <!-- 1. WebSite Schema with SearchAction (Powers Google Search Predictions & Sitelinks Searchbox) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": "https://ifilmdirectory.com/#website",
+    "url": "https://ifilmdirectory.com/",
+    "name": "iFilmDirectory",
+    "alternateName": [
+      "iFilm Directory",
+      "iFilm",
+      "Film Directory",
+      "Film Directory India",
+      "Cinema Directory",
+      "Indian Cinema Directory",
+      "Tollywood Directory",
+      "Bollywood Film Directory"
+    ],
+    "description": "Global film industry directory, casting calls, auditions, crew networking, studio rentals, and production facilities.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "iFilmDirectory",
+      "url": "https://ifilmdirectory.com/",
+      "logo": "https://ifilmdirectory.com/logo.png"
+    },
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://ifilmdirectory.com/search?q={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    },
+    "inLanguage": "en-US"
+  }
+  </script>
+
+  <!-- 2. Organization Knowledge Graph Entity -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": "https://ifilmdirectory.com/#organization",
+    "name": "iFilmDirectory",
+    "legalName": "iFilm Directory",
+    "url": "https://ifilmdirectory.com/",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://ifilmdirectory.com/logo.png",
+      "caption": "iFilmDirectory Logo"
+    },
+    "image": "https://ifilmdirectory.com/logo.png",
+    "description": "The open professional directory and casting platform connecting the film fraternity, including actors, directors, cinematographers, crew, and production studios.",
+    "email": "jobs@ifilmdirectory.com",
+    "sameAs": [
+      "https://twitter.com/ifilmdirectory",
+      "https://instagram.com/ifilmdirectory",
+      "https://linkedin.com/company/ifilmdirectory",
+      "https://facebook.com/ifilmdirectory"
+    ],
+    "knowsAbout": [
+      "Film Industry",
+      "Auditions and Casting Calls",
+      "Film Directing",
+      "Cinematography",
+      "Acting",
+      "Film Production Houses",
+      "South Indian Cinema",
+      "Tollywood Cinema",
+      "Bollywood Cinema",
+      "Kollywood Cinema",
+      "Mollywood Cinema",
+      "Sandalwood Cinema",
+      "Film Equipment Rental",
+      "Sound Stages and Studios",
+      "Film Festivals and Guilds"
+    ],
+    "areaServed": "Global"
+  }
+  </script>
+
+  <!-- 3. SiteNavigationElement (Powers Google Sitelinks Under Search Results) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "itemListElement": [
+      {
+        "@type": "SiteNavigationElement",
+        "position": 1,
+        "name": "Film Auditions & Casting Calls",
+        "description": "Explore verified open casting calls and cinema job opportunities.",
+        "url": "https://ifilmdirectory.com/jobs"
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "position": 2,
+        "name": "Browse Filmmakers & Talent Directory",
+        "description": "Discover verified actors, directors, cinematographers, and crew.",
+        "url": "https://ifilmdirectory.com/browse-profiles"
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "position": 3,
+        "name": "South Cinema News & Updates",
+        "description": "Real-time updates, releases, and insights from South Indian cinema.",
+        "url": "https://ifilmdirectory.com/south-cinema"
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "position": 4,
+        "name": "Film Studio & Facility Bookings",
+        "description": "Book sound stages, shooting locations, dubbing and edit suites.",
+        "url": "https://ifilmdirectory.com/booking-facilities"
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "position": 5,
+        "name": "Cinema Equipment Marketplace",
+        "description": "Rent camera packages, lenses, lighting, and sound gear.",
+        "url": "https://ifilmdirectory.com/marketplace"
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "position": 6,
+        "name": "Showcase & Video Showreels",
+        "description": "Watch video auditions, directing reels, and acting monologues.",
+        "url": "https://ifilmdirectory.com/showcase"
+      }
+    ]
+  }
+  </script>
+
+  <!-- 4. FAQPage (AEO - Answer Engine Optimization for Gemini, Perplexity, ChatGPT Search, Google AI Overviews) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is iFilmDirectory?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "iFilmDirectory is the premier open professional directory for the film fraternity. It connects actors, directors, cinematographers, editors, crew members, and production houses across Indian and international cinema, enabling talent discovery, audition applications, facility booking, and industry networking."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I find movie auditions and casting calls on iFilmDirectory?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "You can browse verified auditions and casting calls by visiting https://ifilmdirectory.com/jobs. Filter by role (lead, supporting, character artist, voice-over), gender, age range, location, and project banner to find matching casting calls."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does iFilmDirectory charge fees for auditions or artist cards?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. iFilmDirectory maintains a strict zero-tolerance anti-fraud policy. Never pay money for auditions, registration, security deposits, or artist cards. Legitimate productions and casting directors never charge talent to audition or apply."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Which film industries are covered on iFilmDirectory?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "iFilmDirectory covers the entire Indian and global film fraternity, with specialized depth in South Cinema (Tollywood - Telugu, Kollywood - Tamil, Mollywood - Malayalam, Sandalwood - Kannada), Bollywood (Hindi), regional cinema, and international co-productions."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How can filmmakers book shooting studios and cinema camera equipment?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Filmmakers can explore verified shooting locations, sound stages, preview theaters, edit suites, and camera rental houses with technical specifications and direct contact at https://ifilmdirectory.com/booking-facilities and https://ifilmdirectory.com/marketplace."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How can production banners and directors post casting calls on iFilmDirectory?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Production banners, casting directors, and independent producers can register and post casting calls and crew job openings directly through https://ifilmdirectory.com/post-job."
+        }
+      }
+    ]
+  }
+  </script>
 </head>
 
 <body>
-  <div id="root"></div>
+  <!-- Semantic Crawlable Fallback: Provides instantaneous crawl indexability for Googlebot, Bingbot & AI bots before JS execution -->
+  <div id="root">
+    <main aria-label="iFilmDirectory Overview" style="padding: 24px; font-family: sans-serif; max-width: 900px; margin: 0 auto; line-height: 1.6; color: #1e293b;">
+      <h1 style="font-size: 28px; font-weight: 800; color: #da620b; margin-bottom: 12px;">iFilmDirectory - The Premier Film Fraternity Directory</h1>
+      <p style="font-size: 16px; margin-bottom: 20px;">
+        iFilmDirectory connects film professionals, cast, crew, and production houses worldwide. Explore verified movie auditions, casting calls, talent profiles, and cinema production facilities across Tollywood, Bollywood, Kollywood, Mollywood, and Pan-India feature films.
+      </p>
+      
+      <section style="margin-bottom: 24px;">
+        <h2 style="font-size: 20px; font-weight: 700;">Explore Key Directory Sections</h2>
+        <ul style="list-style-type: disc; margin-left: 20px; margin-top: 8px;">
+          <li><a href="/jobs" style="color: #da620b; font-weight: 600;">Film Jobs, Auditions &amp; Casting Calls</a> &mdash; Verified lead, supporting, and crew opportunities.</li>
+          <li><a href="/browse-profiles" style="color: #da620b; font-weight: 600;">Filmmaker &amp; Talent Directory</a> &mdash; Search actors, directors, cinematographers, and crew.</li>
+          <li><a href="/south-cinema" style="color: #da620b; font-weight: 600;">South Cinema News &amp; Updates</a> &mdash; Daily film industry news, releases, and announcements.</li>
+          <li><a href="/booking-facilities" style="color: #da620b; font-weight: 600;">Studios &amp; Facilities</a> &mdash; Book sound stages, preview rooms, dubbing, and shoot locations.</li>
+          <li><a href="/marketplace" style="color: #da620b; font-weight: 600;">Cinema Equipment Rental</a> &mdash; Camera, anamorphic lens, lighting, and sound gear.</li>
+          <li><a href="/showcase" style="color: #da620b; font-weight: 600;">Showcase &amp; Video Showreels</a> &mdash; Monologues, showreels, and cinematography portfolios.</li>
+          <li><a href="/guilds" style="color: #da620b; font-weight: 600;">Cinema Guilds &amp; Unions</a> &mdash; Film trade unions and industry associations.</li>
+        </ul>
+      </section>
+
+      <section style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-top: 24px;">
+        <h3 style="font-size: 16px; font-weight: 700; color: #b91c1c; margin-top: 0;">Audition Safety Advisory</h3>
+        <p style="font-size: 14px; margin: 0; color: #334155;">
+          iFilmDirectory is an open directory for the film fraternity. Never pay money for auditions, registration, security deposits, or artist cards. Legitimate productions and casting directors never charge talent.
+        </p>
+      </section>
+    </main>
+  </div>
+
   <script type="module" src="/src/main.tsx"></script>
 
-  <!-- Hidden footer for Google crawler verification -->
-  <footer style="position: absolute; bottom: 0; left: 0; font-size: 1px; opacity: 0.01; pointer-events: none;">
-    <a href="/privacy">Privacy Policy</a>
-    <a href="/terms">Terms of Service</a>
+  <!-- Crawlable footer for legal and policy discovery -->
+  <footer style="position: absolute; bottom: 0; left: 0; font-size: 12px; opacity: 0.05; pointer-events: none;">
+    <a href="/privacy">Privacy Policy</a> &bull;
+    <a href="/terms">Terms of Service</a> &bull;
+    <a href="/sitemap.xml">XML Sitemap</a> &bull;
+    <a href="/llms.txt">AI Reference (LLMs.txt)</a>
   </footer>
 </body>
 

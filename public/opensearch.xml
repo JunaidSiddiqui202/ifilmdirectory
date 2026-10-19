@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+  <ShortName>iFilmDirectory</ShortName>
+  <Description>Search film auditions, casting calls, filmmakers, crew, and studios on iFilmDirectory</Description>
+  <InputEncoding>UTF-8</InputEncoding>
+  <OutputEncoding>UTF-8</OutputEncoding>
+  <Image width="16" height="16" type="image/png">https://ifilmdirectory.com/icons/icon-72x72.png</Image>
+  <Url type="text/html" method="get" template="https://ifilmdirectory.com/search?q={searchTerms}"/>
+  <Url type="application/x-suggestions+json" template="https://ifilmdirectory.com/api/suggest?q={searchTerms}"/>
+</OpenSearchDescription>

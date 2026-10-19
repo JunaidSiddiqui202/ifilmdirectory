@@ -15,6 +15,7 @@ import { useToast } from '../context/ToastContext';
 import { useUnread } from '../context/UnreadContext';
 import PostMedia from '../components/PostMedia';
 import BreakingTicker from '../components/BreakingTicker';
+import SEO from '../components/SEO';
 
 const formatViews = (views: number) => {
     if (views >= 1000000) return `${(views / 1000000).toFixed(1)}M`;
@@ -738,6 +739,23 @@ export default function Home() {
 
     return (
         <div className="relative flex min-h-[100dvh] w-full flex-col bg-slate-50 dark:bg-[#090A0C] text-zinc-900 dark:text-white pb-36 md:pb-24 overflow-x-hidden font-display transition-colors">
+            <SEO
+                title="Home - Premier Film Fraternity Directory"
+                description="Connect with verified film professionals, explore active auditions and casting calls, book film studios, and discover South Cinema industry news."
+                keywords={[
+                    'film directory',
+                    'cinema directory',
+                    'auditions',
+                    'casting calls',
+                    'actors directory',
+                    'directors',
+                    'cinematographers',
+                    'south cinema',
+                    'tollywood',
+                    'bollywood',
+                    'film equipment rental'
+                ]}
+            />
             <div className="w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-6xl 2xl:max-w-7xl mx-auto flex flex-col flex-1 px-4 sm:px-6">
                 
                 {/* 1. CINEMA TOP HEADER: Official Logo + Quick Search + Comms (Mobile Only; on desktop the left sidebar provides full nav and branding) */}

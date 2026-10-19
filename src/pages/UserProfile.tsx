@@ -27,6 +27,7 @@ import {
 import PrivacySettingsModal from '../components/PrivacySettingsModal';
 import FollowListModal from '../components/FollowListModal';
 import { useToast } from '../context/ToastContext';
+import SEO, { PersonStructuredData, BreadcrumbStructuredData } from '../components/SEO';
 
 // Mock Profiles for fallback
 const mockProfiles: Record<string, any> = {
@@ -461,6 +462,39 @@ export default function UserProfile() {
 
     return (
         <div className="relative flex h-auto min-h-[100dvh] w-full flex-col overflow-x-hidden bg-slate-50 dark:bg-[#090A0C] font-display text-zinc-900 dark:text-white antialiased pb-28 md:pb-16 transition-colors">
+            {profile && (
+                <>
+                    <SEO
+                        title={`${profile.displayName || 'Filmmaker Profile'} - ${profile.role?.replace('_', ' ') || 'Film Professional'}`}
+                        description={profile.bio ? profile.bio.slice(0, 160) : `${profile.displayName || 'Filmmaker'} - ${profile.role || 'Film Professional'} based in ${profile.location || 'India'}. Connect on iFilmDirectory.`}
+                        image={profile.photoURL || '/logo.png'}
+                        type="profile"
+                        keywords={[
+                            profile.displayName,
+                            profile.role,
+                            profile.location,
+                            'film profile',
+                            'cinema talent',
+                            'film crew'
+                        ].filter(Boolean) as string[]}
+                    />
+                    <PersonStructuredData
+                        name={profile.displayName || 'Filmmaker'}
+                        jobTitle={profile.role || 'Film Professional'}
+                        image={profile.photoURL || 'https://ifilmdirectory.com/logo.png'}
+                        url={typeof window !== 'undefined' ? window.location.href : `https://ifilmdirectory.com/profile/${profile.uid}`}
+                        description={profile.bio || undefined}
+                        knowsAbout={profile.skills || undefined}
+                    />
+                    <BreadcrumbStructuredData
+                        items={[
+                            { name: 'Home', url: '/' },
+                            { name: 'Talent Directory', url: '/browse-profiles' },
+                            { name: profile.displayName || 'Profile', url: `/profile/${profile.uid}` }
+                        ]}
+                    />
+                </>
+            )}
             <div className="w-full max-w-md md:max-w-2xl lg:max-w-4xl xl:max-w-5xl mx-auto flex flex-col flex-1">
             {/* Top Navigation Bar: Mobile only (Desktop uses sidebar + direct profile header) */}
             <div className="md:hidden flex items-center justify-between p-4 bg-white/95 dark:bg-[#090A0C]/90 backdrop-blur-md sticky top-0 z-50 border-b border-zinc-200 dark:border-white/5">

@@ -1,22 +1,59 @@
+# ==============================================================================
+# iFilmDirectory - Apache Server Configuration
+# Optimized for Fast Delivery, SEO Indexing & SPA Routing
+# ==============================================================================
+
+# 1. Compression (Gzip / Deflate for superior Core Web Vitals & TTFB)
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript
+  AddOutputFilterByType DEFLATE application/javascript application/x-javascript application/json
+  AddOutputFilterByType DEFLATE application/xml application/xhtml+xml application/rss+xml
+  AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+# 2. Caching & Security Headers
 <IfModule mod_headers.c>
-  # Disable caching for index.html and service workers so users always get the latest asset hashes
+  # Ensure index.html and service workers are always revalidated
   <FilesMatch "(index\.html|service-worker\.js|firebase-messaging-sw\.js)$">
     Header set Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0"
     Header set Pragma "no-cache"
     Header set Expires "0"
   </FilesMatch>
 
+  # Cache SEO files with sensible revalidation (1 hour)
+  <FilesMatch "(robots\.txt|sitemap\.xml|llms\.txt|opensearch\.xml)$">
+    Header set Cache-Control "public, max-age=3600"
+    Header set Access-Control-Allow-Origin "*"
+  </FilesMatch>
+
   # Cache hashed production assets immutably
   <FilesMatch "\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$">
     Header set Cache-Control "public, max-age=31536000, immutable"
   </FilesMatch>
+
+  # Security & SEO Trust Headers
+  Header set X-Content-Type-Options "nosniff"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>
 
+# 3. Proper MIME Types
+<IfModule mod_mime.c>
+  AddType text/xml .xml
+  AddType text/plain .txt
+  AddType application/manifest+json .json
+  AddType application/opensearchdescription+xml .xml
+</IfModule>
+
+# 4. Single Page Application (SPA) Routing
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
-  RewriteRule ^index\.html$ - [L]
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule . /index.html [L]
+
+  # Do not rewrite actual files or directories
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Route everything else through index.html
+  RewriteRule ^ index.html [L]
 </IfModule>

@@ -13,6 +13,7 @@ import AddToProjectModal from '../components/AddToProjectModal';
 import MapDiscovery from '../components/MapDiscovery';
 import PostMedia from '../components/PostMedia';
 import { useToast } from '../context/ToastContext';
+import SEO from '../components/SEO';
 
 // High-credibility Indian cinema industry showcase profiles (used if database has few profiles or for empty state enrichment)
 const CURATED_CINEMA_TALENT: Partial<UserProfile>[] = [
@@ -424,6 +425,22 @@ export default function BrowseProfiles() {
 
     return (
         <div className="relative flex min-h-[100dvh] w-full flex-col bg-slate-50 dark:bg-[#090A0C] text-zinc-900 dark:text-white pb-36 md:pb-24 overflow-x-hidden font-display select-none transition-colors">
+            <SEO
+                title="Filmmaker & Talent Directory | Actors, Directors & Crew"
+                description="Search the comprehensive film industry directory. Connect with verified actors, directors, cinematographers, editors, and production crew across Tollywood, Bollywood, Kollywood, and Pan-India cinema."
+                keywords={[
+                    'film directory',
+                    'actors directory',
+                    'casting directory',
+                    'film directors list',
+                    'cinematographers',
+                    'film crew hire',
+                    'south cinema filmmakers',
+                    'tollywood artists',
+                    'bollywood crew',
+                    'indian cinema directory'
+                ]}
+            />
             <div className="w-full max-w-md md:max-w-3xl lg:max-w-5xl xl:max-w-6xl 2xl:max-w-7xl mx-auto flex flex-col flex-1 px-4 sm:px-6">
 
                 {/* 1. CINEMA DIRECTORY TOP HEADER (Mobile View) */}

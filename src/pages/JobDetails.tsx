@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { useAuthModal } from '../context/AuthModalContext';
 import PostMedia from '../components/PostMedia';
 import { useToast } from '../context/ToastContext';
+import SEO, { JobStructuredData, BreadcrumbStructuredData } from '../components/SEO';
 
 export default function JobDetails() {
     const navigate = useNavigate();
@@ -104,6 +105,39 @@ export default function JobDetails() {
 
     return (
         <div className="relative flex min-h-[100dvh] w-full flex-col bg-slate-50 dark:bg-[#090A0C] text-zinc-900 dark:text-white pb-36 md:pb-28 overflow-x-hidden font-display transition-colors">
+            {job && (
+                <>
+                    <SEO
+                        title={`${job.title} - ${job.company || 'Audition & Casting Call'}`}
+                        description={job.description ? job.description.slice(0, 160) : `Casting call for ${job.title} by ${job.company || 'Film Production'}. Location: ${job.location || 'Pan-India'}. Apply directly on iFilmDirectory.`}
+                        keywords={[
+                            job.title,
+                            job.company,
+                            job.location,
+                            'casting call',
+                            'film audition',
+                            'movie audition',
+                            'film job'
+                        ].filter(Boolean) as string[]}
+                    />
+                    <JobStructuredData
+                        title={job.title}
+                        description={job.description || job.title}
+                        company={job.company || 'Film Production Banner'}
+                        location={job.location || 'Pan-India'}
+                        employmentType="CONTRACTOR"
+                        datePosted={job.postedAt ? (typeof job.postedAt === 'string' ? job.postedAt : (job.postedAt.toDate ? job.postedAt.toDate().toISOString() : new Date().toISOString())) : new Date().toISOString()}
+                        url={typeof window !== 'undefined' ? window.location.href : `https://ifilmdirectory.com/job/${id}`}
+                    />
+                    <BreadcrumbStructuredData
+                        items={[
+                            { name: 'Home', url: '/' },
+                            { name: 'Jobs & Auditions', url: '/jobs' },
+                            { name: job.title, url: `/job/${id}` }
+                        ]}
+                    />
+                </>
+            )}
             <div className="w-full max-w-4xl mx-auto flex flex-col flex-1 px-4 sm:px-6">
                 {/* Cinema Top Header */}
                 <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-zinc-200 dark:border-white/[0.06] bg-white/90 dark:bg-[#090A0C]/90 -mx-4 sm:-mx-6 px-4 sm:px-6 backdrop-blur-2xl">

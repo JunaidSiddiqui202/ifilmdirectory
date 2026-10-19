@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  
+  <!-- Homepage -->
+  <url>
+    <loc>https://ifilmdirectory.com/</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://ifilmdirectory.com/logo.png</image:loc>
+      <image:title>iFilmDirectory - The Premier Film Fraternity Directory</image:title>
+    </image:image>
+  </url>
+
+  <!-- Feed & Home -->
+  <url>
+    <loc>https://ifilmdirectory.com/home</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Jobs, Auditions & Casting Calls (High Intent) -->
+  <url>
+    <loc>https://ifilmdirectory.com/jobs</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>hourly</changefreq>
+    <priority>0.95</priority>
+  </url>
+
+  <!-- Browse Filmmakers & Talent Directory -->
+  <url>
+    <loc>https://ifilmdirectory.com/browse-profiles</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
+  </url>
+
+  <!-- South Cinema News & Industry Wire -->
+  <url>
+    <loc>https://ifilmdirectory.com/south-cinema</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>hourly</changefreq>
+    <priority>0.90</priority>
+  </url>
+
+  <!-- News Alias -->
+  <url>
+    <loc>https://ifilmdirectory.com/news</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>hourly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- Booking Facilities & Studios -->
+  <url>
+    <loc>https://ifilmdirectory.com/booking-facilities</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.90</priority>
+  </url>
+
+  <!-- Cinema Equipment & Services Marketplace -->
+  <url>
+    <loc>https://ifilmdirectory.com/marketplace</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- Service Providers & Vendors -->
+  <url>
+    <loc>https://ifilmdirectory.com/service-providers</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- Showcase & Showreels -->
+  <url>
+    <loc>https://ifilmdirectory.com/showcase</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- Industry Guilds & Associations -->
+  <url>
+    <loc>https://ifilmdirectory.com/guilds</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+  </url>
+
+  <!-- Groups & Community Forums -->
+  <url>
+    <loc>https://ifilmdirectory.com/groups-forums</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.80</priority>
+  </url>
+
+  <!-- Blogs & Industry Events -->
+  <url>
+    <loc>https://ifilmdirectory.com/blogs-events</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.80</priority>
+  </url>
+
+  <!-- Search Landing -->
+  <url>
+    <loc>https://ifilmdirectory.com/search</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <!-- Welcome / Platform Overview -->
+  <url>
+    <loc>https://ifilmdirectory.com/welcome</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.70</priority>
+  </url>
+
+  <!-- Legal & Trust Policies -->
+  <url>
+    <loc>https://ifilmdirectory.com/privacy</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.40</priority>
+  </url>
+  <url>
+    <loc>https://ifilmdirectory.com/terms</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.40</priority>
+  </url>
+</urlset>

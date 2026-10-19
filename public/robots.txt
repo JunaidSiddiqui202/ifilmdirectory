@@ -1,0 +1,80 @@
+# ==============================================================================
+# iFilmDirectory - Robots.txt
+# Optimized for Global Search Engines (SEO) & AI Answer Engines (AEO)
+# ==============================================================================
+
+# Search Engine Crawlers & Standard Web Bots
+User-agent: *
+Allow: /
+Allow: /home
+Allow: /jobs
+Allow: /job/*
+Allow: /browse-profiles
+Allow: /profile/*
+Allow: /south-cinema
+Allow: /news
+Allow: /booking-facilities
+Allow: /booking/details/*
+Allow: /business/*
+Allow: /marketplace
+Allow: /service-providers
+Allow: /showcase
+Allow: /blogs-events
+Allow: /guilds
+Allow: /groups-forums
+Allow: /showreel/*
+Allow: /search
+Allow: /welcome
+Allow: /privacy
+Allow: /terms
+Allow: /sitemap.xml
+Allow: /llms.txt
+Allow: /llms-full.txt
+Allow: /opensearch.xml
+
+# Protect Private & Administrative Routes
+Disallow: /-admin
+Disallow: /-admin/*
+Disallow: /settings
+Disallow: /settings/*
+Disallow: /chat/*
+Disallow: /messaging
+Disallow: /messaging/*
+Disallow: /notifications
+Disallow: /edit-blog
+Disallow: /create-blog
+Disallow: /create-event
+Disallow: /post-job
+Disallow: /saved
+
+# Explicit Authorization for Leading AI Search & Answer Engines (AEO)
+User-agent: Google-Extended
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+# Sitemap Location
+Sitemap: https://ifilmdirectory.com/sitemap.xml
+Host: https://ifilmdirectory.com

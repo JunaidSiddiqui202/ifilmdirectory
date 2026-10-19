@@ -1,9 +1,9 @@
-// SEO Component for meta tags, Open Graph, Twitter Cards, and Structured Data
+// SEO Component for meta tags, Open Graph, Twitter Cards, and Structured Data (JSON-LD)
 // Works with React 19 without external dependencies
 
 import { useEffect } from 'react';
 
-interface SEOProps {
+export interface SEOProps {
     title: string;
     description: string;
     image?: string;
@@ -14,6 +14,7 @@ interface SEOProps {
     modifiedTime?: string;
     keywords?: string[];
     noindex?: boolean;
+    structuredData?: any | any[];
 }
 
 export const SEO = ({
@@ -27,10 +28,13 @@ export const SEO = ({
     modifiedTime,
     keywords = [],
     noindex = false,
+    structuredData,
 }: SEOProps) => {
     const fullTitle = `${title} | iFilmDirectory`;
-    const fullUrl = url || window.location.href;
-    const fullImage = image.startsWith('http') ? image : `${window.location.origin}${image}`;
+    const fullUrl = url || (typeof window !== 'undefined' ? window.location.href : 'https://ifilmdirectory.com');
+    const fullImage = image.startsWith('http')
+        ? image
+        : `${typeof window !== 'undefined' ? window.location.origin : 'https://ifilmdirectory.com'}${image}`;
 
     useEffect(() => {
         // Update document title
@@ -51,6 +55,7 @@ export const SEO = ({
         };
 
         // Basic meta tags
+        updateMetaTag('title', fullTitle);
         updateMetaTag('description', description);
         if (keywords.length > 0) {
             updateMetaTag('keywords', keywords.join(', '));
@@ -61,7 +66,7 @@ export const SEO = ({
         if (noindex) {
             updateMetaTag('robots', 'noindex, nofollow');
         } else {
-            updateMetaTag('robots', 'index, follow');
+            updateMetaTag('robots', 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1');
         }
 
         // Open Graph tags
@@ -88,6 +93,7 @@ export const SEO = ({
         updateMetaTag('twitter:description', description);
         updateMetaTag('twitter:image', fullImage);
         updateMetaTag('twitter:site', '@ifilmdirectory');
+        updateMetaTag('twitter:creator', '@ifilmdirectory');
 
         // Canonical URL
         let canonical = document.querySelector('link[rel="canonical"]');
@@ -98,19 +104,40 @@ export const SEO = ({
         }
         canonical.setAttribute('href', fullUrl);
 
-    }, [fullTitle, description, fullImage, fullUrl, type, author, publishedTime, modifiedTime, keywords, noindex]);
+        // Dynamic JSON-LD Structured Data
+        let scriptElement: HTMLScriptElement | null = null;
+        if (structuredData) {
+            const scriptId = 'dynamic-page-structured-data';
+            const existingScript = document.getElementById(scriptId);
+            if (existingScript) {
+                existingScript.remove();
+            }
 
-    return null; // This component doesn't render anything
+            scriptElement = document.createElement('script');
+            scriptElement.id = scriptId;
+            scriptElement.type = 'application/ld+json';
+            scriptElement.text = JSON.stringify(structuredData);
+            document.head.appendChild(scriptElement);
+        }
+
+        return () => {
+            if (scriptElement && scriptElement.parentNode) {
+                scriptElement.remove();
+            }
+        };
+    }, [fullTitle, description, fullImage, fullUrl, type, author, publishedTime, modifiedTime, keywords, noindex, structuredData]);
+
+    return null;
 };
 
-// Structured Data for Jobs (Schema.org)
+// Structured Data for Jobs & Casting Calls (Schema.org / Google for Jobs)
 export const JobStructuredData = ({
     title,
     description,
     company,
     location,
     salary,
-    employmentType,
+    employmentType = 'CONTRACTOR',
     datePosted,
     validThrough,
     url,
@@ -119,58 +146,61 @@ export const JobStructuredData = ({
     description: string;
     company: string;
     location: string;
-    salary?: { min: number; max: number; currency: string };
-    employmentType: 'FULL_TIME' | 'PART_TIME' | 'CONTRACTOR' | 'TEMPORARY' | 'INTERN';
+    salary?: { min: number; max: number; currency: string } | string;
+    employmentType?: 'FULL_TIME' | 'PART_TIME' | 'CONTRACTOR' | 'TEMPORARY' | 'INTERN';
     datePosted: string;
     validThrough?: string;
     url: string;
 }) => {
-    const structuredData = {
+    const structuredData: any = {
         '@context': 'https://schema.org/',
         '@type': 'JobPosting',
         title,
         description,
-        datePosted,
-        validThrough: validThrough || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        datePosted: datePosted || new Date().toISOString(),
+        validThrough: validThrough || new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString(),
         employmentType,
         hiringOrganization: {
             '@type': 'Organization',
-            name: company,
+            name: company || 'Film Production Banner',
+            sameAs: 'https://ifilmdirectory.com',
+            logo: 'https://ifilmdirectory.com/logo.png',
         },
         jobLocation: {
             '@type': 'Place',
             address: {
                 '@type': 'PostalAddress',
-                addressLocality: location,
+                addressLocality: location || 'Pan-India',
+                addressCountry: 'IN',
             },
         },
-        ...(salary && {
-            baseSalary: {
-                '@type': 'MonetaryAmount',
-                currency: salary.currency,
-                value: {
-                    '@type': 'QuantitativeValue',
-                    minValue: salary.min,
-                    maxValue: salary.max,
-                    unitText: 'YEAR',
-                },
-            },
-        }),
-        url,
+        url: url || (typeof window !== 'undefined' ? window.location.href : 'https://ifilmdirectory.com/jobs'),
     };
 
-    useEffect(() => {
-        const script = document.createElement('script');
-        script.type = 'application/ld+json';
-        script.text = JSON.stringify(structuredData);
-        script.id = 'job-structured-data';
+    if (salary && typeof salary === 'object' && salary.min) {
+        structuredData.baseSalary = {
+            '@type': 'MonetaryAmount',
+            currency: salary.currency || 'INR',
+            value: {
+                '@type': 'QuantitativeValue',
+                minValue: salary.min,
+                maxValue: salary.max || salary.min,
+                unitText: 'MONTH',
+            },
+        };
+    }
 
-        // Remove existing script if any
-        const existing = document.getElementById('job-structured-data');
+    useEffect(() => {
+        const scriptId = 'job-structured-data';
+        const existing = document.getElementById(scriptId);
         if (existing) {
             existing.remove();
         }
 
+        const script = document.createElement('script');
+        script.type = 'application/ld+json';
+        script.id = scriptId;
+        script.text = JSON.stringify(structuredData);
         document.head.appendChild(script);
 
         return () => {
@@ -181,41 +211,44 @@ export const JobStructuredData = ({
     return null;
 };
 
-// Structured Data for Person/Profile
+// Structured Data for Person / Filmmaker / Actor Profile
 export const PersonStructuredData = ({
     name,
     jobTitle,
     image,
     url,
     description,
+    knowsAbout,
 }: {
     name: string;
     jobTitle: string;
-    image: string;
-    url: string;
+    image?: string;
+    url?: string;
     description?: string;
+    knowsAbout?: string[];
 }) => {
-    const structuredData = {
+    const structuredData: any = {
         '@context': 'https://schema.org/',
         '@type': 'Person',
         name,
-        jobTitle,
-        image,
-        url,
+        jobTitle: jobTitle || 'Filmmaker',
+        image: image || 'https://ifilmdirectory.com/logo.png',
+        url: url || (typeof window !== 'undefined' ? window.location.href : 'https://ifilmdirectory.com'),
         ...(description && { description }),
+        ...(knowsAbout && { knowsAbout }),
     };
 
     useEffect(() => {
-        const script = document.createElement('script');
-        script.type = 'application/ld+json';
-        script.text = JSON.stringify(structuredData);
-        script.id = 'person-structured-data';
-
-        const existing = document.getElementById('person-structured-data');
+        const scriptId = 'person-structured-data';
+        const existing = document.getElementById(scriptId);
         if (existing) {
             existing.remove();
         }
 
+        const script = document.createElement('script');
+        script.type = 'application/ld+json';
+        script.id = scriptId;
+        script.text = JSON.stringify(structuredData);
         document.head.appendChild(script);
 
         return () => {
@@ -226,41 +259,34 @@ export const PersonStructuredData = ({
     return null;
 };
 
-// Structured Data for Organization
-export const OrganizationStructuredData = ({
-    name,
-    description,
-    url,
-    logo,
-    sameAs,
+// Structured Data for Breadcrumb Navigation (Google Breadcrumb Rich Results)
+export const BreadcrumbStructuredData = ({
+    items,
 }: {
-    name: string;
-    description: string;
-    url: string;
-    logo: string;
-    sameAs?: string[]; // Social media URLs
+    items: { name: string; url: string }[];
 }) => {
     const structuredData = {
-        '@context': 'https://schema.org/',
-        '@type': 'Organization',
-        name,
-        description,
-        url,
-        logo,
-        ...(sameAs && { sameAs }),
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: items.map((item, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            name: item.name,
+            item: item.url.startsWith('http') ? item.url : `https://ifilmdirectory.com${item.url}`,
+        })),
     };
 
     useEffect(() => {
-        const script = document.createElement('script');
-        script.type = 'application/ld+json';
-        script.text = JSON.stringify(structuredData);
-        script.id = 'org-structured-data';
-
-        const existing = document.getElementById('org-structured-data');
+        const scriptId = 'breadcrumb-structured-data';
+        const existing = document.getElementById(scriptId);
         if (existing) {
             existing.remove();
         }
 
+        const script = document.createElement('script');
+        script.type = 'application/ld+json';
+        script.id = scriptId;
+        script.text = JSON.stringify(structuredData);
         document.head.appendChild(script);
 
         return () => {

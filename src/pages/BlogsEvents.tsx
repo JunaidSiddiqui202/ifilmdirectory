@@ -9,6 +9,7 @@ import { Timestamp } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
 import { useAuthModal } from '../context/AuthModalContext';
 import PostMedia from '../components/PostMedia';
+import SEO from '../components/SEO';
 
 const formatTimeAgo = (timestamp: any) => {
     if (!timestamp) return 'Just now';
@@ -108,6 +109,18 @@ export default function BlogsEvents() {
 
     return (
         <div className="relative flex h-auto min-h-screen w-full flex-col bg-background-light dark:bg-[#090A0C] text-zinc-900 dark:text-white overflow-x-hidden pb-36 md:pb-24 font-display transition-colors">
+            <SEO
+                title="Cinema Blogs, Masterclasses & Film Events"
+                description="Read filmmaking blogs, masterclasses, film festival notices, industry workshops, and technical cinema writeups on iFilmDirectory."
+                keywords={[
+                    'film blogs',
+                    'filmmaking masterclass',
+                    'cinema workshops',
+                    'screenwriting tips',
+                    'film festivals india',
+                    'directing masterclass'
+                ]}
+            />
             <div className="w-full max-w-md md:max-w-3xl lg:max-w-5xl mx-auto flex flex-col flex-1">
                 {/* Cinema Header */}
                 <header className="sticky top-0 z-40 bg-white/80 dark:bg-[#090A0C]/85 p-4 pb-3 backdrop-blur-2xl border-b border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between gap-3">

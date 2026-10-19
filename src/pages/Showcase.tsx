@@ -14,6 +14,7 @@ import { db } from '../firebaseConfig';
 import { useToast } from '../context/ToastContext';
 import { useUnread } from '../context/UnreadContext';
 import { rssNewsService, type NewsItem } from '../services/rssNewsService';
+import SEO from '../components/SEO';
 
 interface Comment {
     id: number | string;
@@ -1041,6 +1042,20 @@ export default function Showcase() {
 
     return (
         <div className="relative mx-auto flex h-full min-h-[100dvh] w-full max-w-md md:max-w-2xl lg:max-w-4xl xl:max-w-6xl 2xl:max-w-7xl flex-col bg-background-light dark:bg-[#090A0C] pb-36 md:pb-24 overflow-x-hidden transition-colors">
+            <SEO
+                title="Showcase & Showreels | Acting Monologues & Cinematography"
+                description="Watch video showreels, acting audition clips, cinematography lighting tests, directing reels, and VFX breakdowns from top cinema professionals on iFilmDirectory."
+                keywords={[
+                    'film showreels',
+                    'acting monologues',
+                    'cinematography showreel',
+                    'director portfolio',
+                    'audition videos',
+                    'stunt reel',
+                    'vfx breakdown',
+                    'film talents showcase'
+                ]}
+            />
             {/* Report Modal */}
             {reportModalPostId && (
                 <div

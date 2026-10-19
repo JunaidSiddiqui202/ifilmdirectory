@@ -5,6 +5,7 @@ import BottomNav from '../components/BottomNav';
 import HamburgerMenu from '../components/HamburgerMenu';
 import EmptyState from '../components/EmptyState';
 import PostMedia from '../components/PostMedia';
+import SEO from '../components/SEO';
 
 export default function ServiceMarketplace() {
     const navigate = useNavigate();
@@ -26,6 +27,19 @@ export default function ServiceMarketplace() {
 
     return (
         <div className="relative mx-auto flex h-full min-h-screen w-full max-w-md md:max-w-3xl lg:max-w-4xl flex-col bg-[#F8F9FA] dark:bg-zinc-950 pb-24">
+            <SEO
+                title="Cinema Equipment & Services Marketplace | Camera Rentals & Studios"
+                description="Film equipment rental marketplace: rent cinema camera packages, anamorphic lenses, sound kits, lighting rigs, vanity vans, and production services."
+                keywords={[
+                    'film equipment rental',
+                    'cinema camera rental',
+                    'arri alexa rental',
+                    'red camera package',
+                    'film lighting rental',
+                    'vanity van rental',
+                    'film production services'
+                ]}
+            />
             <header className="sticky top-0 z-40 bg-white/70 dark:bg-zinc-950/70 px-6 pt-5 pb-4 backdrop-blur-3xl border-b border-black/[0.02] dark:border-white/[0.02] flex justify-between items-center">
                 <div className="flex items-center gap-3">
                     <HamburgerMenu />

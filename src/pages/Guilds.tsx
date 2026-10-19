@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { uploadFile } from '../services/storageService';
 import BottomNav from '../components/BottomNav';
 import PostMedia from '../components/PostMedia';
+import SEO from '../components/SEO';
 
 export default function Guilds() {
     const { currentUser } = useAuth();
@@ -252,6 +253,18 @@ export default function Guilds() {
 
     return (
         <div className="flex h-[100dvh] bg-[#FAFAFA] dark:bg-zinc-950 overflow-hidden relative">
+            <SEO
+                title="Cinema Guilds & Film Associations | Industry Unions"
+                description="Explore verified film industry guilds, cinematography societies, writers associations, and cinema unions across Indian and global filmmaking."
+                keywords={[
+                    'film guilds',
+                    'cinema unions',
+                    'cinematography association',
+                    'directors guild',
+                    'screenwriters association',
+                    'film trade bodies'
+                ]}
+            />
             {/* Backdrop for mobile */}
             {showMobileSidebar && (
                 <div

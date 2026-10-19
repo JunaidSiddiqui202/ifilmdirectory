@@ -10,6 +10,7 @@ import PostMedia from '../components/PostMedia';
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
 import { useAuthModal } from '../context/AuthModalContext';
+import SEO from '../components/SEO';
 
 const formatTimeAgo = (timestamp: any) => {
     if (!timestamp) return 'Just now';
@@ -209,6 +210,25 @@ export default function Jobs() {
 
     return (
         <div className="relative flex min-h-[100dvh] w-full flex-col bg-slate-50 dark:bg-[#090A0C] text-zinc-900 dark:text-white pb-36 md:pb-24 overflow-x-hidden font-display transition-colors">
+            <SEO
+                title="Film Jobs & Auditions | Casting Calls & Crew Opportunities"
+                description="Find active film auditions, casting calls, and cinema crew jobs across Tollywood, Bollywood, Kollywood, Mollywood, and Pan-India feature films. Apply directly to verified production banners."
+                keywords={[
+                    'film auditions',
+                    'casting calls',
+                    'movie auditions',
+                    'cinema jobs',
+                    'actor casting',
+                    'crew vacancies',
+                    'assistant director jobs',
+                    'cinematographer hiring',
+                    'south cinema casting',
+                    'tollywood auditions',
+                    'bollywood casting call',
+                    'kollywood film jobs',
+                    'indian cinema casting'
+                ]}
+            />
             <div className="w-full max-w-7xl mx-auto flex flex-col flex-1 px-3 sm:px-6 lg:px-8">
                 
                 {/* Cinema Top Header */}

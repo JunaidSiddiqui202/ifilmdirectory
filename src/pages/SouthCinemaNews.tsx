@@ -7,6 +7,7 @@ import BreakingTicker from '../components/BreakingTicker';
 import { rssNewsService, type NewsItem, type RSSFeedSource } from '../services/rssNewsService';
 import { generateText } from '../services/groqService';
 import { useToast } from '../context/ToastContext';
+import SEO from '../components/SEO';
 
 export default function SouthCinemaNews() {
     const navigate = useNavigate();
@@ -256,6 +257,20 @@ export default function SouthCinemaNews() {
 
     return (
         <div className="relative flex min-h-[100dvh] w-full flex-col bg-slate-50 dark:bg-[#090A0C] text-zinc-900 dark:text-white pb-36 md:pb-24 overflow-x-hidden font-display transition-colors">
+            <SEO
+                title="South Cinema News & Industry Wire | Tollywood, Kollywood & Mollywood"
+                description="Breaking news, production announcements, box office reports, and industry updates from South Indian cinema: Tollywood, Kollywood, Mollywood, and Sandalwood."
+                keywords={[
+                    'south cinema news',
+                    'tollywood updates',
+                    'telugu cinema news',
+                    'kollywood tamil movies',
+                    'mollywood malayalam film news',
+                    'sandalwood kannada cinema',
+                    'pan-india movies',
+                    'box office india'
+                ]}
+            />
             <div className="w-full max-w-md md:max-w-3xl lg:max-w-5xl xl:max-w-6xl 2xl:max-w-7xl mx-auto flex flex-col flex-1 px-4 sm:px-6">
                 
                 {/* 1. TOP HEADER (Mobile) */}
