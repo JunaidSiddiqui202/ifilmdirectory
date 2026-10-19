@@ -41,7 +41,9 @@
   AddType text/xml .xml
   AddType text/plain .txt
   AddType application/manifest+json .json
-  AddType application/opensearchdescription+xml .xml
+  <Files "opensearch.xml">
+    ForceType application/opensearchdescription+xml
+  </Files>
 </IfModule>
 
 # 4. Single Page Application (SPA) Routing
