@@ -654,7 +654,7 @@ export default function Showcase() {
                         className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95 ${
                             post.isFollowing
                                 ? 'bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 border border-black/5 dark:border-white/10'
-                                : 'bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-black border border-amber-500/20'
+                                : 'bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-white border border-amber-500/20'
                         }`}
                     >
                         {post.isFollowing ? 'Following' : '+ Follow'}
@@ -730,7 +730,7 @@ export default function Showcase() {
                             e.stopPropagation();
                             navigate(`/job/${post.jobId}`);
                         }}
-                        className="bg-amber-500 text-black text-xs font-bold px-3.5 py-1.5 rounded-lg hover:bg-amber-400 transition-all flex items-center gap-1 active:scale-95 shrink-0"
+                        className="bg-amber-500 text-white text-xs font-bold px-3.5 py-1.5 rounded-lg hover:bg-amber-400 transition-all flex items-center gap-1 active:scale-95 shrink-0"
                     >
                         View Details
                         <span className="material-symbols-outlined text-sm">arrow_forward</span>
@@ -973,8 +973,8 @@ export default function Showcase() {
                                 {badge.label}
                             </span>
                             {isReview && (
-                                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-lg bg-amber-500 text-black shadow-md flex items-center gap-1">
-                                    <span className="material-symbols-outlined text-[12px] filled">star</span>
+                                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-lg bg-amber-500 text-white shadow-md flex items-center gap-1">
+                                    <span className="material-symbols-outlined text-[12px] filled text-white">star</span>
                                     <span>{item.rating || 'REVIEW'}</span>
                                 </span>
                             )}
@@ -1149,14 +1149,14 @@ export default function Showcase() {
                         onClick={() => setMainFeedTab('news')}
                         className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold transition-all ${
                             mainFeedTab === 'news'
-                                ? 'bg-amber-500 text-black shadow-sm shadow-amber-500/25'
+                                ? 'bg-amber-500 text-white shadow-sm shadow-amber-500/25'
                                 : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >
                         <span className="material-symbols-outlined text-[15px] sm:text-[17px]">newspaper</span>
                         <span>News & Reviews</span>
                         <span className={`text-[9px] font-black uppercase tracking-wider px-1 py-0.2 rounded-full ${
-                            mainFeedTab === 'news' ? 'bg-black/20 text-black' : 'bg-red-500/20 text-red-500 dark:text-red-400'
+                            mainFeedTab === 'news' ? 'bg-white/20 text-white' : 'bg-red-500/20 text-red-500 dark:text-red-400'
                         }`}>
                             Live
                         </span>
@@ -1165,7 +1165,7 @@ export default function Showcase() {
                         onClick={() => setMainFeedTab('creators')}
                         className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold transition-all ${
                             mainFeedTab === 'creators'
-                                ? 'bg-amber-500 text-black shadow-sm shadow-amber-500/25'
+                                ? 'bg-amber-500 text-white shadow-sm shadow-amber-500/25'
                                 : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >
@@ -1190,7 +1190,7 @@ export default function Showcase() {
                                 onClick={() => setNewsFilter(f.id as any)}
                                 className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-semibold whitespace-nowrap transition-all ${
                                     newsFilter === f.id
-                                        ? 'bg-amber-500 text-black font-bold shadow-sm shadow-amber-500/25'
+                                        ? 'bg-amber-500 text-white font-bold shadow-sm shadow-amber-500/25'
                                         : 'bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-transparent dark:border-white/5'
                                 }`}
                             >
@@ -1206,7 +1206,7 @@ export default function Showcase() {
                                 onClick={() => setFeedFilter(cat)}
                                 className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-semibold whitespace-nowrap transition-all ${
                                     feedFilter === cat
-                                        ? 'bg-amber-500 text-black font-bold shadow-sm shadow-amber-500/25'
+                                        ? 'bg-amber-500 text-white font-bold shadow-sm shadow-amber-500/25'
                                         : 'bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-transparent dark:border-white/5'
                                 }`}
                             >
@@ -1230,7 +1230,7 @@ export default function Showcase() {
                         <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-4 max-w-xs">Be the first filmmaker to share trailers, stills, or announcements.</p>
                         <button
                             onClick={() => setFeedFilter('All')}
-                            className="px-4 py-2 rounded-xl bg-amber-500 text-black text-xs font-bold hover:bg-amber-400 transition-colors"
+                            className="px-4 py-2 rounded-xl bg-amber-500 text-white text-xs font-bold hover:bg-amber-400 transition-colors"
                         >
                             View All Feed
                         </button>
@@ -1253,7 +1253,7 @@ export default function Showcase() {
                             </div>
                             <button
                                 onClick={() => navigate('/south-cinema')}
-                                className="px-3 py-1.5 rounded-xl bg-amber-500 text-black text-xs font-bold hover:bg-amber-400 transition-all shrink-0 flex items-center gap-1 active:scale-95 shadow-sm"
+                                className="px-3 py-1.5 rounded-xl bg-amber-500 text-white text-xs font-bold hover:bg-amber-400 transition-all shrink-0 flex items-center gap-1 active:scale-95 shadow-sm"
                             >
                                 <span>Full Wire</span>
                                 <span className="material-symbols-outlined text-sm">open_in_new</span>
@@ -1280,7 +1280,7 @@ export default function Showcase() {
                                     <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-4 max-w-xs">Try selecting 'All Wire & Feed' to view all updates.</p>
                                     <button
                                         onClick={() => setNewsFilter('all')}
-                                        className="px-4 py-2 rounded-xl bg-amber-500 text-black text-xs font-bold hover:bg-amber-400 transition-colors"
+                                        className="px-4 py-2 rounded-xl bg-amber-500 text-white text-xs font-bold hover:bg-amber-400 transition-colors"
                                     >
                                         View All
                                     </button>
@@ -1494,8 +1494,8 @@ export default function Showcase() {
                                     {selectedNewsArticle.source}
                                 </span>
                                 {selectedNewsArticle.category === 'review' && (
-                                    <span className="text-xs font-black px-2.5 py-0.5 rounded-lg bg-amber-500 text-black flex items-center gap-1 shadow-sm">
-                                        <span className="material-symbols-outlined text-xs filled">star</span>
+                                    <span className="text-xs font-black px-2.5 py-0.5 rounded-lg bg-amber-500 text-white flex items-center gap-1 shadow-sm">
+                                        <span className="material-symbols-outlined text-xs filled text-white">star</span>
                                         <span>{selectedNewsArticle.rating || 'REVIEW'}</span>
                                     </span>
                                 )}
@@ -1517,7 +1517,7 @@ export default function Showcase() {
                                     href={selectedNewsArticle.link}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500 text-black text-xs font-bold hover:bg-amber-400 transition-all shadow-sm"
+                                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500 text-white text-xs font-bold hover:bg-amber-400 transition-all shadow-sm"
                                 >
                                     <span>Open Source Link</span>
                                     <span className="material-symbols-outlined text-sm">open_in_new</span>

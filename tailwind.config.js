@@ -19,19 +19,19 @@ export default {
         'surface-dark': '#121316',
         'border-light': '#e2e8f0',
         'border-dark': 'rgba(255, 255, 255, 0.08)',
-        // Decent Royal Indigo & Sapphire Blue palette (replaces old gold theme)
+        // Iconic CNN Red & Editorial Newsroom palette
         amber: {
-          50: '#EEF2FF',
-          100: '#E0E7FF',
-          200: '#C7D2FE',
-          300: '#A5B4FC',
-          400: '#818CF8', // Luminous Electric Indigo
-          500: '#6366F1', // Royal Indigo primary
-          600: '#2563EB', // Electric Sapphire Blue
-          700: '#1D4ED8',
-          800: '#1E40AF',
-          900: '#1E1B4B',
-          950: '#0F0D2E',
+          50: '#FEF2F2',
+          100: '#FEE2E2',
+          200: '#FECACA',
+          300: '#FCA5A5',
+          400: '#EF4444', // Alert Red
+          500: '#CC0000', // Signature Iconic CNN Red
+          600: '#B30000', // Authoritative CNN Crimson
+          700: '#990000', // Deep Newsroom Red
+          800: '#7F0000',
+          900: '#450A0A',
+          950: '#1F0404',
         },
       },
       fontFamily: {

@@ -209,7 +209,7 @@ export default function ProductionProjects() {
                             <div className="flex flex-col sm:flex-row items-center gap-3">
                                 <button
                                     onClick={() => setIsCreateModalOpen(true)}
-                                    className="px-5 py-2.5 rounded-xl bg-amber-500 text-black text-xs font-bold hover:bg-amber-400 transition-all shadow-lg shadow-amber-500/20"
+                                    className="px-5 py-2.5 rounded-xl bg-amber-500 text-white text-xs font-bold hover:bg-amber-400 transition-all shadow-lg shadow-amber-500/20"
                                 >
                                     Start New Project
                                 </button>
@@ -302,7 +302,7 @@ export default function ProductionProjects() {
                             </button>
                             <button
                                 type="submit"
-                                className="flex-1 py-3 rounded-xl bg-amber-500 text-black text-xs font-bold hover:bg-amber-400 shadow-md shadow-amber-500/20 transition-all"
+                                className="flex-1 py-3 rounded-xl bg-amber-500 text-white text-xs font-bold hover:bg-amber-400 shadow-md shadow-amber-500/20 transition-all"
                             >
                                 Initialize Project
                             </button>

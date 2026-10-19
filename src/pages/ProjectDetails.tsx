@@ -79,7 +79,7 @@ export default function ProjectDetails() {
                 <h2 className="text-lg font-bold">Project Not Found</h2>
                 <button
                     onClick={() => navigate('/projects')}
-                    className="mt-4 px-4 py-2 rounded-xl bg-amber-500 text-black font-bold text-xs"
+                    className="mt-4 px-4 py-2 rounded-xl bg-amber-500 text-white font-bold text-xs"
                 >
                     Back to Projects
                 </button>
@@ -233,7 +233,7 @@ export default function ProjectDetails() {
                                                 </button>
                                                 <button
                                                     onClick={() => navigate(`/chat/${talent.userId}`)}
-                                                    className="p-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500 hover:text-black text-amber-600 dark:text-amber-400 border border-amber-500/25 transition-all"
+                                                    className="p-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500 hover:text-white text-amber-600 dark:text-amber-400 border border-amber-500/25 transition-all"
                                                     title="Direct Message"
                                                 >
                                                     <span className="material-symbols-outlined text-base">chat</span>
@@ -257,7 +257,7 @@ export default function ProjectDetails() {
                             </p>
                             <button
                                 onClick={() => navigate('/browse-profiles')}
-                                className="px-4 py-2 rounded-xl bg-amber-500 text-black text-xs font-bold hover:bg-amber-400 transition-all shadow-md shadow-amber-500/20"
+                                className="px-4 py-2 rounded-xl bg-amber-500 text-white text-xs font-bold hover:bg-amber-400 transition-all shadow-md shadow-amber-500/20"
                             >
                                 Browse Talent Directory
                             </button>

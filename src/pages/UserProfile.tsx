@@ -588,7 +588,7 @@ export default function UserProfile() {
                                                 ? 'opacity-60 cursor-not-allowed bg-zinc-200 dark:bg-zinc-800 text-zinc-500'
                                                 : followed
                                                     ? 'bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-300 dark:bg-zinc-800 dark:text-white dark:border-white/10 dark:hover:bg-zinc-700 active:scale-95'
-                                                    : 'bg-amber-500 text-black hover:bg-amber-400 shadow-sm shadow-amber-500/25 active:scale-95'
+                                                    : 'bg-amber-500 text-white hover:bg-amber-400 shadow-sm shadow-amber-500/25 active:scale-95'
                                         }`}
                                     >
                                         <span className={`material-symbols-outlined text-[16px] ${isFollowLoading ? 'animate-spin' : ''}`}>
@@ -715,7 +715,7 @@ export default function UserProfile() {
                                             ? 'opacity-60 cursor-not-allowed bg-zinc-200 dark:bg-zinc-800 text-zinc-500'
                                             : followed
                                                 ? 'bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-300 dark:bg-zinc-800 dark:text-white dark:border-white/10 active:scale-95'
-                                                : 'bg-amber-500 text-black hover:bg-amber-400 active:scale-95'
+                                                : 'bg-amber-500 text-white hover:bg-amber-400 active:scale-95'
                                     }`}
                                 >
                                     <span className={`material-symbols-outlined ${isFollowLoading ? 'animate-spin' : ''}`}>

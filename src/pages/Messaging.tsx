@@ -648,7 +648,7 @@ export default function Messaging() {
                                 </div>
                                 <button
                                     onClick={sendAudioMessage}
-                                    className="p-2 rounded-xl bg-amber-500 text-black hover:bg-amber-400 shadow-md shadow-amber-500/25 transition-all"
+                                    className="p-2 rounded-xl bg-amber-500 text-white hover:bg-amber-400 shadow-md shadow-amber-500/25 transition-all"
                                 >
                                     <span className="material-symbols-outlined text-lg font-bold">send</span>
                                 </button>
@@ -660,7 +660,7 @@ export default function Messaging() {
                                         setShowAttachments(!showAttachments);
                                         setShowEmojiPicker(false);
                                     }}
-                                    className={`flex items-center justify-center h-9 w-9 rounded-xl transition-all ${showAttachments ? 'bg-amber-500 text-black' : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.06]'}`}
+                                    className={`flex items-center justify-center h-9 w-9 rounded-xl transition-all ${showAttachments ? 'bg-amber-500 text-white' : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.06]'}`}
                                     title="Add Attachment"
                                 >
                                     <span className="material-symbols-outlined text-xl">add</span>
@@ -688,7 +688,7 @@ export default function Messaging() {
                                 {messageText.trim() ? (
                                     <button
                                         onClick={handleSendMessage}
-                                        className="flex items-center justify-center h-9 w-9 rounded-xl bg-amber-500 text-black hover:bg-amber-400 shadow-md shadow-amber-500/20 active:scale-95 transition-all"
+                                        className="flex items-center justify-center h-9 w-9 rounded-xl bg-amber-500 text-white hover:bg-amber-400 shadow-md shadow-amber-500/20 active:scale-95 transition-all"
                                         title="Send"
                                     >
                                         <span className="material-symbols-outlined text-base font-bold">send</span>

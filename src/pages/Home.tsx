@@ -181,10 +181,10 @@ export default function Home() {
         <div className="grid grid-cols-4 gap-2">
             <button
                 onClick={() => navigate('/post-job')}
-                className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-gradient-to-b from-amber-500/20 to-amber-500/5 border border-amber-500/30 hover:border-amber-500/60 transition-all group active:scale-95 text-center shadow-sm"
+                className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 hover:border-amber-500/40 dark:hover:border-white/20 transition-all group active:scale-95 text-center shadow-sm dark:shadow-none"
             >
-                <div className="size-9 rounded-xl bg-amber-500 text-black flex items-center justify-center mb-1.5 shadow-sm group-hover:scale-110 transition-transform">
-                    <span className="material-symbols-outlined text-lg">campaign</span>
+                <div className="size-9 rounded-xl bg-amber-500 text-white flex items-center justify-center mb-1.5 shadow-sm group-hover:scale-110 transition-transform">
+                    <span className="material-symbols-outlined text-lg text-white">campaign</span>
                 </div>
                 <span className="text-xs font-bold text-zinc-900 dark:text-white leading-tight">Post Call</span>
                 <span className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Cast & Crew</span>
@@ -420,7 +420,7 @@ export default function Home() {
                                         }}
                                     />
                                     {item.rating && (
-                                        <div className="absolute inset-x-0 bottom-0 bg-amber-500 text-black font-black text-[9px] text-center leading-tight py-0.5">
+                                        <div className="absolute inset-x-0 bottom-0 bg-amber-500 text-white font-black text-[9px] text-center leading-tight py-0.5">
                                             {item.rating}
                                         </div>
                                     )}
@@ -520,7 +520,7 @@ export default function Home() {
                                         e.stopPropagation();
                                         setSelectedJobModal(job);
                                     }}
-                                    className="p-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500 text-amber-600 hover:text-black transition-all shrink-0 group-hover:bg-amber-500 group-hover:text-black"
+                                    className="p-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500 text-amber-600 hover:text-white transition-all shrink-0 group-hover:bg-amber-500 group-hover:text-white"
                                     title="View Job"
                                 >
                                     <span className="material-symbols-outlined text-sm">visibility</span>
@@ -678,7 +678,7 @@ export default function Home() {
                                             onClick={() => setNewsFilter('all')}
                                             className={`px-2.5 py-1 rounded-lg transition-all ${
                                                 newsFilter === 'all'
-                                                    ? 'bg-amber-500 text-black shadow-sm'
+                                                    ? 'bg-amber-500 text-white shadow-sm'
                                                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                             }`}
                                         >
@@ -688,18 +688,18 @@ export default function Home() {
                                             onClick={() => setNewsFilter('review')}
                                             className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 ${
                                                 newsFilter === 'review'
-                                                    ? 'bg-amber-500 text-black shadow-sm'
+                                                    ? 'bg-amber-500 text-white shadow-sm'
                                                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                             }`}
                                         >
-                                            <span className="material-symbols-outlined text-[12px] filled">star</span>
+                                            <span className="material-symbols-outlined text-[12px] filled text-white">star</span>
                                             <span>Reviews</span>
                                         </button>
                                         <button
                                             onClick={() => setNewsFilter('news')}
                                             className={`px-2.5 py-1 rounded-lg transition-all ${
                                                 newsFilter === 'news'
-                                                    ? 'bg-amber-500 text-black shadow-sm'
+                                                    ? 'bg-amber-500 text-white shadow-sm'
                                                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                             }`}
                                         >
@@ -753,7 +753,7 @@ export default function Home() {
                                                         }}
                                                     />
                                                     {isReview && item.rating && (
-                                                        <div className="absolute inset-x-0 bottom-0 bg-amber-500 text-black font-black text-[9px] text-center leading-tight py-0.5 shadow-xs">
+                                                        <div className="absolute inset-x-0 bottom-0 bg-amber-500 text-white font-black text-[9px] text-center leading-tight py-0.5 shadow-xs">
                                                             ★ {item.rating}
                                                         </div>
                                                     )}
@@ -1051,7 +1051,7 @@ export default function Home() {
                             <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-xs">
                                 <div className="flex items-center gap-2">
                                     {selectedNewsArticle.rating ? (
-                                        <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-lg bg-amber-500 text-black flex items-center gap-1 shadow-md">
+                                        <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-lg bg-amber-500 text-white flex items-center gap-1 shadow-md">
                                             <span className="material-symbols-outlined text-[11px] filled">star</span>
                                             <span>{selectedNewsArticle.rating}</span>
                                         </span>

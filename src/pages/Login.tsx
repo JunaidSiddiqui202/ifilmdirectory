@@ -425,7 +425,7 @@ export default function Login() {
                                             onClick={() => setActiveSlide(idx)}
                                             className={`py-2 px-2.5 rounded-lg text-xs font-bold transition-all text-center truncate ${
                                                 activeSlide === idx
-                                                    ? 'bg-amber-500 text-black shadow-md'
+                                                    ? 'bg-amber-500 text-white shadow-md'
                                                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                             }`}
                                         >
@@ -496,7 +496,7 @@ export default function Login() {
                                         onClick={() => { setView('login'); setSubmitted(false); }}
                                         className={`flex h-full grow items-center justify-center rounded-lg px-2 text-xs font-extrabold transition-all ${
                                             view === 'login'
-                                                ? 'bg-amber-500 text-black shadow-md'
+                                                ? 'bg-amber-500 text-white shadow-md'
                                                 : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                         }`}
                                     >
@@ -506,7 +506,7 @@ export default function Login() {
                                         onClick={() => { setView('signup'); setSubmitted(false); }}
                                         className={`flex h-full grow items-center justify-center rounded-lg px-2 text-xs font-extrabold transition-all ${
                                             view === 'signup'
-                                                ? 'bg-amber-500 text-black shadow-md'
+                                                ? 'bg-amber-500 text-white shadow-md'
                                                 : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                         }`}
                                     >
@@ -516,7 +516,7 @@ export default function Login() {
                                         onClick={() => { setView('request'); setSubmitted(false); }}
                                         className={`flex h-full grow items-center justify-center rounded-lg px-2 text-xs font-extrabold transition-all ${
                                             view === 'request'
-                                                ? 'bg-amber-500 text-black shadow-md'
+                                                ? 'bg-amber-500 text-white shadow-md'
                                                 : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                         }`}
                                     >
@@ -559,7 +559,7 @@ export default function Login() {
                                         </p>
                                         <button
                                             onClick={() => setView('login')}
-                                            className="px-5 py-2.5 rounded-xl bg-amber-500 text-black font-extrabold text-xs hover:bg-amber-400 transition-all shadow-md"
+                                            className="px-5 py-2.5 rounded-xl bg-amber-500 text-white font-extrabold text-xs hover:bg-amber-400 transition-all shadow-md"
                                         >
                                             Return to Sign In
                                         </button>

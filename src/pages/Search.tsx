@@ -359,7 +359,7 @@ export default function Search() {
                                 key={tab}
                                 onClick={() => setActiveTab(tab as TabType)}
                                 className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors flex items-center gap-1 ${activeTab === tab
-                                    ? 'bg-amber-500 text-black font-bold shadow-sm'
+                                    ? 'bg-amber-500 text-white font-bold shadow-sm'
                                     : 'bg-white dark:bg-[#121316] text-zinc-500 dark:text-zinc-400 border border-black/[0.04] dark:border-white/[0.07] hover:bg-black/5 dark:hover:bg-white/5'
                                     }`}
                             >
@@ -545,7 +545,7 @@ export default function Search() {
                                     <p className="text-xs text-zinc-400 mb-4">Enable location to find people near you</p>
                                     <button
                                         onClick={getUserLocation}
-                                        className="px-5 py-2.5 bg-amber-500 text-black font-bold text-xs rounded-xl hover:bg-amber-400 transition-all shadow-sm"
+                                        className="px-5 py-2.5 bg-amber-500 text-white font-bold text-xs rounded-xl hover:bg-amber-400 transition-all shadow-sm"
                                     >
                                         Enable Location
                                     </button>

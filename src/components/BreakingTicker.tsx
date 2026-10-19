@@ -121,10 +121,10 @@ export default function BreakingTicker({ variant = 'home', onNewsClick, onJobCli
         >
             {/* Fixed Left Live Badge */}
             <div className="z-10 shrink-0 flex items-center pl-3 sm:pl-4 pr-3 py-2 bg-white/95 dark:bg-[#14151a]/95 backdrop-blur-md border-r border-zinc-200 dark:border-white/10 shadow-[4px_0_12px_rgba(0,0,0,0.04)] dark:shadow-[4px_0_12px_rgba(0,0,0,0.5)]">
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-red-500/10 text-red-600 dark:bg-red-600/20 dark:text-red-400 border border-red-500/30 dark:border-red-500/40 font-black text-[10px] sm:text-xs uppercase tracking-wider">
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-500 text-white font-black text-[10px] sm:text-xs uppercase tracking-wider shadow-sm">
                     <span className="relative flex size-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full size-2 bg-red-500"></span>
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                        <span className="relative inline-flex rounded-full size-2 bg-white"></span>
                     </span>
                     <span>Live Wire</span>
                 </div>
@@ -150,7 +150,7 @@ export default function BreakingTicker({ variant = 'home', onNewsClick, onJobCli
                                     {/* Job Tag */}
                                     <span className={`text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border flex items-center gap-1 ${
                                         isAudition 
-                                            ? 'bg-amber-500 text-black border-amber-600' 
+                                            ? 'bg-amber-500 text-white border-amber-600' 
                                             : 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/40'
                                     }`}>
                                         <span className="material-symbols-outlined text-[11px]">
@@ -195,8 +195,8 @@ export default function BreakingTicker({ variant = 'home', onNewsClick, onJobCli
 
                                 {/* Review Star Tag */}
                                 {isReview && (
-                                    <span className="text-[9px] sm:text-[10px] font-extrabold px-1.5 py-0.5 rounded-md bg-amber-500 text-black flex items-center gap-0.5 shadow-sm">
-                                        <span className="material-symbols-outlined text-[10px] filled">star</span>
+                                    <span className="text-[9px] sm:text-[10px] font-extrabold px-1.5 py-0.5 rounded-md bg-amber-500 text-white flex items-center gap-0.5 shadow-sm">
+                                        <span className="material-symbols-outlined text-[10px] filled text-white">star</span>
                                         <span>{item.rating || 'REVIEW'}</span>
                                     </span>
                                 )}

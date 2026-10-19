@@ -297,7 +297,7 @@ export default function SouthCinemaNews() {
                             onClick={() => setActiveTab('all')}
                             className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all ${
                                 activeTab === 'all'
-                                    ? 'bg-amber-500 text-black shadow-md'
+                                    ? 'bg-amber-500 text-white shadow-md'
                                     : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/5'
                             }`}
                         >
@@ -433,8 +433,8 @@ export default function SouthCinemaNews() {
                                                 {badge.label}
                                             </span>
                                             {isReview && (
-                                                <span className="text-[10px] font-black px-2 py-0.5 rounded-lg bg-amber-500 text-black shadow-md flex items-center gap-0.5">
-                                                    <span className="material-symbols-outlined text-[10px] filled">star</span>
+                                                <span className="text-[10px] font-black px-2 py-0.5 rounded-lg bg-amber-500 text-white shadow-md flex items-center gap-0.5">
+                                                    <span className="material-symbols-outlined text-[10px] filled text-white">star</span>
                                                     <span>{item.rating || 'REVIEW'}</span>
                                                 </span>
                                             )}

@@ -510,7 +510,7 @@ export default function AdminDashboard() {
                             <span>Blog Review</span>
                         </div>
                         {pendingBlogsCount > 0 && (
-                            <span className="size-5 rounded-full bg-amber-500 text-black text-[10px] font-black flex items-center justify-center animate-pulse">
+                            <span className="size-5 rounded-full bg-amber-500 text-white text-[10px] font-black flex items-center justify-center animate-pulse">
                                 {pendingBlogsCount}
                             </span>
                         )}
