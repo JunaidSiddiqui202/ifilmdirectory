@@ -56,8 +56,8 @@ export default function Home() {
     const [jobs, setJobs] = useState<Job[]>([]);
     const [newUsers, setNewUsers] = useState<UserProfile[]>([]);
     const [reels, setReels] = useState<Showreel[]>([]);
-    const [networkPost, setNetworkPost] = useState<PostData | null>(null);
-    const [networkPostLiked, setNetworkPostLiked] = useState(false);
+    const [networkPosts, setNetworkPosts] = useState<PostData[]>([]);
+    const [likedPostsMap, setLikedPostsMap] = useState<Record<string, boolean>>({});
     const [selectedPollOption, setSelectedPollOption] = useState<number | null>(null);
 
     // Film News & Movie Reviews state
@@ -84,18 +84,18 @@ export default function Home() {
                     jobService.getJobs(),
                     getLatestUsers(8),
                     showreelService.getTrendingShowreels(10),
-                    getPosts(),
+                    getPosts(10),
                     rssNewsService.getNews(false).catch((err) => {
                         console.error('Error fetching cinema news:', err);
                         return null;
                     })
                 ]);
-                setBlogs(fetchedBlogs.slice(0, 4));
+                setBlogs(fetchedBlogs.slice(0, 6));
                 setJobs(fetchedJobs.slice(0, 6));
                 setNewUsers(fetchedUsers);
 
                 if (fetchedPosts && fetchedPosts.length > 0) {
-                    setNetworkPost(fetchedPosts[0]);
+                    setNetworkPosts(fetchedPosts.slice(0, 4));
                 }
                 
                 if (fetchedReels && fetchedReels.length > 0) {
@@ -345,53 +345,185 @@ export default function Home() {
         </section>
     );
 
-    // Reusable Articles Section
+    const defaultBlogs: BlogPost[] = [
+        {
+            id: 'seed-blog-1',
+            title: 'The Visual Language of Modern South Indian Action Cinema',
+            excerpt: 'Deconstructing slow-motion choreography, multi-camera setups, and color grading that redefined pan-India blockbuster aesthetics.',
+            content: '',
+            author: 'Arun Matheswaran',
+            authorId: 'arun-matheswaran',
+            authorPhoto: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop',
+            image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&h=450&fit=crop',
+            category: 'Cinematography',
+            views: 1840,
+            likes: 320,
+            date: null,
+        },
+        {
+            id: 'seed-blog-2',
+            title: 'Independent Filmmaking in 2026: Financing, OTT Presales & Distribution',
+            excerpt: 'A pragmatic survival manual for debut directors navigating international festival circuits, angel syndicates, and hybrid theatrical releases.',
+            content: '',
+            author: 'Suman Kumar',
+            authorId: 'suman-kumar',
+            authorPhoto: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100&h=100&fit=crop',
+            image: 'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?w=800&h=450&fit=crop',
+            category: 'Film Trade',
+            views: 2410,
+            likes: 415,
+            date: null,
+        },
+        {
+            id: 'seed-blog-3',
+            title: 'Mastering Sync Sound & Foley Recording on Challenging Indian Sets',
+            excerpt: 'Why live sync sound is making a massive resurgence in multilingual productions, and how sound recordists manage chaotic urban locations.',
+            content: '',
+            author: 'Resul Pookutty',
+            authorId: 'resul-pookutty',
+            authorPhoto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop',
+            image: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&h=450&fit=crop',
+            category: 'Sound Design',
+            views: 1520,
+            likes: 298,
+            date: null,
+        },
+        {
+            id: 'seed-blog-4',
+            title: 'The Art of Screenplay Pacing: From 3-Act Paradigm to Non-Linear Narratives',
+            excerpt: 'Examining structure, character arcs, and dialogue economy in contemporary Malayalam and Tamil screenplay masterpieces.',
+            content: '',
+            author: 'Jeethu Joseph',
+            authorId: 'jeethu-joseph',
+            authorPhoto: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=100&h=100&fit=crop',
+            image: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&h=450&fit=crop',
+            category: 'Screenwriting',
+            views: 3100,
+            likes: 540,
+            date: null,
+        }
+    ];
+
+    const displayBlogs = blogs.length > 0 ? blogs : defaultBlogs;
+
+    const defaultCommunityPosts: PostData[] = [
+        {
+            id: 'seed-post-1',
+            author: 'Karan Johar',
+            authorId: 'karan-johar',
+            authorImage: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop',
+            role: 'Producer & Director',
+            authorVerified: true,
+            content: 'Just wrapped up principal photography for our new feature film in Mumbai! Incredible work by our camera department and lighting team. Post-production starts Monday. #CinemaLife #Wrap',
+            image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&h=450&fit=crop',
+            likes: 142,
+            comments: 28,
+            createdAt: null,
+        },
+        {
+            id: 'seed-post-2',
+            author: 'Sandeep Reddy Vanga',
+            authorId: 'sandeep-vanga',
+            authorImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop',
+            role: 'Director & Writer',
+            authorVerified: true,
+            content: 'Final 7.1.4 Dolby Atmos surround mix underway. The dynamics between whispered silence and an explosive brass score are monumental. Experience it on the biggest screen possible. 🔊🎬 #SoundDesign #Cinema',
+            image: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&h=450&fit=crop',
+            likes: 389,
+            comments: 64,
+            createdAt: null,
+        },
+        {
+            id: 'seed-post-3',
+            author: 'Ravi Varman',
+            authorId: 'ravi-varman',
+            authorImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop',
+            role: 'Cinematographer (ISC)',
+            authorVerified: true,
+            content: 'Shooting natural dusk in Rajasthan with Cooke Anamorphic Full Frame primes. Always respect the shadows as much as the light. 🎥🌅 #Cinematography #Filmmaking',
+            image: 'https://images.unsplash.com/photo-1518173946687-a4c8a383392e?w=800&h=450&fit=crop',
+            likes: 215,
+            comments: 41,
+            createdAt: null,
+        }
+    ];
+
+    const displayPosts = networkPosts.length > 0 ? networkPosts : defaultCommunityPosts;
+
+    // Featured Editorial Articles & Blog Section (Rendered in Main Feed Column)
     const EditorialArticlesSection = () => (
-        <section className="rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 p-4 sm:p-5 shadow-sm dark:shadow-none">
-            <div className="flex items-center justify-between mb-3.5">
+        <section className="space-y-3.5">
+            <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    <span className="size-2 rounded-full bg-amber-500" />
-                    <h2 className="text-base font-bold text-zinc-900 dark:text-white tracking-tight">
-                        Industry Insights & Articles
+                    <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
+                    <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white tracking-tight">
+                        Industry Insights & Editorial Articles
                     </h2>
                 </div>
                 <button
                     onClick={() => navigate('/blogs-events')}
-                    className="text-xs font-bold text-amber-500 dark:text-amber-400 hover:text-amber-600 dark:hover:text-amber-300 transition-colors flex items-center gap-0.5"
+                    className="text-xs font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors flex items-center gap-0.5"
                 >
-                    <span>Read All</span>
+                    <span>Read All Articles</span>
                     <span className="material-symbols-outlined text-sm">chevron_right</span>
                 </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-3">
-                {blogs.slice(0, 2).map((blog) => (
-                    <div
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                {displayBlogs.slice(0, 4).map((blog) => (
+                    <article
                         key={blog.id}
                         onClick={() => navigate('/blogs-events')}
-                        className="rounded-xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-200 dark:border-white/5 overflow-hidden hover:border-amber-500/30 transition-all cursor-pointer group flex gap-3 p-2.5 shadow-xs dark:shadow-none"
+                        className="group rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 overflow-hidden hover:border-amber-500/40 transition-all cursor-pointer flex flex-col shadow-sm dark:shadow-none hover:shadow-md"
                     >
-                        <div className="size-20 rounded-lg overflow-hidden shrink-0 relative">
+                        {/* Cover Image */}
+                        <div className="w-full aspect-[16/9] relative overflow-hidden bg-black/5 dark:bg-black/40">
                             <img
-                                src={blog.image || 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=300&h=300&fit=crop'}
+                                src={blog.image || blog.coverImage || 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&h=450&fit=crop'}
                                 alt={blog.title}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                loading="lazy"
                             />
-                        </div>
-                        <div className="flex flex-col justify-between min-w-0 flex-1">
-                            <div>
-                                <span className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
+                            <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
+                                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500 text-black font-extrabold shadow-sm">
                                     {blog.category || 'Film Trade'}
                                 </span>
-                                <h3 className="font-bold text-xs text-zinc-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors line-clamp-2 mt-0.5">
+                            </div>
+                            <div className="absolute bottom-2.5 right-2.5 bg-black/70 backdrop-blur-md px-2 py-0.5 rounded-full text-[10px] font-semibold text-zinc-300 border border-white/10 flex items-center gap-1">
+                                <span className="material-symbols-outlined text-[12px] text-amber-400">schedule</span>
+                                <span>3 min read</span>
+                            </div>
+                        </div>
+
+                        {/* Article Info */}
+                        <div className="p-4 flex-1 flex flex-col justify-between">
+                            <div>
+                                <h3 className="font-bold text-sm sm:text-[15px] text-zinc-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors line-clamp-2 leading-snug">
                                     {blog.title}
                                 </h3>
+                                {blog.excerpt && (
+                                    <p className="text-xs text-zinc-600 dark:text-zinc-400 line-clamp-2 mt-1.5 leading-relaxed">
+                                        {blog.excerpt}
+                                    </p>
+                                )}
                             </div>
-                            <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                                3 min read
-                            </span>
+
+                            <div className="flex items-center justify-between pt-3 mt-3 border-t border-zinc-100 dark:border-white/5 text-[11px] text-zinc-500 dark:text-zinc-400">
+                                <div className="flex items-center gap-1.5 truncate">
+                                    {blog.authorPhoto ? (
+                                        <img src={blog.authorPhoto} alt="" className="size-4 rounded-full object-cover shrink-0" />
+                                    ) : (
+                                        <span className="material-symbols-outlined text-xs text-amber-500">edit_note</span>
+                                    )}
+                                    <span className="font-medium truncate">{blog.author || 'Editorial Board'}</span>
+                                </div>
+                                <span className="font-semibold text-amber-600 dark:text-amber-400 group-hover:translate-x-0.5 transition-transform shrink-0 flex items-center gap-0.5">
+                                    Read Article <span className="material-symbols-outlined text-xs">arrow_forward</span>
+                                </span>
+                            </div>
                         </div>
-                    </div>
+                    </article>
                 ))}
             </div>
         </section>
@@ -915,96 +1047,182 @@ export default function Home() {
                             </div>
                         </section>
 
-                        {/* Latest From Your Network */}
-                        <section>
-                            <div className="flex items-center justify-between mb-3">
+                        {/* Filmmaker Community Feed */}
+                        <section className="space-y-3.5">
+                            <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <span className="size-2 rounded-full bg-blue-500" />
+                                    <span className="size-2 rounded-full bg-blue-500 animate-pulse" />
                                     <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white tracking-tight">
-                                        Latest From Your Network
+                                        Filmmaker Community Feed
                                     </h2>
                                 </div>
                                 <button
                                     onClick={() => navigate('/showcase')}
                                     className="text-xs font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors flex items-center gap-0.5"
                                 >
-                                    <span>Open Feed</span>
+                                    <span>Explore Feed</span>
                                     <span className="material-symbols-outlined text-sm">chevron_right</span>
                                 </button>
                             </div>
 
-                            <div
-                                onClick={() => navigate('/showcase')}
-                                className="rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 p-4 sm:p-5 hover:border-amber-500/30 transition-all cursor-pointer group shadow-sm dark:shadow-none"
-                            >
-                                <div className="flex items-center justify-between mb-3">
-                                    <div className="flex items-center gap-2.5">
-                                        <div className="size-10 rounded-full overflow-hidden border border-zinc-200 dark:border-white/10 shrink-0">
-                                            <PostMedia
-                                                src={networkPost?.authorImage || 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop'}
-                                                fallbackType="USER_MALE"
-                                                className="w-full h-full object-cover"
-                                            />
+                            <div className="space-y-4">
+                                {displayPosts.slice(0, 3).map((post, pIdx) => {
+                                    const postKey = post.id || `post-${pIdx}`;
+                                    const isLiked = !!likedPostsMap[postKey];
+                                    const currentLikes = (post.likes || 12) + (isLiked ? 1 : 0);
+                                    const mediaUrl = post.image || (post.images && post.images[0]);
+
+                                    return (
+                                        <div
+                                            key={postKey}
+                                            onClick={() => navigate(`/showcase${post.id ? `?id=${post.id}` : ''}`)}
+                                            className="rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 p-4 sm:p-5 hover:border-amber-500/30 transition-all cursor-pointer group shadow-sm dark:shadow-none"
+                                        >
+                                            {/* Creator Row */}
+                                            <div className="flex items-center justify-between mb-3">
+                                                <div className="flex items-center gap-2.5 min-w-0">
+                                                    <div
+                                                        className="size-10 rounded-full overflow-hidden border border-zinc-200 dark:border-white/10 shrink-0 cursor-pointer"
+                                                        onClick={(e) => {
+                                                            if (post.authorId) {
+                                                                e.stopPropagation();
+                                                                navigate(`/profile/${post.authorId}`);
+                                                            }
+                                                        }}
+                                                    >
+                                                        <PostMedia
+                                                            src={post.authorImage || ''}
+                                                            fallbackType="USER_MALE"
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    </div>
+                                                    <div className="min-w-0">
+                                                        <div className="flex items-center gap-1.5 flex-wrap">
+                                                            <h3 className="text-sm font-bold text-zinc-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors truncate">
+                                                                {post.author}
+                                                            </h3>
+                                                            {(post.authorVerified || post.author === 'Karan Johar' || post.author === 'Sandeep Reddy Vanga' || post.author === 'Ravi Varman') && (
+                                                                <span className="material-symbols-outlined text-amber-500 text-[15px] filled shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>
+                                                                    verified
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
+                                                            {post.role || 'Film Professional'} • {post.createdAt ? formatNewsTimeAgo(post.createdAt.toDate ? post.createdAt.toDate().getTime() : post.createdAt) : '2h ago'}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-white/10 shrink-0">
+                                                    Post
+                                                </span>
+                                            </div>
+
+                                            {/* Post Text */}
+                                            <p className="text-xs sm:text-sm text-zinc-800 dark:text-zinc-200 leading-relaxed mb-3 line-clamp-3">
+                                                {post.content}
+                                            </p>
+
+                                            {/* Post Media Attachment */}
+                                            {mediaUrl && (
+                                                <div className="w-full aspect-video rounded-xl overflow-hidden bg-black mb-3 border border-zinc-200 dark:border-white/5">
+                                                    <PostMedia
+                                                        src={mediaUrl}
+                                                        fallbackType="FILM_SET"
+                                                        className="w-full h-full object-cover group-hover:scale-101 transition-transform duration-500"
+                                                    />
+                                                </div>
+                                            )}
+
+                                            {/* Engagement Bar */}
+                                            <div className="flex items-center justify-between text-xs font-semibold text-zinc-500 dark:text-zinc-400 pt-2.5 border-t border-zinc-100 dark:border-white/5">
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        if (!currentUser) {
+                                                            openAuthModal('Sign in to appreciate posts and connect with creators');
+                                                            return;
+                                                        }
+                                                        setLikedPostsMap(prev => ({ ...prev, [postKey]: !prev[postKey] }));
+                                                    }}
+                                                    className={`flex items-center gap-1.5 py-1 px-2 -ml-2 rounded-lg transition-colors ${isLiked ? 'text-red-500 bg-red-500/10' : 'hover:text-zinc-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'}`}
+                                                    title="Like"
+                                                >
+                                                    <span className={`material-symbols-outlined text-[17px] ${isLiked ? 'filled' : ''}`} style={isLiked ? { fontVariationSettings: "'FILL' 1" } : undefined}>
+                                                        {isLiked ? 'favorite' : 'favorite_border'}
+                                                    </span>
+                                                    <span>{currentLikes}</span>
+                                                </button>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        navigate(`/showcase${post.id ? `?id=${post.id}` : ''}`);
+                                                    }}
+                                                    className="flex items-center gap-1.5 py-1 px-2 rounded-lg hover:text-zinc-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                                                    title="Comments"
+                                                >
+                                                    <span className="material-symbols-outlined text-[17px]">chat_bubble_outline</span>
+                                                    <span>{post.comments || 18} Comments</span>
+                                                </button>
+                                                <button
+                                                    onClick={async (e) => {
+                                                        e.stopPropagation();
+                                                        const shareUrl = `${window.location.origin}/showcase${post.id ? `?id=${post.id}` : ''}`;
+                                                        if (navigator.share) {
+                                                            try {
+                                                                await navigator.share({
+                                                                    title: `${post.author} on iFilmDirectory`,
+                                                                    text: post.content.slice(0, 100),
+                                                                    url: shareUrl,
+                                                                });
+                                                            } catch {}
+                                                        } else {
+                                                            await navigator.clipboard.writeText(shareUrl);
+                                                            toast.success('Post link copied to clipboard!');
+                                                        }
+                                                    }}
+                                                    className="flex items-center gap-1.5 py-1 px-2 -mr-2 rounded-lg hover:text-zinc-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                                                    title="Share"
+                                                >
+                                                    <span className="material-symbols-outlined text-[17px]">share</span>
+                                                    <span>Share</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+
+                                {/* Callout card to enter community */}
+                                <div
+                                    onClick={() => navigate('/showcase')}
+                                    className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/20 flex items-center justify-between cursor-pointer hover:border-amber-500/40 transition-all group"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className="size-10 rounded-xl bg-amber-500/20 text-amber-500 flex items-center justify-center shrink-0">
+                                            <span className="material-symbols-outlined text-xl">forum</span>
                                         </div>
                                         <div>
-                                            <h3 className="text-sm font-bold text-zinc-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors">
-                                                {networkPost?.author || 'Karan Johar'}
-                                            </h3>
-                                            <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                                                Producer & Director • 2h ago
+                                            <h4 className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-white group-hover:text-amber-500 transition-colors">
+                                                Join 5,000+ Film Fraternity Creators
+                                            </h4>
+                                            <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                                                Share behind-the-scenes, post project updates & collaborate
                                             </p>
                                         </div>
                                     </div>
-                                    <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-white/10">
-                                        Network Update
-                                    </span>
-                                </div>
-
-                                <p className="text-xs sm:text-sm text-zinc-800 dark:text-zinc-200 leading-relaxed mb-3 line-clamp-3">
-                                    {networkPost?.content || "Just wrapped up principal photography for our new feature film in Mumbai! Incredible work by our camera department and lighting team. Post-production starts Monday. #CinemaLife #Wrap"}
-                                </p>
-
-                                <div className="w-full aspect-video rounded-xl overflow-hidden bg-black mb-3 border border-zinc-200 dark:border-white/5">
-                                    <PostMedia
-                                        src={networkPost?.image || 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&h=450&fit=crop'}
-                                        fallbackType="FILM_SET"
-                                        className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
-                                    />
-                                </div>
-
-                                <div className="flex items-center justify-between text-xs font-semibold text-zinc-500 dark:text-zinc-400 pt-2 border-t border-zinc-100 dark:border-white/5">
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            if (!currentUser) {
-                                                openAuthModal('Sign in to like posts and engage with creators');
-                                                return;
-                                            }
-                                            setNetworkPostLiked(!networkPostLiked);
-                                        }}
-                                        className={`flex items-center gap-1.5 transition-colors ${networkPostLiked ? 'text-red-500' : 'hover:text-zinc-900 dark:hover:text-white'}`}
-                                    >
-                                        <span className="material-symbols-outlined text-base">
-                                            {networkPostLiked ? 'favorite' : 'favorite_border'}
-                                        </span>
-                                        <span>{(networkPost?.likes || 124) + (networkPostLiked ? 1 : 0)}</span>
-                                    </button>
-                                    <span className="flex items-center gap-1.5 hover:text-zinc-900 dark:hover:text-white transition-colors">
-                                        <span className="material-symbols-outlined text-base">chat_bubble_outline</span>
-                                        <span>28 Comments</span>
-                                    </span>
-                                    <span className="flex items-center gap-1.5 hover:text-zinc-900 dark:hover:text-white transition-colors">
-                                        <span className="material-symbols-outlined text-base">share</span>
-                                        <span>Share</span>
+                                    <span className="text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center gap-0.5 group-hover:translate-x-1 transition-transform shrink-0">
+                                        <span>View Feed</span>
+                                        <span className="material-symbols-outlined text-sm">arrow_forward</span>
                                     </span>
                                 </div>
                             </div>
                         </section>
 
+                        {/* Industry Insights & Editorial Articles (Blog Section) */}
+                        <EditorialArticlesSection />
+
                         {/* On Mobile / Tablet, render remaining community sections sequentially */}
                         <div className="xl:hidden space-y-6">
                             <DailyPollSection />
-                            <EditorialArticlesSection />
 
                             {/* Mobile Footer Links */}
                             <div className="pt-4 pb-4 px-2 text-center text-xs text-zinc-500 space-y-2 border-t border-zinc-200 dark:border-white/5">
@@ -1040,9 +1258,6 @@ export default function Home() {
 
                         {/* 5. Industry Pulse (Daily Poll) */}
                         <DailyPollSection />
-
-                        {/* 6. Industry Insights & Editorial */}
-                        <EditorialArticlesSection />
 
                         {/* Footer Links & Copyright (Instagram Style) */}
                         <div className="px-2 pt-2 text-[11px] text-zinc-500 space-y-2">

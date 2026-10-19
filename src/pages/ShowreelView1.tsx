@@ -20,14 +20,22 @@ interface ShowreelExtended extends Showreel {
 import { Timestamp, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 
-// Helper to get YouTube embed URL
+// Helper to get YouTube embed URL using privacy-enhanced youtube-nocookie.com
 const getYouTubeEmbedUrl = (url: string): string | null => {
-    const shortsMatch = url.match(/youtube\.com\/shorts\/([^?&]+)/);
-    if (shortsMatch) return `https://www.youtube.com/embed/${shortsMatch[1]}?autoplay=1&mute=1&loop=1&playlist=${shortsMatch[1]}`;
+    const baseParams = 'rel=0&playsinline=1';
+
+    const shortsMatch = url.match(/youtube\.com\/shorts\/([^?&/]+)/);
+    if (shortsMatch) return `https://www.youtube-nocookie.com/embed/${shortsMatch[1]}?autoplay=1&mute=1&loop=1&playlist=${shortsMatch[1]}&${baseParams}`;
+
     const watchMatch = url.match(/youtube\.com\/watch\?v=([^&]+)/);
-    if (watchMatch) return `https://www.youtube.com/embed/${watchMatch[1]}?autoplay=1&mute=1&loop=1&playlist=${watchMatch[1]}`;
-    const shortMatch = url.match(/youtu\.be\/([^?]+)/);
-    if (shortMatch) return `https://www.youtube.com/embed/${shortMatch[1]}?autoplay=1&mute=1&loop=1&playlist=${shortMatch[1]}`;
+    if (watchMatch) return `https://www.youtube-nocookie.com/embed/${watchMatch[1]}?autoplay=1&mute=1&loop=1&playlist=${watchMatch[1]}&${baseParams}`;
+
+    const shortMatch = url.match(/youtu\.be\/([^?&#/]+)/);
+    if (shortMatch) return `https://www.youtube-nocookie.com/embed/${shortMatch[1]}?autoplay=1&mute=1&loop=1&playlist=${shortMatch[1]}&${baseParams}`;
+
+    const embedMatch = url.match(/youtube\.com\/embed\/([^?&/]+)/);
+    if (embedMatch) return `https://www.youtube-nocookie.com/embed/${embedMatch[1]}?autoplay=1&mute=1&loop=1&playlist=${embedMatch[1]}&${baseParams}`;
+
     return null;
 };
 
@@ -381,13 +389,27 @@ export default function ShowreelView1() {
                     {/* Media Container */}
                     <div className="absolute inset-0 z-0">
                         {reel.type === 'embed' ? (
-                            <iframe
-                                src={getYouTubeEmbedUrl(reel.videoUrl) || reel.videoUrl}
-                                className="h-full w-full"
-                                allow="autoplay; encrypted-media; gyroscope; picture-in-picture"
-                                allowFullScreen
-                                title={reel.title}
-                            />
+                            <div className="relative h-full w-full">
+                                <iframe
+                                    src={getYouTubeEmbedUrl(reel.videoUrl) || reel.videoUrl}
+                                    className="h-full w-full"
+                                    allow="autoplay; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowFullScreen
+                                    referrerPolicy="strict-origin-when-cross-origin"
+                                    title={reel.title}
+                                />
+                                <a
+                                    href={reel.videoUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="absolute top-24 right-4 z-30 px-3 py-1.5 rounded-full bg-black/60 hover:bg-black/90 backdrop-blur-md border border-white/20 text-white text-xs font-semibold flex items-center gap-1.5 shadow-lg transition-colors"
+                                    title="Open directly on YouTube"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    <span>Watch on YouTube</span>
+                                    <span className="material-symbols-outlined text-sm">open_in_new</span>
+                                </a>
+                            </div>
                         ) : (
                             <div className="relative h-full w-full group">
                                 <video

@@ -42,19 +42,23 @@ const isVerticalVideo = (url: string): boolean => {
     return false;
 };
 
-// Helper to get YouTube embed URL
+// Helper to get YouTube embed URL using privacy-enhanced youtube-nocookie.com
 const getYouTubeEmbedUrl = (url: string): string | null => {
     // Match youtube.com/shorts/VIDEO_ID (YouTube Shorts)
-    const shortsMatch = url.match(/youtube\.com\/shorts\/([^?&]+)/);
-    if (shortsMatch) return `https://www.youtube.com/embed/${shortsMatch[1]}`;
+    const shortsMatch = url.match(/youtube\.com\/shorts\/([^?&/]+)/);
+    if (shortsMatch) return `https://www.youtube-nocookie.com/embed/${shortsMatch[1]}`;
 
     // Match youtube.com/watch?v=VIDEO_ID
     const watchMatch = url.match(/youtube\.com\/watch\?v=([^&]+)/);
-    if (watchMatch) return `https://www.youtube.com/embed/${watchMatch[1]}`;
+    if (watchMatch) return `https://www.youtube-nocookie.com/embed/${watchMatch[1]}`;
 
     // Match youtu.be/VIDEO_ID
-    const shortMatch = url.match(/youtu\.be\/([^?]+)/);
-    if (shortMatch) return `https://www.youtube.com/embed/${shortMatch[1]}`;
+    const shortMatch = url.match(/youtu\.be\/([^?&#/]+)/);
+    if (shortMatch) return `https://www.youtube-nocookie.com/embed/${shortMatch[1]}`;
+
+    // Match youtube.com/embed/VIDEO_ID
+    const embedMatch = url.match(/youtube\.com\/embed\/([^?&/]+)/);
+    if (embedMatch) return `https://www.youtube-nocookie.com/embed/${embedMatch[1]}`;
 
     return null;
 };
@@ -79,11 +83,16 @@ export default function PostMedia({ src, alt = "Post attachment", className = ""
     // Handle YouTube videos (including Shorts)
     const youtubeEmbedUrl = getYouTubeEmbedUrl(src);
     if (youtubeEmbedUrl) {
-        // Extract video ID for looping
-        const videoId = youtubeEmbedUrl.split('/').pop();
+        // Extract clean video ID
+        const rawId = youtubeEmbedUrl.split('/').pop() || '';
+        const videoId = rawId.split('?')[0];
+
+        const baseParams = 'rel=0&playsinline=1';
         const embedParams = isThumbnail
-            ? `?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoId}&modestbranding=1&rel=0`
-            : '';
+            ? `?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoId}&${baseParams}`
+            : `?${baseParams}`;
+
+        const directWatchUrl = videoId ? `https://www.youtube.com/watch?v=${videoId}` : src;
 
         // For YouTube Shorts: display as tall vertical video (9:16)
         if (isVertical) {
@@ -93,10 +102,24 @@ export default function PostMedia({ src, alt = "Post attachment", className = ""
                         src={`${youtubeEmbedUrl}${embedParams}`}
                         className={`absolute inset-0 w-full h-full ${isThumbnail ? '' : 'rounded-2xl shadow-xl'}`}
                         frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                         allowFullScreen
+                        referrerPolicy="strict-origin-when-cross-origin"
                         title={alt}
                     />
+                    {!isThumbnail && (
+                        <a
+                            href={directWatchUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="absolute top-2.5 right-2.5 z-10 px-2 py-1 bg-black/75 hover:bg-black text-white text-[10px] font-bold rounded-lg border border-white/20 backdrop-blur-md flex items-center gap-1 shadow-md opacity-75 hover:opacity-100 transition-opacity"
+                            title="Watch on YouTube"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <span>YouTube</span>
+                            <span className="material-symbols-outlined text-[11px]">open_in_new</span>
+                        </a>
+                    )}
                 </div>
             );
         }
@@ -107,10 +130,24 @@ export default function PostMedia({ src, alt = "Post attachment", className = ""
                     src={`${youtubeEmbedUrl}${embedParams}`}
                     className="absolute inset-0 w-full h-full rounded-lg"
                     frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowFullScreen
+                    referrerPolicy="strict-origin-when-cross-origin"
                     title={alt}
                 />
+                {!isThumbnail && (
+                    <a
+                        href={directWatchUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="absolute top-2.5 right-2.5 z-10 px-2.5 py-1 bg-black/75 hover:bg-black text-white text-[10px] font-bold rounded-lg border border-white/20 backdrop-blur-md flex items-center gap-1 shadow-md opacity-75 hover:opacity-100 transition-opacity"
+                        title="Watch on YouTube"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <span>Watch on YouTube</span>
+                        <span className="material-symbols-outlined text-[12px]">open_in_new</span>
+                    </a>
+                )}
             </div>
         );
     }
@@ -127,6 +164,7 @@ export default function PostMedia({ src, alt = "Post attachment", className = ""
                     frameBorder="0"
                     allow="autoplay; fullscreen; picture-in-picture"
                     allowFullScreen
+                    referrerPolicy="strict-origin-when-cross-origin"
                     title={alt}
                 />
             </div>
