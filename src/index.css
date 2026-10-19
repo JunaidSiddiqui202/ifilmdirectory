@@ -358,3 +358,31 @@ html:not(.dark) .sent-message-bubble * {
   color: #ffffff !important;
   fill: #ffffff !important;
 }
+
+/* ========================================================
+   FULLSCREEN SHOWREEL & CINEMA VIDEO PLAYER IMMUNITY
+   Prevents Day Theme Engine from inverting or bleaching
+   video player overlays, controls, or engagement icons
+   ======================================================== */
+.showreel-cinema,
+.showreel-cinema *,
+[data-reel-page],
+[data-reel-page] * {
+  color-scheme: dark;
+}
+
+html:not(.dark) .showreel-cinema,
+html:not(.dark) [data-reel-page] {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+html:not(.dark) .showreel-cinema button,
+html:not(.dark) [data-reel-page] button {
+  color: #ffffff !important;
+}
+
+html:not(.dark) .showreel-cinema .material-symbols-outlined,
+html:not(.dark) [data-reel-page] .material-symbols-outlined {
+  color: #ffffff !important;
+}

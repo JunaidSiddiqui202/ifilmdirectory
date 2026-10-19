@@ -507,9 +507,9 @@ export default function ShowreelView1() {
     }
 
     return (
-        <div className="h-[100dvh] w-full overflow-y-scroll snap-y snap-mandatory no-scrollbar bg-black" ref={containerRef}>
+        <div className="showreel-cinema h-[100dvh] w-full overflow-y-scroll snap-y snap-mandatory no-scrollbar bg-black" data-reel-page="true" ref={containerRef}>
             {reels.map((reel) => (
-                <div key={reel.id} className="h-[100dvh] w-full snap-start snap-always shrink-0 relative bg-black" data-reel-id={reel.id}>
+                <div key={reel.id} className="showreel-cinema h-[100dvh] w-full snap-start snap-always shrink-0 relative bg-black select-none" data-reel-id={reel.id} data-reel-page="true">
                     {/* Media Container */}
                     <div className="absolute inset-0 z-0">
                         {reel.type === 'embed' ? (
@@ -527,14 +527,14 @@ export default function ShowreelView1() {
                                     href={reel.videoUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="absolute top-24 left-4 z-30 px-3 py-1.5 rounded-full bg-black/60 hover:bg-black/90 backdrop-blur-md border border-white/20 text-white text-xs font-semibold flex items-center gap-1.5 shadow-lg transition-colors"
+                                    className="absolute top-20 sm:top-24 left-4 z-30 px-3.5 py-1.5 rounded-full bg-zinc-950/85 hover:bg-zinc-900 backdrop-blur-md border border-white/20 text-white text-xs font-bold flex items-center gap-1.5 shadow-2xl transition-all cursor-pointer"
                                     title="Open directly on YouTube"
                                     onClick={(e) => e.stopPropagation()}
                                 >
                                     <span className="material-symbols-outlined text-red-500 text-sm">smart_display</span>
                                     <span className="hidden sm:inline">Watch on YouTube</span>
                                     <span className="sm:hidden">YouTube</span>
-                                    <span className="material-symbols-outlined text-xs">open_in_new</span>
+                                    <span className="material-symbols-outlined text-xs text-white/80">open_in_new</span>
                                 </a>
                             </div>
                         ) : (
@@ -558,14 +558,14 @@ export default function ShowreelView1() {
                         <button
                             type="button"
                             onClick={toggleSound}
-                            className={`absolute top-24 right-4 z-30 size-11 flex items-center justify-center rounded-full backdrop-blur-xl border transition-all active:scale-90 shadow-2xl cursor-pointer ${
+                            className={`absolute top-20 sm:top-24 right-4 z-30 size-11 flex items-center justify-center rounded-full backdrop-blur-xl border transition-all active:scale-90 shadow-2xl cursor-pointer ${
                                 isMuted
-                                    ? 'bg-black/60 border-white/20 text-white hover:bg-black/80'
-                                    : 'bg-amber-500 border-amber-400 text-white shadow-amber-500/40 ring-2 ring-amber-400/40'
+                                    ? 'bg-zinc-950/85 border-white/20 text-white hover:bg-zinc-900'
+                                    : 'bg-amber-500 border-amber-400 text-white shadow-amber-500/40 ring-2 ring-amber-400/40 animate-pulse'
                             }`}
                             title={isMuted ? "Unmute Audio" : "Mute Audio"}
                         >
-                            <span className="material-symbols-outlined text-xl">
+                            <span className="material-symbols-outlined text-2xl text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">
                                 {isMuted ? 'volume_off' : 'volume_up'}
                             </span>
                         </button>
@@ -575,7 +575,7 @@ export default function ShowreelView1() {
                             <button
                                 type="button"
                                 onClick={toggleSound}
-                                className="absolute top-24 left-1/2 -translate-x-1/2 z-30 px-3.5 py-1.5 rounded-full bg-black/75 hover:bg-black/95 backdrop-blur-md border border-amber-400/60 text-white text-xs font-bold flex items-center gap-2 shadow-2xl active:scale-95 transition-all cursor-pointer animate-pulse"
+                                className="absolute top-20 sm:top-24 left-1/2 -translate-x-1/2 z-30 px-4 py-1.5 rounded-full bg-zinc-950/90 hover:bg-zinc-900 backdrop-blur-md border border-amber-400/70 text-white text-xs font-bold flex items-center gap-2 shadow-2xl active:scale-95 transition-all cursor-pointer animate-pulse"
                             >
                                 <span className="material-symbols-outlined text-base text-amber-400">volume_off</span>
                                 <span>Tap to Unmute</span>
@@ -587,51 +587,76 @@ export default function ShowreelView1() {
                     <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/80 via-transparent to-black/40 pointer-events-none" />
 
                     {/* Top Bar */}
-                    <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between p-6">
-                        <button onClick={() => navigate(-1)} className="size-10 flex items-center justify-center rounded-full bg-black/20 backdrop-blur-xl border border-white/10">
-                            <span className="material-symbols-outlined text-white">arrow_back_ios_new</span>
+                    <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between p-4 sm:p-6">
+                        <button
+                            onClick={() => navigate(-1)}
+                            className="size-10 flex items-center justify-center rounded-full bg-zinc-950/80 hover:bg-zinc-900 backdrop-blur-xl border border-white/20 text-white shadow-xl active:scale-90 transition-all cursor-pointer"
+                            title="Back"
+                        >
+                            <span className="material-symbols-outlined text-white text-xl drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">arrow_back_ios_new</span>
                         </button>
-                        <div className="flex items-center gap-1 bg-black/20 backdrop-blur-xl px-4 py-1.5 rounded-full border border-white/10">
-                            <span className="text-white text-xs font-black uppercase tracking-widest">Showreels</span>
+                        <div className="flex items-center gap-1.5 bg-zinc-950/80 backdrop-blur-xl px-4 py-1.5 rounded-full border border-white/20 shadow-xl">
+                            <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
+                            <span className="text-white text-xs font-black uppercase tracking-widest drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Showreels</span>
                         </div>
                         <button
                             onClick={() => setActiveMoreMenuReelId(reel.id)}
-                            className="size-10 flex items-center justify-center rounded-full bg-black/20 backdrop-blur-xl border border-white/10 active:scale-90 transition-all"
+                            className="size-10 flex items-center justify-center rounded-full bg-zinc-950/80 hover:bg-zinc-900 backdrop-blur-xl border border-white/20 text-white shadow-xl active:scale-90 transition-all cursor-pointer"
+                            title="More Options"
                         >
-                            <span className="material-symbols-outlined text-white">more_vert</span>
+                            <span className="material-symbols-outlined text-white text-xl drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">more_vert</span>
                         </button>
                     </div>
 
                     {/* Engagement Actions (Right Side) */}
-                    <div className="absolute right-4 bottom-32 z-20 flex flex-col gap-6 items-center">
-                        <div className="flex flex-col items-center gap-1.5">
+                    <div className="absolute right-4 bottom-28 sm:bottom-32 z-20 flex flex-col gap-5 items-center">
+                        <div className="flex flex-col items-center gap-1">
                             <button
                                 onClick={() => handleLike(reel.id)}
-                                className={`size-12 flex items-center justify-center rounded-full backdrop-blur-3xl border border-white/20 transition-all active:scale-75 ${reel.isLiked ? 'bg-red-500 border-red-400 font-bold' : 'bg-white/10 hover:bg-white/20'}`}
+                                className={`size-12 flex items-center justify-center rounded-full backdrop-blur-xl border transition-all active:scale-75 shadow-2xl ${
+                                    reel.isLiked
+                                        ? 'bg-red-600 border-red-400 text-white shadow-red-500/40 ring-2 ring-red-400/30'
+                                        : 'bg-zinc-950/85 hover:bg-zinc-900 border-white/20 text-white hover:border-white/40'
+                                }`}
+                                title={reel.isLiked ? "Unlike Reel" : "Like Reel"}
                             >
-                                <span className={`material-symbols-outlined text-2xl ${reel.isLiked ? 'filled text-white' : 'text-white'}`}>favorite</span>
+                                <span className={`material-symbols-outlined text-2xl ${reel.isLiked ? 'filled text-white' : 'text-white'} drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]`}>
+                                    favorite
+                                </span>
                             </button>
-                            <span className="text-[11px] font-black text-white">{formatViews(reel.likes)}</span>
+                            <span className="text-[11px] font-black text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] bg-black/60 px-2 py-0.5 rounded-full backdrop-blur-sm border border-white/10">
+                                {formatViews(reel.likes)}
+                            </span>
                         </div>
 
-                        <div className="flex flex-col items-center gap-1.5">
+                        <div className="flex flex-col items-center gap-1">
                             <button
                                 onClick={() => setActiveCommentReelId(reel.id)}
-                                className="size-12 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-3xl border border-white/20 hover:bg-white/20 active:scale-75 transition-all"
+                                className="size-12 flex items-center justify-center rounded-full bg-zinc-950/85 hover:bg-zinc-900 backdrop-blur-xl border border-white/20 hover:border-white/40 active:scale-75 transition-all shadow-2xl text-white"
+                                title="Comments"
                             >
-                                <span className="material-symbols-outlined text-2xl text-white">chat_bubble</span>
+                                <span className="material-symbols-outlined text-2xl text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                                    chat_bubble
+                                </span>
                             </button>
-                            <span className="text-[11px] font-black text-white">{formatViews(reel.comments)}</span>
+                            <span className="text-[11px] font-black text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] bg-black/60 px-2 py-0.5 rounded-full backdrop-blur-sm border border-white/10">
+                                {formatViews(reel.comments)}
+                            </span>
                         </div>
 
-                        <div className="flex flex-col items-center gap-1.5">
+                        <div className="flex flex-col items-center gap-1">
                             <button
                                 onClick={() => handleShare(reel)}
-                                className="size-12 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-3xl border border-white/20 hover:bg-white/20 active:scale-75 transition-all"
+                                className="size-12 flex items-center justify-center rounded-full bg-zinc-950/85 hover:bg-zinc-900 backdrop-blur-xl border border-white/20 hover:border-white/40 active:scale-75 transition-all shadow-2xl text-white"
+                                title="Share Showreel"
                             >
-                                <span className="material-symbols-outlined text-2xl text-white">share</span>
+                                <span className="material-symbols-outlined text-2xl text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                                    share
+                                </span>
                             </button>
-                            <span className="text-[11px] font-black text-white">Share</span>
+                            <span className="text-[11px] font-black text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] bg-black/60 px-2 py-0.5 rounded-full backdrop-blur-sm border border-white/10">
+                                Share
+                            </span>
                         </div>
                     </div>
 

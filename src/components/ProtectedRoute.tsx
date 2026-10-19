@@ -40,10 +40,13 @@ export default function ProtectedRoute({ children, allowGuest = false }: Protect
         return <Navigate to={`/login?redirect=${encodeURIComponent(location.pathname)}`} replace />;
     }
 
-    const isStandalone = location.pathname.startsWith('/-admin');
+    const isShowreelViewer = location.pathname.startsWith('/showreel/view');
+    const isStandalone = location.pathname.startsWith('/-admin') || isShowreelViewer;
 
     return (
-        <div className={`min-h-screen bg-background-light dark:bg-background-dark transition-all duration-300 ${
+        <div className={`min-h-screen ${
+            isShowreelViewer ? 'bg-black text-white' : 'bg-background-light dark:bg-background-dark'
+        } transition-all duration-300 ${
             isStandalone ? '' : 'md:pl-20 xl:pl-64'
         }`}>
             {children}
