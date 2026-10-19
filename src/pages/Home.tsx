@@ -698,6 +698,17 @@ export default function Home() {
                         </div>
                     )}
                 </div>
+
+                {/* Audition Safety Notice */}
+                <div className="mt-3 pt-3 border-t border-zinc-200 dark:border-white/5 flex items-start gap-2 text-[10px] text-zinc-500 dark:text-zinc-400">
+                    <span className="material-symbols-outlined text-amber-500 text-xs shrink-0 mt-0.5">shield</span>
+                    <p className="leading-snug">
+                        <strong className="text-zinc-700 dark:text-zinc-300">Audition Safety:</strong> Never pay money for auditions, screen tests, or roles. Report suspicious calls to{' '}
+                        <a href="mailto:jobs@ifilmdirectory.com" className="text-amber-600 dark:text-amber-400 font-bold hover:underline">
+                            jobs@ifilmdirectory.com
+                        </a>.
+                    </p>
+                </div>
             </section>
         );
     };
@@ -982,6 +993,26 @@ export default function Home() {
                                     </button>
                                 </div>
                             )}
+
+                            {/* South Cinema Wire Editorial & Review Disclaimer */}
+                            <div className="p-3 sm:p-3.5 rounded-xl bg-zinc-100/70 dark:bg-white/[0.02] border border-zinc-200 dark:border-white/5 text-[11px] text-zinc-500 dark:text-zinc-400 flex items-start gap-2.5">
+                                <span className="material-symbols-outlined text-amber-500 text-base shrink-0 mt-0.5">verified_user</span>
+                                <div className="space-y-1">
+                                    <p className="leading-relaxed">
+                                        <strong className="text-zinc-700 dark:text-zinc-300">Editorial & Review Notice:</strong> Film headlines and certified reviews are aggregated via public RSS feeds under fair use. Copyrights and trademarks belong to original publishers. Reviews reflect critic opinions.
+                                    </p>
+                                    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                                        <span>Editorial inquiries & DMCA:</span>
+                                        <a href="mailto:editorial@ifilmdirectory.com" className="text-amber-600 dark:text-amber-400 font-semibold hover:underline">
+                                            editorial@ifilmdirectory.com
+                                        </a>
+                                        <span>•</span>
+                                        <a href="mailto:contact@ifilmdirectory.com" className="hover:text-amber-500">
+                                            contact@ifilmdirectory.com
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
                         </section>
 
                         {/* On Mobile / Tablet: Prioritize Jobs & Featured Talent right after News & Reviews */}
@@ -1357,6 +1388,31 @@ export default function Home() {
                             <div className="text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed whitespace-pre-line space-y-3 pt-3 border-t border-zinc-200 dark:border-white/5">
                                 {selectedNewsArticle.content || selectedNewsArticle.description}
                             </div>
+
+                            {/* Editorial & Review Attribution Box */}
+                            <div className="p-3.5 rounded-xl bg-amber-500/5 dark:bg-amber-400/[0.04] border border-amber-500/20 text-xs space-y-2">
+                                <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-bold text-[11px] uppercase tracking-wider">
+                                    <span className="material-symbols-outlined text-sm">verified_user</span>
+                                    <span>Editorial Attribution & Fair Use</span>
+                                </div>
+                                <p className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                                    Aggregated under fair use and public RSS syndication. All trademarks, story excerpts, and copyright belong exclusively to {selectedNewsArticle.source}. Film reviews represent independent viewpoints of their respective critics.
+                                </p>
+                                <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] border-t border-amber-500/15">
+                                    <span className="text-zinc-500 dark:text-zinc-400">Queries & DMCA:</span>
+                                    <a
+                                        href={`mailto:editorial@ifilmdirectory.com?subject=Editorial Inquiry: ${encodeURIComponent(selectedNewsArticle.title)}`}
+                                        className="text-amber-600 dark:text-amber-400 font-bold hover:underline inline-flex items-center gap-1"
+                                    >
+                                        <span className="material-symbols-outlined text-xs">mail</span>
+                                        editorial@ifilmdirectory.com
+                                    </a>
+                                    <span className="text-zinc-400 dark:text-zinc-600">•</span>
+                                    <a href="mailto:contact@ifilmdirectory.com" className="text-zinc-600 dark:text-zinc-400 hover:text-amber-500">
+                                        contact@ifilmdirectory.com
+                                    </a>
+                                </div>
+                            </div>
                         </div>
 
                         {/* Sticky Action Footer */}
@@ -1501,6 +1557,36 @@ export default function Home() {
                                     <span>Application Deadline: <strong>{new Date(selectedJobModal.deadline).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</strong></span>
                                 </div>
                             )}
+
+                            {/* In-Modal Casting & Opportunity Safety Alert */}
+                            <div className="p-3.5 rounded-xl bg-amber-500/10 dark:bg-amber-400/[0.05] border border-amber-500/20 text-xs space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-bold text-[11px] uppercase tracking-wider">
+                                        <span className="material-symbols-outlined text-sm">shield</span>
+                                        <span>Safety & Anti-Fraud Notice</span>
+                                    </div>
+                                    <a
+                                        href={`mailto:jobs@ifilmdirectory.com?subject=Job Safety Report: ${encodeURIComponent(selectedJobModal.title)} at ${encodeURIComponent(selectedJobModal.company)}`}
+                                        className="text-[10px] font-bold text-red-500 hover:text-red-600 dark:text-red-400 flex items-center gap-1 hover:underline"
+                                    >
+                                        <span className="material-symbols-outlined text-xs">flag</span>
+                                        <span>Report Listing</span>
+                                    </a>
+                                </div>
+                                <p className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                                    iFilmDirectory never charges fees for auditions or applications. Never pay anyone for roles, screen tests, or job processing. Legitimate productions never charge talent. Verify producer credentials before attending private auditions.
+                                </p>
+                                <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] border-t border-amber-500/15">
+                                    <span className="text-zinc-500 dark:text-zinc-400">Fraud Helpline:</span>
+                                    <a href="mailto:jobs@ifilmdirectory.com" className="text-amber-600 dark:text-amber-400 font-bold hover:underline">
+                                        jobs@ifilmdirectory.com
+                                    </a>
+                                    <span className="text-zinc-400 dark:text-zinc-600">•</span>
+                                    <a href="mailto:support@ifilmdirectory.com" className="text-zinc-600 dark:text-zinc-400 hover:text-amber-500">
+                                        support@ifilmdirectory.com
+                                    </a>
+                                </div>
+                            </div>
                         </div>
 
                         {/* Modal Actions */}

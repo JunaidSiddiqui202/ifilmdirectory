@@ -580,6 +580,74 @@ export default function SouthCinemaNews() {
                         })}
                     </div>
                 )}
+
+                {/* EDITORIAL & REVIEW SYNDICATION DISCLAIMER */}
+                <div className="mt-10 rounded-2xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 p-5 sm:p-6 space-y-4">
+                    <div className="flex items-start gap-3">
+                        <div className="size-10 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                            <span className="material-symbols-outlined text-xl">policy</span>
+                        </div>
+                        <div className="space-y-1">
+                            <h3 className="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white flex items-center gap-2">
+                                <span>Editorial & Movie Review Syndication Notice — South Cinema Wire</span>
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+                                    Fair Use
+                                </span>
+                            </h3>
+                            <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                                iFilmDirectory curates film entertainment news, trade reports, and critical reviews for discovery, educational commentary, and media research.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed">
+                        <div className="p-3.5 rounded-xl bg-white dark:bg-white/[0.02] border border-zinc-200 dark:border-white/5 space-y-1.5">
+                            <div className="flex items-center gap-1.5 font-bold text-amber-600 dark:text-amber-400">
+                                <span className="material-symbols-outlined text-sm">copyright</span>
+                                <span>Intellectual Property & Attribution</span>
+                            </div>
+                            <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
+                                All headlines, original article extracts, publisher logos, and trademarks belong to their respective publications (The Hindu, Times of India, Cinema Express, Film Companion, 123Telugu, etc.). We always link directly to original publications.
+                            </p>
+                        </div>
+
+                        <div className="p-3.5 rounded-xl bg-white dark:bg-white/[0.02] border border-zinc-200 dark:border-white/5 space-y-1.5">
+                            <div className="flex items-center gap-1.5 font-bold text-blue-600 dark:text-blue-400">
+                                <span className="material-symbols-outlined text-sm">rate_review</span>
+                                <span>Independent Review Opinions</span>
+                            </div>
+                            <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
+                                Film reviews, ratings, and critical verdicts expressed in aggregated articles represent solely the perspectives of the originating journalists and publications, not iFilmDirectory or 5M Collective Services.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-zinc-200 dark:border-white/5 flex flex-wrap items-center justify-between gap-3 text-xs">
+                        <div className="flex items-center gap-2 text-zinc-600 dark:text-zinc-400 text-[11px]">
+                            <span className="material-symbols-outlined text-sm text-amber-500">mail</span>
+                            <span>Editorial inquiries, corrections, or syndication queries:</span>
+                            <a
+                                href="mailto:editorial@ifilmdirectory.com?subject=Editorial%20Correction%20or%20Syndication%20Notice%20-%20South%20Cinema%20Wire"
+                                className="font-bold text-amber-600 dark:text-amber-400 hover:underline"
+                            >
+                                editorial@ifilmdirectory.com
+                            </a>
+                        </div>
+                        <div className="flex items-center gap-3 text-[11px] font-semibold text-zinc-500 dark:text-zinc-400">
+                            <a href="mailto:contact@ifilmdirectory.com" className="hover:text-amber-500 transition-colors">
+                                Corporate Desk
+                            </a>
+                            <span>•</span>
+                            <span onClick={() => navigate('/terms')} className="hover:text-amber-500 cursor-pointer transition-colors">
+                                Terms of Use
+                            </span>
+                            <span>•</span>
+                            <span onClick={() => navigate('/privacy')} className="hover:text-amber-500 cursor-pointer transition-colors">
+                                Privacy Policy
+                            </span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {/* 6. FULL ARTICLE READER MODAL */}
@@ -682,6 +750,33 @@ export default function SouthCinemaNews() {
                                         .map((para, i) => (
                                             <p key={i} className="leading-relaxed">{para.trim()}</p>
                                         ))}
+                                    {/* Modal Editorial Attribution & Contact Disclaimer */}
+                                    <div className="mt-5 p-3.5 rounded-xl bg-amber-500/5 dark:bg-amber-400/[0.04] border border-amber-500/20 text-xs space-y-2">
+                                        <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold text-[11px] uppercase tracking-wider">
+                                            <span className="material-symbols-outlined text-sm">verified_user</span>
+                                            <span>Editorial & Review Attribution</span>
+                                        </div>
+                                        <p className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                                            Aggregated under fair use and public RSS syndication for cinema industry discovery. All trademarks, excerpts, headlines, and copyright belong exclusively to the source publisher ({selectedArticle.source}). Movie reviews reflect independent opinions of respective film critics.
+                                        </p>
+                                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-1 text-[11px] border-t border-amber-500/15">
+                                            <span className="text-zinc-500 dark:text-zinc-400 font-medium">Corrections & Grievances:</span>
+                                            <a
+                                                href={`mailto:editorial@ifilmdirectory.com?subject=Editorial Inquiry: ${encodeURIComponent(selectedArticle.title)}`}
+                                                className="text-amber-600 dark:text-amber-400 font-bold hover:underline inline-flex items-center gap-1"
+                                            >
+                                                <span className="material-symbols-outlined text-xs">mail</span>
+                                                editorial@ifilmdirectory.com
+                                            </a>
+                                            <span className="text-zinc-400 dark:text-zinc-600">•</span>
+                                            <a
+                                                href="mailto:contact@ifilmdirectory.com"
+                                                className="text-zinc-600 dark:text-zinc-400 hover:text-amber-500 inline-flex items-center gap-1"
+                                            >
+                                                contact@ifilmdirectory.com
+                                            </a>
+                                        </div>
+                                    </div>
                                 </div>
                             )}
                         </div>
