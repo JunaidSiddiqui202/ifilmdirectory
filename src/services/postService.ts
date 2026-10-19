@@ -12,7 +12,8 @@ import {
     arrayRemove,
     increment,
     getDoc,
-    onSnapshot
+    onSnapshot,
+    limit
 } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { createNotification } from './notificationService';
@@ -50,9 +51,15 @@ export interface CommentData {
     type?: 'post' | 'showreel' | 'blog';
 }
 
+// Client-side cache to protect free daily Firestore read quota
+let postsCache: { posts: PostData[]; timestamp: number } | null = null;
+const POSTS_CACHE_TTL = 2 * 60 * 1000; // 2 minutes
+
 export const createPost = async (postData: Omit<PostData, 'id'>) => {
     try {
         const docRef = await addDoc(collection(db, 'posts'), postData);
+        // Invalidate cache immediately on new post
+        postsCache = null;
         return { id: docRef.id, ...postData };
     } catch (error) {
         console.error("Error creating post: ", error);
@@ -60,27 +67,34 @@ export const createPost = async (postData: Omit<PostData, 'id'>) => {
     }
 };
 
-export const getPosts = async () => {
+export const getPosts = async (limitCount: number = 40, bypassCache: boolean = false) => {
+    if (!bypassCache && postsCache && Date.now() - postsCache.timestamp < POSTS_CACHE_TTL) {
+        return postsCache.posts;
+    }
+
     try {
-        const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
+        const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'), limit(limitCount));
         const querySnapshot = await getDocs(q);
-        return querySnapshot.docs.map(doc => ({
+        const posts = querySnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
         })) as PostData[];
+        postsCache = { posts, timestamp: Date.now() };
+        return posts;
     } catch (error) {
         console.error("Error getting posts: ", error);
-        return [];
+        return postsCache?.posts || [];
     }
 };
 
-export const subscribeToPosts = (callback: (posts: PostData[]) => void) => {
-    const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
+export const subscribeToPosts = (callback: (posts: PostData[]) => void, limitCount: number = 40) => {
+    const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'), limit(limitCount));
     return onSnapshot(q, (snapshot) => {
         const posts = snapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
         })) as PostData[];
+        postsCache = { posts, timestamp: Date.now() };
         callback(posts);
     }, (error) => {
         console.error("Posts subscription error:", error);

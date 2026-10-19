@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import { useAuth } from '../context/AuthContext';
+import { useAuthModal } from '../context/AuthModalContext';
 import { useTheme } from '../context/ThemeContext';
 import Logo from './Logo';
 
@@ -12,22 +13,27 @@ export default function HamburgerMenu() {
     const location = useLocation();
 
     const { currentUser, logout } = useAuth();
+    const { openAuthModal } = useAuthModal();
     const { isDarkMode, toggleDarkMode } = useTheme();
 
     const toggleMenu = () => {
         setIsOpen(!isOpen);
     };
 
-    const handleNavigation = (path: string) => {
-        navigate(path);
+    const handleNavigation = (path: string, label?: string) => {
         setIsOpen(false);
+        if (!currentUser && ['/projects', '/saved', '/settings', '/-admin'].includes(path)) {
+            openAuthModal(`Sign in to access ${label ? label.toLowerCase() : 'this feature'}`);
+            return;
+        }
+        navigate(path);
     };
 
     const handleLogout = async () => {
         try {
             setIsOpen(false);
             await logout();
-            navigate('/login');
+            navigate('/home');
         } catch (error) {
             console.error("Logout failed", error);
         }
@@ -116,9 +122,9 @@ export default function HamburgerMenu() {
                                         </button>
                                     </div>
                                 </div>
-                                {currentUser && (
+                                {currentUser ? (
                                     <div
-                                        onClick={() => handleNavigation('/profile')}
+                                        onClick={() => handleNavigation('/profile', 'Profile')}
                                         className="flex items-center gap-3 p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.03] border border-black/5 dark:border-white/5 hover:border-primary/40 cursor-pointer transition-all active:scale-98"
                                     >
                                         <div className="size-11 rounded-xl bg-primary/10 flex items-center justify-center overflow-hidden border border-primary/20 shrink-0">
@@ -138,6 +144,27 @@ export default function HamburgerMenu() {
                                         </div>
                                         <span className="material-symbols-outlined text-zinc-400 text-sm">chevron_right</span>
                                     </div>
+                                ) : (
+                                    <div
+                                        onClick={() => {
+                                            setIsOpen(false);
+                                            openAuthModal('Sign in to access your filmmaker profile & portfolio');
+                                        }}
+                                        className="flex items-center gap-3 p-3 rounded-2xl bg-gradient-to-r from-amber-500/15 to-amber-600/10 border border-amber-500/30 cursor-pointer transition-all active:scale-98"
+                                    >
+                                        <div className="size-11 rounded-xl bg-amber-500 text-black flex items-center justify-center shadow-md shrink-0">
+                                            <span className="material-symbols-outlined text-2xl font-black">login</span>
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-xs font-black text-zinc-900 dark:text-white truncate font-display">
+                                                Sign In / Join iFilm
+                                            </p>
+                                            <p className="text-[10px] text-amber-600 dark:text-amber-400 font-bold truncate">
+                                                Free Access for Indian Cinema
+                                            </p>
+                                        </div>
+                                        <span className="material-symbols-outlined text-amber-500 text-sm">chevron_right</span>
+                                    </div>
                                 )}
                             </div>
 
@@ -152,7 +179,7 @@ export default function HamburgerMenu() {
                                             {section.items.map((item) => (
                                                 <button
                                                     key={item.path}
-                                                    onClick={() => handleNavigation(item.path)}
+                                                    onClick={() => handleNavigation(item.path, item.label)}
                                                     className={`flex items-center gap-3.5 rounded-xl px-3.5 py-2.5 text-left transition-all ${location.pathname === item.path
                                                         ? 'bg-primary/10 text-primary font-bold'
                                                         : 'text-zinc-700 dark:text-zinc-300 hover:bg-black/5 dark:hover:bg-white/[0.04] font-medium'
@@ -197,13 +224,26 @@ export default function HamburgerMenu() {
                                     </button>
                                 </div>
 
-                                <button
-                                    onClick={handleLogout}
-                                    className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
-                                >
-                                    <span className="material-symbols-outlined text-xl">logout</span>
-                                    <span className="text-xs font-bold">Sign Out</span>
-                                </button>
+                                {currentUser ? (
+                                    <button
+                                        onClick={handleLogout}
+                                        className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
+                                    >
+                                        <span className="material-symbols-outlined text-xl">logout</span>
+                                        <span className="text-xs font-bold">Sign Out</span>
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={() => {
+                                            setIsOpen(false);
+                                            openAuthModal('Sign in to access your filmmaker profile & portfolio');
+                                        }}
+                                        className="flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-extrabold text-xs shadow-md transition-all active:scale-95 cursor-pointer"
+                                    >
+                                        <span className="material-symbols-outlined text-lg font-black">login</span>
+                                        <span>Sign In / Create Account</span>
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>

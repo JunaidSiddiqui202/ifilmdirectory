@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useToast } from '../context/ToastContext';
 
 export interface ExperienceItem {
     id: string;
@@ -18,6 +19,7 @@ interface ExperienceModalProps {
 }
 
 export default function ExperienceModal({ isOpen, onClose, onSave, onDelete, itemToEdit }: ExperienceModalProps) {
+    const toast = useToast();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState<ExperienceItem>({
         id: '',
@@ -50,13 +52,41 @@ export default function ExperienceModal({ isOpen, onClose, onSave, onDelete, ite
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // 1. Prevent double-click race conditions
+        if (loading) return;
+
+        // 2. Offline check
+        if (!navigator.onLine) {
+            toast.error("You are offline. Please check your internet connection.");
+            return;
+        }
+
+        // 3. Sanitize inputs (strip leading/trailing whitespace)
+        const sanitizedTitle = formData.title.trim();
+        const sanitizedRole = formData.role.trim();
+
+        if (!sanitizedTitle) {
+            toast.error("Please enter a valid project title.");
+            return;
+        }
+
+        if (!sanitizedRole) {
+            toast.error("Please enter a valid role.");
+            return;
+        }
+
         setLoading(true);
         try {
-            await onSave(formData);
+            await onSave({
+                ...formData,
+                title: sanitizedTitle,
+                role: sanitizedRole,
+                description: formData.description?.trim() || ''
+            });
             onClose();
         } catch (error) {
             console.error("Failed to save experience:", error);
-            // Optional: alert user here or rely on parent
         } finally {
             setLoading(false);
         }
@@ -165,9 +195,10 @@ export default function ExperienceModal({ isOpen, onClose, onSave, onDelete, ite
                             </button>
                             <button
                                 type="submit"
-                                className="px-6 py-2 rounded-lg font-bold text-white bg-primary hover:bg-primary/90 transition-colors"
+                                disabled={loading}
+                                className="px-6 py-2 rounded-lg font-bold text-white bg-primary hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                             >
-                                Save
+                                {loading ? 'Saving...' : 'Save'}
                             </button>
                         </div>
                     </div>

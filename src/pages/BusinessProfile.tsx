@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useAuthModal } from '../context/AuthModalContext';
 import { aiService } from '../services/aiService';
 import BottomNav from '../components/BottomNav';
 import PostMedia from '../components/PostMedia';
@@ -82,6 +83,7 @@ export default function BusinessProfile() {
     const navigate = useNavigate();
     const { id } = useParams();
     const { currentUser } = useAuth();
+    const { openAuthModal } = useAuthModal();
     const [activeTab, setActiveTab] = useState<'about' | 'services' | 'gallery' | 'reviews'>('about');
     const [showContactModal, setShowContactModal] = useState(false);
     const [showMap, setShowMap] = useState(false);
@@ -780,7 +782,13 @@ export default function BusinessProfile() {
                     <div className="rounded-2xl bg-white/95 dark:bg-[#121316]/95 backdrop-blur-xl p-3 shadow-2xl border border-zinc-200 dark:border-white/[0.1]">
                         <div className="flex items-center gap-2.5">
                             <button
-                                onClick={() => setShowContactModal(true)}
+                                onClick={() => {
+                                    if (!currentUser) {
+                                        openAuthModal('Sign in to contact facility & inquire booking');
+                                        return;
+                                    }
+                                    setShowContactModal(true);
+                                }}
                                 className="flex-1 min-w-0 rounded-xl bg-amber-500 hover:bg-amber-400 py-3.5 font-black text-black shadow-lg shadow-amber-500/20 transition-all active:scale-95 flex items-center justify-center gap-2"
                             >
                                 <span className="material-symbols-outlined text-xl">calendar_month</span>

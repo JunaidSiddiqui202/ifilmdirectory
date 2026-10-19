@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import Logo from '../components/Logo';
-import { getChats } from '../services/messagingService';
+import { subscribeToChats } from '../services/messagingService';
 import { useAuth } from '../context/AuthContext';
 import { useUnread } from '../context/UnreadContext';
 import PostMedia from '../components/PostMedia';
@@ -67,19 +67,35 @@ export default function MessagesList() {
     }, [currentUser]);
 
     useEffect(() => {
-        const fetchChats = async () => {
-            setLoading(true);
+        if (!currentUser) {
+            setRecentChats(mockChats);
+            setLoading(false);
+            return;
+        }
+
+        setLoading(true);
+        const unsubscribe = subscribeToChats(async (dbChats) => {
             try {
-                const dbChats = await getChats();
-                if (dbChats.length > 0) {
-                    const formattedPromises = dbChats.map(async (c: any) => {
+                // Filter to threads where current user is a participant
+                const userChats = dbChats.filter((c: any) => {
+                    if (c.participants && Array.isArray(c.participants)) {
+                        return c.participants.includes(currentUser.uid);
+                    }
+                    if (c.id && c.id.includes(currentUser.uid)) {
+                        return true;
+                    }
+                    return false;
+                });
+
+                if (userChats.length > 0) {
+                    const formattedPromises = userChats.map(async (c: any) => {
                         let otherUserId = c.id;
 
-                        if (currentUser && c.id.includes('_')) {
+                        if (c.id.includes('_')) {
                             const participants = c.id.split('_');
                             otherUserId = participants.find((p: string) => p !== currentUser.uid) || c.id;
                         } else if (c.participants && Array.isArray(c.participants)) {
-                            otherUserId = c.participants.find((p: string) => p !== currentUser?.uid) || c.participants[0];
+                            otherUserId = c.participants.find((p: string) => p !== currentUser.uid) || c.participants[0];
                         }
 
                         let userName = 'Filmmaker';
@@ -99,12 +115,32 @@ export default function MessagesList() {
 
                         const isUnread = Boolean(c.unreadBy && currentUser?.uid && Array.isArray(c.unreadBy) && c.unreadBy.includes(currentUser.uid));
 
+                        let timeStr = 'Recent';
+                        const ts = c.updatedAt || c.lastMessageTime;
+                        if (ts) {
+                            try {
+                                const date = ts.toDate ? ts.toDate() : (ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts));
+                                const now = new Date();
+                                const diffMs = now.getTime() - date.getTime();
+                                const diffMins = Math.floor(diffMs / 60000);
+                                if (diffMins < 1) timeStr = 'Just now';
+                                else if (diffMins < 60) timeStr = `${diffMins}m ago`;
+                                else {
+                                    const diffHours = Math.floor(diffMins / 60);
+                                    if (diffHours < 24) timeStr = `${diffHours}h ago`;
+                                    else timeStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                                }
+                            } catch {
+                                timeStr = 'Recent';
+                            }
+                        }
+
                         return {
                             id: c.id,
                             name: userName,
                             role: userRole,
                             message: c.lastMessage || 'Active project discussion',
-                            time: 'Recent',
+                            time: timeStr,
                             image: userImage,
                             isStory: false,
                             unread: isUnread
@@ -114,16 +150,17 @@ export default function MessagesList() {
                     const formatted = await Promise.all(formattedPromises);
                     setRecentChats(formatted);
                 } else {
-                    setRecentChats(mockChats);
+                    setRecentChats([]);
                 }
             } catch (err) {
-                console.error(err);
-                setRecentChats(mockChats);
+                console.error('Error processing chats:', err);
+                setRecentChats([]);
             } finally {
                 setLoading(false);
             }
-        };
-        fetchChats();
+        });
+
+        return () => unsubscribe();
     }, [currentUser]);
 
     const filteredChats = recentChats.filter(chat => 
@@ -223,7 +260,7 @@ export default function MessagesList() {
                         </div>
 
                         {/* Recent Collaborators */}
-                        {mockChats.map((creator) => (
+                        {(recentChats.length > 0 ? recentChats : mockChats).slice(0, 8).map((creator) => (
                             <div 
                                 key={creator.id} 
                                 onClick={() => navigate(`/chat/${creator.id}`)}

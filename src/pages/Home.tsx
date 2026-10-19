@@ -10,6 +10,7 @@ import { showreelService, type Showreel } from '../services/showreelService';
 import { getPosts, type PostData } from '../services/postService';
 import { rssNewsService, type NewsItem } from '../services/rssNewsService';
 import { useAuth } from '../context/AuthContext';
+import { useAuthModal } from '../context/AuthModalContext';
 import { useToast } from '../context/ToastContext';
 import { useUnread } from '../context/UnreadContext';
 import PostMedia from '../components/PostMedia';
@@ -48,6 +49,7 @@ const formatJobTimeAgo = (timestamp: any) => {
 export default function Home() {
     const navigate = useNavigate();
     const { currentUser } = useAuth();
+    const { openAuthModal } = useAuthModal();
     const toast = useToast();
     const { hasUnreadMessages, hasUnreadNotifications } = useUnread();
     const [blogs, setBlogs] = useState<BlogPost[]>([]);
@@ -289,7 +291,13 @@ export default function Home() {
                     return (
                         <button
                             key={option.id}
-                            onClick={() => setSelectedPollOption(option.id)}
+                            onClick={() => {
+                                if (!currentUser) {
+                                    openAuthModal('Sign in to vote in industry polls');
+                                    return;
+                                }
+                                setSelectedPollOption(option.id);
+                            }}
                             className={`relative w-full text-left p-2.5 rounded-xl border transition-all overflow-hidden ${
                                 isSelected
                                     ? 'border-amber-500 bg-amber-500/10'
@@ -549,7 +557,13 @@ export default function Home() {
                             <span className="material-symbols-outlined text-xl">search</span>
                         </button>
                         <button
-                            onClick={() => navigate('/notifications')}
+                            onClick={() => {
+                                if (!currentUser) {
+                                    openAuthModal('Sign in to view notifications & alerts');
+                                    return;
+                                }
+                                navigate('/notifications');
+                            }}
                             className="relative p-2 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:border-amber-500/30 transition-all active:scale-95"
                             aria-label="Notifications"
                             title="Notifications & Alerts"
@@ -560,7 +574,13 @@ export default function Home() {
                             )}
                         </button>
                         <button
-                            onClick={() => navigate('/messaging')}
+                            onClick={() => {
+                                if (!currentUser) {
+                                    openAuthModal('Sign in to view direct messages');
+                                    return;
+                                }
+                                navigate('/messaging');
+                            }}
                             className="relative p-2 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:border-amber-500/30 transition-all active:scale-95"
                             aria-label="Messages"
                             title="Direct Messages"
@@ -570,17 +590,28 @@ export default function Home() {
                                 <span className="absolute top-1.5 right-1.5 size-2.5 bg-red-500 rounded-full ring-2 ring-white dark:ring-[#121316] animate-pulse shadow-sm shadow-red-500/60" />
                             )}
                         </button>
-                        <div
-                            onClick={() => navigate('/profile')}
-                            className="size-9 rounded-full overflow-hidden border border-zinc-300 dark:border-white/20 ml-1 cursor-pointer hover:border-amber-500 transition-colors shrink-0"
-                            title="My Profile"
-                        >
-                            <PostMedia
-                                src={currentUser?.photoURL || ''}
-                                fallbackType="USER_MALE"
-                                className="w-full h-full object-cover"
-                            />
-                        </div>
+                        {currentUser ? (
+                            <div
+                                onClick={() => navigate('/profile')}
+                                className="size-9 rounded-full overflow-hidden border border-zinc-300 dark:border-white/20 ml-1 cursor-pointer hover:border-amber-500 transition-colors shrink-0"
+                                title="My Profile"
+                            >
+                                <PostMedia
+                                    src={currentUser?.photoURL || ''}
+                                    fallbackType="USER_MALE"
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                        ) : (
+                            <button
+                                onClick={() => openAuthModal('Sign in to join the filmmaker network')}
+                                className="ml-1 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-extrabold text-xs flex items-center gap-1 shadow-sm active:scale-95 transition-all cursor-pointer"
+                                title="Sign In"
+                            >
+                                <span className="material-symbols-outlined text-[15px] font-black">login</span>
+                                <span>Sign In</span>
+                            </button>
+                        )}
                     </div>
                 </header>
 
@@ -598,7 +629,7 @@ export default function Home() {
                                     Filmmaker Network & Production Hub
                                 </span>
                                 <h1 className="text-xl sm:text-2xl font-black tracking-tight text-zinc-900 dark:text-white mt-0.5">
-                                    Welcome back, {currentUser?.displayName?.split(' ')[0] || 'Creator'}!
+                                    {currentUser ? `Welcome back, ${currentUser.displayName?.split(' ')[0] || 'Creator'}!` : 'Welcome to iFilmDirectory!'}
                                 </h1>
                             </div>
                             <button
@@ -903,6 +934,10 @@ export default function Home() {
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
+                                            if (!currentUser) {
+                                                openAuthModal('Sign in to like posts and engage with creators');
+                                                return;
+                                            }
                                             setNetworkPostLiked(!networkPostLiked);
                                         }}
                                         className={`flex items-center gap-1.5 transition-colors ${networkPostLiked ? 'text-red-500' : 'hover:text-zinc-900 dark:hover:text-white'}`}

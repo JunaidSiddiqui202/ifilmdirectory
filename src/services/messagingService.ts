@@ -113,6 +113,22 @@ export const markChatAsRead = async (chatId: string, userId: string) => {
             unreadBy: arrayRemove(userId)
         }).catch(() => {});
 
+        // Mark messages in this chat from the other user as read
+        try {
+            const messagesRef = collection(db, 'chats', chatId, 'messages');
+            const unreadMsgsQuery = query(
+                messagesRef,
+                where('isRead', '==', false)
+            );
+            const unreadSnapshot = await getDocs(unreadMsgsQuery);
+            const updates = unreadSnapshot.docs
+                .filter(docSnap => docSnap.data().senderId !== userId)
+                .map(docSnap => updateDoc(docSnap.ref, { isRead: true }).catch(() => {}));
+            await Promise.all(updates);
+        } catch (msgErr) {
+            console.warn("Could not mark messages as read:", msgErr);
+        }
+
         // Also mark any unread message notifications corresponding to this chat as read
         const notifRef = collection(db, 'notifications');
         const q = query(
@@ -138,12 +154,17 @@ export const markChatAsRead = async (chatId: string, userId: string) => {
 export const getChats = async () => {
     try {
         const chatsRef = collection(db, 'chats');
-        const q = query(chatsRef, orderBy('updatedAt', 'desc'));
-        const snapshot = await getDocs(q);
-        return snapshot.docs.map(doc => ({
+        const snapshot = await getDocs(chatsRef);
+        const chats = snapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
-        }));
+        } as ChatThread));
+        chats.sort((a, b) => {
+            const timeA = a.updatedAt?.seconds || a.lastMessageTime?.seconds || 0;
+            const timeB = b.updatedAt?.seconds || b.lastMessageTime?.seconds || 0;
+            return timeB - timeA;
+        });
+        return chats;
     } catch (error) {
         console.error("Error getting chats: ", error);
         return [];
@@ -155,13 +176,17 @@ export const getChats = async () => {
  */
 export const subscribeToChats = (callback: (chats: ChatThread[]) => void) => {
     const chatsRef = collection(db, 'chats');
-    const q = query(chatsRef, orderBy('updatedAt', 'desc'));
 
-    return onSnapshot(q, (snapshot) => {
+    return onSnapshot(chatsRef, (snapshot) => {
         const chats = snapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
         } as ChatThread));
+        chats.sort((a, b) => {
+            const timeA = a.updatedAt?.seconds || a.lastMessageTime?.seconds || 0;
+            const timeB = b.updatedAt?.seconds || b.lastMessageTime?.seconds || 0;
+            return timeB - timeA;
+        });
         callback(chats);
     }, (err) => {
         console.warn('Error subscribing to chats:', err);

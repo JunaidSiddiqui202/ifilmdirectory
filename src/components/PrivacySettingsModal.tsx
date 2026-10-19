@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { type UserProfile } from '../services/userService';
+import { useToast } from '../context/ToastContext';
 
 interface PrivacySettingsModalProps {
     isOpen: boolean;
@@ -9,6 +10,7 @@ interface PrivacySettingsModalProps {
 }
 
 export default function PrivacySettingsModal({ isOpen, onClose, privacySettings, onSave }: PrivacySettingsModalProps) {
+    const toast = useToast();
     const [settings, setSettings] = useState<NonNullable<UserProfile['privacySettings']>>(privacySettings || {
         profileVisibility: 'public',
         showreelsVisibility: 'public',
@@ -21,13 +23,19 @@ export default function PrivacySettingsModal({ isOpen, onClose, privacySettings,
     };
 
     const handleSave = async () => {
+        if (loading) return;
+        if (!navigator.onLine) {
+            toast.error('You are offline. Please check your internet connection.');
+            return;
+        }
+
         setLoading(true);
         try {
             await onSave(settings);
             onClose();
         } catch (error) {
             console.error(error);
-            alert('Failed to save privacy settings');
+            toast.error('Failed to save privacy settings');
         } finally {
             setLoading(false);
         }

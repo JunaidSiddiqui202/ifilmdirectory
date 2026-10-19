@@ -3,6 +3,7 @@ import BottomNav from '../components/BottomNav';
 import { useNavigate, useParams } from 'react-router-dom';
 import { jobService, type Job } from '../services/jobService';
 import { useAuth } from '../context/AuthContext';
+import { useAuthModal } from '../context/AuthModalContext';
 import { getUserProfile } from '../services/userService';
 import PostMedia from '../components/PostMedia';
 import { useToast } from '../context/ToastContext';
@@ -11,6 +12,7 @@ export default function JobDetails() {
     const navigate = useNavigate();
     const { id } = useParams();
     const { currentUser } = useAuth();
+    const { openAuthModal } = useAuthModal();
     const toast = useToast();
     const [isBookmarked, setIsBookmarked] = useState(false);
     const [job, setJob] = useState<Job | null>(null);
@@ -44,8 +46,7 @@ export default function JobDetails() {
 
     const handleApply = async () => {
         if (!currentUser) {
-            toast.info('Please login to apply for this job.');
-            navigate('/login');
+            openAuthModal('Sign in to submit your casting or job application');
             return;
         }
 
@@ -101,10 +102,11 @@ export default function JobDetails() {
     };
 
     const handleBookmark = async () => {
-        if (!currentUser || !job?.id) {
-            toast.info('Please login to save this job.');
+        if (!currentUser) {
+            openAuthModal('Sign in to save this job to your bookmarks');
             return;
         }
+        if (!job?.id) return;
 
         const result = await jobService.toggleBookmarkJob(job.id, currentUser.uid);
         if (result.success) {
@@ -204,10 +206,22 @@ export default function JobDetails() {
                                 <span className="material-symbols-outlined text-sm">work</span>
                                 <span>{job.type}</span>
                             </div>
+                            {job.fraternityRole && (
+                                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-500/15 text-purple-600 dark:text-purple-300 border border-purple-500/30 text-xs font-bold">
+                                    <span className="material-symbols-outlined text-sm">movie_filter</span>
+                                    <span>{job.fraternityRole}</span>
+                                </div>
+                            )}
+                            {job.isRss && (
+                                <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-blue-500/10 text-blue-500 dark:text-blue-300 border border-blue-500/20 text-xs font-bold">
+                                    <span className="material-symbols-outlined text-sm">rss_feed</span>
+                                    <span>Live Feed</span>
+                                </div>
+                            )}
                             {job.salary && (
                                 <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-xs font-bold">
                                     <span className="material-symbols-outlined text-sm">payments</span>
-                                    <span>₹ {job.salary}</span>
+                                    <span>{job.salary}</span>
                                 </div>
                             )}
                             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-white/[0.04] border border-zinc-200 dark:border-white/10 text-xs text-zinc-600 dark:text-zinc-400">
@@ -215,7 +229,7 @@ export default function JobDetails() {
                                 <span>Posted {job.postedAt?.toDate ? job.postedAt.toDate().toLocaleDateString() : 'Recently'}</span>
                             </div>
                             {job.deadline && (
-                                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-500/10 text-red-500 dark:text-red-400 border border-red-500/20 text-xs font-bold ml-auto">
+                                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-500/10 text-red-500 dark:text-red-400 border border-red-500/20 text-xs font-bold sm:ml-auto">
                                     <span className="material-symbols-outlined text-sm">event_busy</span>
                                     <span>Deadline: {job.deadline}</span>
                                 </div>
@@ -272,14 +286,14 @@ export default function JobDetails() {
                         </section>
                     )}
 
-                    {/* Role Description */}
+                    {/* Role Description & Full Content */}
                     <section className="p-6 sm:p-8 bg-white dark:bg-[#121316] rounded-3xl border border-zinc-200 dark:border-white/[0.06] shadow-sm dark:shadow-lg space-y-4">
                         <h3 className="text-lg font-black text-zinc-900 dark:text-white flex items-center gap-2">
                             <span className="material-symbols-outlined text-amber-500 dark:text-amber-400 text-xl">description</span>
                             <span>Opportunity Overview</span>
                         </h3>
-                        <p className="text-sm leading-relaxed text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap font-normal">
-                            {job.description}
+                        <p className="text-sm leading-relaxed text-zinc-700 dark:text-zinc-300 whitespace-pre-line font-normal">
+                            {job.fullContent || job.description}
                         </p>
                     </section>
 
@@ -290,7 +304,7 @@ export default function JobDetails() {
                                 <span className="material-symbols-outlined text-amber-500 dark:text-amber-400 text-xl">checklist</span>
                                 <span>Candidate Requirements & Skills</span>
                             </h3>
-                            <p className="text-sm leading-relaxed text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap font-normal">
+                            <p className="text-sm leading-relaxed text-zinc-700 dark:text-zinc-300 whitespace-pre-line font-normal">
                                 {job.requirements}
                             </p>
                         </section>
@@ -309,21 +323,36 @@ export default function JobDetails() {
                                         <span>{job.company}</span>
                                         {renderVerificationBadge(job.user_details?.verification_tier)}
                                     </p>
+                                    {job.sourceName && (
+                                        <p className="text-xs text-zinc-400 mt-0.5">Via {job.sourceName}</p>
+                                    )}
                                 </div>
                             </div>
-                            <button
-                                onClick={() => navigate(`/profile/${job.postedBy}`)}
-                                className="px-5 py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.06] dark:hover:bg-white/10 text-zinc-900 dark:text-white text-xs font-bold border border-zinc-200 dark:border-white/10 transition-all self-start sm:self-auto"
-                            >
-                                View Creator Profile
-                            </button>
+                            {job.sourceUrl ? (
+                                <a
+                                    href={job.sourceUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="px-5 py-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-bold border border-amber-500/30 transition-all self-start sm:self-auto flex items-center gap-1.5"
+                                >
+                                    <span>View Original Listing</span>
+                                    <span className="material-symbols-outlined text-sm">launch</span>
+                                </a>
+                            ) : (
+                                <button
+                                    onClick={() => navigate(`/profile/${job.postedBy}`)}
+                                    className="px-5 py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.06] dark:hover:bg-white/10 text-zinc-900 dark:text-white text-xs font-bold border border-zinc-200 dark:border-white/10 transition-all self-start sm:self-auto"
+                                >
+                                    View Creator Profile
+                                </button>
+                            )}
                         </div>
                     </section>
                 </main>
 
                 {/* Fixed Bottom Action Drawer */}
                 <div className="fixed bottom-0 left-0 z-30 w-full bg-white/95 dark:bg-[#090A0C]/95 backdrop-blur-xl border-t border-zinc-200 dark:border-white/[0.08] p-4">
-                    <div className="max-w-4xl mx-auto flex items-center gap-3">
+                    <div className="max-w-4xl mx-auto flex flex-wrap items-center gap-3">
                         {isOwnJob ? (
                             <button
                                 onClick={() => navigate(`/job/${job.id}/applications`)}
@@ -338,13 +367,37 @@ export default function JobDetails() {
                                 <span>Application Submitted</span>
                             </div>
                         ) : (
-                            <button
-                                onClick={handleApply}
-                                className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black text-sm font-black shadow-xl shadow-amber-500/20 transition-all active:scale-95"
-                            >
-                                <span className="material-symbols-outlined text-lg">send</span>
-                                <span>Apply with iFilm Profile</span>
-                            </button>
+                            <div className="flex items-center gap-3 w-full">
+                                {job.sourceUrl && (
+                                    <a
+                                        href={job.sourceUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex-1 flex h-12 items-center justify-center gap-2 rounded-2xl bg-zinc-100 dark:bg-white/10 hover:bg-zinc-200 dark:hover:bg-white/15 text-zinc-900 dark:text-white text-xs sm:text-sm font-bold border border-zinc-200 dark:border-white/10 transition-all"
+                                    >
+                                        <span>Apply on Source</span>
+                                        <span className="material-symbols-outlined text-sm">launch</span>
+                                    </a>
+                                )}
+
+                                {job.applicationEmail && (
+                                    <a
+                                        href={`mailto:${job.applicationEmail}?subject=${encodeURIComponent(`Application for ${job.title} - iFilmDirectory`)}&body=${encodeURIComponent(`Hi ${job.company} Team,\n\nI am applying for the ${job.title} role posted on iFilmDirectory.\n\nPlease find my showreel and profile attached.\n\nBest regards.`)}`}
+                                        className="flex-1 flex h-12 items-center justify-center gap-2 rounded-2xl bg-zinc-800 hover:bg-zinc-700 text-white text-xs sm:text-sm font-bold transition-all"
+                                    >
+                                        <span className="material-symbols-outlined text-sm">mail</span>
+                                        <span>Email Studio</span>
+                                    </a>
+                                )}
+
+                                <button
+                                    onClick={handleApply}
+                                    className="flex-1 flex h-12 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black text-xs sm:text-sm font-black shadow-xl shadow-amber-500/20 transition-all active:scale-95"
+                                >
+                                    <span className="material-symbols-outlined text-lg">send</span>
+                                    <span>Apply in iFilm</span>
+                                </button>
+                            </div>
                         )}
                     </div>
                 </div>

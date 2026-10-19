@@ -6,6 +6,7 @@ import Logo from '../components/Logo';
 import PostMedia from '../components/PostMedia';
 import ExternalLink from '../components/ExternalLink';
 import { useAuth } from '../context/AuthContext';
+import { useAuthModal } from '../context/AuthModalContext';
 import { getUserProfile, followUser, unfollowUser, isFollowing } from '../services/userService';
 import { addCommentToPost, getCommentsForPost, toggleLikePost, deletePost, reportPost, toggleSavePost } from '../services/postService';
 import { Timestamp, collection, query, where, getDocs } from 'firebase/firestore';
@@ -101,6 +102,7 @@ export default function Showcase() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const { currentUser } = useAuth();
+    const { openAuthModal } = useAuthModal();
     const toast = useToast();
     const { hasUnreadMessages, hasUnreadNotifications } = useUnread();
     const [posts, setPosts] = useState<Post[]>([]);
@@ -160,7 +162,7 @@ export default function Showcase() {
 
     const toggleFollowSuggested = async (creatorId: string, creatorName: string) => {
         if (!currentUser) {
-            toast.info("Please login to follow creators!");
+            openAuthModal('Sign in to follow creators');
             return;
         }
         const isNowFollowing = !followedSuggestedIds[creatorId];
@@ -319,7 +321,7 @@ export default function Showcase() {
 
     // Handle Likes
     const handleLike = async (post: Post) => {
-        if (!currentUser) return toast.info("Please login to like posts.");
+        if (!currentUser) return openAuthModal('Sign in to like posts');
 
         const originalPosts = [...posts];
         setPosts(posts.map(p => String(p.id) === String(post.id) ? { ...p, isLiked: !p.isLiked, likes: p.isLiked ? Math.max(0, p.likes - 1) : p.likes + 1 } : p));
@@ -333,7 +335,7 @@ export default function Showcase() {
 
     // Handle Save Post
     const handleSavePost = async (post: Post) => {
-        if (!currentUser) return toast.info("Please login to save posts.");
+        if (!currentUser) return openAuthModal('Sign in to save posts to your bookmarks');
 
         const result = await toggleSavePost(post.id, currentUser.uid);
         if (result.success) {
@@ -345,7 +347,7 @@ export default function Showcase() {
     // Handle Follow
     const handleToggleFollow = async (e: React.MouseEvent, post: Post) => {
         e.stopPropagation();
-        if (!currentUser) return toast.info("Please login to follow creators.");
+        if (!currentUser) return openAuthModal('Sign in to follow creators');
         if (currentUser.uid === post.authorId) return;
 
         const isCurrentlyFollowing = post.isFollowing;
@@ -394,7 +396,7 @@ export default function Showcase() {
 
     // Open Report Modal
     const handleReportPost = (postId: string) => {
-        if (!currentUser) return toast.info("Please login to report.");
+        if (!currentUser) return openAuthModal('Sign in to report content');
         setReportModalPostId(postId);
         setActiveMenuPostId(null);
     };
@@ -930,10 +932,10 @@ export default function Showcase() {
                         <div className="text-center py-3">
                             <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-2">Sign in to join the filmmaker discussion</p>
                             <button
-                                onClick={() => navigate('/login')}
+                                onClick={() => openAuthModal('Sign in to post comments and join discussions')}
                                 className="px-4 py-1.5 bg-amber-500 text-black rounded-lg text-xs font-bold hover:bg-amber-400 transition-colors"
                             >
-                                Login
+                                Sign In / Join
                             </button>
                         </div>
                     )}
@@ -1093,7 +1095,10 @@ export default function Showcase() {
                             <span className="material-symbols-outlined text-[18px] sm:text-[20px]">search</span>
                         </button>
                         <button
-                            onClick={() => navigate('/notifications')}
+                            onClick={() => {
+                                if (!currentUser) return openAuthModal('Sign in to view notifications');
+                                navigate('/notifications');
+                            }}
                             className="relative size-8 sm:size-9 rounded-lg sm:rounded-xl flex items-center justify-center text-zinc-600 dark:text-zinc-400 hover:text-amber-500 hover:bg-black/5 dark:hover:bg-white/5 transition-all"
                             title="Notifications"
                         >
@@ -1103,7 +1108,10 @@ export default function Showcase() {
                             )}
                         </button>
                         <button
-                            onClick={() => navigate('/messaging')}
+                            onClick={() => {
+                                if (!currentUser) return openAuthModal('Sign in to view messages');
+                                navigate('/messaging');
+                            }}
                             className="relative size-8 sm:size-9 rounded-lg sm:rounded-xl flex items-center justify-center text-zinc-600 dark:text-zinc-400 hover:text-amber-500 hover:bg-black/5 dark:hover:bg-white/5 transition-all"
                             title="Direct Messages"
                         >
@@ -1112,17 +1120,26 @@ export default function Showcase() {
                                 <span className="absolute top-1 right-1 size-2.5 bg-red-500 rounded-full ring-2 ring-white dark:ring-[#090A0C] animate-pulse shadow-sm shadow-red-500/60" />
                             )}
                         </button>
-                        <div
-                            onClick={() => navigate('/profile')}
-                            className="size-8 sm:size-9 rounded-full overflow-hidden ring-1 ring-black/10 dark:ring-white/10 cursor-pointer active:scale-95 transition-transform shrink-0"
-                            title="Your Profile"
-                        >
-                            <PostMedia
-                                src={userProfile?.photoURL || currentUser?.photoURL || ''}
-                                fallbackType="USER_MALE"
-                                className="w-full h-full object-cover"
-                            />
-                        </div>
+                        {currentUser ? (
+                            <div
+                                onClick={() => navigate('/profile')}
+                                className="size-8 sm:size-9 rounded-full overflow-hidden ring-1 ring-black/10 dark:ring-white/10 cursor-pointer active:scale-95 transition-transform shrink-0"
+                                title="Your Profile"
+                            >
+                                <PostMedia
+                                    src={userProfile?.photoURL || currentUser?.photoURL || ''}
+                                    fallbackType="USER_MALE"
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                        ) : (
+                            <button
+                                onClick={() => openAuthModal('Sign in to your account')}
+                                className="px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold transition-all shrink-0 shadow-sm"
+                            >
+                                Sign In
+                            </button>
+                        )}
                     </div>
                 </div>
 
@@ -1283,37 +1300,57 @@ export default function Showcase() {
                 {/* Right Rail Column (Instagram Desktop style) */}
                 <aside className="hidden xl:block xl:col-span-4 sticky top-24 self-start space-y-6 pt-3 pr-2">
                     {/* User Profile Card */}
-                    <div className="flex items-center justify-between p-3.5 rounded-2xl bg-white dark:bg-[#121316] border border-black/[0.04] dark:border-white/[0.06] shadow-sm">
-                        <div
-                            onClick={() => navigate('/profile')}
-                            className="flex items-center gap-3 cursor-pointer min-w-0"
-                        >
-                            <div className="size-11 rounded-full overflow-hidden ring-1 ring-amber-500/30 shrink-0 bg-black">
-                                <PostMedia
-                                    src={userProfile?.photoURL || currentUser?.photoURL || ''}
-                                    fallbackType="USER_MALE"
-                                    className="w-full h-full object-cover"
-                                />
-                            </div>
-                            <div className="min-w-0">
-                                <div className="flex items-center gap-1">
-                                    <span className="font-bold text-sm text-zinc-900 dark:text-white truncate">
-                                        {userProfile?.displayName || currentUser?.displayName || 'Filmmaker'}
-                                    </span>
-                                    <span className="material-symbols-outlined text-[15px] text-amber-500">verified</span>
+                    {currentUser ? (
+                        <div className="flex items-center justify-between p-3.5 rounded-2xl bg-white dark:bg-[#121316] border border-black/[0.04] dark:border-white/[0.06] shadow-sm">
+                            <div
+                                onClick={() => navigate('/profile')}
+                                className="flex items-center gap-3 cursor-pointer min-w-0"
+                            >
+                                <div className="size-11 rounded-full overflow-hidden ring-1 ring-amber-500/30 shrink-0 bg-black">
+                                    <PostMedia
+                                        src={userProfile?.photoURL || currentUser?.photoURL || ''}
+                                        fallbackType="USER_MALE"
+                                        className="w-full h-full object-cover"
+                                    />
                                 </div>
-                                <span className="text-xs text-zinc-500 dark:text-zinc-400 truncate block">
-                                    {userProfile?.role || 'Creator'} • iFilm ID
-                                </span>
+                                <div className="min-w-0">
+                                    <div className="flex items-center gap-1">
+                                        <span className="font-bold text-sm text-zinc-900 dark:text-white truncate">
+                                            {userProfile?.displayName || currentUser?.displayName || 'Filmmaker'}
+                                        </span>
+                                        <span className="material-symbols-outlined text-[15px] text-amber-500">verified</span>
+                                    </div>
+                                    <span className="text-xs text-zinc-500 dark:text-zinc-400 truncate block">
+                                        {userProfile?.role || 'Creator'} • iFilm ID
+                                    </span>
+                                </div>
                             </div>
+                            <button
+                                onClick={() => navigate('/profile')}
+                                className="text-xs font-bold text-amber-500 hover:text-amber-400 transition-colors"
+                            >
+                                Profile
+                            </button>
                         </div>
-                        <button
-                            onClick={() => navigate('/profile')}
-                            className="text-xs font-bold text-amber-500 hover:text-amber-400 transition-colors"
-                        >
-                            Profile
-                        </button>
-                    </div>
+                    ) : (
+                        <div className="p-4 rounded-2xl bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/20 shadow-sm space-y-3">
+                            <div className="flex items-center gap-2.5">
+                                <div className="size-9 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-500">
+                                    <span className="material-symbols-outlined text-lg">movie</span>
+                                </div>
+                                <div>
+                                    <p className="text-xs font-bold text-zinc-900 dark:text-white">Join the Community</p>
+                                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400">Post reels, apply for jobs & connect</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => openAuthModal('Sign in to access your filmmaker profile & post')}
+                                className="w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs transition-all shadow-sm"
+                            >
+                                Sign In / Join iFilm
+                            </button>
+                        </div>
+                    )}
 
                     {/* Suggested For You */}
                     <div className="p-4 rounded-2xl bg-white dark:bg-[#121316] border border-black/[0.04] dark:border-white/[0.06] space-y-3.5 shadow-sm">

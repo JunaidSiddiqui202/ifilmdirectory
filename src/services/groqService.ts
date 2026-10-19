@@ -1,53 +1,102 @@
 export interface AIResponse {
     text: string;
     error?: string;
+    provider?: string;
 }
 
+interface AIProviderConfig {
+    name: string;
+    endpoint: string;
+    apiKey: string;
+    models: string[];
+    extraHeaders?: Record<string, string>;
+}
+
+// In-memory cache for recent AI responses to prevent duplicate calls and save rate limits
+const responseCache = new Map<string, { text: string; timestamp: number }>();
+const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+
+/**
+ * Multi-Cloud Free AI Engine
+ * Pools multiple free-tier providers (Groq Primary, Groq Backup, Cerebras, SambaNova, OpenRouter)
+ * with automatic zero-downtime rate-limit failover.
+ */
 export const generateText = async (prompt: string, context: string = '', language: string = 'English'): Promise<AIResponse> => {
-    // In a real implementation, this would call the Groq API
-    // Since we don't have the API key yet, we'll simulate a response
-    // or use a placeholder if the user provides a key later.
+    const cacheKey = `${prompt.trim()}_${context}_${language}`;
+    const cached = responseCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+        return { text: cached.text, provider: 'cache' };
+    }
 
-    // Check for API key in environment variables (Vite uses import.meta.env)
-    const apiKey = import.meta.env.VITE_GROQ_API_KEY;
+    // 1. Gather all active cloud providers from environment
+    const providers: AIProviderConfig[] = [];
 
-    if (!apiKey) {
-        // Mock response for demo purposes
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve({
-                    text: `[AI Generated Content based on: "${prompt}"]\n\nHere is a professionally written draft for your ${context}. \n\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. \n\n(Note: To get real AI generation, please add your VITE_GROQ_API_KEY to the .env file)`
-                });
-            }, 1500);
+    // Groq Primary
+    const groqKey1 = import.meta.env.VITE_GROQ_API_KEY;
+    if (groqKey1) {
+        providers.push({
+            name: 'Groq (Primary)',
+            endpoint: 'https://api.groq.com/openai/v1/chat/completions',
+            apiKey: groqKey1,
+            models: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant']
         });
     }
 
-    try {
-        // Try current Groq models in order of preference
-        const models = [
-            'llama-3.3-70b-versatile',  // Latest, most capable
-            'llama-3.1-70b-versatile',  // Fast and capable
-            'llama-3.1-8b-instant',     // Fastest
-            'mixtral-8x7b-32768'        // Old model (will fail, but keep as fallback)
-        ];
+    // Groq Secondary / Backup Key (if user adds a second free Groq account key)
+    const groqKey2 = import.meta.env.VITE_GROQ_API_KEY_2;
+    if (groqKey2) {
+        providers.push({
+            name: 'Groq (Secondary)',
+            endpoint: 'https://api.groq.com/openai/v1/chat/completions',
+            apiKey: groqKey2,
+            models: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant']
+        });
+    }
 
-        let lastError: any = null;
+    // Cerebras Cloud (100% Free Tier, 30 RPM, 1M tokens/day)
+    const cerebrasKey = import.meta.env.VITE_CEREBRAS_API_KEY;
+    if (cerebrasKey) {
+        providers.push({
+            name: 'Cerebras Cloud',
+            endpoint: 'https://api.cerebras.ai/v1/chat/completions',
+            apiKey: cerebrasKey,
+            models: ['llama3.1-70b', 'llama3.1-8b']
+        });
+    }
 
-        for (const model of models) {
-            try {
-                console.log(`[Groq] Trying model: ${model}`);
+    // SambaNova Cloud (100% Free Tier)
+    const sambanovaKey = import.meta.env.VITE_SAMBANOVA_API_KEY;
+    if (sambanovaKey) {
+        providers.push({
+            name: 'SambaNova Cloud',
+            endpoint: 'https://api.sambanova.ai/v1/chat/completions',
+            apiKey: sambanovaKey,
+            models: ['Meta-Llama-3.3-70B-Instruct', 'DeepSeek-V3.2']
+        });
+    }
 
-                const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${apiKey}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        messages: [
-                            {
-                                role: 'system',
-                                content: `You are a professional writing assistant for the film industry. Help the user write a ${context}. 
+    // OpenRouter Free Tier
+    const openrouterKey = import.meta.env.VITE_OPENROUTER_API_KEY;
+    if (openrouterKey) {
+        providers.push({
+            name: 'OpenRouter (Free)',
+            endpoint: 'https://openrouter.ai/api/v1/chat/completions',
+            apiKey: openrouterKey,
+            models: ['openrouter/free', 'google/gemma-4-31b-it:free'],
+            extraHeaders: {
+                'HTTP-Referer': 'https://ifilmdirectory.com',
+                'X-Title': 'iFilmDirectory'
+            }
+        });
+    }
+
+    if (providers.length === 0) {
+        return {
+            text: `[AI Generated Draft for ${context}]\n\nHere is a professional draft based on: "${prompt}".\n\n(To enable live generation, add your free VITE_GROQ_API_KEY to your environment settings).`
+        };
+    }
+
+    const systemPrompt = `You are a professional writing assistant for the film industry. Help the user write a ${context}.
 
 IMPORTANT RULES:
 1. Keep it professional, engaging, and detailed.
@@ -55,49 +104,63 @@ IMPORTANT RULES:
 3. Write in plain text only - no special formatting characters.
 4. Output ONLY the content, no introductory phrases like "Here is..." or "Here's a..."
 5. Write in ${language} language.
-6. For blog posts, write comprehensive, in-depth content (1000-1500 words).
-7. For other content, provide detailed and professional text (300-500 words).`
-                            },
-                            {
-                                role: 'user',
-                                content: prompt
-                            }
+6. For blog posts, write comprehensive, in-depth content (800-1200 words).
+7. For other content, provide detailed and professional text (200-400 words).`;
+
+    let lastErrorMessage = '';
+
+    // 2. Iterate through providers; if one hits rate limits (429) or fails, seamlessly failover
+    for (const provider of providers) {
+        for (const model of provider.models) {
+            try {
+                const response = await fetch(provider.endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${provider.apiKey}`,
+                        'Content-Type': 'application/json',
+                        ...(provider.extraHeaders || {})
+                    },
+                    body: JSON.stringify({
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            { role: 'user', content: prompt }
                         ],
                         model: model,
                         temperature: 0.7,
-                        max_tokens: 2048,
+                        max_tokens: 2048
                     })
                 });
 
+                if (response.status === 429) {
+                    console.warn(`[AI Engine] Provider ${provider.name} model ${model} reached rate limit (429). Switching to next provider...`);
+                    lastErrorMessage = `${provider.name} rate limit reached`;
+                    break; // Move to next provider
+                }
+
                 const data = await response.json();
 
-                if (response.ok && data.choices && data.choices[0]) {
-                    console.log(`[Groq] ✅ Success with model: ${model}`);
+                if (response.ok && data.choices && data.choices[0]?.message?.content) {
+                    const generatedText = data.choices[0].message.content.trim();
+                    // Cache the successful response
+                    responseCache.set(cacheKey, { text: generatedText, timestamp: Date.now() });
                     return {
-                        text: data.choices[0].message.content
+                        text: generatedText,
+                        provider: provider.name
                     };
                 } else {
-                    console.warn(`[Groq] ❌ Failed with ${model}:`, data.error?.message || 'Unknown error');
-                    lastError = data.error;
-                    continue;
+                    const errMsg = data.error?.message || 'Unknown response';
+                    console.warn(`[AI Engine] ${provider.name} (${model}) failed: ${errMsg}`);
+                    lastErrorMessage = errMsg;
                 }
-            } catch (error: any) {
-                console.warn(`[Groq] ❌ Network error with ${model}:`, error.message);
-                lastError = error;
-                continue;
+            } catch (networkErr: any) {
+                console.warn(`[AI Engine] Network issue with ${provider.name}: ${networkErr?.message || networkErr}`);
+                lastErrorMessage = networkErr?.message || 'Network error';
             }
         }
-
-        // All models failed
-        return {
-            text: '',
-            error: `Groq API error: ${lastError?.message || 'All models failed'}`
-        };
-    } catch (error) {
-        console.error('Groq API Error:', error);
-        return {
-            text: '',
-            error: error instanceof Error ? error.message : 'Unknown error'
-        };
     }
+
+    return {
+        text: '',
+        error: `All AI providers were busy or unavailable: ${lastErrorMessage}`
+    };
 };

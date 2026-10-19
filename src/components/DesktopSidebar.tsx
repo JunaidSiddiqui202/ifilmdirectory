@@ -1,5 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useAuthModal } from '../context/AuthModalContext';
 import { useTheme } from '../context/ThemeContext';
 import { useUnread } from '../context/UnreadContext';
 import Logo from './Logo';
@@ -14,6 +15,7 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
     const navigate = useNavigate();
     const location = useLocation();
     const { currentUser } = useAuth();
+    const { openAuthModal } = useAuthModal();
     const { isDarkMode, toggleDarkMode } = useTheme();
     const { hasUnreadMessages, hasUnreadNotifications } = useUnread();
 
@@ -49,6 +51,14 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
         { path: '/profile', label: 'Profile', icon: 'person', isProfile: true },
     ];
 
+    const handleNavClick = (item: typeof navItems[0]) => {
+        if (!currentUser && ['/messaging', '/notifications', '/projects', '/saved', '/profile'].includes(item.path)) {
+            openAuthModal(`Sign in to access your ${item.label.toLowerCase()}`);
+            return;
+        }
+        navigate(item.path);
+    };
+
     return (
         <aside className="hidden md:flex flex-col fixed left-0 top-0 bottom-0 z-40 bg-white dark:bg-[#090A0C] border-r border-zinc-200 dark:border-white/[0.08] w-20 xl:w-64 select-none px-3 py-4 font-display transition-colors duration-200 overflow-y-auto overscroll-contain custom-scrollbar">
             {/* Top: Brand Header & Navigation */}
@@ -74,7 +84,7 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                         return (
                             <button
                                 key={item.path}
-                                onClick={() => navigate(item.path)}
+                                onClick={() => handleNavClick(item)}
                                 title={item.label}
                                 className={`relative group flex items-center justify-center xl:justify-start gap-4 px-3 py-2.5 rounded-2xl transition-all duration-200 ${
                                     active
@@ -129,7 +139,13 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                     {/* Instagram-Style Standout CREATE Button */}
                     <div className="pt-1.5">
                         <button
-                            onClick={() => setIsCreateOpen(!isCreateOpen)}
+                            onClick={() => {
+                                if (!currentUser) {
+                                    openAuthModal('Sign in to post jobs, share showreels, or submit castings');
+                                    return;
+                                }
+                                setIsCreateOpen(!isCreateOpen);
+                            }}
                             className="w-full flex items-center justify-center xl:justify-start gap-3.5 px-3 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-extrabold shadow-lg shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-95 group"
                             title="Create Post / Job / Reel"
                         >
@@ -195,7 +211,13 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
 
                 {/* Settings Item */}
                 <button
-                    onClick={() => navigate('/settings')}
+                    onClick={() => {
+                        if (!currentUser) {
+                            openAuthModal('Sign in to access account settings');
+                            return;
+                        }
+                        navigate('/settings');
+                    }}
                     title="Settings"
                     className={`group relative flex items-center justify-center xl:justify-start gap-4 px-3 py-2.5 rounded-2xl transition-all cursor-pointer ${
                         isActive('/settings')
@@ -210,29 +232,48 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                     </span>
                 </button>
 
-                {/* User Card on expanded (xl) */}
-                <div
-                    onClick={() => navigate('/profile')}
-                    title="My Profile"
-                    className="hidden xl:flex items-center gap-3 p-2 mt-0.5 rounded-2xl bg-zinc-100 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/5 hover:border-amber-500/40 transition-all cursor-pointer group"
-                >
-                    <div className="size-9 rounded-full overflow-hidden border border-zinc-300 dark:border-white/20 group-hover:border-amber-500 transition-colors shrink-0">
-                        <PostMedia
-                            src={currentUser?.photoURL || ''}
-                            fallbackType="USER_MALE"
-                            className="w-full h-full object-cover"
-                        />
+                {/* User Card on expanded (xl) or Sign In button when unauthenticated */}
+                {currentUser ? (
+                    <div
+                        onClick={() => navigate('/profile')}
+                        title="My Profile"
+                        className="hidden xl:flex items-center gap-3 p-2 mt-0.5 rounded-2xl bg-zinc-100 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/5 hover:border-amber-500/40 transition-all cursor-pointer group"
+                    >
+                        <div className="size-9 rounded-full overflow-hidden border border-zinc-300 dark:border-white/20 group-hover:border-amber-500 transition-colors shrink-0">
+                            <PostMedia
+                                src={currentUser?.photoURL || ''}
+                                fallbackType="USER_MALE"
+                                className="w-full h-full object-cover"
+                            />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                            <p className="text-xs font-bold text-zinc-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors truncate">
+                                {currentUser?.displayName || 'Filmmaker'}
+                            </p>
+                            <p className="text-[10px] text-zinc-500 dark:text-zinc-400 truncate">
+                                {currentUser?.email?.split('@')[0] || 'Creator'}
+                            </p>
+                        </div>
+                        <span className="material-symbols-outlined text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-800 dark:group-hover:text-white text-base">chevron_right</span>
                     </div>
-                    <div className="min-w-0 flex-1">
-                        <p className="text-xs font-bold text-zinc-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors truncate">
-                            {currentUser?.displayName || 'Filmmaker'}
-                        </p>
-                        <p className="text-[10px] text-zinc-500 dark:text-zinc-400 truncate">
-                            {currentUser?.email?.split('@')[0] || 'Creator'}
-                        </p>
-                    </div>
-                    <span className="material-symbols-outlined text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-800 dark:group-hover:text-white text-base">chevron_right</span>
-                </div>
+                ) : (
+                    <button
+                        onClick={() => openAuthModal('Sign in to join the filmmaker network')}
+                        title="Sign In / Register"
+                        className="group relative flex items-center justify-center xl:justify-start gap-3 p-2.5 mt-0.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-extrabold shadow-md shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-95 cursor-pointer"
+                    >
+                        <div className="size-8 rounded-xl bg-black/15 flex items-center justify-center text-black shrink-0">
+                            <span className="material-symbols-outlined text-[20px] font-black">login</span>
+                        </div>
+                        <div className="hidden xl:flex flex-col text-left leading-tight min-w-0">
+                            <span className="text-xs font-black tracking-tight truncate">Sign In / Join</span>
+                            <span className="text-[10px] font-bold opacity-80 truncate">Free Filmmaker Access</span>
+                        </div>
+                        <span className="xl:hidden opacity-0 pointer-events-none group-hover:opacity-100 absolute left-full ml-3 px-2.5 py-1 bg-zinc-900 text-white dark:bg-[#18191D] border border-amber-500/30 text-xs font-bold rounded-lg shadow-xl whitespace-nowrap z-50 transition-opacity">
+                            Sign In / Join
+                        </span>
+                    </button>
+                )}
             </div>
         </aside>
 

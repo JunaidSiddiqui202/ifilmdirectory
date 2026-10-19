@@ -3,13 +3,14 @@ import { useNavigate, useParams } from 'react-router-dom';
 import PostMedia from '../components/PostMedia';
 import BottomNav from '../components/BottomNav';
 import Logo from '../components/Logo';
-import ImageUploadModal from '../components/ImageUploadModal';
+import MediaUploadModal from '../components/MediaUploadModal';
 import ProfileEnhancementModal from '../components/ProfileEnhancementModal';
 import EditProfileModal from '../components/EditProfileModal';
 import ExperienceModal, { type ExperienceItem } from '../components/ExperienceModal';
 import { type EnhancedProfile } from '../services/aiService';
 import VerificationModal from '../components/VerificationModal';
 import { useAuth } from '../context/AuthContext';
+import { useAuthModal } from '../context/AuthModalContext';
 import {
     getUserProfile,
     updateUserProfile,
@@ -22,9 +23,10 @@ import {
     getUserByUsername,
     hasAdminPrivileges
 } from '../services/userService';
-import GalleryUploadModal from '../components/GalleryUploadModal';
+
 import PrivacySettingsModal from '../components/PrivacySettingsModal';
 import FollowListModal from '../components/FollowListModal';
+import { useToast } from '../context/ToastContext';
 
 // Mock Profiles for fallback
 const mockProfiles: Record<string, any> = {
@@ -161,6 +163,8 @@ export default function UserProfile() {
     const navigate = useNavigate();
     const { id } = useParams();
     const { currentUser } = useAuth();
+    const { openAuthModal } = useAuthModal();
+    const toast = useToast();
     const [profile, setProfile] = useState<UserProfileType | null>(null);
     const [loading, setLoading] = useState(true);
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
@@ -174,6 +178,7 @@ export default function UserProfile() {
     const [followersCount, setFollowersCount] = useState(0);
     const [followingCount, setFollowingCount] = useState(0);
     const [followed, setFollowed] = useState(false);
+    const [isFollowLoading, setIsFollowLoading] = useState(false);
     const [activeTab, setActiveTab] = useState('Portfolio');
     const [isFollowListModalOpen, setIsFollowListModalOpen] = useState(false);
     const [followListType, setFollowListType] = useState<'followers' | 'following'>('followers');
@@ -237,88 +242,114 @@ export default function UserProfile() {
     }, [id, currentUser, isMe]);
 
     const handleToggleFollow = async () => {
-        if (!currentUser) return navigate('/login');
-        if (!profile?.uid) return;
+        if (!currentUser) return openAuthModal('Sign in to follow creators & professionals');
+        if (!profile?.uid || isFollowLoading) return;
 
+        if (!navigator.onLine) {
+            toast.error("You are offline. Please check your internet connection.");
+            return;
+        }
+
+        setIsFollowLoading(true);
         try {
             if (followed) {
                 await unfollowUser(currentUser.uid, profile.uid);
                 setFollowed(false);
                 setFollowersCount(prev => Math.max(0, prev - 1));
+                toast.info(`Unfollowed ${profile.displayName || 'user'}`);
             } else {
                 await followUser(currentUser.uid, profile.uid);
                 setFollowed(true);
                 setFollowersCount(prev => prev + 1);
+                toast.success(`Following ${profile.displayName || 'user'}`);
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error toggling follow:", error);
+            toast.error(error?.message?.includes('network') 
+                ? "Network error. Please try again." 
+                : "Failed to update follow status.");
+        } finally {
+            setIsFollowLoading(false);
         }
     };
 
     const handleSaveProfileImage = async (url: string) => {
-        if (currentUser && profile) {
-            try {
-                await updateUserProfile(currentUser.uid, { photoURL: url });
-                setProfile({ ...profile, photoURL: url });
-            } catch (error) {
-                console.error("Error updating profile image:", error);
-            }
+        if (!currentUser || !profile) return;
+        if (!navigator.onLine) {
+            toast.error("Cannot update profile photo while offline.");
+            return;
+        }
+        try {
+            await updateUserProfile(currentUser.uid, { photoURL: url });
+            setProfile({ ...profile, photoURL: url });
+            toast.success("Profile photo updated successfully!");
+        } catch (error) {
+            console.error("Error updating profile image:", error);
+            toast.error("Failed to update profile photo.");
         }
     };
 
     const handleProfileEnhancement = async (enhancedData: EnhancedProfile) => {
-        if (currentUser && profile) {
-            try {
-                const updatedProfile = {
-                    ...profile,
-                    displayName: profile.displayName, // Keep original name
-                    role: enhancedData.headline as any,
-                    bio: enhancedData.bio.standard, // Use standard bio version
-                    // Note: AI does not currently return physicalAttributes or structured experience with dates
-                };
+        if (!currentUser || !profile) return;
+        if (!navigator.onLine) {
+            toast.error("Cannot apply AI enhancement while offline.");
+            return;
+        }
+        try {
+            const updatedProfile = {
+                ...profile,
+                displayName: profile.displayName, // Keep original name
+                role: enhancedData.headline as any,
+                bio: enhancedData.bio.standard, // Use standard bio version
+            };
 
-                await updateUserProfile(currentUser.uid, updatedProfile);
-                setProfile(updatedProfile);
-
-                alert('Profile enhanced successfully!');
-            } catch (error) {
-                console.error("Error updating profile:", error);
-            }
+            await updateUserProfile(currentUser.uid, updatedProfile);
+            setProfile(updatedProfile);
+            toast.success('Profile enhanced with AI successfully!');
+        } catch (error) {
+            console.error("Error updating profile:", error);
+            toast.error('Failed to apply AI profile enhancement.');
         }
     };
 
     const handleSaveProfile = async (updatedProfile: UserProfileType) => {
         if (!currentUser) return;
+        if (!navigator.onLine) {
+            toast.error("You are offline. Changes cannot be saved right now.");
+            return;
+        }
 
         try {
-            console.log(`[UserProfile] Saving profile for UID: ${currentUser.uid}`, updatedProfile);
             await updateUserProfile(currentUser.uid, updatedProfile);
-            console.log('[UserProfile] Profile save call completed');
 
             // Force refresh the profile from Firebase
             const freshProfile = await getUserProfile(currentUser.uid);
             if (freshProfile) {
                 setProfile(freshProfile);
-                console.log('[UserProfile] Profile refreshed from Firestore:', freshProfile);
-                alert(`✅ Profile for "${freshProfile.displayName || 'You'}" updated successfully!`);
+                toast.success(`Profile for "${freshProfile.displayName || 'You'}" updated successfully!`);
             } else {
                 setProfile(updatedProfile);
-                alert('✅ Profile updated! (Visual update complete)');
+                toast.success('Profile updated successfully!');
             }
         } catch (error: any) {
             console.error("Error updating profile:", error);
-            alert(`❌ Failed to update profile: ${error.message || 'Unknown error'}`);
+            toast.error(`Failed to update profile: ${error.message || 'Unknown error'}`);
         }
     };
 
     const handleSaveExperience = async (item: ExperienceItem) => {
         if (!currentUser || !profile) return;
+        if (!navigator.onLine) {
+            toast.error("Cannot save experience while offline.");
+            return;
+        }
 
         const currentExperience = profile.experience || [];
         let updatedExperience;
 
         const existingIndex = currentExperience.findIndex(e => e.id === item.id);
-        if (existingIndex >= 0) {
+        const isEditing = existingIndex >= 0;
+        if (isEditing) {
             updatedExperience = [...currentExperience];
             updatedExperience[existingIndex] = item;
         } else {
@@ -329,14 +360,19 @@ export default function UserProfile() {
             const updatedProfile = { ...profile, experience: updatedExperience };
             await updateUserProfile(currentUser.uid, updatedProfile);
             setProfile(updatedProfile);
+            toast.success(isEditing ? "Experience updated successfully!" : "Experience added successfully!");
         } catch (error) {
             console.error("Error saving experience:", error);
-            alert("Failed to save experience.");
+            toast.error("Failed to save experience.");
         }
     };
 
     const handleDeleteExperience = async (id: string) => {
         if (!currentUser || !profile) return;
+        if (!navigator.onLine) {
+            toast.error("Cannot delete experience while offline.");
+            return;
+        }
 
         const updatedExperience = (profile.experience || []).filter(e => e.id !== id);
 
@@ -344,33 +380,59 @@ export default function UserProfile() {
             const updatedProfile = { ...profile, experience: updatedExperience };
             await updateUserProfile(currentUser.uid, updatedProfile);
             setProfile(updatedProfile);
+            toast.success("Experience deleted.");
         } catch (error) {
             console.error("Error deleting experience:", error);
-            alert("Failed to delete experience.");
+            toast.error("Failed to delete experience.");
         }
     };
 
     const handleSaveGalleryPhoto = async (url: string) => {
         if (!currentUser || !profile) return;
+        if (!navigator.onLine) {
+            toast.error("Cannot add photo while offline.");
+            return;
+        }
         const updatedGallery = [...(profile.gallery || []), url];
         try {
             const updatedProfile = { ...profile, gallery: updatedGallery };
             await updateUserProfile(currentUser.uid, updatedProfile);
             setProfile(updatedProfile);
+            toast.success("Photo added to gallery successfully!");
         } catch (error) {
             console.error("Error saving gallery photo:", error);
+            toast.error("Failed to add photo to gallery.");
         }
     };
 
     const handleSavePrivacySettings = async (settings: UserProfileType['privacySettings']) => {
         if (!currentUser || !profile) return;
+        if (!navigator.onLine) {
+            toast.error("Cannot update privacy settings while offline.");
+            return;
+        }
         try {
             const updatedProfile = { ...profile, privacySettings: settings };
             await updateUserProfile(currentUser.uid, updatedProfile);
             setProfile(updatedProfile);
+            toast.success("Privacy settings updated successfully!");
         } catch (error) {
             console.error("Error saving privacy settings:", error);
+            toast.error("Failed to update privacy settings.");
             throw error;
+        }
+    };
+
+    const handleShareProfile = () => {
+        if (navigator.share) {
+            navigator.share({
+                title: profile?.displayName || 'iFilmDirectory Profile',
+                text: `Check out ${profile?.displayName || 'this'}'s professional profile on iFilmDirectory!`,
+                url: window.location.href
+            }).catch(() => {});
+        } else {
+            const text = encodeURIComponent(`Check out my professional profile on iFilmDirectory: ${window.location.href}`);
+            window.open(`https://wa.me/?text=${text}`, '_blank');
         }
     };
 
@@ -398,7 +460,7 @@ export default function UserProfile() {
     const isAdminUser = isMe && currentUser && hasAdminPrivileges(profile, currentUser.email);
 
     return (
-        <div className="relative flex h-auto min-h-[100dvh] w-full flex-col overflow-x-hidden bg-slate-50 dark:bg-[#090A0C] font-display text-zinc-900 dark:text-white antialiased pb-36 md:pb-24 transition-colors">
+        <div className="relative flex h-auto min-h-[100dvh] w-full flex-col overflow-x-hidden bg-slate-50 dark:bg-[#090A0C] font-display text-zinc-900 dark:text-white antialiased pb-28 md:pb-16 transition-colors">
             <div className="w-full max-w-md md:max-w-2xl lg:max-w-4xl xl:max-w-5xl mx-auto flex flex-col flex-1">
             {/* Top Navigation Bar: Mobile only (Desktop uses sidebar + direct profile header) */}
             <div className="md:hidden flex items-center justify-between p-4 bg-white/95 dark:bg-[#090A0C]/90 backdrop-blur-md sticky top-0 z-50 border-b border-zinc-200 dark:border-white/5">
@@ -410,7 +472,11 @@ export default function UserProfile() {
                         <Logo size="sm" showText={true} />
                     </div>
                 </div>
-                <button className="p-2 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 hover:border-amber-500/30 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors">
+                <button
+                    onClick={handleShareProfile}
+                    className="p-2 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 hover:border-amber-500/30 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors"
+                    title="Share Profile"
+                >
                     <span className="material-symbols-outlined text-xl">share</span>
                 </button>
             </div>
@@ -441,20 +507,26 @@ export default function UserProfile() {
                 <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left min-w-0">
                     {/* Top Row: Name, Verification Badge & Desktop Action Buttons */}
                     <div className="flex flex-col md:flex-row md:items-center md:gap-4 mb-3.5 w-full">
-                        <div className="flex items-center gap-2 justify-center md:justify-start">
+                        <div className="flex items-center gap-2 justify-center md:justify-start min-w-0">
                             {!isMe && (
                                 <button
                                     onClick={() => navigate(-1)}
-                                    className="hidden md:flex p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-zinc-300 hover:text-white transition-colors mr-1"
+                                    className="hidden md:flex p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-zinc-300 hover:text-white transition-colors mr-1 shrink-0"
                                     title="Back"
                                 >
                                     <span className="material-symbols-outlined text-lg">arrow_back</span>
                                 </button>
                             )}
-                            <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
-                                <span>{profile?.displayName || 'Anonymous User'}</span>
-                                {(profile?.verification_tier === 'gold' || profile?.verification_tier === 'blue') && (
-                                    <span className="material-symbols-outlined text-amber-500 text-2xl filled">verified</span>
+                            <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2 min-w-0 flex-wrap justify-center md:justify-start">
+                                <span className="break-words">{profile?.displayName || 'Anonymous User'}</span>
+                                {(profile?.verification_tier === 'gold' || profile?.verification_tier === 'blue' || profile?.verification?.isVerified) && (
+                                    <button
+                                        onClick={() => isMe && setIsVerificationModalOpen(true)}
+                                        className={`inline-flex items-center ${isMe ? 'cursor-pointer hover:scale-110 transition-transform' : 'cursor-default'}`}
+                                        title={isMe ? "Click to view verification details" : "Verified Professional"}
+                                    >
+                                        <span className="material-symbols-outlined text-amber-500 text-2xl filled shrink-0">verified</span>
+                                    </button>
                                 )}
                             </h1>
                         </div>
@@ -476,6 +548,16 @@ export default function UserProfile() {
                                         <span className="material-symbols-outlined text-[16px]">auto_awesome</span>
                                         AI Enhance
                                     </button>
+                                    {!profile?.verification?.isVerified && (
+                                        <button
+                                            onClick={() => setIsVerificationModalOpen(true)}
+                                            className="px-4 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 font-bold text-xs flex items-center gap-1.5 transition-all border border-amber-500/30 active:scale-95"
+                                            title="Apply for Verified Badge"
+                                        >
+                                            <span className="material-symbols-outlined text-[16px]">verified</span>
+                                            {profile?.verification?.status === 'pending' ? 'Pending' : 'Get Verified'}
+                                        </button>
+                                    )}
                                     <button
                                         onClick={() => {
                                             const text = encodeURIComponent(`Check out my professional profile on iFilmDirectory: ${window.location.href}`);
@@ -500,17 +582,28 @@ export default function UserProfile() {
                                 <>
                                     <button
                                         onClick={handleToggleFollow}
-                                        className={`px-5 py-2 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all active:scale-95 ${
-                                            followed
-                                                ? 'bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-300 dark:bg-zinc-800 dark:text-white dark:border-white/10 dark:hover:bg-zinc-700'
-                                                : 'bg-amber-500 text-black hover:bg-amber-400 shadow-sm shadow-amber-500/25'
+                                        disabled={isFollowLoading}
+                                        className={`px-5 py-2 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all ${
+                                            isFollowLoading
+                                                ? 'opacity-60 cursor-not-allowed bg-zinc-200 dark:bg-zinc-800 text-zinc-500'
+                                                : followed
+                                                    ? 'bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-300 dark:bg-zinc-800 dark:text-white dark:border-white/10 dark:hover:bg-zinc-700 active:scale-95'
+                                                    : 'bg-amber-500 text-black hover:bg-amber-400 shadow-sm shadow-amber-500/25 active:scale-95'
                                         }`}
                                     >
-                                        <span className="material-symbols-outlined text-[16px]">{followed ? 'person_check' : 'person_add'}</span>
-                                        <span>{followed ? 'Following' : 'Follow'}</span>
+                                        <span className={`material-symbols-outlined text-[16px] ${isFollowLoading ? 'animate-spin' : ''}`}>
+                                            {isFollowLoading ? 'sync' : (followed ? 'person_check' : 'person_add')}
+                                        </span>
+                                        <span>{isFollowLoading ? 'Updating...' : (followed ? 'Following' : 'Follow')}</span>
                                     </button>
                                     <button
-                                        onClick={() => navigate(`/chat/${profile.uid}`)}
+                                        onClick={() => {
+                                            if (!currentUser) {
+                                                openAuthModal(`Sign in to message ${profile.displayName || 'this creator'}`);
+                                                return;
+                                            }
+                                            navigate(`/chat/${profile.uid}`);
+                                        }}
                                         className="px-4 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/10 dark:hover:bg-white/20 text-zinc-900 dark:text-white font-bold text-xs flex items-center gap-1.5 transition-all border border-zinc-200 dark:border-white/10"
                                     >
                                         <span className="material-symbols-outlined text-[16px]">mail</span>
@@ -582,6 +675,15 @@ export default function UserProfile() {
                                     <span className="material-symbols-outlined text-lg">auto_awesome</span>
                                     AI Enhance Profile
                                 </button>
+                                {!profile?.verification?.isVerified && (
+                                    <button
+                                        onClick={() => setIsVerificationModalOpen(true)}
+                                        className="w-full h-11 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 font-bold text-sm flex items-center justify-center gap-2 border border-amber-500/30 transition-all"
+                                    >
+                                        <span className="material-symbols-outlined text-lg">verified</span>
+                                        {profile?.verification?.status === 'pending' ? 'Verification Pending Review' : 'Get Verified Badge'}
+                                    </button>
+                                )}
                                 <button
                                     onClick={() => {
                                         const text = encodeURIComponent(`Check out my professional profile on iFilmDirectory: ${window.location.href}`);
@@ -607,17 +709,28 @@ export default function UserProfile() {
                             <>
                                 <button
                                     onClick={handleToggleFollow}
+                                    disabled={isFollowLoading}
                                     className={`w-full h-11 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
-                                        followed
-                                            ? 'bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-300 dark:bg-zinc-800 dark:text-white dark:border-white/10'
-                                            : 'bg-amber-500 text-black hover:bg-amber-400'
+                                        isFollowLoading
+                                            ? 'opacity-60 cursor-not-allowed bg-zinc-200 dark:bg-zinc-800 text-zinc-500'
+                                            : followed
+                                                ? 'bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-300 dark:bg-zinc-800 dark:text-white dark:border-white/10 active:scale-95'
+                                                : 'bg-amber-500 text-black hover:bg-amber-400 active:scale-95'
                                     }`}
                                 >
-                                    <span className="material-symbols-outlined">{followed ? 'person_check' : 'person_add'}</span>
-                                    {followed ? 'Following' : 'Follow'}
+                                    <span className={`material-symbols-outlined ${isFollowLoading ? 'animate-spin' : ''}`}>
+                                        {isFollowLoading ? 'sync' : (followed ? 'person_check' : 'person_add')}
+                                    </span>
+                                    <span>{isFollowLoading ? 'Updating...' : (followed ? 'Following' : 'Follow')}</span>
                                 </button>
                                 <button
-                                    onClick={() => navigate(`/chat/${profile.uid}`)}
+                                    onClick={() => {
+                                        if (!currentUser) {
+                                            openAuthModal(`Sign in to message ${profile.displayName || 'this creator'}`);
+                                            return;
+                                        }
+                                        navigate(`/chat/${profile.uid}`);
+                                    }}
                                     className="w-full h-11 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-900 border border-zinc-200 dark:bg-white/10 dark:text-white font-bold text-sm flex items-center justify-center gap-2 dark:border-white/10"
                                 >
                                     <span className="material-symbols-outlined">mail</span>
@@ -657,20 +770,35 @@ export default function UserProfile() {
             {/* Content Section */}
             <div className="flex-1 bg-slate-50 dark:bg-[#090A0C] min-h-[400px]">
                 {activeTab === 'Portfolio' && (
-                    <div className="p-6 pb-32 flex flex-col gap-10">
+                    <div className="p-6 pb-8 flex flex-col gap-10">
                         {/* Showreels Section */}
                         <section>
                             <div className="flex items-center justify-between mb-5">
-                                <h2 className="text-2xl font-bold text-white">Showreels</h2>
-                                <div className="flex items-center gap-1.5 text-amber-500 text-sm font-bold cursor-pointer">
-                                    Privacy
-                                    <span className="material-symbols-outlined text-[20px]">lock</span>
-                                </div>
+                                <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Showreels</h2>
+                                {isMe ? (
+                                    <button
+                                        onClick={() => setIsPrivacyModalOpen(true)}
+                                        className="flex items-center gap-1.5 text-amber-500 hover:text-amber-600 dark:hover:text-amber-400 text-sm font-bold cursor-pointer transition-colors"
+                                        title="Manage portfolio privacy"
+                                    >
+                                        Privacy
+                                        <span className="material-symbols-outlined text-[20px]">lock</span>
+                                    </button>
+                                ) : (
+                                    <div className="flex items-center gap-1.5 text-zinc-400 text-sm font-medium">
+                                        <span className="material-symbols-outlined text-[18px]">public</span>
+                                        Public
+                                    </div>
+                                )}
                             </div>
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                                 {(profile?.gallery || []).slice(0, 4).map((url, idx) => (
                                     <div key={idx} className="flex flex-col gap-3">
-                                        <div className="aspect-[4/3] bg-zinc-100 dark:bg-zinc-900 rounded-2xl overflow-hidden relative group cursor-pointer shadow-sm border border-zinc-200 dark:border-white/5">
+                                        <div
+                                            onClick={() => navigate('/showreels')}
+                                            className="aspect-[4/3] bg-zinc-100 dark:bg-zinc-900 rounded-2xl overflow-hidden relative group cursor-pointer shadow-sm border border-zinc-200 dark:border-white/5"
+                                            title="Watch Showreel"
+                                        >
                                             <PostMedia src={url} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                                             <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
                                                 <div className="size-12 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center border border-white/20">
@@ -891,7 +1019,7 @@ export default function UserProfile() {
                 )}
 
                 {activeTab === 'About' && (
-                    <div className="p-6 pb-32 flex flex-col gap-8">
+                    <div className="p-6 pb-8 flex flex-col gap-8">
                         {/* Biography */}
                         <section>
                             <h2 className="text-xl font-bold mb-3">Biography</h2>
@@ -940,7 +1068,7 @@ export default function UserProfile() {
                 )}
 
                 {activeTab === 'Availability' && (
-                    <div className="p-6 pb-32 flex flex-col gap-6">
+                    <div className="p-6 pb-8 flex flex-col gap-6">
                         <section>
                             <h2 className="text-xl font-bold mb-4">Work Availability</h2>
                             <div className={`p-6 rounded-2xl border flex flex-col gap-4 shadow-sm ${profile?.availabilityStatus === 'available'
@@ -973,17 +1101,33 @@ export default function UserProfile() {
                 )}
 
                 {activeTab === 'Contact' && (
-                    <div className="p-6 pb-32">
+                    <div className="p-6 pb-8">
                         {/* Contact & Socials */}
                         <section id="contact" className="grid grid-cols-2 md:grid-cols-4 gap-3">
                             {/* Email */}
-                            <a
-                                className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-white dark:bg-[#1c242e] text-[#4f6374] dark:text-[#9dabb8] border border-zinc-200 dark:border-zinc-800 hover:text-primary hover:border-primary transition-all shadow-sm"
-                                href={`mailto:${profile?.email || ''}`}
-                            >
-                                <span className="material-symbols-outlined">mail</span>
-                                <span className="text-xs font-sans font-medium">Email</span>
-                            </a>
+                            {profile?.email ? (
+                                <a
+                                    className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-white dark:bg-[#1c242e] text-[#4f6374] dark:text-[#9dabb8] border border-zinc-200 dark:border-zinc-800 hover:text-primary hover:border-primary transition-all shadow-sm"
+                                    href={`mailto:${profile.email}`}
+                                >
+                                    <span className="material-symbols-outlined">mail</span>
+                                    <span className="text-xs font-sans font-medium">Email</span>
+                                </a>
+                            ) : !isMe && profile?.uid ? (
+                                <button
+                                    onClick={() => {
+                                        if (!currentUser) {
+                                            openAuthModal(`Sign in to message ${profile.displayName || 'this creator'}`);
+                                            return;
+                                        }
+                                        navigate(`/chat/${profile.uid}`);
+                                    }}
+                                    className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-white dark:bg-[#1c242e] text-[#4f6374] dark:text-[#9dabb8] border border-zinc-200 dark:border-zinc-800 hover:text-primary hover:border-primary transition-all shadow-sm"
+                                >
+                                    <span className="material-symbols-outlined">chat</span>
+                                    <span className="text-xs font-sans font-medium">Message</span>
+                                </button>
+                            ) : null}
 
                             {/* Website */}
                             {profile?.socialLinks?.website && (
@@ -1013,18 +1157,7 @@ export default function UserProfile() {
 
                             {/* Share */}
                             <button
-                                onClick={() => {
-                                    if (navigator.share) {
-                                        navigator.share({
-                                            title: profile?.displayName || 'iFilmDirectory Profile',
-                                            text: `Check out my film professional profile on iFilmDirectory!`,
-                                            url: window.location.href
-                                        });
-                                    } else {
-                                        const text = encodeURIComponent(`Check out my professional profile on iFilmDirectory: ${window.location.href}`);
-                                        window.open(`https://wa.me/?text=${text}`, '_blank');
-                                    }
-                                }}
+                                onClick={handleShareProfile}
                                 className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-white dark:bg-[#1c242e] text-[#4f6374] dark:text-[#9dabb8] border border-zinc-200 dark:border-zinc-800 hover:text-primary hover:border-primary transition-all shadow-sm"
                             >
                                 <span className="material-symbols-outlined">share</span>
@@ -1051,13 +1184,24 @@ export default function UserProfile() {
             {/* Bottom Navigation */}
             <BottomNav />
 
-            {/* Existing Modals */}
-            <ImageUploadModal isOpen={isUploadModalOpen} onClose={() => setIsUploadModalOpen(false)} onSave={handleSaveProfileImage} />
+            {/* Consolidated Media Upload Modals */}
+            <MediaUploadModal
+                isOpen={isUploadModalOpen}
+                onClose={() => setIsUploadModalOpen(false)}
+                onSave={handleSaveProfileImage}
+                variant="avatar"
+                aspectRatio={1}
+            />
+            <MediaUploadModal
+                isOpen={isGalleryModalOpen}
+                onClose={() => setIsGalleryModalOpen(false)}
+                onSave={handleSaveGalleryPhoto}
+                variant="gallery"
+            />
             <ProfileEnhancementModal isOpen={isEnhanceModalOpen} onClose={() => setIsEnhanceModalOpen(false)} currentProfile={profile} onApply={handleProfileEnhancement} />
             {profile && <EditProfileModal isOpen={isEditProfileModalOpen} onClose={() => setIsEditProfileModalOpen(false)} profile={profile} onSave={handleSaveProfile} />}
             {profile && <VerificationModal isOpen={isVerificationModalOpen} onClose={() => setIsVerificationModalOpen(false)} profile={profile} onSave={handleSaveProfile} />}
             <ExperienceModal isOpen={isExperienceModalOpen} onClose={() => setIsExperienceModalOpen(false)} onSave={handleSaveExperience} onDelete={handleDeleteExperience} itemToEdit={editingExperience} />
-            <GalleryUploadModal isOpen={isGalleryModalOpen} onClose={() => setIsGalleryModalOpen(false)} onSave={handleSaveGalleryPhoto} />
             <PrivacySettingsModal isOpen={isPrivacyModalOpen} onClose={() => setIsPrivacyModalOpen(false)} privacySettings={profile.privacySettings} onSave={handleSavePrivacySettings} />
             {profile && <FollowListModal isOpen={isFollowListModalOpen} onClose={() => setIsFollowListModalOpen(false)} userId={profile.uid} type={followListType} />}
         </div>

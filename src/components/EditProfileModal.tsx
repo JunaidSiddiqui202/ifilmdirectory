@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { type UserProfile, checkUsernameAvailability, generateUsernameFromName } from '../services/userService';
+import { useToast } from '../context/ToastContext';
 
 interface EditProfileModalProps {
     isOpen: boolean;
@@ -9,6 +10,7 @@ interface EditProfileModalProps {
 }
 
 export default function EditProfileModal({ isOpen, onClose, profile, onSave }: EditProfileModalProps) {
+    const toast = useToast();
     const [formData, setFormData] = useState<UserProfile>(profile);
     const [loading, setLoading] = useState(false);
     const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
@@ -138,35 +140,72 @@ export default function EditProfileModal({ isOpen, onClose, profile, onSave }: E
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (formData.email && !validateEmail(formData.email)) {
-            alert("Please enter a valid email address.");
+        // 1. Prevent double-click race conditions
+        if (loading) return;
+
+        // 2. Offline check
+        if (!navigator.onLine) {
+            toast.error("You are offline. Please check your internet connection.");
             return;
         }
 
-        if (formData.phoneNumber && !validatePhone(formData.phoneNumber)) {
-            alert("Please enter a valid phone number.");
+        // 3. Name validation (cannot be empty or spaces)
+        const cleanName = formData.displayName?.trim();
+        if (!cleanName) {
+            toast.error("Full Name is required and cannot be blank.");
+            return;
+        }
+
+        const cleanEmail = formData.email?.trim() || '';
+        if (cleanEmail && !validateEmail(cleanEmail)) {
+            toast.error("Please enter a valid email address.");
+            return;
+        }
+
+        const cleanPhone = formData.phoneNumber?.trim() || '';
+        if (cleanPhone && !validatePhone(cleanPhone)) {
+            toast.error("Please enter a valid phone number.");
             return;
         }
 
         // Validate username if it's been changed
-        if (formData.username && formData.username !== profile.username) {
+        const cleanUsername = formData.username?.trim() || '';
+        if (cleanUsername && cleanUsername !== profile.username) {
             if (usernameAvailable === false) {
-                alert("This username is already taken. Please choose another one.");
+                toast.error("This username is already taken. Please choose another one.");
                 return;
             }
-            if (!formData.username.match(/^[a-z0-9-]+$/)) {
-                alert("Username can only contain lowercase letters, numbers, and hyphens.");
+            if (!cleanUsername.match(/^[a-z0-9-]+$/)) {
+                toast.error("Username can only contain lowercase letters, numbers, and hyphens.");
                 return;
             }
         }
 
+        // 4. Filter out empty ghost projects
+        const cleanPastProjects = (formData.pastProjects || [])
+            .filter(p => p.title.trim() && p.role.trim())
+            .map(p => ({ ...p, title: p.title.trim(), role: p.role.trim() }));
+
+        const cleanUnderProduction = (formData.underProductionProjects || [])
+            .filter(p => p.title.trim())
+            .map(p => ({ ...p, title: p.title.trim() }));
+
         setLoading(true);
         try {
-            await onSave(formData);
+            await onSave({
+                ...formData,
+                displayName: cleanName,
+                email: cleanEmail,
+                phoneNumber: cleanPhone,
+                username: cleanUsername,
+                bio: formData.bio?.trim() || '',
+                pastProjects: cleanPastProjects,
+                underProductionProjects: cleanUnderProduction
+            });
             onClose();
         } catch (error) {
             console.error("Failed to save profile:", error);
-            alert("Failed to save profile changes.");
+            toast.error("Failed to save profile changes.");
         } finally {
             setLoading(false);
         }

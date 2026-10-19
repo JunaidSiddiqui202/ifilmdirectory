@@ -220,16 +220,43 @@ export const checkAccessApproval = async (email: string): Promise<boolean> => {
     }
 };
 
-export const getUserProfile = async (uid: string) => {
-    const userRef = doc(db, 'users', uid);
-    const userSnap = await getDoc(userRef);
-    if (userSnap.exists()) {
-        return userSnap.data() as UserProfile;
+// High-performance client-side cache to slash Firestore reads and prevent quota limits
+const profileCache = new Map<string, { profile: UserProfile; timestamp: number }>();
+const PROFILE_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+let allUsersCache: { users: UserProfile[]; timestamp: number } | null = null;
+const ALL_USERS_CACHE_TTL = 3 * 60 * 1000; // 3 minutes
+
+export const getUserProfile = async (uid: string, bypassCache: boolean = false): Promise<UserProfile | null> => {
+    if (!uid) return null;
+
+    if (!bypassCache) {
+        const cached = profileCache.get(uid);
+        if (cached && Date.now() - cached.timestamp < PROFILE_CACHE_TTL) {
+            return cached.profile;
+        }
     }
-    return null;
+
+    try {
+        const userRef = doc(db, 'users', uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+            const data = userSnap.data() as UserProfile;
+            profileCache.set(uid, { profile: data, timestamp: Date.now() });
+            return data;
+        }
+        return null;
+    } catch (err) {
+        console.warn(`Error fetching user profile for ${uid}:`, err);
+        return null;
+    }
 };
 
 export const updateUserProfile = async (uid: string, data: Partial<UserProfile>) => {
+    // Invalidate profile and all-users cache immediately on update
+    profileCache.delete(uid);
+    allUsersCache = null;
+
     const userRef = doc(db, 'users', uid);
     try {
         // Filter out undefined values as Firestore doesn't accept them
@@ -250,13 +277,19 @@ export const updateUserProfile = async (uid: string, data: Partial<UserProfile>)
     }
 };
 
-export const getAllUsers = async (): Promise<UserProfile[]> => {
+export const getAllUsers = async (bypassCache: boolean = false): Promise<UserProfile[]> => {
+    if (!bypassCache && allUsersCache && Date.now() - allUsersCache.timestamp < ALL_USERS_CACHE_TTL) {
+        return allUsersCache.users;
+    }
+
     try {
         const querySnapshot = await getDocs(collection(db, 'users'));
-        return querySnapshot.docs.map(doc => doc.data() as UserProfile);
+        const users = querySnapshot.docs.map(doc => doc.data() as UserProfile);
+        allUsersCache = { users, timestamp: Date.now() };
+        return users;
     } catch (error) {
         console.error("Error getting all users:", error);
-        return [];
+        return allUsersCache?.users || [];
     }
 };
 

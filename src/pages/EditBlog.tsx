@@ -97,32 +97,6 @@ export default function EditBlog() {
         ));
     };
 
-    // Replace image via upload
-    const handleReplaceImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file || !replacingImageId) return;
-
-        setIsUploading(true);
-        try {
-            const result = await uploadFile(file);
-            if (result.url) {
-                setContentBlocks(prev => prev.map(block =>
-                    block.id === replacingImageId ? { ...block, content: result.url! } : block
-                ));
-            } else {
-                alert('Failed to upload image');
-            }
-        } catch (error) {
-            console.error('Upload error:', error);
-            alert('Failed to upload image');
-        } finally {
-            setIsUploading(false);
-            setReplacingImageId(null);
-            if (replaceImageInputRef.current) {
-                replaceImageInputRef.current.value = '';
-            }
-        }
-    };
 
     // Get language instruction
     const getLanguageInstruction = () => {
@@ -153,7 +127,7 @@ export default function EditBlog() {
     // AI Write Blog
     const handleAIWriteBlog = async () => {
         if (!aiTopic.trim() && !title.trim()) {
-            alert('Please enter a topic or title first');
+            toast.error('Please enter a topic or title first');
             return;
         }
 
@@ -237,7 +211,7 @@ Output ONLY the raw blog content paragraphs separated by blank lines.`,
             }
         } catch (error) {
             console.error('AI generation error:', error);
-            alert('Failed to generate blog. Please try again.');
+            toast.error('Failed to generate blog. Please try again.');
         } finally {
             setIsGenerating(false);
         }
@@ -247,7 +221,7 @@ Output ONLY the raw blog content paragraphs separated by blank lines.`,
     const handleAIEnhance = async () => {
         const textContent = contentBlocks.filter(b => b.type === 'text').map(b => b.content).join('\n\n');
         if (!textContent.trim()) {
-            alert('Please write some content first');
+            toast.error('Please write some content first');
             return;
         }
 
@@ -304,7 +278,7 @@ Output ONLY the enhanced content with paragraphs separated by blank lines.`,
             }
         } catch (error) {
             console.error('AI enhance error:', error);
-            alert('Failed to enhance content. Please try again.');
+            toast.error('Failed to enhance content. Please try again.');
         } finally {
             setIsEnhancing(false);
         }
@@ -313,7 +287,7 @@ Output ONLY the enhanced content with paragraphs separated by blank lines.`,
     // AI Generate Image
     const handleAIGenerateImage = async () => {
         if (!aiImagePrompt.trim()) {
-            alert('Please describe the image you want');
+            toast.error('Please describe the image you want');
             return;
         }
 
@@ -333,33 +307,44 @@ Output ONLY the enhanced content with paragraphs separated by blank lines.`,
             setAiImagePrompt('');
         } catch (error) {
             console.error('AI image error:', error);
-            alert('Failed to generate image. Please try again.');
+            toast.error('Failed to generate image. Please try again.');
         } finally {
             setIsGeneratingImage(false);
         }
     };
 
-    // Handle image upload
-    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Handle image upload (new or replace)
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, targetBlockId?: string | null) => {
         const file = e.target.files?.[0];
+        const blockId = targetBlockId || replacingImageId;
         if (!file) return;
 
         setIsUploading(true);
         try {
             const result = await uploadFile(file);
             if (result.url) {
-                setContentBlocks(prev => [
-                    ...prev,
-                    { id: generateId(), type: 'image', content: result.url! }
-                ]);
+                if (blockId) {
+                    setContentBlocks(prev => prev.map(block =>
+                        block.id === blockId ? { ...block, content: result.url! } : block
+                    ));
+                } else {
+                    setContentBlocks(prev => [
+                        ...prev,
+                        { id: generateId(), type: 'image', content: result.url! }
+                    ]);
+                }
             } else {
-                alert('Failed to upload image');
+                toast.error('Failed to upload image: ' + (result.error || ''));
             }
         } catch (error) {
             console.error('Upload error:', error);
-            alert('Failed to upload image');
+            toast.error('Failed to upload image');
         } finally {
             setIsUploading(false);
+            setReplacingImageId(null);
+            if (replaceImageInputRef.current) {
+                replaceImageInputRef.current.value = '';
+            }
             if (fileInputRef.current) {
                 fileInputRef.current.value = '';
             }
@@ -503,7 +488,7 @@ Output ONLY the enhanced content with paragraphs separated by blank lines.`,
                 ref={replaceImageInputRef}
                 type="file"
                 accept="image/*"
-                onChange={handleReplaceImageUpload}
+                onChange={(e) => handleImageUpload(e, replacingImageId)}
                 className="hidden"
             />
 

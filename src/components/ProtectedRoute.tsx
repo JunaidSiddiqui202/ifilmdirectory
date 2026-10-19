@@ -2,7 +2,12 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useEffect } from 'react';
 
-export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
+interface ProtectedRouteProps {
+    children: React.ReactNode;
+    allowGuest?: boolean;
+}
+
+export default function ProtectedRoute({ children, allowGuest = false }: ProtectedRouteProps) {
     const { currentUser, loading } = useAuth();
     const location = useLocation();
 
@@ -11,9 +16,10 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
             loading,
             hasUser: !!currentUser,
             userId: currentUser?.uid,
-            path: location.pathname
+            path: location.pathname,
+            allowGuest
         });
-    }, [loading, currentUser, location.pathname]);
+    }, [loading, currentUser, location.pathname, allowGuest]);
 
     if (loading) {
         return (
@@ -28,8 +34,8 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
         );
     }
 
-    if (!currentUser) {
-        console.log('[ProtectedRoute] No user found, redirecting to login with return URL:', location.pathname);
+    if (!currentUser && !allowGuest) {
+        console.log('[ProtectedRoute] No user found and route requires auth, redirecting to login with return URL:', location.pathname);
         // Preserve the current path so user can return after login
         return <Navigate to={`/login?redirect=${encodeURIComponent(location.pathname)}`} replace />;
     }

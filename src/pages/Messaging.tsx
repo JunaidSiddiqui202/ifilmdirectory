@@ -68,11 +68,7 @@ export default function Messaging() {
     if (currentUser && rawId !== 'demo-chat-ranveer') {
         if (rawId.includes('_')) {
             const parts = rawId.split('_');
-            otherUserId = parts.find(p => p !== currentUser.uid) || rawId;
-            chatId = rawId;
-        } else if (rawId.includes('-')) {
-            const parts = rawId.split('-');
-            otherUserId = parts.find(p => p !== currentUser.uid) || rawId;
+            otherUserId = parts.find(p => p !== currentUser.uid) || parts[0] || rawId;
             chatId = [currentUser.uid, otherUserId].sort().join('_');
         } else {
             // rawId is a direct user profile UID

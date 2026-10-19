@@ -1,7 +1,19 @@
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { storage } from '../firebaseConfig';
+
 export interface UploadResponse {
     url?: string;
     error?: string;
+    provider?: 'cloudinary' | 'firebase' | 'local';
 }
+
+const uploadToFirebaseStorage = async (file: File): Promise<string> => {
+    const ext = file.name.split('.').pop() || 'bin';
+    const filePath = `user_uploads/${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${ext}`;
+    const storageRef = ref(storage, filePath);
+    const snapshot = await uploadBytes(storageRef, file);
+    return await getDownloadURL(snapshot.ref);
+};
 
 // Helper to compress image
 const compressImage = (file: File): Promise<File> => {
@@ -26,7 +38,7 @@ const compressImage = (file: File): Promise<File> => {
                 } else {
                     if (height > MAX_HEIGHT) {
                         width *= MAX_HEIGHT / height;
-                        height = MAX_HEIGHT;
+                        width = MAX_HEIGHT;
                     }
                 }
 
@@ -83,46 +95,41 @@ export const uploadFile = async (file: File): Promise<UploadResponse> => {
         }
     }
 
-    if (!cloudName || !uploadPreset) {
-        console.warn('Cloudinary credentials missing. Simulating upload.');
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve({
-                    url: URL.createObjectURL(fileToUpload)
-                });
-            }, 2000);
-        });
+    // Try Cloudinary Primary
+    if (cloudName && uploadPreset) {
+        try {
+            const formData = new FormData();
+            formData.append('file', fileToUpload);
+            formData.append('upload_preset', uploadPreset);
+            formData.append('folder', 'ifilm_user_uploads');
+
+            const resourceType = fileToUpload.type.startsWith('image/') ? 'image' : 'video';
+            const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`, {
+                method: 'POST',
+                body: formData,
+            });
+
+            const data = await response.json();
+
+            if (data.secure_url) {
+                return { url: data.secure_url, provider: 'cloudinary' };
+            }
+            console.warn('[Cloudinary] Upload responded with issue, trying Firebase Storage fallback:', data.error);
+        } catch (cloudinaryErr) {
+            console.warn('[Cloudinary] Network/quota failure, falling back to Firebase Storage:', cloudinaryErr);
+        }
     }
 
-    const formData = new FormData();
-    formData.append('file', fileToUpload);
-    formData.append('upload_preset', uploadPreset);
-    formData.append('folder', 'ifilm_user_uploads');
-
+    // Secondary Free Cloud Fallback: Firebase Storage (5 GB Free Tier)
     try {
-        // Cloudinary treats audio as 'video' resource type
-        const resourceType = fileToUpload.type.startsWith('image/') ? 'image' : 'video';
-        const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`, {
-            method: 'POST',
-            body: formData,
-        });
-
-        const data = await response.json();
-
-        if (data.error) {
-            throw new Error(data.error.message);
+        const firebaseUrl = await uploadToFirebaseStorage(fileToUpload);
+        return { url: firebaseUrl, provider: 'firebase' };
+    } catch (firebaseErr: any) {
+        console.error('[Storage] Both Cloudinary and Firebase Storage uploads failed:', firebaseErr);
+        // Local preview fallback for development/offline
+        if (typeof window !== 'undefined') {
+            return { url: URL.createObjectURL(fileToUpload), provider: 'local' };
         }
-
-        return { url: data.secure_url };
-
-    } catch (error) {
-        // Fallback for "Upload preset must be whitelisted for unsigned uploads" error
-        if (error instanceof Error && error.message.includes('whitelisted for unsigned uploads')) {
-            console.warn('Cloudinary preset not configured for unsigned uploads. Falling back to local preview.');
-            return { url: URL.createObjectURL(fileToUpload) };
-        }
-
-        console.error('Upload Error:', error);
-        return { error: error instanceof Error ? error.message : 'Upload failed' };
+        return { error: firebaseErr?.message || 'Upload failed across all storage providers' };
     }
 };

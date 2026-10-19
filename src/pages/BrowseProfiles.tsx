@@ -8,6 +8,7 @@ import { guildService, type Guild } from '../services/guildService';
 import { facilityService, type Facility } from '../services/facilityService';
 import EmptyState from '../components/EmptyState';
 import { useAuth } from '../context/AuthContext';
+import { useAuthModal } from '../context/AuthModalContext';
 import AddToProjectModal from '../components/AddToProjectModal';
 import MapDiscovery from '../components/MapDiscovery';
 import PostMedia from '../components/PostMedia';
@@ -158,6 +159,7 @@ const CURATED_CINEMA_TALENT: Partial<UserProfile>[] = [
 export default function BrowseProfiles() {
     const navigate = useNavigate();
     const { currentUser } = useAuth();
+    const { openAuthModal } = useAuthModal();
     const toast = useToast();
 
     // Primary Pillar: 'talent' | 'guilds' | 'studios'
@@ -263,8 +265,7 @@ export default function BrowseProfiles() {
     const handleToggleFollow = async (e: React.MouseEvent, targetProfile: any) => {
         e.stopPropagation();
         if (!currentUser) {
-            toast.info("Please sign in to follow professionals!");
-            navigate('/login');
+            openAuthModal('Sign in to follow filmmakers & talent');
             return;
         }
         if (currentUser.uid === targetProfile.uid) return;
@@ -295,8 +296,7 @@ export default function BrowseProfiles() {
     const handleDirectMessage = (e: React.MouseEvent, profile: any) => {
         e.stopPropagation();
         if (!currentUser) {
-            toast.info("Please sign in to message professionals");
-            navigate('/login');
+            openAuthModal(`Sign in to message ${profile.displayName || 'this professional'}`);
             return;
         }
         navigate(`/chat/${profile.uid}`);
@@ -306,8 +306,7 @@ export default function BrowseProfiles() {
     const handleShortlist = (e: React.MouseEvent, profile: any) => {
         e.stopPropagation();
         if (!currentUser) {
-            toast.info("Please sign in to shortlist talent for a project");
-            navigate('/login');
+            openAuthModal('Sign in to shortlist talent for production projects');
             return;
         }
         setShortlistModalData(profile);

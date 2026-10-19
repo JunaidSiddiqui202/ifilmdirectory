@@ -24,6 +24,7 @@ export interface Job {
     type: 'Job' | 'Audition' | 'Crew' | 'Post-Production';
     postedBy: string; // User ID
     postedAt: any; // Timestamp
+    postedAtDate?: Date;
     applicationEmail?: string;
     logo?: string; // URL to company logo
     user_details?: {
@@ -41,6 +42,14 @@ export interface Job {
         imdb?: string;
         wiki?: string;
     };
+    // Live RSS & Fraternity Job Fields
+    isRss?: boolean;
+    sourceName?: string;
+    sourceUrl?: string;
+    fraternityRole?: 'Editor' | 'Cameraman' | 'VFX Artist' | 'SFX & Sound' | 'Musician' | 'Artist & Actor' | 'Makeup & Stylist' | 'Crew';
+    fullContent?: string;
+    applicationUrl?: string;
+    is_dummy?: boolean;
 }
 
 const JOBS_COLLECTION = 'jobs';
@@ -97,23 +106,19 @@ export const jobService = {
         }
     },
 
-    // Get all jobs (with specified filter)
+    // Get all jobs (merging Firestore database jobs with live Film Fraternity RSS jobs)
     getJobs: async (filterType?: string) => {
         try {
-            // Fetch ALL jobs ordered by date
-            const q = query(collection(db, JOBS_COLLECTION), orderBy('postedAt', 'desc'));
+            // 1. Fetch Firestore jobs ordered by date
+            let firestoreJobs: (Job & { postedAtDate: Date })[] = [];
+            try {
+                const q = query(collection(db, JOBS_COLLECTION), orderBy('postedAt', 'desc'));
+                const snapshot = await getDocs(q);
 
-            const snapshot = await getDocs(q);
-            const now = new Date();
-            // Set now to start of today, so we can compare correctly
-            now.setHours(0, 0, 0, 0);
-
-            return snapshot.docs
-                .map(doc => {
+                firestoreJobs = snapshot.docs.map(doc => {
                     const data = doc.data();
                     let postedAtDate = new Date();
 
-                    // Normalize postedAt
                     if (data.postedAt) {
                         if (data.postedAt.toDate) {
                             postedAtDate = data.postedAt.toDate();
@@ -125,25 +130,51 @@ export const jobService = {
                     return {
                         id: doc.id,
                         ...data,
-                        postedAt: data.postedAt, // Keep original for reference if needed
-                        postedAtDate: postedAtDate // Add parsed date for sorting/filtering
+                        postedAt: data.postedAt,
+                        postedAtDate
                     } as Job & { postedAtDate: Date };
-                })
-                .filter(job => {
-                    // Filter out future jobs (sanity check for bad mock data)
-                    // If a job says it was posted in the future (> 5 mins from now), hide it.
-                    // This fixes the issue with mock data having weird timestamps like "-15526699s ago" (which implies future)
-                    const timeDiff = job.postedAtDate.getTime() - new Date().getTime();
-                    if (timeDiff > 5 * 60 * 1000) { // If > 5 mins in future, it's invalid mock data
-                        return false;
-                    }
+                });
+            } catch (fsErr) {
+                console.warn("Firestore jobs fetch error (falling back to RSS jobs):", fsErr);
+            }
 
-                    // Filter by deadline
+            // 2. Fetch live Film Fraternity RSS jobs (auto-synced every 30m)
+            let rssJobs: (Job & { postedAtDate: Date })[] = [];
+            try {
+                const { rssJobService } = await import('./rssJobService');
+                const fetchedRss = await rssJobService.getJobs(false);
+                rssJobs = fetchedRss.map(j => ({
+                    ...j,
+                    postedAtDate: j.postedAtDate ? new Date(j.postedAtDate) : new Date(j.postedAt || Date.now())
+                }));
+            } catch (rssErr) {
+                console.warn("RSS jobs fetch error:", rssErr);
+            }
+
+            // 3. Merge both collections
+            const combined = [...firestoreJobs, ...rssJobs];
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+
+            // 4. Deduplicate by title & company
+            const seen = new Set<string>();
+            const deduplicated: (Job & { postedAtDate: Date })[] = [];
+
+            for (const job of combined) {
+                const key = `${job.title}_${job.company}`.toLowerCase().replace(/[^a-z0-9]/g, '');
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    deduplicated.push(job);
+                }
+            }
+
+            // 5. Filter out invalid/expired dates & apply category filters
+            return deduplicated
+                .filter(job => {
+                    // Check deadline
                     if (job.deadline) {
                         const deadlineDate = new Date(job.deadline);
-                        // Set deadline to END of that day to ensure it doesn't expire prematurely
                         deadlineDate.setHours(23, 59, 59, 999);
-
                         if (deadlineDate < now) return false;
                     }
 
@@ -154,27 +185,48 @@ export const jobService = {
 
                     return true;
                 })
-                .sort((a, b) => b.postedAtDate.getTime() - a.postedAtDate.getTime()); // Strict client-side sort
+                .sort((a, b) => {
+                    const timeA = a.postedAtDate ? a.postedAtDate.getTime() : 0;
+                    const timeB = b.postedAtDate ? b.postedAtDate.getTime() : 0;
+                    return timeB - timeA; // STRICT newest jobs at the top
+                });
         } catch (error) {
             console.error("Error fetching jobs:", error);
             return [];
         }
     },
 
-    // Get a single job by ID
+    // Get a single job by ID (checks Firestore first, then RSS Fraternity jobs)
     getJobById: async (jobId: string) => {
         try {
+            // Check RSS jobs first if ID has rss or seed pattern
+            if (jobId.startsWith('rss_') || jobId.startsWith('seed_job_') || jobId.startsWith('r2j_')) {
+                const { rssJobService } = await import('./rssJobService');
+                const rssMatch = rssJobService.getJobById(jobId);
+                if (rssMatch) return rssMatch;
+            }
+
+            // Check Firestore database
             const docRef = doc(db, JOBS_COLLECTION, jobId);
             const docSnap = await getDoc(docRef);
 
             if (docSnap.exists()) {
                 return { id: docSnap.id, ...docSnap.data() } as Job;
-            } else {
+            }
+
+            // Fallback: check RSS jobs even if standard ID
+            const { rssJobService } = await import('./rssJobService');
+            const fallbackMatch = rssJobService.getJobById(jobId);
+            return fallbackMatch || null;
+        } catch (error) {
+            console.error("Error fetching job by ID:", error);
+            // Last resort fallback to RSS cache
+            try {
+                const { rssJobService } = await import('./rssJobService');
+                return rssJobService.getJobById(jobId);
+            } catch {
                 return null;
             }
-        } catch (error) {
-            console.error("Error fetching job:", error);
-            return null;
         }
     },
 

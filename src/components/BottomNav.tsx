@@ -1,10 +1,14 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { useAuthModal } from '../context/AuthModalContext';
 import DesktopSidebar from './DesktopSidebar';
 
 export default function BottomNav() {
     const navigate = useNavigate();
     const location = useLocation();
+    const { currentUser } = useAuth();
+    const { openAuthModal } = useAuthModal();
     const [isCreateOpen, setIsCreateOpen] = useState(false);
 
     const isActive = (path: string) => location.pathname === path;
@@ -45,8 +49,12 @@ export default function BottomNav() {
         }
     ];
 
-    const handleActionClick = (path: string) => {
+    const handleActionClick = (path: string, title?: string) => {
         setIsCreateOpen(false);
+        if (!currentUser) {
+            openAuthModal(`Sign in to ${title ? title.toLowerCase() : 'publish or create'}`);
+            return;
+        }
         navigate(path);
     };
 
@@ -83,7 +91,7 @@ export default function BottomNav() {
                             {quickActions.map(action => (
                                 <button
                                     key={action.title}
-                                    onClick={() => handleActionClick(action.path)}
+                                    onClick={() => handleActionClick(action.path, action.title)}
                                     className="flex flex-col text-left p-3.5 rounded-2xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/5 hover:border-amber-500/40 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-all group active:scale-95"
                                 >
                                     <div className={`size-10 rounded-xl bg-gradient-to-br ${action.color} flex items-center justify-center text-white mb-2.5 shadow-md group-hover:scale-105 transition-transform`}>

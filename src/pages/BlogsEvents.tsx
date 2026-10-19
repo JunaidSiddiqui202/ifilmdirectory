@@ -7,6 +7,7 @@ import { blogService, type BlogPost } from '../services/blogService';
 import { addCommentToPost, getCommentsForPost } from '../services/postService';
 import { Timestamp } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
+import { useAuthModal } from '../context/AuthModalContext';
 import PostMedia from '../components/PostMedia';
 
 const formatTimeAgo = (timestamp: any) => {
@@ -31,6 +32,7 @@ export default function BlogsEvents() {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
     const { currentUser } = useAuth();
+    const { openAuthModal } = useAuthModal();
 
     // Comment states
     const [comments, setComments] = useState<any[]>([]);
@@ -140,14 +142,20 @@ export default function BlogsEvents() {
 
                         {/* Mobile Action Buttons */}
                         <button
-                            onClick={() => navigate('/create-event')}
+                            onClick={() => {
+                                if (!currentUser) return openAuthModal('Sign in to publish an event');
+                                navigate('/create-event');
+                            }}
                             className="md:hidden p-2 text-amber-500 hover:bg-amber-500/10 rounded-full transition-colors"
                             aria-label="Add Event"
                         >
                             <span className="material-symbols-outlined text-xl">calendar_add_on</span>
                         </button>
                         <button
-                            onClick={() => navigate('/create-blog')}
+                            onClick={() => {
+                                if (!currentUser) return openAuthModal('Sign in to write a film article');
+                                navigate('/create-blog');
+                            }}
                             className="md:hidden p-2 text-zinc-600 dark:text-zinc-400 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors"
                             aria-label="Write Article"
                         >
@@ -178,7 +186,10 @@ export default function BlogsEvents() {
                             Events
                         </button>
                         <button
-                            onClick={() => setActiveTab('my-blogs')}
+                            onClick={() => {
+                                if (!currentUser) return openAuthModal('Sign in to view your published articles');
+                                setActiveTab('my-blogs');
+                            }}
                             className={`flex flex-1 flex-col items-center justify-center border-b-2 pb-3 pt-3.5 transition-all text-xs font-semibold ${activeTab === 'my-blogs'
                                 ? 'border-b-amber-500 text-amber-500'
                                 : 'border-b-transparent text-zinc-400 hover:text-zinc-200'
@@ -467,7 +478,7 @@ export default function BlogsEvents() {
                                 ) : (
                                     <div className="text-center py-4 bg-black/5 dark:bg-[#090A0C] rounded-xl mb-6 border border-black/[0.04] dark:border-white/[0.07]">
                                         <p className="text-zinc-500 dark:text-zinc-400 text-xs">
-                                            <button onClick={() => navigate('/login')} className="text-amber-500 font-bold hover:underline">Login</button> to comment
+                                            <button onClick={() => openAuthModal('Sign in to comment on this article')} className="text-amber-500 font-bold hover:underline">Sign In</button> to comment
                                         </p>
                                     </div>
                                 )}
