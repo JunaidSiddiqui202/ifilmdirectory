@@ -274,13 +274,14 @@ class RSSNewsService {
             if (raw) {
                 const items: NewsItem[] = JSON.parse(raw);
                 if (Array.isArray(items) && items.length > 0) {
+                    items.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
                     return items;
                 }
             }
         } catch (e) {
             console.warn('Error reading news cache:', e);
         }
-        return SEED_BACKUP_ITEMS;
+        return [...SEED_BACKUP_ITEMS].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
     }
 
     /**
@@ -433,25 +434,35 @@ class RSSNewsService {
                     const timestamp = pubDateStr ? new Date(pubDateStr).getTime() : Date.now();
 
                     const descRaw = el.querySelector('description')?.textContent || '';
-                    const contentRaw = el.querySelector('content\\:encoded, encoded')?.textContent || descRaw;
+                    const encodedNode = el.getElementsByTagNameNS('*', 'encoded')[0] ||
+                                        el.getElementsByTagName('content:encoded')[0] ||
+                                        el.getElementsByTagName('encoded')[0];
+                    const contentRaw = encodedNode?.textContent || descRaw;
                     const content = this.cleanFullText(contentRaw || descRaw);
                     const description = this.cleanHtmlSnippet(descRaw || contentRaw);
 
                     // Extract image/thumbnail
                     let thumbnail = '';
-                    const mediaContent = el.querySelector('media\\:content, content');
+                    const mediaContent = el.getElementsByTagNameNS('*', 'content')[0] || el.getElementsByTagName('media:content')[0];
                     if (mediaContent && mediaContent.getAttribute('url')) {
                         thumbnail = mediaContent.getAttribute('url') || '';
                     }
                     if (!thumbnail) {
+                        const mediaThumb = el.getElementsByTagNameNS('*', 'thumbnail')[0] || el.getElementsByTagName('media:thumbnail')[0];
+                        if (mediaThumb && mediaThumb.getAttribute('url')) {
+                            thumbnail = mediaThumb.getAttribute('url') || '';
+                        }
+                    }
+                    if (!thumbnail) {
                         const enclosure = el.querySelector('enclosure');
-                        if (enclosure && enclosure.getAttribute('type')?.startsWith('image')) {
+                        if (enclosure && (enclosure.getAttribute('type')?.startsWith('image') || enclosure.getAttribute('url')?.match(/\.(jpe?g|png|webp|gif)/i))) {
                             thumbnail = enclosure.getAttribute('url') || '';
                         }
                     }
                     if (!thumbnail) {
                         thumbnail = this.extractImageFromHtml(contentRaw || descRaw);
                     }
+                    thumbnail = this.formatImageUrl(thumbnail);
                     if (!thumbnail) {
                         thumbnail = this.getFallbackImage(feed.industry, title);
                     }
@@ -542,6 +553,7 @@ class RSSNewsService {
             if (!thumbnail) {
                 thumbnail = this.extractImageFromHtml(contentRaw || descRaw);
             }
+            thumbnail = this.formatImageUrl(thumbnail);
             if (!thumbnail) {
                 thumbnail = this.getFallbackImage(feed.industry, title);
             }
@@ -622,16 +634,44 @@ class RSSNewsService {
     }
 
     /**
-     * Extract image URL from raw HTML
+     * Proxies WordPress images through Automattic Jetpack Photon CDN
+     * to eliminate hotlink protection and CORS/referrer blocks
+     */
+    public formatImageUrl(url: string): string {
+        if (!url) return '';
+        // If already on photon CDN or external Unsplash image, keep as-is
+        if (url.includes('.wp.com/') || url.includes('images.unsplash.com')) {
+            return url;
+        }
+        // If WordPress upload, proxy via i0.wp.com
+        if (url.includes('/wp-content/uploads/')) {
+            const clean = url.replace(/^https?:\/\//i, '');
+            return `https://i0.wp.com/${clean}`;
+        }
+        return url;
+    }
+
+    /**
+     * Extract image URL from raw HTML, supporting data-orig-file, srcset, data-src, and standard src
      */
     private extractImageFromHtml(html: string): string {
         if (!html) return '';
+        // 1. Check data-orig-file or data-src (often full high-resolution)
+        const dataSrcMatch = html.match(/<img[^>]+(?:data-orig-file|data-src|data-lazy-src)=["'](https?:\/\/[^"']+)["']/i);
+        if (dataSrcMatch && dataSrcMatch[1] && !dataSrcMatch[1].includes('1x1') && !dataSrcMatch[1].includes('pixel')) {
+            return this.formatImageUrl(dataSrcMatch[1]);
+        }
+        // 2. Check srcset first image
+        const srcsetMatch = html.match(/<img[^>]+srcset=["'](https?:\/\/[^"'\s,]+)/i);
+        if (srcsetMatch && srcsetMatch[1] && !srcsetMatch[1].includes('1x1')) {
+            return this.formatImageUrl(srcsetMatch[1]);
+        }
+        // 3. Check standard src
         const imgMatch = html.match(/<img[^>]+src=["'](https?:\/\/[^"']+)["']/i);
         if (imgMatch && imgMatch[1]) {
-            // Avoid tracking pixels or tiny icons
             const url = imgMatch[1];
             if (!url.includes('1x1') && !url.includes('favicon') && !url.includes('pixel')) {
-                return url;
+                return this.formatImageUrl(url);
             }
         }
         return '';
@@ -663,6 +703,8 @@ class RSSNewsService {
             .replace(/&quot;/g, '"')
             .replace(/&lt;/g, '<')
             .replace(/&gt;/g, '>')
+            .replace(/&#8230;/g, '...')
+            .replace(/&hellip;/g, '...')
             .replace(/&#\d+;/g, '')
             .trim();
     }
@@ -683,7 +725,11 @@ class RSSNewsService {
             .replace(/&quot;/g, '"')
             .replace(/&lt;/g, '<')
             .replace(/&gt;/g, '>')
+            .replace(/&#8230;/g, '')
+            .replace(/&hellip;/g, '')
             .replace(/The post .* appeared first on .*/gi, '')
+            .replace(/\[\s*(?:\.{3}|…|&#8230;|&hellip;)?\s*\]/g, '')
+            .replace(/\s+(?:\.{3}|…)\s*$/g, '')
             .replace(/\n\s*\n\s*\n+/g, '\n\n')
             .trim();
     }
@@ -702,9 +748,13 @@ class RSSNewsService {
             .replace(/&#8220;/g, '"')
             .replace(/&#8221;/g, '"')
             .replace(/&quot;/g, '"')
+            .replace(/&#8230;/g, '')
+            .replace(/&hellip;/g, '')
             .replace(/The post .* appeared first on .*/gi, '')
+            .replace(/\[\s*(?:\.{3}|…|&#8230;|&hellip;)?\s*\]/g, '')
+            .replace(/\s+(?:\.{3}|…)\s*$/g, '')
             .trim();
-        return cleaned.length > 320 ? cleaned.slice(0, 320) + '...' : cleaned;
+        return cleaned.length > 280 ? cleaned.slice(0, 280).trim() + '...' : cleaned;
     }
 
     private normalizeTitle(title: string): string {

@@ -38,7 +38,7 @@ export const generateText = async (prompt: string, context: string = '', languag
             name: 'Groq (Primary)',
             endpoint: 'https://api.groq.com/openai/v1/chat/completions',
             apiKey: groqKey1,
-            models: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant']
+            models: ['qwen/qwen3.8-27b', 'openai/gpt-oss-120b', 'openai/gpt-oss-20b']
         });
     }
 
@@ -49,7 +49,7 @@ export const generateText = async (prompt: string, context: string = '', languag
             name: 'Groq (Secondary)',
             endpoint: 'https://api.groq.com/openai/v1/chat/completions',
             apiKey: groqKey2,
-            models: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant']
+            models: ['qwen/qwen3.8-27b', 'openai/gpt-oss-120b', 'openai/gpt-oss-20b']
         });
     }
 

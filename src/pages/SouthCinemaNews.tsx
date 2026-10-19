@@ -5,6 +5,7 @@ import HamburgerMenu from '../components/HamburgerMenu';
 import Logo from '../components/Logo';
 import BreakingTicker from '../components/BreakingTicker';
 import { rssNewsService, type NewsItem, type RSSFeedSource } from '../services/rssNewsService';
+import { generateText } from '../services/groqService';
 import { useToast } from '../context/ToastContext';
 
 export default function SouthCinemaNews() {
@@ -19,6 +20,8 @@ export default function SouthCinemaNews() {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedArticle, setSelectedArticle] = useState<NewsItem | null>(null);
     const [expandedId, setExpandedId] = useState<string | null>(null);
+    const [expandedStories, setExpandedStories] = useState<{ [id: string]: string }>({});
+    const [isGeneratingStory, setIsGeneratingStory] = useState(false);
 
     // Feed management modal state
     const [isFeedModalOpen, setIsFeedModalOpen] = useState(false);
@@ -27,6 +30,35 @@ export default function SouthCinemaNews() {
     const [newFeedUrl, setNewFeedUrl] = useState('');
     const [newFeedIndustry, setNewFeedIndustry] = useState<RSSFeedSource['industry']>('telugu');
 
+    // Auto expand short teaser articles into full journalistic reporting
+    const expandStoryWithAI = async (article: NewsItem) => {
+        if (expandedStories[article.id] || isGeneratingStory) return;
+        setIsGeneratingStory(true);
+        try {
+            const prompt = `You are a professional film journalist for South Cinema Wire. Given the breaking news headline: "${article.title}" and summary: "${article.description}", write a detailed, comprehensive 3-paragraph news article in professional journalistic tone. Include context, industry significance, fan and audience reaction, and box office or release outlook. Do NOT use markdown headers or bullet points; write 3 clean, engaging paragraphs separated by double line breaks.`;
+            const res = await generateText(prompt, 'South Indian Cinema News', 'English');
+            if (res.text && res.text.length > 80) {
+                setExpandedStories(prev => ({
+                    ...prev,
+                    [article.id]: res.text.trim()
+                }));
+            }
+        } catch (err) {
+            console.warn('AI story expansion error:', err);
+        } finally {
+            setIsGeneratingStory(false);
+        }
+    };
+
+    useEffect(() => {
+        if (selectedArticle) {
+            const isShort = !selectedArticle.content || selectedArticle.content.length < 320 || selectedArticle.content.includes('[...]');
+            if (isShort && !expandedStories[selectedArticle.id]) {
+                expandStoryWithAI(selectedArticle);
+            }
+        }
+    }, [selectedArticle]);
+
     useEffect(() => {
         let mounted = true;
         const loadNews = async () => {
@@ -34,7 +66,8 @@ export default function SouthCinemaNews() {
             try {
                 const res = await rssNewsService.getNews(false);
                 if (mounted) {
-                    setNews(res.items);
+                    const sorted = [...res.items].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                    setNews(sorted);
                     setLastSyncTime(res.lastSync);
                 }
             } catch (err) {
@@ -52,7 +85,8 @@ export default function SouthCinemaNews() {
             if (rssNewsService.isCacheStale()) {
                 const res = await rssNewsService.getNews(true);
                 if (mounted) {
-                    setNews(res.items);
+                    const sorted = [...res.items].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                    setNews(sorted);
                     setLastSyncTime(res.lastSync);
                 }
             }
@@ -69,7 +103,8 @@ export default function SouthCinemaNews() {
         setIsRefreshing(true);
         try {
             const fresh = await rssNewsService.syncAllFeeds();
-            setNews(fresh);
+            const sorted = [...fresh].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+            setNews(sorted);
             setLastSyncTime(Date.now());
             showToast('News & reviews synchronized successfully!', 'success');
         } catch {
@@ -139,26 +174,28 @@ export default function SouthCinemaNews() {
         }
     };
 
-    // Filter news items
-    const filteredNews = news.filter((item) => {
-        // Tab filter
-        if (activeTab === 'news' && item.category !== 'news') return false;
-        if (activeTab === 'review' && item.category !== 'review') return false;
-        if (activeTab === 'telugu' && item.industry !== 'telugu') return false;
-        if (activeTab === 'tamil' && item.industry !== 'tamil') return false;
-        if (activeTab === 'malayalam' && item.industry !== 'malayalam') return false;
-        if (activeTab === 'kannada' && item.industry !== 'kannada') return false;
+    // Filter & sort news items (new news always strictly on top)
+    const filteredNews = news
+        .filter((item) => {
+            // Tab filter
+            if (activeTab === 'news' && item.category !== 'news') return false;
+            if (activeTab === 'review' && item.category !== 'review') return false;
+            if (activeTab === 'telugu' && item.industry !== 'telugu') return false;
+            if (activeTab === 'tamil' && item.industry !== 'tamil') return false;
+            if (activeTab === 'malayalam' && item.industry !== 'malayalam') return false;
+            if (activeTab === 'kannada' && item.industry !== 'kannada') return false;
 
-        // Search query
-        if (searchQuery.trim()) {
-            const q = searchQuery.toLowerCase();
-            return item.title.toLowerCase().includes(q) ||
-                item.description.toLowerCase().includes(q) ||
-                item.source.toLowerCase().includes(q);
-        }
+            // Search query
+            if (searchQuery.trim()) {
+                const q = searchQuery.toLowerCase();
+                return item.title.toLowerCase().includes(q) ||
+                    item.description.toLowerCase().includes(q) ||
+                    item.source.toLowerCase().includes(q);
+            }
 
-        return true;
-    });
+            return true;
+        })
+        .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
     const reviewsCount = news.filter(n => n.category === 'review').length;
     const newsCount = news.filter(n => n.category === 'news').length;
@@ -224,11 +261,8 @@ export default function SouthCinemaNews() {
                     <div>
                         <div className="flex items-center gap-2">
                             <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
-                            <h1 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
+                            <h1 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white tracking-tight">
                                 South Cinema Wire
-                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 uppercase tracking-widest">
-                                    Live RSS
-                                </span>
                             </h1>
                         </div>
                         <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
@@ -419,10 +453,17 @@ export default function SouthCinemaNews() {
                                             src={item.thumbnail}
                                             alt={item.title}
                                             loading="lazy"
+                                            referrerPolicy="no-referrer"
                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                             onError={(e) => {
-                                                // Fallback image if broken
-                                                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&h=450&fit=crop';
+                                                const fallbacks = [
+                                                    'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&h=450&fit=crop',
+                                                    'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=800&h=450&fit=crop',
+                                                    'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&h=450&fit=crop',
+                                                    'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800&h=450&fit=crop',
+                                                    'https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=800&h=450&fit=crop'
+                                                ];
+                                                (e.target as HTMLImageElement).src = fallbacks[Math.abs(item.title.length) % fallbacks.length];
                                             }}
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/30 pointer-events-none" />
@@ -530,7 +571,17 @@ export default function SouthCinemaNews() {
                             <img
                                 src={selectedArticle.thumbnail}
                                 alt={selectedArticle.title}
+                                referrerPolicy="no-referrer"
                                 className="w-full h-full object-cover"
+                                onError={(e) => {
+                                    const fallbacks = [
+                                        'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1200&h=600&fit=crop',
+                                        'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=1200&h=600&fit=crop',
+                                        'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=1200&h=600&fit=crop',
+                                        'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1200&h=600&fit=crop'
+                                    ];
+                                    (e.target as HTMLImageElement).src = fallbacks[Math.abs(selectedArticle.title.length) % fallbacks.length];
+                                }}
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/60 pointer-events-none" />
                             <button
@@ -567,14 +618,46 @@ export default function SouthCinemaNews() {
                                 </div>
                             )}
 
-                            <h2 className="text-base sm:text-xl font-bold text-zinc-900 dark:text-white leading-snug">
-                                {selectedArticle.title}
-                            </h2>
+                            <div className="flex items-start justify-between gap-3">
+                                <h2 className="text-base sm:text-xl font-bold text-zinc-900 dark:text-white leading-snug">
+                                    {selectedArticle.title}
+                                </h2>
+                                {!isGeneratingStory && !expandedStories[selectedArticle.id] && (
+                                    <button
+                                        onClick={() => expandStoryWithAI(selectedArticle)}
+                                        className="shrink-0 px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 text-[11px] font-bold flex items-center gap-1 transition-all active:scale-95"
+                                        title="Enhance article into full report"
+                                    >
+                                        <span className="material-symbols-outlined text-xs">auto_awesome</span>
+                                        <span>Full Report</span>
+                                    </button>
+                                )}
+                            </div>
 
                             {/* Complete Full Story Content */}
-                            <div className="text-xs sm:text-sm text-zinc-700 dark:text-zinc-200 leading-relaxed whitespace-pre-line space-y-3 pt-3 border-t border-zinc-200 dark:border-white/5 font-normal">
-                                {selectedArticle.content || selectedArticle.description}
-                            </div>
+                            {isGeneratingStory && !expandedStories[selectedArticle.id] ? (
+                                <div className="space-y-3 pt-3 border-t border-zinc-200 dark:border-white/5 animate-pulse">
+                                    <div className="flex items-center gap-2 text-xs font-bold text-amber-500 pb-1">
+                                        <span className="material-symbols-outlined text-sm animate-spin">sync</span>
+                                        <span>Synthesizing full journalistic report...</span>
+                                    </div>
+                                    <div className="h-3.5 bg-zinc-200 dark:bg-white/10 rounded-md w-full" />
+                                    <div className="h-3.5 bg-zinc-200 dark:bg-white/10 rounded-md w-5/6" />
+                                    <div className="h-3.5 bg-zinc-200 dark:bg-white/10 rounded-md w-4/6" />
+                                    <p className="text-xs text-zinc-600 dark:text-zinc-400 pt-2 leading-relaxed italic">
+                                        {selectedArticle.content || selectedArticle.description}
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="text-xs sm:text-sm text-zinc-700 dark:text-zinc-200 leading-relaxed space-y-3 pt-3 border-t border-zinc-200 dark:border-white/5 font-normal">
+                                    {((expandedStories[selectedArticle.id] || selectedArticle.content || selectedArticle.description) || '')
+                                        .split('\n\n')
+                                        .filter(Boolean)
+                                        .map((para, i) => (
+                                            <p key={i} className="leading-relaxed">{para.trim()}</p>
+                                        ))}
+                                </div>
+                            )}
                         </div>
 
                         {/* Sticky Action Footer */}
