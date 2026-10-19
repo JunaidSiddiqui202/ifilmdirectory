@@ -21,20 +21,24 @@ import { Timestamp, collection, query, where, getDocs } from 'firebase/firestore
 import { db } from '../firebaseConfig';
 
 // Helper to get YouTube embed URL using privacy-enhanced youtube-nocookie.com
-const getYouTubeEmbedUrl = (url: string): string | null => {
-    const baseParams = 'rel=0&playsinline=1';
+const getYouTubeEmbedUrl = (url: string, muted: boolean = true): string | null => {
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const baseParams = `rel=0&playsinline=1&enablejsapi=1&origin=${encodeURIComponent(origin)}&mute=${muted ? 1 : 0}`;
 
     const shortsMatch = url.match(/youtube\.com\/shorts\/([^?&/]+)/);
-    if (shortsMatch) return `https://www.youtube-nocookie.com/embed/${shortsMatch[1]}?autoplay=1&mute=1&loop=1&playlist=${shortsMatch[1]}&${baseParams}`;
+    if (shortsMatch) return `https://www.youtube-nocookie.com/embed/${shortsMatch[1]}?autoplay=1&loop=1&playlist=${shortsMatch[1]}&${baseParams}`;
 
     const watchMatch = url.match(/youtube\.com\/watch\?v=([^&]+)/);
-    if (watchMatch) return `https://www.youtube-nocookie.com/embed/${watchMatch[1]}?autoplay=1&mute=1&loop=1&playlist=${watchMatch[1]}&${baseParams}`;
+    if (watchMatch) return `https://www.youtube-nocookie.com/embed/${watchMatch[1]}?autoplay=1&loop=1&playlist=${watchMatch[1]}&${baseParams}`;
 
     const shortMatch = url.match(/youtu\.be\/([^?&#/]+)/);
-    if (shortMatch) return `https://www.youtube-nocookie.com/embed/${shortMatch[1]}?autoplay=1&mute=1&loop=1&playlist=${shortMatch[1]}&${baseParams}`;
+    if (shortMatch) return `https://www.youtube-nocookie.com/embed/${shortMatch[1]}?autoplay=1&loop=1&playlist=${shortMatch[1]}&${baseParams}`;
 
     const embedMatch = url.match(/youtube\.com\/embed\/([^?&/]+)/);
-    if (embedMatch) return `https://www.youtube-nocookie.com/embed/${embedMatch[1]}?autoplay=1&mute=1&loop=1&playlist=${embedMatch[1]}&${baseParams}`;
+    if (embedMatch) return `https://www.youtube-nocookie.com/embed/${embedMatch[1]}?autoplay=1&loop=1&playlist=${embedMatch[1]}&${baseParams}`;
+
+    const liveMatch = url.match(/youtube\.com\/live\/([^?&/]+)/);
+    if (liveMatch) return `https://www.youtube-nocookie.com/embed/${liveMatch[1]}?autoplay=1&loop=1&playlist=${liveMatch[1]}&${baseParams}`;
 
     return null;
 };
@@ -83,6 +87,7 @@ export default function ShowreelView1() {
     const [loading, setLoading] = useState(true);
     const containerRef = useRef<HTMLDivElement>(null);
     const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({});
+    const iframeRefs = useRef<{ [key: string]: HTMLIFrameElement | null }>({});
 
     // Interaction states
     const [activeCommentReelId, setActiveCommentReelId] = useState<string | null>(null);
@@ -349,30 +354,149 @@ export default function ShowreelView1() {
         }
     };
 
-    // Observer for autoplay
+    // Synchronized sound toggle for both HTML5 videos and YouTube iframe embeds
+    const toggleSound = (e?: React.MouseEvent) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        const nextMuted = !isMuted;
+        setIsMuted(nextMuted);
+
+        // 1. Synchronize HTML5 video elements
+        Object.values(videoRefs.current).forEach((video) => {
+            if (video) {
+                video.muted = nextMuted;
+                if (!nextMuted) {
+                    video.volume = 1.0;
+                    if (video.paused) {
+                        video.play().catch(() => {});
+                    }
+                }
+            }
+        });
+
+        // 2. Broadcast to YouTube iframe elements via postMessage
+        const sendIframeSound = (iframe: HTMLIFrameElement | null) => {
+            if (!iframe || !iframe.contentWindow) return;
+            try {
+                iframe.contentWindow.postMessage(
+                    JSON.stringify({
+                        event: 'command',
+                        func: nextMuted ? 'mute' : 'unMute',
+                        args: []
+                    }),
+                    '*'
+                );
+                if (!nextMuted) {
+                    iframe.contentWindow.postMessage(
+                        JSON.stringify({
+                            event: 'command',
+                            func: 'setVolume',
+                            args: [100]
+                        }),
+                        '*'
+                    );
+                    iframe.contentWindow.postMessage(
+                        JSON.stringify({
+                            event: 'command',
+                            func: 'playVideo',
+                            args: []
+                        }),
+                        '*'
+                    );
+                }
+            } catch (err) {
+                console.error("Iframe postMessage sound error:", err);
+            }
+        };
+
+        Object.values(iframeRefs.current).forEach(sendIframeSound);
+        document.querySelectorAll('iframe').forEach(sendIframeSound);
+    };
+
+    const handleVideoClick = (_reelId: string, e: React.MouseEvent<HTMLVideoElement>) => {
+        const v = e.currentTarget;
+        if (isMuted) {
+            toggleSound(e);
+            if (v.paused) v.play().catch(() => {});
+        } else {
+            if (v.paused) v.play().catch(() => {});
+            else v.pause();
+        }
+    };
+
+    // Observer for autoplay and sound sync
     useEffect(() => {
         const observer = new IntersectionObserver(
             (entries) => {
                 entries.forEach((entry) => {
                     const videoId = entry.target.getAttribute('data-reel-id');
                     const video = videoRefs.current[videoId || ''];
-                    if (video) {
-                        if (entry.isIntersecting) {
-                            video.play().catch(e => console.log("Autoplay blocked:", e));
-                        } else {
+                    const iframe = iframeRefs.current[videoId || ''];
+
+                    if (entry.isIntersecting) {
+                        if (video) {
+                            video.muted = isMuted;
+                            if (!isMuted) {
+                                video.volume = 1.0;
+                            }
+                            const playPromise = video.play();
+                            if (playPromise !== undefined) {
+                                playPromise.catch((e) => {
+                                    console.log("Autoplay unmuted blocked, falling back to muted:", e);
+                                    video.muted = true;
+                                    video.play().catch((err) => console.log("Muted autoplay blocked:", err));
+                                });
+                            }
+                        }
+                        if (iframe && iframe.contentWindow) {
+                            try {
+                                iframe.contentWindow.postMessage(
+                                    JSON.stringify({
+                                        event: 'command',
+                                        func: isMuted ? 'mute' : 'unMute',
+                                        args: []
+                                    }),
+                                    '*'
+                                );
+                                iframe.contentWindow.postMessage(
+                                    JSON.stringify({
+                                        event: 'command',
+                                        func: 'playVideo',
+                                        args: []
+                                    }),
+                                    '*'
+                                );
+                            } catch {}
+                        }
+                    } else {
+                        if (video) {
                             video.pause();
+                        }
+                        if (iframe && iframe.contentWindow) {
+                            try {
+                                iframe.contentWindow.postMessage(
+                                    JSON.stringify({
+                                        event: 'command',
+                                        func: 'pauseVideo',
+                                        args: []
+                                    }),
+                                    '*'
+                                );
+                            } catch {}
                         }
                     }
                 });
             },
-            { threshold: 0.8 }
+            { threshold: 0.6 }
         );
 
         const currentReels = document.querySelectorAll('[data-reel-id]');
-        currentReels.forEach(el => observer.observe(el));
+        currentReels.forEach((el) => observer.observe(el));
 
         return () => observer.disconnect();
-    }, [reels]);
+    }, [reels, isMuted]);
 
     if (loading) {
         return (
@@ -391,8 +515,9 @@ export default function ShowreelView1() {
                         {reel.type === 'embed' ? (
                             <div className="relative h-full w-full">
                                 <iframe
-                                    src={getYouTubeEmbedUrl(reel.videoUrl) || reel.videoUrl}
-                                    className="h-full w-full"
+                                    ref={(el) => { iframeRefs.current[reel.id] = el; }}
+                                    src={getYouTubeEmbedUrl(reel.videoUrl, isMuted) || reel.videoUrl}
+                                    className="h-full w-full border-0"
                                     allow="autoplay; encrypted-media; gyroscope; picture-in-picture; web-share"
                                     allowFullScreen
                                     referrerPolicy="strict-origin-when-cross-origin"
@@ -402,12 +527,14 @@ export default function ShowreelView1() {
                                     href={reel.videoUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="absolute top-24 right-4 z-30 px-3 py-1.5 rounded-full bg-black/60 hover:bg-black/90 backdrop-blur-md border border-white/20 text-white text-xs font-semibold flex items-center gap-1.5 shadow-lg transition-colors"
+                                    className="absolute top-24 left-4 z-30 px-3 py-1.5 rounded-full bg-black/60 hover:bg-black/90 backdrop-blur-md border border-white/20 text-white text-xs font-semibold flex items-center gap-1.5 shadow-lg transition-colors"
                                     title="Open directly on YouTube"
                                     onClick={(e) => e.stopPropagation()}
                                 >
-                                    <span>Watch on YouTube</span>
-                                    <span className="material-symbols-outlined text-sm">open_in_new</span>
+                                    <span className="material-symbols-outlined text-red-500 text-sm">smart_display</span>
+                                    <span className="hidden sm:inline">Watch on YouTube</span>
+                                    <span className="sm:hidden">YouTube</span>
+                                    <span className="material-symbols-outlined text-xs">open_in_new</span>
                                 </a>
                             </div>
                         ) : (
@@ -415,31 +542,44 @@ export default function ShowreelView1() {
                                 <video
                                     ref={(el) => { videoRefs.current[reel.id] = el; }}
                                     src={reel.videoUrl}
-                                    className="h-full w-full object-contain"
+                                    className="h-full w-full object-contain cursor-pointer"
                                     autoPlay
                                     loop
                                     muted={isMuted}
                                     playsInline
                                     preload="auto"
                                     poster={reel.thumbnail}
-                                    onClick={(e) => {
-                                        const v = e.currentTarget;
-                                        if (v.paused) v.play();
-                                        else v.pause();
-                                    }}
+                                    onClick={(e) => handleVideoClick(reel.id, e)}
                                 />
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setIsMuted(!isMuted);
-                                    }}
-                                    className="absolute top-24 right-4 z-30 size-10 flex items-center justify-center rounded-full bg-black/20 backdrop-blur-xl border border-white/10 text-white"
-                                >
-                                    <span className="material-symbols-outlined text-xl">
-                                        {isMuted ? 'volume_off' : 'volume_up'}
-                                    </span>
-                                </button>
                             </div>
+                        )}
+
+                        {/* Universal Sound / Volume Toggle Button (Active for both Embeds and Native Video) */}
+                        <button
+                            type="button"
+                            onClick={toggleSound}
+                            className={`absolute top-24 right-4 z-30 size-11 flex items-center justify-center rounded-full backdrop-blur-xl border transition-all active:scale-90 shadow-2xl cursor-pointer ${
+                                isMuted
+                                    ? 'bg-black/60 border-white/20 text-white hover:bg-black/80'
+                                    : 'bg-amber-500 border-amber-400 text-white shadow-amber-500/40 ring-2 ring-amber-400/40'
+                            }`}
+                            title={isMuted ? "Unmute Audio" : "Mute Audio"}
+                        >
+                            <span className="material-symbols-outlined text-xl">
+                                {isMuted ? 'volume_off' : 'volume_up'}
+                            </span>
+                        </button>
+
+                        {/* Floating "Tap to Unmute" Pill when muted */}
+                        {isMuted && (
+                            <button
+                                type="button"
+                                onClick={toggleSound}
+                                className="absolute top-24 left-1/2 -translate-x-1/2 z-30 px-3.5 py-1.5 rounded-full bg-black/75 hover:bg-black/95 backdrop-blur-md border border-amber-400/60 text-white text-xs font-bold flex items-center gap-2 shadow-2xl active:scale-95 transition-all cursor-pointer animate-pulse"
+                            >
+                                <span className="material-symbols-outlined text-base text-amber-400">volume_off</span>
+                                <span>Tap to Unmute</span>
+                            </button>
                         )}
                     </div>
 
