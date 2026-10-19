@@ -19,7 +19,6 @@ export default function SouthCinemaNews() {
     const [activeTab, setActiveTab] = useState<'all' | 'news' | 'review' | 'telugu' | 'tamil' | 'malayalam' | 'kannada'>('all');
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedArticle, setSelectedArticle] = useState<NewsItem | null>(null);
-    const [expandedId, setExpandedId] = useState<string | null>(null);
     const [expandedStories, setExpandedStories] = useState<{ [id: string]: string }>({});
     const [isGeneratingStory, setIsGeneratingStory] = useState(false);
 
@@ -171,6 +170,27 @@ export default function SouthCinemaNews() {
         } else {
             navigator.clipboard.writeText(item.link);
             showToast('Article link copied to clipboard!', 'success');
+        }
+    };
+
+    /**
+     * Opens original news article in a focused pop-up window over the current page.
+     * When finished reading, the user can simply close the popup to return.
+     */
+    const openSourcePopup = (url: string, _title?: string) => {
+        if (!url) return;
+        const width = Math.min(1060, Math.max(680, Math.floor(window.innerWidth * 0.88)));
+        const height = Math.min(900, Math.max(600, Math.floor(window.innerHeight * 0.90)));
+        const left = Math.max(0, Math.floor((window.screen.width - width) / 2));
+        const top = Math.max(0, Math.floor((window.screen.height - height) / 2));
+
+        const popupFeatures = `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes,status=no,toolbar=no,menubar=no,location=yes`;
+        const popup = window.open(url, 'CinemaNewsSourcePopup', popupFeatures);
+
+        if (popup) {
+            popup.focus();
+        } else {
+            window.open(url, '_blank', 'noopener,noreferrer');
         }
     };
 
@@ -499,31 +519,24 @@ export default function SouthCinemaNews() {
                                                 {item.title}
                                             </h3>
 
-                                            {/* In-place full text or preview excerpt */}
-                                            {expandedId === item.id ? (
-                                                <div className="text-xs sm:text-sm text-zinc-800 dark:text-zinc-200 leading-relaxed whitespace-pre-line pt-1 border-t border-zinc-200 dark:border-white/5 space-y-2 animate-in fade-in duration-200 max-h-72 overflow-y-auto pr-1">
-                                                    {item.content || item.description}
-                                                </div>
-                                            ) : (
-                                                <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                                                    {item.description}
-                                                </p>
-                                            )}
+                                            <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed line-clamp-3">
+                                                {item.description}
+                                            </p>
                                         </div>
 
-                                        {/* Card Footer with Expand and Actions */}
+                                        {/* Card Footer with Open Source Pop-Up and Reader */}
                                         <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-white/5 flex items-center justify-between">
                                             <button
+                                                type="button"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    setExpandedId(expandedId === item.id ? null : item.id);
+                                                    openSourcePopup(item.link, item.title);
                                                 }}
-                                                className="text-[11px] font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors flex items-center gap-1 active:scale-95"
+                                                className="text-[11px] font-extrabold text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors flex items-center gap-1 active:scale-95 cursor-pointer"
+                                                title="Open original news in pop-up window"
                                             >
-                                                <span>{expandedId === item.id ? 'Collapse News' : 'Read Full Story'}</span>
-                                                <span className="material-symbols-outlined text-sm">
-                                                    {expandedId === item.id ? 'expand_less' : 'expand_more'}
-                                                </span>
+                                                <span>Open Source</span>
+                                                <span className="material-symbols-outlined text-xs">open_in_new</span>
                                             </button>
 
                                             <div className="flex items-center gap-2">
@@ -532,8 +545,8 @@ export default function SouthCinemaNews() {
                                                         e.stopPropagation();
                                                         setSelectedArticle(item);
                                                     }}
-                                                    className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors flex items-center gap-0.5"
-                                                    title="Open in full reader"
+                                                    className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors flex items-center gap-0.5 px-2 py-1 rounded-md hover:bg-zinc-100 dark:hover:bg-white/5"
+                                                    title="Open reader preview"
                                                 >
                                                     <span>Reader</span>
                                                     <span className="material-symbols-outlined text-xs">fullscreen</span>
@@ -634,6 +647,29 @@ export default function SouthCinemaNews() {
                                 )}
                             </div>
 
+                            {/* In-app banner to open full original article in popup window */}
+                            <div className="p-3.5 rounded-xl bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 flex items-center justify-between gap-3">
+                                <div className="flex items-center gap-2.5 min-w-0">
+                                    <span className="material-symbols-outlined text-red-500 text-xl shrink-0">newspaper</span>
+                                    <div className="min-w-0">
+                                        <p className="text-xs font-bold text-zinc-900 dark:text-white truncate">
+                                            Original Article on {selectedArticle.source}
+                                        </p>
+                                        <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">
+                                            Opens in a clean pop-up window. Close when done reading.
+                                        </p>
+                                    </div>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => openSourcePopup(selectedArticle.link, selectedArticle.title)}
+                                    className="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold shrink-0 flex items-center gap-1 shadow-xs transition-all active:scale-95 cursor-pointer"
+                                >
+                                    <span>Open Pop-Up</span>
+                                    <span className="material-symbols-outlined text-xs">open_in_new</span>
+                                </button>
+                            </div>
+
                             {/* Complete Full Story Content */}
                             {isGeneratingStory && !expandedStories[selectedArticle.id] ? (
                                 <div className="space-y-3 pt-3 border-t border-zinc-200 dark:border-white/5 animate-pulse">
@@ -662,15 +698,15 @@ export default function SouthCinemaNews() {
 
                         {/* Sticky Action Footer */}
                         <div className="p-4 sm:px-6 bg-slate-50 dark:bg-[#0e0f12] border-t border-zinc-200 dark:border-white/10 flex items-center gap-3 shrink-0">
-                            <a
-                                href={selectedArticle.link}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex-1 py-2.5 sm:py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-xs sm:text-sm text-center flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95"
+                            <button
+                                type="button"
+                                onClick={() => openSourcePopup(selectedArticle.link, selectedArticle.title)}
+                                className="flex-1 py-3 px-4 rounded-xl bg-red-600 hover:bg-red-700 text-white font-extrabold text-xs sm:text-sm text-center flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 cursor-pointer"
+                                title="Open original news in a pop-up window"
                             >
-                                <span>Read Original Source on {selectedArticle.source}</span>
                                 <span className="material-symbols-outlined text-base">open_in_new</span>
-                            </a>
+                                <span>Read Original Source on {selectedArticle.source}</span>
+                            </button>
 
                             <button
                                 onClick={(e) => handleShare(selectedArticle, e)}
