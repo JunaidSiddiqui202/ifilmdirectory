@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import HamburgerMenu from '../components/HamburgerMenu';
 import Logo from '../components/Logo';
@@ -10,6 +10,7 @@ import { useToast } from '../context/ToastContext';
 
 export default function SouthCinemaNews() {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const { showToast } = useToast();
 
     const [news, setNews] = useState<NewsItem[]>([]);
@@ -57,6 +58,17 @@ export default function SouthCinemaNews() {
             }
         }
     }, [selectedArticle]);
+
+    // Deep-link direct article opener if URL has ?id=... or ?article=...
+    useEffect(() => {
+        const articleId = searchParams.get('id') || searchParams.get('article');
+        if (articleId && news.length > 0) {
+            const found = news.find(n => n.id === articleId);
+            if (found) {
+                setSelectedArticle(found);
+            }
+        }
+    }, [searchParams, news]);
 
     useEffect(() => {
         let mounted = true;
@@ -157,19 +169,20 @@ export default function SouthCinemaNews() {
 
     const handleShare = async (item: NewsItem, e: React.MouseEvent) => {
         e.stopPropagation();
+        const siteLink = `${window.location.origin}/south-cinema?id=${encodeURIComponent(item.id)}`;
         if (navigator.share) {
             try {
                 await navigator.share({
                     title: item.title,
                     text: `${item.title} - Read on iFilmDirectory South Cinema Wire`,
-                    url: item.link
+                    url: siteLink
                 });
             } catch {
                 // User cancelled or share failed
             }
         } else {
-            navigator.clipboard.writeText(item.link);
-            showToast('Article link copied to clipboard!', 'success');
+            navigator.clipboard.writeText(siteLink);
+            showToast('iFilmDirectory news link copied to clipboard!', 'success');
         }
     };
 
@@ -645,29 +658,6 @@ export default function SouthCinemaNews() {
                                         <span>Full Report</span>
                                     </button>
                                 )}
-                            </div>
-
-                            {/* In-app banner to open full original article in popup window */}
-                            <div className="p-3.5 rounded-xl bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 flex items-center justify-between gap-3">
-                                <div className="flex items-center gap-2.5 min-w-0">
-                                    <span className="material-symbols-outlined text-red-500 text-xl shrink-0">newspaper</span>
-                                    <div className="min-w-0">
-                                        <p className="text-xs font-bold text-zinc-900 dark:text-white truncate">
-                                            Original Article on {selectedArticle.source}
-                                        </p>
-                                        <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">
-                                            Opens in a clean pop-up window. Close when done reading.
-                                        </p>
-                                    </div>
-                                </div>
-                                <button
-                                    type="button"
-                                    onClick={() => openSourcePopup(selectedArticle.link, selectedArticle.title)}
-                                    className="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold shrink-0 flex items-center gap-1 shadow-xs transition-all active:scale-95 cursor-pointer"
-                                >
-                                    <span>Open Pop-Up</span>
-                                    <span className="material-symbols-outlined text-xs">open_in_new</span>
-                                </button>
                             </div>
 
                             {/* Complete Full Story Content */}
