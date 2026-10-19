@@ -23,7 +23,7 @@ import { db } from '../firebaseConfig';
 // Helper to get YouTube embed URL using privacy-enhanced youtube-nocookie.com
 const getYouTubeEmbedUrl = (url: string, muted: boolean = true): string | null => {
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    const baseParams = `rel=0&playsinline=1&enablejsapi=1&origin=${encodeURIComponent(origin)}&mute=${muted ? 1 : 0}`;
+    const baseParams = `rel=0&playsinline=1&enablejsapi=1&origin=${encodeURIComponent(origin)}&mute=${muted ? 1 : 0}&controls=0&modestbranding=1&iv_load_policy=3&fs=0&disablekb=1`;
 
     const shortsMatch = url.match(/youtube\.com\/shorts\/([^?&/]+)/);
     if (shortsMatch) return `https://www.youtube-nocookie.com/embed/${shortsMatch[1]}?autoplay=1&loop=1&playlist=${shortsMatch[1]}&${baseParams}`;
@@ -498,6 +498,40 @@ export default function ShowreelView1() {
         return () => observer.disconnect();
     }, [reels, isMuted]);
 
+    const scrollToNext = () => {
+        if (containerRef.current) {
+            containerRef.current.scrollBy({ top: containerRef.current.clientHeight, behavior: 'smooth' });
+        }
+    };
+
+    const scrollToPrev = () => {
+        if (containerRef.current) {
+            containerRef.current.scrollBy({ top: -containerRef.current.clientHeight, behavior: 'smooth' });
+        }
+    };
+
+    // Keyboard navigation (Arrow keys / M for mute)
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (activeCommentReelId || activeMoreMenuReelId) return;
+            const target = e.target as HTMLElement;
+            if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
+
+            if (e.key === 'ArrowDown' || e.key === 'j') {
+                e.preventDefault();
+                scrollToNext();
+            } else if (e.key === 'ArrowUp' || e.key === 'k') {
+                e.preventDefault();
+                scrollToPrev();
+            } else if (e.key === 'm' || e.key === 'M') {
+                e.preventDefault();
+                toggleSound();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [activeCommentReelId, activeMoreMenuReelId, isMuted]);
+
     if (loading) {
         return (
             <div className="flex h-[100dvh] w-full items-center justify-center bg-black">
@@ -507,13 +541,51 @@ export default function ShowreelView1() {
     }
 
     return (
-        <div className="showreel-cinema h-[100dvh] w-full overflow-y-scroll snap-y snap-mandatory no-scrollbar bg-black" data-reel-page="true" ref={containerRef}>
+        <div
+            className="showreel-cinema relative h-[100dvh] w-full overflow-y-scroll snap-y snap-mandatory no-scrollbar bg-zinc-950"
+            data-reel-page="true"
+            ref={containerRef}
+        >
+            {/* Desktop Side Navigation Buttons (Prev / Next Reel) */}
+            <div className="hidden lg:flex fixed right-6 xl:right-10 top-1/2 -translate-y-1/2 flex-col gap-3 z-40">
+                <button
+                    type="button"
+                    onClick={scrollToPrev}
+                    className="size-11 rounded-full bg-zinc-900/90 hover:bg-zinc-800 text-white/80 hover:text-white border border-white/15 flex items-center justify-center backdrop-blur-md shadow-2xl active:scale-90 transition-all cursor-pointer group"
+                    title="Previous Showreel (↑ or K)"
+                >
+                    <span className="material-symbols-outlined text-xl group-hover:-translate-y-0.5 transition-transform">arrow_upward</span>
+                </button>
+                <button
+                    type="button"
+                    onClick={scrollToNext}
+                    className="size-11 rounded-full bg-zinc-900/90 hover:bg-zinc-800 text-white/80 hover:text-white border border-white/15 flex items-center justify-center backdrop-blur-md shadow-2xl active:scale-90 transition-all cursor-pointer group"
+                    title="Next Showreel (↓ or J)"
+                >
+                    <span className="material-symbols-outlined text-xl group-hover:translate-y-0.5 transition-transform">arrow_downward</span>
+                </button>
+            </div>
+
             {reels.map((reel) => (
-                <div key={reel.id} className="showreel-cinema h-[100dvh] w-full snap-start snap-always shrink-0 relative bg-black select-none" data-reel-id={reel.id} data-reel-page="true">
-                    {/* Media Container */}
-                    <div className="absolute inset-0 z-0">
-                        {reel.type === 'embed' ? (
-                            <div className="relative h-full w-full">
+                <section
+                    key={reel.id}
+                    className="showreel-cinema h-[100dvh] w-full snap-start snap-always shrink-0 relative bg-zinc-950 flex items-center justify-center select-none overflow-hidden"
+                    data-reel-id={reel.id}
+                    data-reel-page="true"
+                >
+                    {/* Desktop Ambient Blurred Backdrop */}
+                    <div
+                        className="hidden md:block absolute inset-0 z-0 bg-cover bg-center filter blur-3xl opacity-20 scale-125 pointer-events-none transition-all duration-700"
+                        style={{ backgroundImage: `url(${reel.thumbnail || reel.creatorPhoto || 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&fit=crop'})` }}
+                    />
+                    <div className="hidden md:block absolute inset-0 z-0 bg-black/60 pointer-events-none" />
+
+                    {/* Centered Cinema Phone Frame - Mobile: Edge-to-Edge, Desktop: Sleek Rounded Card */}
+                    <div className="relative w-full h-full sm:max-w-[420px] md:max-w-[430px] sm:h-[92vh] sm:max-h-[860px] sm:rounded-[32px] sm:border sm:border-white/15 sm:shadow-[0_0_80px_rgba(0,0,0,0.95)] overflow-hidden bg-black flex flex-col justify-between z-10">
+
+                        {/* Media Container */}
+                        <div className="absolute inset-0 z-0 bg-black">
+                            {reel.type === 'embed' ? (
                                 <iframe
                                     ref={(el) => { iframeRefs.current[reel.id] = el; }}
                                     src={getYouTubeEmbedUrl(reel.videoUrl, isMuted) || reel.videoUrl}
@@ -523,26 +595,11 @@ export default function ShowreelView1() {
                                     referrerPolicy="strict-origin-when-cross-origin"
                                     title={reel.title}
                                 />
-                                <a
-                                    href={reel.videoUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="absolute top-20 sm:top-24 left-4 z-30 px-3.5 py-1.5 rounded-full bg-zinc-950/85 hover:bg-zinc-900 backdrop-blur-md border border-white/20 text-white text-xs font-bold flex items-center gap-1.5 shadow-2xl transition-all cursor-pointer"
-                                    title="Open directly on YouTube"
-                                    onClick={(e) => e.stopPropagation()}
-                                >
-                                    <span className="material-symbols-outlined text-red-500 text-sm">smart_display</span>
-                                    <span className="hidden sm:inline">Watch on YouTube</span>
-                                    <span className="sm:hidden">YouTube</span>
-                                    <span className="material-symbols-outlined text-xs text-white/80">open_in_new</span>
-                                </a>
-                            </div>
-                        ) : (
-                            <div className="relative h-full w-full group">
+                            ) : (
                                 <video
                                     ref={(el) => { videoRefs.current[reel.id] = el; }}
                                     src={reel.videoUrl}
-                                    className="h-full w-full object-contain cursor-pointer"
+                                    className="h-full w-full object-cover cursor-pointer"
                                     autoPlay
                                     loop
                                     muted={isMuted}
@@ -551,143 +608,187 @@ export default function ShowreelView1() {
                                     poster={reel.thumbnail}
                                     onClick={(e) => handleVideoClick(reel.id, e)}
                                 />
-                            </div>
-                        )}
-
-                        {/* Universal Sound / Volume Toggle Button (Active for both Embeds and Native Video) */}
-                        <button
-                            type="button"
-                            onClick={toggleSound}
-                            className={`absolute top-20 sm:top-24 right-4 z-30 size-11 flex items-center justify-center rounded-full backdrop-blur-xl border transition-all active:scale-90 shadow-2xl cursor-pointer ${
-                                isMuted
-                                    ? 'bg-zinc-950/85 border-white/20 text-white hover:bg-zinc-900'
-                                    : 'bg-amber-500 border-amber-400 text-white shadow-amber-500/40 ring-2 ring-amber-400/40 animate-pulse'
-                            }`}
-                            title={isMuted ? "Unmute Audio" : "Mute Audio"}
-                        >
-                            <span className="material-symbols-outlined text-2xl text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">
-                                {isMuted ? 'volume_off' : 'volume_up'}
-                            </span>
-                        </button>
-
-                        {/* Floating "Tap to Unmute" Pill when muted */}
-                        {isMuted && (
-                            <button
-                                type="button"
-                                onClick={toggleSound}
-                                className="absolute top-20 sm:top-24 left-1/2 -translate-x-1/2 z-30 px-4 py-1.5 rounded-full bg-zinc-950/90 hover:bg-zinc-900 backdrop-blur-md border border-amber-400/70 text-white text-xs font-bold flex items-center gap-2 shadow-2xl active:scale-95 transition-all cursor-pointer animate-pulse"
-                            >
-                                <span className="material-symbols-outlined text-base text-amber-400">volume_off</span>
-                                <span>Tap to Unmute</span>
-                            </button>
-                        )}
-                    </div>
-
-                    {/* Overlays */}
-                    <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/80 via-transparent to-black/40 pointer-events-none" />
-
-                    {/* Top Bar */}
-                    <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between p-4 sm:p-6">
-                        <button
-                            onClick={() => navigate(-1)}
-                            className="size-10 flex items-center justify-center rounded-full bg-zinc-950/80 hover:bg-zinc-900 backdrop-blur-xl border border-white/20 text-white shadow-xl active:scale-90 transition-all cursor-pointer"
-                            title="Back"
-                        >
-                            <span className="material-symbols-outlined text-white text-xl drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">arrow_back_ios_new</span>
-                        </button>
-                        <div className="flex items-center gap-1.5 bg-zinc-950/80 backdrop-blur-xl px-4 py-1.5 rounded-full border border-white/20 shadow-xl">
-                            <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
-                            <span className="text-white text-xs font-black uppercase tracking-widest drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Showreels</span>
-                        </div>
-                        <button
-                            onClick={() => setActiveMoreMenuReelId(reel.id)}
-                            className="size-10 flex items-center justify-center rounded-full bg-zinc-950/80 hover:bg-zinc-900 backdrop-blur-xl border border-white/20 text-white shadow-xl active:scale-90 transition-all cursor-pointer"
-                            title="More Options"
-                        >
-                            <span className="material-symbols-outlined text-white text-xl drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">more_vert</span>
-                        </button>
-                    </div>
-
-                    {/* Engagement Actions (Right Side) */}
-                    <div className="absolute right-4 bottom-28 sm:bottom-32 z-20 flex flex-col gap-5 items-center">
-                        <div className="flex flex-col items-center gap-1">
-                            <button
-                                onClick={() => handleLike(reel.id)}
-                                className={`size-12 flex items-center justify-center rounded-full backdrop-blur-xl border transition-all active:scale-75 shadow-2xl ${
-                                    reel.isLiked
-                                        ? 'bg-red-600 border-red-400 text-white shadow-red-500/40 ring-2 ring-red-400/30'
-                                        : 'bg-zinc-950/85 hover:bg-zinc-900 border-white/20 text-white hover:border-white/40'
-                                }`}
-                                title={reel.isLiked ? "Unlike Reel" : "Like Reel"}
-                            >
-                                <span className={`material-symbols-outlined text-2xl ${reel.isLiked ? 'filled text-white' : 'text-white'} drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]`}>
-                                    favorite
-                                </span>
-                            </button>
-                            <span className="text-[11px] font-black text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] bg-black/60 px-2 py-0.5 rounded-full backdrop-blur-sm border border-white/10">
-                                {formatViews(reel.likes)}
-                            </span>
-                        </div>
-
-                        <div className="flex flex-col items-center gap-1">
-                            <button
-                                onClick={() => setActiveCommentReelId(reel.id)}
-                                className="size-12 flex items-center justify-center rounded-full bg-zinc-950/85 hover:bg-zinc-900 backdrop-blur-xl border border-white/20 hover:border-white/40 active:scale-75 transition-all shadow-2xl text-white"
-                                title="Comments"
-                            >
-                                <span className="material-symbols-outlined text-2xl text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                                    chat_bubble
-                                </span>
-                            </button>
-                            <span className="text-[11px] font-black text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] bg-black/60 px-2 py-0.5 rounded-full backdrop-blur-sm border border-white/10">
-                                {formatViews(reel.comments)}
-                            </span>
-                        </div>
-
-                        <div className="flex flex-col items-center gap-1">
-                            <button
-                                onClick={() => handleShare(reel)}
-                                className="size-12 flex items-center justify-center rounded-full bg-zinc-950/85 hover:bg-zinc-900 backdrop-blur-xl border border-white/20 hover:border-white/40 active:scale-75 transition-all shadow-2xl text-white"
-                                title="Share Showreel"
-                            >
-                                <span className="material-symbols-outlined text-2xl text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                                    share
-                                </span>
-                            </button>
-                            <span className="text-[11px] font-black text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] bg-black/60 px-2 py-0.5 rounded-full backdrop-blur-sm border border-white/10">
-                                Share
-                            </span>
-                        </div>
-                    </div>
-
-                    {/* Info Overlay (Bottom) */}
-                    <div className="absolute bottom-8 left-0 right-16 z-20 p-6 flex flex-col gap-4">
-                        <div className="flex items-center gap-3">
-                            <div
-                                className="size-10 rounded-full bg-cover bg-center border-2 border-primary shadow-lg cursor-pointer"
-                                style={{ backgroundImage: `url(${reel.creatorPhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop'})` }}
-                                onClick={() => navigate(`/profile/${reel.creatorId}`)}
-                            />
-                            <div className="flex-1">
-                                <h3 className="text-white font-black text-sm tracking-tight cursor-pointer hover:underline" onClick={() => navigate(`/profile/${reel.creatorId}`)}>
-                                    {reel.creator}
-                                </h3>
-                                <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest">{reel.category || 'Professional Actor'}</p>
-                            </div>
-                            {currentUser?.uid !== reel.creatorId && (
-                                <button
-                                    onClick={() => handleFollow(reel.creatorId)}
-                                    className={`${reel.isFollowing ? 'bg-white/10 border border-white/20' : 'bg-primary shadow-primary/20'} text-white text-[10px] font-black px-4 py-1.5 rounded-lg uppercase tracking-widest shadow-lg active:scale-90 transition-all`}
-                                >
-                                    {reel.isFollowing ? 'Following' : 'Follow'}
-                                </button>
                             )}
                         </div>
-                        <p className="text-white/90 text-sm font-medium leading-snug line-clamp-2">
-                            {reel.title}
-                        </p>
+
+                        {/* Top and Bottom Atmospheric Gradients */}
+                        <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/75 via-transparent to-black/90 pointer-events-none" />
+
+                        {/* Top Bar Header (ZERO OVERLAP - Single Unified Row) */}
+                        <header className="relative z-30 flex items-center justify-between p-3.5 sm:p-4 bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-auto">
+                            {/* Left: Back Button */}
+                            <button
+                                type="button"
+                                onClick={() => navigate(-1)}
+                                className="size-10 flex items-center justify-center rounded-full bg-black/50 hover:bg-black/75 backdrop-blur-md border border-white/20 text-white shadow-xl active:scale-90 transition-all cursor-pointer"
+                                title="Back to Directory"
+                            >
+                                <span className="material-symbols-outlined text-white text-lg drop-shadow">arrow_back_ios_new</span>
+                            </button>
+
+                            {/* Center: Live Showreels Badge */}
+                            <div className="flex items-center gap-1.5 bg-black/50 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/15 shadow-xl">
+                                <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
+                                <span className="text-white text-xs font-black uppercase tracking-widest drop-shadow">Showreels</span>
+                            </div>
+
+                            {/* Right: Exactly ONE Sound Button + More Options */}
+                            <div className="flex items-center gap-2">
+                                <button
+                                    type="button"
+                                    onClick={toggleSound}
+                                    className={`size-10 flex items-center justify-center rounded-full backdrop-blur-md border transition-all active:scale-90 shadow-xl cursor-pointer ${
+                                        isMuted
+                                            ? 'bg-black/50 hover:bg-black/75 border-white/20 text-white/90'
+                                            : 'bg-amber-500 border-amber-400 text-white shadow-amber-500/40 ring-2 ring-amber-400/40'
+                                    }`}
+                                    title={isMuted ? "Unmute Audio (M)" : "Mute Audio (M)"}
+                                >
+                                    <span className="material-symbols-outlined text-xl text-white drop-shadow">
+                                        {isMuted ? 'volume_off' : 'volume_up'}
+                                    </span>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveMoreMenuReelId(reel.id)}
+                                    className="size-10 flex items-center justify-center rounded-full bg-black/50 hover:bg-black/75 backdrop-blur-md border border-white/20 text-white shadow-xl active:scale-90 transition-all cursor-pointer"
+                                    title="More Options"
+                                >
+                                    <span className="material-symbols-outlined text-white text-xl drop-shadow">more_vert</span>
+                                </button>
+                            </div>
+                        </header>
+
+                        {/* Engagement Actions (Right Side Column) */}
+                        <aside className="absolute right-3 sm:right-3.5 bottom-24 sm:bottom-28 z-30 flex flex-col gap-3.5 sm:gap-4 items-center pointer-events-auto">
+                            {/* Like */}
+                            <div className="flex flex-col items-center gap-1">
+                                <button
+                                    type="button"
+                                    onClick={() => handleLike(reel.id)}
+                                    className={`size-11 sm:size-12 flex items-center justify-center rounded-full backdrop-blur-md border transition-all active:scale-75 shadow-2xl cursor-pointer ${
+                                        reel.isLiked
+                                            ? 'bg-red-600 border-red-400 text-white shadow-red-500/40 ring-2 ring-red-400/30'
+                                            : 'bg-black/50 hover:bg-black/75 border-white/20 text-white hover:border-white/40'
+                                    }`}
+                                    title={reel.isLiked ? "Unlike Reel" : "Like Reel"}
+                                >
+                                    <span className={`material-symbols-outlined text-2xl ${reel.isLiked ? 'filled text-white' : 'text-white'} drop-shadow`}>
+                                        favorite
+                                    </span>
+                                </button>
+                                <span className="text-[10px] font-black text-white drop-shadow bg-black/60 px-2 py-0.5 rounded-full backdrop-blur-sm border border-white/10">
+                                    {formatViews(reel.likes)}
+                                </span>
+                            </div>
+
+                            {/* Comment */}
+                            <div className="flex flex-col items-center gap-1">
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveCommentReelId(reel.id)}
+                                    className="size-11 sm:size-12 flex items-center justify-center rounded-full bg-black/50 hover:bg-black/75 backdrop-blur-md border border-white/20 hover:border-white/40 active:scale-75 transition-all shadow-2xl text-white cursor-pointer"
+                                    title="Comments"
+                                >
+                                    <span className="material-symbols-outlined text-2xl text-white drop-shadow">
+                                        chat_bubble
+                                    </span>
+                                </button>
+                                <span className="text-[10px] font-black text-white drop-shadow bg-black/60 px-2 py-0.5 rounded-full backdrop-blur-sm border border-white/10">
+                                    {formatViews(reel.comments)}
+                                </span>
+                            </div>
+
+                            {/* Share */}
+                            <div className="flex flex-col items-center gap-1">
+                                <button
+                                    type="button"
+                                    onClick={() => handleShare(reel)}
+                                    className="size-11 sm:size-12 flex items-center justify-center rounded-full bg-black/50 hover:bg-black/75 backdrop-blur-md border border-white/20 hover:border-white/40 active:scale-75 transition-all shadow-2xl text-white cursor-pointer"
+                                    title="Share Showreel"
+                                >
+                                    <span className="material-symbols-outlined text-2xl text-white drop-shadow">
+                                        share
+                                    </span>
+                                </button>
+                                <span className="text-[10px] font-black text-white drop-shadow bg-black/60 px-2 py-0.5 rounded-full backdrop-blur-sm border border-white/10">
+                                    Share
+                                </span>
+                            </div>
+
+                            {/* Direct YouTube Link (Integrated cleanly into action column for embeds) */}
+                            {reel.type === 'embed' && (
+                                <div className="flex flex-col items-center gap-1">
+                                    <a
+                                        href={reel.videoUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="size-11 sm:size-12 flex items-center justify-center rounded-full bg-black/50 hover:bg-red-600 backdrop-blur-md border border-white/20 hover:border-red-500 active:scale-75 transition-all shadow-2xl text-white group cursor-pointer"
+                                        title="Watch Directly on YouTube"
+                                    >
+                                        <span className="material-symbols-outlined text-2xl text-red-500 group-hover:text-white transition-colors drop-shadow">
+                                            smart_display
+                                        </span>
+                                    </a>
+                                    <span className="text-[9px] font-black text-white/90 drop-shadow bg-black/60 px-1.5 py-0.5 rounded-full backdrop-blur-sm border border-white/10">
+                                        YouTube
+                                    </span>
+                                </div>
+                            )}
+                        </aside>
+
+                        {/* Bottom Info Overlay (Left aligned with right padding so it never collides with action column) */}
+                        <footer className="relative z-20 p-4 sm:p-5 pr-18 sm:pr-20 pb-5 sm:pb-6 flex flex-col gap-2.5 bg-gradient-to-t from-black/95 via-black/70 to-transparent pointer-events-auto">
+                            {/* Creator Profile Row */}
+                            <div className="flex items-center gap-2.5 flex-wrap">
+                                <div
+                                    className="size-10 rounded-full bg-cover bg-center border-2 border-amber-500 shadow-md cursor-pointer shrink-0"
+                                    style={{ backgroundImage: `url(${reel.creatorPhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop'})` }}
+                                    onClick={() => navigate(`/profile/${reel.creatorId}`)}
+                                />
+                                <div className="min-w-0 flex-1">
+                                    <div className="flex items-center gap-1.5">
+                                        <h3
+                                            className="text-white font-bold text-sm tracking-tight truncate cursor-pointer hover:underline"
+                                            onClick={() => navigate(`/profile/${reel.creatorId}`)}
+                                        >
+                                            {reel.creator}
+                                        </h3>
+                                        <span className="material-symbols-outlined text-amber-400 text-xs filled" title="Verified Creator">
+                                            verified
+                                        </span>
+                                    </div>
+                                    <p className="text-white/60 text-[10px] font-semibold uppercase tracking-wider truncate">
+                                        {reel.category || 'Professional Actor'}
+                                    </p>
+                                </div>
+
+                                {currentUser?.uid !== reel.creatorId && (
+                                    <button
+                                        type="button"
+                                        onClick={() => handleFollow(reel.creatorId)}
+                                        className={`${reel.isFollowing ? 'bg-white/15 border border-white/20 text-white/80' : 'bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/30'} text-[10px] font-black px-3.5 py-1 rounded-full uppercase tracking-wider active:scale-95 transition-all`}
+                                    >
+                                        {reel.isFollowing ? 'Following' : 'Follow'}
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* Showreel Title / Description */}
+                            <p className="text-white/95 text-xs sm:text-sm font-normal leading-snug line-clamp-2 drop-shadow-md">
+                                {reel.title}
+                            </p>
+
+                            {/* Original Sound Attribution */}
+                            <div className="flex items-center gap-1.5 text-white/70 text-[11px] font-medium">
+                                <span className="material-symbols-outlined text-sm text-amber-400">music_note</span>
+                                <span className="truncate">{reel.creator} • Original Audio</span>
+                            </div>
+                        </footer>
                     </div>
-                </div>
+                </section>
             ))}
 
             {/* Premium Comments Modal */}
