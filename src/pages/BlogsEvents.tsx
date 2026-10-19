@@ -127,7 +127,7 @@ export default function BlogsEvents() {
                     <div className="flex items-center gap-2 shrink-0">
                         <button
                             onClick={() => navigate('/create-event')}
-                            className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-black bg-amber-500 hover:bg-amber-400 rounded-xl transition-all shadow-sm"
+                            className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-amber-500 hover:bg-amber-400 rounded-xl transition-all shadow-sm"
                         >
                             <span className="material-symbols-outlined text-sm">calendar_add_on</span>
                             Add Event
@@ -459,7 +459,7 @@ export default function BlogsEvents() {
                                             <button
                                                 onClick={handleSubmitComment}
                                                 disabled={!commentText.trim() || submittingComment}
-                                                className="mt-2 px-3.5 py-1.5 bg-amber-500 text-black font-bold text-xs rounded-xl hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 transition-all shadow-sm"
+                                                className="mt-2 px-3.5 py-1.5 bg-amber-500 text-white font-bold text-xs rounded-xl hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 transition-all shadow-sm"
                                             >
                                                 {submittingComment ? (
                                                     <>

@@ -144,7 +144,7 @@ export default function BottomNav() {
                     <div className="flex items-center justify-center px-2">
                         <button
                             onClick={() => setIsCreateOpen(!isCreateOpen)}
-                            className={`size-11 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black shadow-lg shadow-amber-500/25 flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 border border-zinc-200/50 dark:border-white/20 ${isCreateOpen ? 'rotate-45' : ''}`}
+                            className={`size-11 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white shadow-lg shadow-amber-500/25 flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 border border-zinc-200/50 dark:border-white/20 ${isCreateOpen ? 'rotate-45' : ''}`}
                             title="Create New Post / Job"
                         >
                             <span className="material-symbols-outlined text-2xl font-black">add</span>

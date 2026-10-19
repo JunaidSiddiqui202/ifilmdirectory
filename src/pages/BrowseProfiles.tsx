@@ -725,7 +725,7 @@ export default function BrowseProfiles() {
                             <p className="text-sm text-red-500 font-semibold">{error}</p>
                             <button
                                 onClick={() => window.location.reload()}
-                                className="mt-4 px-4 py-2 bg-amber-500 text-black font-bold rounded-xl text-xs hover:bg-amber-400 transition-colors"
+                                className="mt-4 px-4 py-2 bg-amber-500 text-white font-bold rounded-xl text-xs hover:bg-amber-400 transition-colors"
                             >
                                 Retry
                             </button>

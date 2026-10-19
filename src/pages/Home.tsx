@@ -605,7 +605,7 @@ export default function Home() {
                         ) : (
                             <button
                                 onClick={() => openAuthModal('Sign in to join the filmmaker network')}
-                                className="ml-1 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-extrabold text-xs flex items-center gap-1 shadow-sm active:scale-95 transition-all cursor-pointer"
+                                className="ml-1 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white font-extrabold text-xs flex items-center gap-1 shadow-sm active:scale-95 transition-all cursor-pointer"
                                 title="Sign In"
                             >
                                 <span className="material-symbols-outlined text-[15px] font-black">login</span>

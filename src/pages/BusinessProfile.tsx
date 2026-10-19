@@ -789,7 +789,7 @@ export default function BusinessProfile() {
                                     }
                                     setShowContactModal(true);
                                 }}
-                                className="flex-1 min-w-0 rounded-xl bg-amber-500 hover:bg-amber-400 py-3.5 font-black text-black shadow-lg shadow-amber-500/20 transition-all active:scale-95 flex items-center justify-center gap-2"
+                                className="flex-1 min-w-0 rounded-xl bg-amber-500 hover:bg-amber-400 py-3.5 font-black text-white shadow-lg shadow-amber-500/20 transition-all active:scale-95 flex items-center justify-center gap-2"
                             >
                                 <span className="material-symbols-outlined text-xl">calendar_month</span>
                                 <span className="text-sm font-bold">Contact & Inquire Booking</span>

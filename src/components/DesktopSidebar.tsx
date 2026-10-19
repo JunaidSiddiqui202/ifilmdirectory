@@ -146,7 +146,7 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                                 }
                                 setIsCreateOpen(!isCreateOpen);
                             }}
-                            className="w-full flex items-center justify-center xl:justify-start gap-3.5 px-3 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-extrabold shadow-lg shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-95 group"
+                            className="w-full flex items-center justify-center xl:justify-start gap-3.5 px-3 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white font-extrabold shadow-lg shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-95 group"
                             title="Create Post / Job / Reel"
                         >
                             <span className="material-symbols-outlined text-[24px] font-black">add_circle</span>
@@ -260,9 +260,9 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                     <button
                         onClick={() => openAuthModal('Sign in to join the filmmaker network')}
                         title="Sign In / Register"
-                        className="group relative flex items-center justify-center xl:justify-start gap-3 p-2.5 mt-0.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-extrabold shadow-md shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-95 cursor-pointer"
+                        className="group relative flex items-center justify-center xl:justify-start gap-3 p-2.5 mt-0.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white font-extrabold shadow-md shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-95 cursor-pointer"
                     >
-                        <div className="size-8 rounded-xl bg-black/15 flex items-center justify-center text-black shrink-0">
+                        <div className="size-8 rounded-xl bg-white/20 flex items-center justify-center text-white shrink-0">
                             <span className="material-symbols-outlined text-[20px] font-black">login</span>
                         </div>
                         <div className="hidden xl:flex flex-col text-left leading-tight min-w-0">

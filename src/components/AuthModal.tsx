@@ -158,7 +158,7 @@ export default function AuthModal() {
                         </button>
                         <button
                             onClick={handleEmailSignUp}
-                            className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-extrabold text-xs shadow-md shadow-amber-500/20 transition-all"
+                            className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white font-extrabold text-xs shadow-md shadow-amber-500/20 transition-all"
                         >
                             <span className="material-symbols-outlined text-sm">person_add</span>
                             <span>Register Free</span>

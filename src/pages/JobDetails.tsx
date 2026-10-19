@@ -356,7 +356,7 @@ export default function JobDetails() {
                         {isOwnJob ? (
                             <button
                                 onClick={() => navigate(`/job/${job.id}/applications`)}
-                                className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-amber-500 hover:bg-amber-400 text-black text-sm font-black shadow-lg shadow-amber-500/20 transition-all active:scale-95"
+                                className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-amber-500 hover:bg-amber-400 text-white text-sm font-black shadow-lg shadow-amber-500/20 transition-all active:scale-95"
                             >
                                 <span className="material-symbols-outlined">group</span>
                                 <span>Review Applications ({(job as any).applicationsCount || 0})</span>
@@ -392,7 +392,7 @@ export default function JobDetails() {
 
                                 <button
                                     onClick={handleApply}
-                                    className="flex-1 flex h-12 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black text-xs sm:text-sm font-black shadow-xl shadow-amber-500/20 transition-all active:scale-95"
+                                    className="flex-1 flex h-12 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white text-xs sm:text-sm font-black shadow-xl shadow-amber-500/20 transition-all active:scale-95"
                                 >
                                     <span className="material-symbols-outlined text-lg">send</span>
                                     <span>Apply in iFilm</span>
@@ -468,7 +468,7 @@ export default function JobDetails() {
                                 <button
                                     onClick={confirmApplication}
                                     disabled={isApplying || !disclaimerAccepted}
-                                    className="flex-1 py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-black text-xs disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20"
+                                    className="flex-1 py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-white font-black text-xs disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20"
                                 >
                                     {isApplying ? (
                                         <>

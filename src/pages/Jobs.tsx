@@ -213,7 +213,7 @@ export default function Jobs() {
                                     if (!currentUser) return openAuthModal('Sign in to post a casting call or crew opening');
                                     navigate('/post-job');
                                 }}
-                                className="rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 px-4 py-2 text-xs font-black text-black shadow-lg shadow-amber-500/20 transition-all active:scale-95 flex items-center gap-1.5"
+                                className="rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 px-4 py-2 text-xs font-black text-white shadow-lg shadow-amber-500/20 transition-all active:scale-95 flex items-center gap-1.5"
                             >
                                 <span className="material-symbols-outlined text-base">add_circle</span>
                                 <span>Post Call</span>
@@ -635,7 +635,7 @@ export default function Jobs() {
                                             setSelectedJobModal(null);
                                             navigate(`/job/${id}`);
                                         }}
-                                        className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 hover:brightness-105 transition-all"
+                                        className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 hover:brightness-105 transition-all"
                                     >
                                         <span>Apply in iFilm</span>
                                         <span className="material-symbols-outlined text-sm">arrow_forward</span>

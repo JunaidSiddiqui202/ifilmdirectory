@@ -4,8 +4,8 @@
 
 @layer base {
   :root {
-    --color-primary: #f59e0b;
-    /* Cinema Warm Amber Gold */
+    --color-primary: #6366f1;
+    /* Decent Cinema Royal Indigo & Sapphire Theme */
     --color-background: #f8fafc;
     --color-background-dark: #090a0c;
     --color-surface: #ffffff;
@@ -285,4 +285,19 @@ html:not(.dark) select[class*="bg-[#"] {
 html:not(.dark) input::placeholder,
 html:not(.dark) textarea::placeholder {
   color: #94a3b8 !important;
+}
+
+/* Ensure Royal Indigo & Sapphire buttons and badges have crisp white typography */
+.bg-amber-500.text-black,
+.bg-amber-400.text-black,
+.bg-amber-600.text-black,
+[class*="bg-amber-500"].text-black,
+[class*="bg-amber-600"].text-black,
+[class*="from-amber-500"].text-black,
+[class*="from-amber-"].text-black,
+[class*="from-amber-"] .text-black,
+[class*="bg-amber-"] > span.text-black,
+button[class*="bg-amber-"].text-black,
+a[class*="bg-amber-"].text-black {
+  color: #ffffff !important;
 }

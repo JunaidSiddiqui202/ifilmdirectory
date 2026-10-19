@@ -19,6 +19,20 @@ export default {
         'surface-dark': '#121316',
         'border-light': '#e2e8f0',
         'border-dark': 'rgba(255, 255, 255, 0.08)',
+        // Decent Royal Indigo & Sapphire Blue palette (replaces old gold theme)
+        amber: {
+          50: '#EEF2FF',
+          100: '#E0E7FF',
+          200: '#C7D2FE',
+          300: '#A5B4FC',
+          400: '#818CF8', // Luminous Electric Indigo
+          500: '#6366F1', // Royal Indigo primary
+          600: '#2563EB', // Electric Sapphire Blue
+          700: '#1D4ED8',
+          800: '#1E40AF',
+          900: '#1E1B4B',
+          950: '#0F0D2E',
+        },
       },
       fontFamily: {
         'display': ['Plus Jakarta Sans', 'Spline Sans', '-apple-system', 'sans-serif'],

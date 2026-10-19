@@ -933,7 +933,7 @@ export default function Showcase() {
                             <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-2">Sign in to join the filmmaker discussion</p>
                             <button
                                 onClick={() => openAuthModal('Sign in to post comments and join discussions')}
-                                className="px-4 py-1.5 bg-amber-500 text-black rounded-lg text-xs font-bold hover:bg-amber-400 transition-colors"
+                                className="px-4 py-1.5 bg-amber-500 text-white rounded-lg text-xs font-bold hover:bg-amber-400 transition-colors"
                             >
                                 Sign In / Join
                             </button>
@@ -1135,7 +1135,7 @@ export default function Showcase() {
                         ) : (
                             <button
                                 onClick={() => openAuthModal('Sign in to your account')}
-                                className="px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold transition-all shrink-0 shadow-sm"
+                                className="px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-white text-xs font-bold transition-all shrink-0 shadow-sm"
                             >
                                 Sign In
                             </button>
@@ -1345,7 +1345,7 @@ export default function Showcase() {
                             </div>
                             <button
                                 onClick={() => openAuthModal('Sign in to access your filmmaker profile & post')}
-                                className="w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs transition-all shadow-sm"
+                                className="w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-white font-bold text-xs transition-all shadow-sm"
                             >
                                 Sign In / Join iFilm
                             </button>

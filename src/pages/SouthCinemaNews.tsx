@@ -249,7 +249,7 @@ export default function SouthCinemaNews() {
                         <button
                             onClick={handleManualRefresh}
                             disabled={isRefreshing}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 text-black hover:bg-amber-400 font-bold text-xs transition-all active:scale-95 disabled:opacity-50 shadow-xs"
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 text-white hover:bg-amber-400 font-bold text-xs transition-all active:scale-95 disabled:opacity-50 shadow-xs"
                         >
                             <span className={`material-symbols-outlined text-sm ${isRefreshing ? 'animate-spin' : ''}`}>sync</span>
                             <span className="hidden xs:inline">Refresh</span>
@@ -396,7 +396,7 @@ export default function SouthCinemaNews() {
                         </p>
                         <button
                             onClick={() => { setActiveTab('all'); setSearchQuery(''); }}
-                            className="px-4 py-2 rounded-xl bg-amber-500 text-black text-xs font-bold mt-2 hover:bg-amber-400 transition-all shadow-xs"
+                            className="px-4 py-2 rounded-xl bg-amber-500 text-white text-xs font-bold mt-2 hover:bg-amber-400 transition-all shadow-xs"
                         >
                             Show All Stories
                         </button>
@@ -658,7 +658,7 @@ export default function SouthCinemaNews() {
                                     </select>
                                     <button
                                         type="submit"
-                                        className="h-10 px-4 rounded-lg bg-amber-500 text-black text-xs font-bold hover:bg-amber-400 transition-all shrink-0"
+                                        className="h-10 px-4 rounded-lg bg-amber-500 text-white text-xs font-bold hover:bg-amber-400 transition-all shrink-0"
                                     >
                                         Add Feed
                                     </button>
@@ -732,7 +732,7 @@ export default function SouthCinemaNews() {
                         <div className="pt-2 flex justify-end">
                             <button
                                 onClick={() => setIsFeedModalOpen(false)}
-                                className="px-5 py-2.5 rounded-xl bg-amber-500 text-black font-bold text-xs hover:bg-amber-400 transition-all"
+                                className="px-5 py-2.5 rounded-xl bg-amber-500 text-white font-bold text-xs hover:bg-amber-400 transition-all"
                             >
                                 Done
                             </button>

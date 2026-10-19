@@ -152,7 +152,7 @@ export default function HamburgerMenu() {
                                         }}
                                         className="flex items-center gap-3 p-3 rounded-2xl bg-gradient-to-r from-amber-500/15 to-amber-600/10 border border-amber-500/30 cursor-pointer transition-all active:scale-98"
                                     >
-                                        <div className="size-11 rounded-xl bg-amber-500 text-black flex items-center justify-center shadow-md shrink-0">
+                                        <div className="size-11 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-md shrink-0">
                                             <span className="material-symbols-outlined text-2xl font-black">login</span>
                                         </div>
                                         <div className="flex-1 min-w-0">
@@ -238,7 +238,7 @@ export default function HamburgerMenu() {
                                             setIsOpen(false);
                                             openAuthModal('Sign in to access your filmmaker profile & portfolio');
                                         }}
-                                        className="flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-extrabold text-xs shadow-md transition-all active:scale-95 cursor-pointer"
+                                        className="flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white font-extrabold text-xs shadow-md transition-all active:scale-95 cursor-pointer"
                                     >
                                         <span className="material-symbols-outlined text-lg font-black">login</span>
                                         <span>Sign In / Create Account</span>
