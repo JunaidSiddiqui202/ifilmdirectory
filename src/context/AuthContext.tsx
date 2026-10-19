@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, useRef, type ReactNode 
 import { type User, onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '../firebaseConfig';
 import { unregisterFCMToken } from '../services/fcmService';
+import { initUserPresence, updateUserPresence } from '../services/presenceService';
 
 interface AuthContextType {
     currentUser: User | null;
@@ -90,8 +91,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         };
     }, []);
 
+    // Real-time Presence tracking (Heartbeat + Online/Offline status)
+    useEffect(() => {
+        if (!currentUser?.uid) return;
+        const cleanupPresence = initUserPresence(currentUser.uid);
+        return () => {
+            cleanupPresence();
+        };
+    }, [currentUser?.uid]);
+
     const logout = async () => {
         if (currentUser) {
+            try {
+                await updateUserPresence(currentUser.uid, false);
+            } catch (e) {
+                console.warn('Error marking user offline during logout:', e);
+            }
             await unregisterFCMToken(currentUser.uid);
         }
         return signOut(auth);

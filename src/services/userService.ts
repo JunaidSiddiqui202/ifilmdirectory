@@ -106,6 +106,8 @@ export interface UserProfile {
     verification_tier?: 'gold' | 'blue' | 'gray'; // Added verification tier
     warningCount?: number;
     type?: 'user' | 'service'; // Differentiate between normal users and service providers/studios
+    isOnline?: boolean;
+    lastActive?: string | number | any;
 }
 
 export type AdminRoleType = 'super_admin' | 'admin' | 'moderator' | 'commercial_manager' | 'user_manager' | 'ad_manager';

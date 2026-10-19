@@ -53,6 +53,7 @@ import CreateCampaignModal from '../components/CreateCampaignModal';
 import UserStatusModal from '../components/UserStatusModal';
 import AdminInviteModal from '../components/AdminInviteModal';
 import { type EmailType } from '../services/emailTemplates';
+import { isUserOnline, getUserPresenceInfo } from '../services/presenceService';
 
 type AdminTab = 'dashboard' | 'blogs' | 'moderation' | 'notices' | 'commercial' | 'users' | 'system';
 type ModerationContentType = 'posts' | 'jobs' | 'showreels' | 'logs';
@@ -97,7 +98,7 @@ export default function AdminDashboard() {
     const [isInviteOpen, setIsInviteOpen] = useState(false);
     const [selectedUserForStatus, setSelectedUserForStatus] = useState<UserProfile | null>(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'verified' | 'applications'>('all');
+    const [filterStatus, setFilterStatus] = useState<'all' | 'online' | 'pending' | 'verified' | 'applications'>('all');
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [isClaimingSuperAdmin, setIsClaimingSuperAdmin] = useState(false);
@@ -194,6 +195,23 @@ export default function AdminDashboard() {
             loadTabData();
         }
     }, [activeTab, moderationTab, currentUser]);
+
+    // Live presence polling every 30s to keep user online counters and list fresh
+    useEffect(() => {
+        if (!currentUser) return;
+        const presenceInterval = setInterval(async () => {
+            try {
+                if (activeTab === 'dashboard' || activeTab === 'users') {
+                    const freshUsers = await getAllUsers(true);
+                    setUsers(freshUsers);
+                }
+            } catch (err) {
+                console.warn('Presence auto-refresh error in Admin Dashboard:', err);
+            }
+        }, 30000);
+
+        return () => clearInterval(presenceInterval);
+    }, [currentUser, activeTab]);
 
     // Super Admin Claim Handler
     const handleClaimSuperAdmin = async () => {
@@ -459,6 +477,8 @@ export default function AdminDashboard() {
     const currentSuperAdmin = isSuperAdmin(currentUserProfile?.email, currentUserProfile);
     const commercialMetrics = calculateCommercialMetrics(ads);
     const pendingBlogsCount = blogs.filter(b => b.status === 'pending').length;
+    const onlineUsers = users.filter(u => isUserOnline(u));
+    const onlineUsersCount = onlineUsers.length;
 
     return (
         <div className="flex bg-[#f4f5f8] dark:bg-[#07080a] min-h-screen font-sans text-zinc-900 dark:text-zinc-100 antialiased selection:bg-amber-500 selection:text-black">
@@ -557,6 +577,12 @@ export default function AdminDashboard() {
                             <span className="material-symbols-outlined text-[20px]">manage_accounts</span>
                             <span>Users & Roles</span>
                         </div>
+                        {onlineUsersCount > 0 && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500 text-[10px] font-black border border-emerald-500/20">
+                                <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                {onlineUsersCount} Live
+                            </span>
+                        )}
                     </button>
 
                     <button
@@ -788,8 +814,20 @@ export default function AdminDashboard() {
                         </div>
                     </div>
 
-                    {/* Super Admin Claim & User Badge */}
-                    <div className="flex items-center gap-3">
+                    {/* Live Presence Pill & Super Admin Claim */}
+                    <div className="flex items-center gap-2.5">
+                        <button
+                            onClick={() => { setActiveTab('users'); setFilterStatus('online'); }}
+                            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-black tracking-wider uppercase transition-all shadow-sm active:scale-95 cursor-pointer"
+                            title="Click to view all online users"
+                        >
+                            <span className="relative flex size-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full size-2 bg-emerald-500"></span>
+                            </span>
+                            <span>{onlineUsersCount} Online Now</span>
+                        </button>
+
                         {!currentSuperAdmin ? (
                             <button
                                 onClick={handleClaimSuperAdmin}
@@ -839,10 +877,35 @@ export default function AdminDashboard() {
                     {/* ======================================================== */}
                     {activeTab === 'dashboard' && (
                         <div className="space-y-6">
-                            {/* KPI Metrics Grid */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            {/* KPI Metrics Grid with Real-Time Online Presence */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                                 <div
-                                    onClick={() => setActiveTab('users')}
+                                    onClick={() => { setActiveTab('users'); setFilterStatus('online'); }}
+                                    className="p-6 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-emerald-600/5 to-transparent border border-emerald-500/30 hover:border-emerald-500/60 cursor-pointer transition-all shadow-sm group"
+                                >
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-xs font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                                            <span className="relative flex size-2">
+                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                                <span className="relative inline-flex rounded-full size-2 bg-emerald-500"></span>
+                                            </span>
+                                            Active Presence
+                                        </span>
+                                        <div className="size-8 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
+                                            <span className="material-symbols-outlined text-lg">wifi_tethering</span>
+                                        </div>
+                                    </div>
+                                    <p className="text-3xl font-black tracking-tight text-zinc-900 dark:text-white flex items-baseline gap-2">
+                                        <span>{onlineUsersCount}</span>
+                                        <span className="text-xs font-extrabold uppercase text-emerald-500 tracking-wider">Online</span>
+                                    </p>
+                                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1 font-bold">
+                                        Active in past 5 mins &bull; Live
+                                    </p>
+                                </div>
+
+                                <div
+                                    onClick={() => { setActiveTab('users'); setFilterStatus('all'); }}
                                     className="p-6 rounded-2xl bg-white dark:bg-[#0e1014] border border-zinc-200 dark:border-white/10 hover:border-amber-500/50 cursor-pointer transition-all shadow-sm group"
                                 >
                                     <div className="flex items-center justify-between mb-2">
@@ -903,6 +966,117 @@ export default function AdminDashboard() {
                                     <p className="text-3xl font-black tracking-tight">{notices.filter(n => n.isActive).length}</p>
                                     <p className="text-[11px] text-zinc-400 mt-1 font-bold">Active platform broadcasts</p>
                                 </div>
+                            </div>
+
+                            {/* Live Active Presence Monitor */}
+                            <div className="p-6 rounded-2xl bg-white dark:bg-[#0e1014] border border-zinc-200 dark:border-white/10 shadow-sm space-y-4">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-200 dark:border-white/5 pb-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="size-10 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center border border-emerald-500/20 shrink-0">
+                                            <span className="material-symbols-outlined text-2xl">sensors</span>
+                                        </div>
+                                        <div>
+                                            <div className="flex items-center gap-2">
+                                                <h4 className="font-black text-sm uppercase tracking-wider text-zinc-900 dark:text-white">
+                                                    Live Online Users & Presence Monitor
+                                                </h4>
+                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-extrabold text-[10px] border border-emerald-500/30">
+                                                    <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                                    {onlineUsersCount} Online Now
+                                                </span>
+                                            </div>
+                                            <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
+                                                Real-time active sessions from filmmakers, crew, and verified talents across India
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={async () => {
+                                                const fresh = await getAllUsers(true);
+                                                setUsers(fresh);
+                                                showSuccess("Presence synchronized with live server data");
+                                            }}
+                                            className="px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 text-xs font-bold flex items-center gap-1.5 transition-all"
+                                            title="Sync Live Presence"
+                                        >
+                                            <span className="material-symbols-outlined text-sm">sync</span>
+                                            <span>Refresh</span>
+                                        </button>
+                                        <button
+                                            onClick={() => { setActiveTab('users'); setFilterStatus('online'); }}
+                                            className="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white text-xs font-black uppercase tracking-wider transition-all shadow-md shadow-emerald-500/20 flex items-center gap-1"
+                                        >
+                                            <span>View All Online</span>
+                                            <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {onlineUsers.length === 0 ? (
+                                    <div className="py-8 text-center text-zinc-500 space-y-2">
+                                        <span className="material-symbols-outlined text-3xl text-zinc-400">signal_cellular_nodata</span>
+                                        <p className="text-xs font-bold text-zinc-600 dark:text-zinc-400">No other users active in the last 5 minutes.</p>
+                                        <p className="text-[11px] text-zinc-400">Your presence as Admin is actively broadcasting.</p>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 pt-1">
+                                        {onlineUsers.map(user => {
+                                            const presence = getUserPresenceInfo(user);
+                                            return (
+                                                <div 
+                                                    key={user.uid}
+                                                    className="p-3.5 rounded-xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/5 hover:border-emerald-500/40 transition-all flex items-center justify-between gap-3 group"
+                                                >
+                                                    <div className="flex items-center gap-3 min-w-0">
+                                                        <div className="relative size-11 rounded-full overflow-hidden border-2 border-emerald-500/40 shrink-0 bg-zinc-100 dark:bg-black">
+                                                            <img 
+                                                                src={user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'User')}&background=0D8ABC&color=fff`} 
+                                                                alt="" 
+                                                                className="size-full object-cover" 
+                                                            />
+                                                            <span className="absolute bottom-0 right-0 size-3 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-[#0e1014]" />
+                                                        </div>
+                                                        <div className="min-w-0">
+                                                            <div className="flex items-center gap-1.5">
+                                                                <p className="text-xs font-black text-zinc-900 dark:text-white truncate">
+                                                                    {user.displayName || 'Filmmaker'}
+                                                                </p>
+                                                                {user.verification_tier && (
+                                                                    <span className="material-symbols-outlined text-xs text-amber-400 select-none filled">verified</span>
+                                                                )}
+                                                            </div>
+                                                            <p className="text-[10px] text-zinc-500 capitalize truncate">
+                                                                {user.role?.replace('_', ' ') || 'Filmmaker'} {user.location ? `• ${user.location}` : ''}
+                                                            </p>
+                                                            <span className="inline-flex items-center gap-1 text-[10px] text-emerald-600 dark:text-emerald-400 font-bold mt-0.5">
+                                                                <span className="size-1 rounded-full bg-emerald-500 animate-pulse"></span>
+                                                                <span>{presence.statusText}</span>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex items-center gap-1 shrink-0">
+                                                        <button
+                                                            onClick={() => navigate(`/profile/${user.username || user.uid}`)}
+                                                            className="p-2 rounded-lg bg-zinc-200 dark:bg-white/10 hover:bg-emerald-500 hover:text-white text-zinc-700 dark:text-zinc-300 transition-colors"
+                                                            title="View Public Profile"
+                                                        >
+                                                            <span className="material-symbols-outlined text-sm">visibility</span>
+                                                        </button>
+                                                        <button
+                                                            onClick={() => setSelectedUserForStatus(user)}
+                                                            className="p-2 rounded-lg bg-zinc-200 dark:bg-white/10 hover:bg-amber-500 hover:text-white text-zinc-700 dark:text-zinc-300 transition-colors"
+                                                            title="Inspect / Manage User"
+                                                        >
+                                                            <span className="material-symbols-outlined text-sm">tune</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                )}
                             </div>
 
                             {/* Quick Action Shortcuts */}
@@ -1608,6 +1782,13 @@ export default function AdminDashboard() {
                                         All Accounts ({users.length})
                                     </button>
                                     <button
+                                        onClick={() => setFilterStatus('online')}
+                                        className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap flex items-center gap-1.5 ${filterStatus === 'online' ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20' : 'text-emerald-600 dark:text-emerald-400 hover:text-emerald-700'}`}
+                                    >
+                                        <span className="size-2 rounded-full bg-emerald-500"></span>
+                                        Online Now ({onlineUsersCount})
+                                    </button>
+                                    <button
                                         onClick={() => setFilterStatus('pending')}
                                         className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap ${filterStatus === 'pending' ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'}`}
                                     >
@@ -1644,6 +1825,7 @@ export default function AdminDashboard() {
                                             <tr className="bg-zinc-50 dark:bg-white/[0.02] border-b border-zinc-200 dark:border-white/10 text-zinc-500 uppercase font-black tracking-wider">
                                                 <th className="p-4">Filmmaker / Identity</th>
                                                 <th className="p-4">Craft & Role</th>
+                                                <th className="p-4">Presence</th>
                                                 <th className="p-4">Verification</th>
                                                 <th className="p-4">Account Status</th>
                                                 <th className="p-4">Admin Privileges</th>
@@ -1659,6 +1841,9 @@ export default function AdminDashboard() {
                                                             <p className="text-[10px] text-zinc-500">{r.email}</p>
                                                         </td>
                                                         <td className="p-4 font-bold text-zinc-600 dark:text-zinc-300 capitalize">{r.role}</td>
+                                                        <td className="p-4">
+                                                            <span className="text-[10px] text-zinc-400">Application</span>
+                                                        </td>
                                                         <td className="p-4">
                                                             <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${r.status === 'approved' ? 'bg-green-500/10 text-green-500' : r.status === 'rejected' ? 'bg-red-500/10 text-red-500' : 'bg-amber-500/10 text-amber-500'}`}>
                                                                 {r.status}
@@ -1699,24 +1884,52 @@ export default function AdminDashboard() {
                                                 ))
                                             ) : (
                                                 users
-                                                    .filter(u => filterStatus === 'all' || u.verification?.status === filterStatus)
-                                                    .map(u => (
-                                                        <tr key={u.uid} className="hover:bg-zinc-50 dark:hover:bg-white/[0.02] transition-colors">
-                                                        <td className="p-4">
-                                                            <div className="flex items-center gap-3">
-                                                                <div className="size-10 rounded-full overflow-hidden border border-zinc-200 dark:border-white/10 shrink-0">
-                                                                    <img src={u.photoURL || ''} alt="" className="size-full object-cover" />
+                                                    .filter(u => {
+                                                        if (filterStatus === 'all') return true;
+                                                        if (filterStatus === 'online') return isUserOnline(u);
+                                                        return u.verification?.status === filterStatus;
+                                                    })
+                                                    .map(u => {
+                                                        const presence = getUserPresenceInfo(u);
+                                                        return (
+                                                            <tr key={u.uid} className="hover:bg-zinc-50 dark:hover:bg-white/[0.02] transition-colors">
+                                                            <td className="p-4">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className="relative size-10 rounded-full overflow-hidden border border-zinc-200 dark:border-white/10 shrink-0">
+                                                                        <img src={u.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(u.displayName || 'User')}&background=0D8ABC&color=fff`} alt="" className="size-full object-cover" />
+                                                                        {presence.isOnline && (
+                                                                            <span className="absolute bottom-0 right-0 size-2.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-[#0e1014]" />
+                                                                        )}
+                                                                    </div>
+                                                                    <div className="min-w-0">
+                                                                        <p className="font-black text-zinc-900 dark:text-white truncate flex items-center gap-1.5">
+                                                                            <span>{u.displayName || 'Unnamed Filmmaker'}</span>
+                                                                            {presence.isOnline && (
+                                                                                <span className="size-1.5 rounded-full bg-emerald-500 inline-block animate-pulse" title="Online now" />
+                                                                            )}
+                                                                        </p>
+                                                                        <p className="text-[10px] text-zinc-500 truncate">{u.email}</p>
+                                                                    </div>
                                                                 </div>
-                                                                <div className="min-w-0">
-                                                                    <p className="font-black text-zinc-900 dark:text-white truncate">{u.displayName || 'Unnamed Filmmaker'}</p>
-                                                                    <p className="text-[10px] text-zinc-500 truncate">{u.email}</p>
-                                                                </div>
-                                                            </div>
-                                                        </td>
+                                                            </td>
 
-                                                        <td className="p-4 font-bold text-zinc-600 dark:text-zinc-300 capitalize">
-                                                            {u.role?.replace('_', ' ') || 'Filmmaker'}
-                                                        </td>
+                                                            <td className="p-4 font-bold text-zinc-600 dark:text-zinc-300 capitalize">
+                                                                {u.role?.replace('_', ' ') || 'Filmmaker'}
+                                                            </td>
+
+                                                            {/* Presence Status */}
+                                                            <td className="p-4">
+                                                                {presence.isOnline ? (
+                                                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-black text-[10px]">
+                                                                        <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                                                        <span>Online now</span>
+                                                                    </span>
+                                                                ) : (
+                                                                    <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium">
+                                                                        {presence.statusText}
+                                                                    </span>
+                                                                )}
+                                                            </td>
 
                                                         <td className="p-4">
                                                             <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${u.verification?.status === 'verified' ? 'bg-green-500/10 text-green-500 border border-green-500/20' : u.verification?.status === 'pending' ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' : 'bg-zinc-200 dark:bg-white/10 text-zinc-400'}`}>
@@ -1787,7 +2000,9 @@ export default function AdminDashboard() {
                                                             </div>
                                                         </td>
                                                     </tr>
-                                                )))}
+                                                );
+                                            })
+                                        )}
                                         </tbody>
                                     </table>
                                 </div>
