@@ -877,7 +877,7 @@ export default function BusinessProfile() {
 
                             <button
                                 onClick={() => navigate(`/messaging`)}
-                                className="mt-5 w-full rounded-xl bg-amber-500 hover:bg-amber-400 py-3 text-xs font-black text-black transition-all shadow-md flex items-center justify-center gap-2"
+                                className="mt-5 w-full rounded-xl bg-amber-500 hover:bg-amber-600 py-3 text-xs font-black text-white transition-all shadow-md flex items-center justify-center gap-2"
                             >
                                 <span className="material-symbols-outlined text-sm">chat</span>
                                 <span>Message on iFilm Directory</span>

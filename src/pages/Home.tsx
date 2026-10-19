@@ -1080,7 +1080,7 @@ export default function Home() {
                                             Film Review & Verdict
                                         </span>
                                     </div>
-                                    <span className="text-sm font-black text-black bg-amber-500 px-2.5 py-0.5 rounded-lg">
+                                    <span className="text-sm font-black text-white bg-amber-500 px-2.5 py-0.5 rounded-lg">
                                         {selectedNewsArticle.rating || '★ CERTIFIED'}
                                     </span>
                                 </div>
@@ -1101,7 +1101,7 @@ export default function Home() {
                                 href={selectedNewsArticle.link}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex-1 py-2.5 sm:py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs sm:text-sm text-center flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95"
+                                className="flex-1 py-2.5 sm:py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-xs sm:text-sm text-center flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95"
                             >
                                 <span>Read Full Story on {selectedNewsArticle.source}</span>
                                 <span className="material-symbols-outlined text-base">open_in_new</span>

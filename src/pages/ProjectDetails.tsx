@@ -127,7 +127,7 @@ export default function ProjectDetails() {
 
                 <button
                     onClick={() => navigate('/browse-profiles')}
-                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold transition-all shadow-md shadow-amber-500/10 shrink-0"
+                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition-all shadow-md shadow-amber-500/10 shrink-0"
                 >
                     <span className="material-symbols-outlined text-base">person_add</span>
                     <span className="hidden sm:inline">Add Crew</span>

@@ -361,7 +361,7 @@ export default function Login() {
                         {currentUser ? (
                             <button
                                 onClick={() => navigate('/home')}
-                                className="px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs sm:text-sm shadow-lg shadow-amber-500/20 transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+                                className="px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-xs sm:text-sm shadow-lg shadow-amber-500/20 transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
                             >
                                 <span>Enter App</span>
                                 <span className="material-symbols-outlined text-base">arrow_forward</span>
@@ -380,7 +380,7 @@ export default function Login() {
                                 <button
                                     type="button"
                                     onClick={() => scrollToAuthBox('signup')}
-                                    className="px-3 sm:px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs transition-all shadow-sm cursor-pointer whitespace-nowrap"
+                                    className="px-3 sm:px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-xs transition-all shadow-sm cursor-pointer whitespace-nowrap"
                                 >
                                     Sign Up
                                 </button>

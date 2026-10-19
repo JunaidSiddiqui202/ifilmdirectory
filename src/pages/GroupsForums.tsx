@@ -147,7 +147,7 @@ export default function GroupsForums() {
                 <div className="flex items-center gap-2.5">
                     <button
                         onClick={() => setShowCreateModal(true)}
-                        className="flex items-center gap-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 px-4 py-2 text-xs font-bold text-black shadow-lg shadow-amber-500/20 transition-all active:scale-95"
+                        className="flex items-center gap-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 px-4 py-2 text-xs font-bold text-white shadow-lg shadow-amber-500/20 transition-all active:scale-95"
                     >
                         <span className="material-symbols-outlined text-base">add</span>
                         <span>Start Discussion</span>

@@ -280,77 +280,77 @@ html:not(.dark) textarea::placeholder {
 }
 
 /* ========================================================
-   CRISP WHITE TYPOGRAPHY ON SOLID BRAND / PRIMARY / AMBER / SAPPHIRE
-   Guarantees high contrast white text in both Day & Night modes.
+   CRISP WHITE TYPOGRAPHY ON SOLID BRAND / CNN RED BUTTONS & CHIPS
+   Guarantees high contrast white text in both Day & Night modes
+   without bleeding into container backgrounds.
    ======================================================== */
 .btn-primary,
-button[class*="bg-amber-"]:not([class*="/10"]):not([class*="/15"]):not([class*="/20"]):not([class*="/25"]):not([class*="/30"]):not([class*="/5"]):not([class*="/0."]),
-button[class*="from-amber-"]:not([class*="/"]):not([class*="from-amber-500/"]):not([class*="from-amber-600/"]),
-button[class*="bg-primary"],
-a[class*="bg-amber-"]:not([class*="/10"]):not([class*="/15"]):not([class*="/20"]):not([class*="/25"]):not([class*="/30"]):not([class*="/5"]):not([class*="/0."]),
-a[class*="from-amber-"]:not([class*="/"]):not([class*="from-amber-500/"]):not([class*="from-amber-600/"]),
-a[class*="bg-primary"],
-span[class*="bg-amber-"]:not([class*="/10"]):not([class*="/15"]):not([class*="/20"]):not([class*="/25"]):not([class*="/30"]):not([class*="/5"]):not([class*="/0."]),
-span[class*="from-amber-"]:not([class*="/"]):not([class*="from-amber-500/"]):not([class*="from-amber-600/"]),
-[class*="bg-amber-500"]:not([class*="/"]):not(input):not(textarea),
-[class*="bg-amber-600"]:not([class*="/"]):not(input):not(textarea),
-[class*="from-amber-500"]:not([class*="/"]) {
+button[class~="bg-amber-500"],
+button[class~="bg-amber-600"],
+button[class~="bg-primary"],
+a[class~="bg-amber-500"],
+a[class~="bg-amber-600"],
+a[class~="bg-primary"],
+span[class~="bg-amber-500"],
+span[class~="bg-amber-600"],
+button[class~="from-amber-500"],
+button[class~="from-amber-600"],
+a[class~="from-amber-500"],
+a[class~="from-amber-600"],
+span[class~="from-amber-500"],
+span[class~="from-amber-600"] {
   color: #ffffff !important;
 }
 
 .btn-primary *,
-button[class*="bg-amber-"]:not([class*="/10"]):not([class*="/15"]):not([class*="/20"]):not([class*="/25"]):not([class*="/30"]):not([class*="/5"]):not([class*="/0."]) *,
-button[class*="from-amber-"] *,
-button[class*="bg-primary"] *,
-a[class*="bg-amber-"]:not([class*="/10"]):not([class*="/15"]):not([class*="/20"]):not([class*="/25"]):not([class*="/30"]):not([class*="/5"]):not([class*="/0."]) *,
-a[class*="from-amber-"] *,
-a[class*="bg-primary"] *,
-span[class*="bg-amber-"]:not([class*="/10"]):not([class*="/15"]):not([class*="/20"]):not([class*="/25"]):not([class*="/30"]):not([class*="/5"]):not([class*="/0."]) *,
-span[class*="from-amber-"] * {
+button[class~="bg-amber-500"] *,
+button[class~="bg-amber-600"] *,
+button[class~="bg-primary"] *,
+a[class~="bg-amber-500"] *,
+a[class~="bg-amber-600"] *,
+a[class~="bg-primary"] *,
+span[class~="bg-amber-500"] *,
+span[class~="bg-amber-600"] *,
+button[class~="from-amber-500"] *,
+button[class~="from-amber-600"] *,
+a[class~="from-amber-500"] *,
+a[class~="from-amber-600"] *,
+span[class~="from-amber-500"] *,
+span[class~="from-amber-600"] * {
   color: #ffffff !important;
   fill: #ffffff !important;
 }
 
-/* Explicit Day Theme (Light Mode) High-Contrast Override */
+/* Day theme safety: ensure buttons and action pills stay white */
 html:not(.dark) .btn-primary,
-html:not(.dark) button[class*="bg-amber-"]:not([class*="/10"]):not([class*="/15"]):not([class*="/20"]):not([class*="/25"]):not([class*="/30"]):not([class*="/5"]):not([class*="/0."]),
-html:not(.dark) button[class*="from-amber-"]:not([class*="/"]):not([class*="from-amber-500/"]):not([class*="from-amber-600/"]),
-html:not(.dark) button[class*="bg-primary"],
-html:not(.dark) a[class*="bg-amber-"]:not([class*="/10"]):not([class*="/15"]):not([class*="/20"]):not([class*="/25"]):not([class*="/30"]):not([class*="/5"]):not([class*="/0."]),
-html:not(.dark) a[class*="from-amber-"]:not([class*="/"]):not([class*="from-amber-500/"]):not([class*="from-amber-600/"]),
-html:not(.dark) a[class*="bg-primary"],
-html:not(.dark) span[class*="bg-amber-"]:not([class*="/10"]):not([class*="/15"]):not([class*="/20"]):not([class*="/25"]):not([class*="/30"]):not([class*="/5"]):not([class*="/0."]),
-html:not(.dark) span[class*="from-amber-"]:not([class*="/"]):not([class*="from-amber-500/"]):not([class*="from-amber-600/"]),
-html:not(.dark) [class*="bg-amber-500"]:not([class*="/"]):not(input):not(textarea),
-html:not(.dark) [class*="bg-amber-600"]:not([class*="/"]):not(input):not(textarea),
-html:not(.dark) [class*="from-amber-500"]:not([class*="/"]),
-html:not(.dark) .btn-primary *,
-html:not(.dark) button[class*="bg-amber-"]:not([class*="/10"]):not([class*="/15"]):not([class*="/20"]):not([class*="/25"]):not([class*="/30"]):not([class*="/5"]):not([class*="/0."]) *,
-html:not(.dark) button[class*="from-amber-"]:not([class*="/"]):not([class*="from-amber-500/"]):not([class*="from-amber-600/"]) *,
-html:not(.dark) button[class*="bg-primary"] *,
-html:not(.dark) a[class*="bg-amber-"]:not([class*="/10"]):not([class*="/15"]):not([class*="/20"]):not([class*="/25"]):not([class*="/30"]):not([class*="/5"]):not([class*="/0."]) *,
-html:not(.dark) a[class*="from-amber-"]:not([class*="/"]):not([class*="from-amber-500/"]):not([class*="from-amber-600/"]) *,
-html:not(.dark) a[class*="bg-primary"] *,
-html:not(.dark) span[class*="bg-amber-"]:not([class*="/10"]):not([class*="/15"]):not([class*="/20"]):not([class*="/25"]):not([class*="/30"]):not([class*="/5"]):not([class*="/0."]) *,
-html:not(.dark) span[class*="from-amber-"]:not([class*="/"]):not([class*="from-amber-500/"]):not([class*="from-amber-600/"]) * {
+html:not(.dark) button[class~="bg-amber-500"],
+html:not(.dark) button[class~="bg-amber-600"],
+html:not(.dark) button[class~="bg-primary"],
+html:not(.dark) a[class~="bg-amber-500"],
+html:not(.dark) a[class~="bg-amber-600"],
+html:not(.dark) a[class~="bg-primary"],
+html:not(.dark) span[class~="bg-amber-500"],
+html:not(.dark) span[class~="bg-amber-600"],
+html:not(.dark) button[class~="from-amber-500"],
+html:not(.dark) button[class~="from-amber-600"],
+html:not(.dark) a[class~="from-amber-500"],
+html:not(.dark) a[class~="from-amber-600"] {
   color: #ffffff !important;
-  fill: #ffffff !important;
 }
 
-/* Translucent pills / tags in Day theme - Crisp CNN Red */
-html:not(.dark) [class*="bg-amber-"][class*="/10"]:not(button):not(a),
-html:not(.dark) [class*="bg-amber-"][class*="/15"]:not(button):not(a),
-html:not(.dark) [class*="bg-amber-"][class*="/20"]:not(button):not(a),
-html:not(.dark) [class*="bg-amber-"][class*="/25"]:not(button):not(a),
-html:not(.dark) [class*="bg-amber-"][class*="/30"]:not(button):not(a),
-html:not(.dark) [class*="bg-amber-"][class*="/5"]:not(button):not(a) {
-  color: #CC0000 !important;
-}
-html:not(.dark) [class*="bg-amber-"][class*="/10"]:not(button):not(a) *,
-html:not(.dark) [class*="bg-amber-"][class*="/15"]:not(button):not(a) *,
-html:not(.dark) [class*="bg-amber-"][class*="/20"]:not(button):not(a) *,
-html:not(.dark) [class*="bg-amber-"][class*="/25"]:not(button):not(a) *,
-html:not(.dark) [class*="bg-amber-"][class*="/30"]:not(button):not(a) *,
-html:not(.dark) [class*="bg-amber-"][class*="/5"]:not(button):not(a) * {
-  color: #CC0000 !important;
+html:not(.dark) .btn-primary *,
+html:not(.dark) button[class~="bg-amber-500"] *,
+html:not(.dark) button[class~="bg-amber-600"] *,
+html:not(.dark) button[class~="bg-primary"] *,
+html:not(.dark) a[class~="bg-amber-500"] *,
+html:not(.dark) a[class~="bg-amber-600"] *,
+html:not(.dark) a[class~="bg-primary"] *,
+html:not(.dark) span[class~="bg-amber-500"] *,
+html:not(.dark) span[class~="bg-amber-600"] *,
+html:not(.dark) button[class~="from-amber-500"] *,
+html:not(.dark) button[class~="from-amber-600"] *,
+html:not(.dark) a[class~="from-amber-500"] *,
+html:not(.dark) a[class~="from-amber-600"] * {
+  color: #ffffff !important;
+  fill: #ffffff !important;
 }

@@ -102,11 +102,11 @@ export default function BreakingTicker({ variant = 'home', onNewsClick, onJobCli
 
     const getIndustryBadge = (industry: NewsItem['industry']) => {
         switch (industry) {
-            case 'telugu': return { label: 'Tollywood', color: 'text-amber-600 dark:text-amber-400 bg-amber-500/15 border-amber-500/30' };
-            case 'tamil': return { label: 'Kollywood', color: 'text-rose-600 dark:text-rose-400 bg-rose-500/15 border-rose-500/30' };
-            case 'malayalam': return { label: 'Mollywood', color: 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/15 border-emerald-500/30' };
-            case 'kannada': return { label: 'Sandalwood', color: 'text-purple-600 dark:text-purple-400 bg-purple-500/15 border-purple-500/30' };
-            default: return { label: 'Cinema Wire', color: 'text-blue-600 dark:text-blue-400 bg-blue-500/15 border-blue-500/30' };
+            case 'telugu': return { label: 'Tollywood', color: 'text-white bg-amber-600 border-amber-500/40' };
+            case 'tamil': return { label: 'Kollywood', color: 'text-white bg-rose-600 border-rose-500/40' };
+            case 'malayalam': return { label: 'Mollywood', color: 'text-white bg-emerald-600 border-emerald-500/40' };
+            case 'kannada': return { label: 'Sandalwood', color: 'text-white bg-purple-600 border-purple-500/40' };
+            default: return { label: 'Cinema Wire', color: 'text-white bg-blue-600 border-blue-500/40' };
         }
     };
 

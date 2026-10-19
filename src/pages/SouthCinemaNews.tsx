@@ -176,11 +176,11 @@ export default function SouthCinemaNews() {
 
     const getIndustryBadge = (industry: NewsItem['industry']) => {
         switch (industry) {
-            case 'telugu': return { label: 'Tollywood', color: 'text-amber-400 bg-amber-500/10 border-amber-500/20' };
-            case 'tamil': return { label: 'Kollywood', color: 'text-rose-400 bg-rose-500/10 border-rose-500/20' };
-            case 'malayalam': return { label: 'Mollywood', color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' };
-            case 'kannada': return { label: 'Sandalwood', color: 'text-purple-400 bg-purple-500/10 border-purple-500/20' };
-            default: return { label: 'South Cinema', color: 'text-blue-400 bg-blue-500/10 border-blue-500/20' };
+            case 'telugu': return { label: 'Tollywood', color: 'text-white bg-red-600/90 border-red-500/40 shadow-xs' };
+            case 'tamil': return { label: 'Kollywood', color: 'text-white bg-rose-600/90 border-rose-500/40 shadow-xs' };
+            case 'malayalam': return { label: 'Mollywood', color: 'text-white bg-emerald-600/90 border-emerald-500/40 shadow-xs' };
+            case 'kannada': return { label: 'Sandalwood', color: 'text-white bg-purple-600/90 border-purple-500/40 shadow-xs' };
+            default: return { label: 'South Cinema', color: 'text-white bg-blue-600/90 border-blue-500/40 shadow-xs' };
         }
     };
 
@@ -561,7 +561,7 @@ export default function SouthCinemaNews() {
                                             Film Review & Verdict
                                         </span>
                                     </div>
-                                    <span className="text-sm font-black text-black bg-amber-500 px-2.5 py-0.5 rounded-lg">
+                                    <span className="text-sm font-black text-white bg-amber-500 px-2.5 py-0.5 rounded-lg">
                                         {selectedArticle.rating || '★ RATED'}
                                     </span>
                                 </div>
@@ -583,7 +583,7 @@ export default function SouthCinemaNews() {
                                 href={selectedArticle.link}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex-1 py-2.5 sm:py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs sm:text-sm text-center flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95"
+                                className="flex-1 py-2.5 sm:py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-xs sm:text-sm text-center flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95"
                             >
                                 <span>Read Original Source on {selectedArticle.source}</span>
                                 <span className="material-symbols-outlined text-base">open_in_new</span>
