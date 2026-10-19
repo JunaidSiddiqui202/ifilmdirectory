@@ -1617,19 +1617,32 @@ export default function Home() {
 
                             <div className="flex items-center gap-2">
                                 {selectedJobModal.applicationEmail && (
-                                    <a
-                                        href={`mailto:${selectedJobModal.applicationEmail}?subject=${encodeURIComponent(`Application for ${selectedJobModal.title} - iFilmDirectory`)}&body=${encodeURIComponent(`Hi ${selectedJobModal.company} Team,\n\nI am writing to apply for the ${selectedJobModal.title} position on iFilmDirectory.\n\nPlease find my portfolio and credits attached.\n\nBest regards.`)}`}
-                                        className="px-4 py-2.5 rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-black font-bold text-xs flex items-center gap-1.5 hover:opacity-90 transition-opacity"
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            if (!currentUser) {
+                                                openAuthModal('Sign in to apply for casting calls & jobs');
+                                                return;
+                                            }
+                                            window.location.href = `mailto:${selectedJobModal.applicationEmail}?subject=${encodeURIComponent(`Application for ${selectedJobModal.title} - iFilmDirectory`)}&body=${encodeURIComponent(`Hi ${selectedJobModal.company} Team,\n\nI am writing to apply for the ${selectedJobModal.title} position on iFilmDirectory.\n\nPlease find my portfolio and credits attached.\n\nBest regards.`)}`;
+                                        }}
+                                        className="px-4 py-2.5 rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-black font-bold text-xs flex items-center gap-1.5 hover:opacity-90 transition-opacity cursor-pointer"
                                     >
                                         <span className="material-symbols-outlined text-sm">mail</span>
                                         <span>Apply via Email</span>
-                                    </a>
+                                    </button>
                                 )}
 
                                 {selectedJobModal.sourceUrl && (
                                     <button
                                         type="button"
-                                        onClick={() => openSourcePopup(selectedJobModal.sourceUrl!, selectedJobModal.title)}
+                                        onClick={() => {
+                                            if (!currentUser) {
+                                                openAuthModal('Sign in to access verified application links');
+                                                return;
+                                            }
+                                            openSourcePopup(selectedJobModal.sourceUrl!, selectedJobModal.title);
+                                        }}
                                         className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 hover:brightness-105 transition-all cursor-pointer"
                                     >
                                         <span className="text-white">Apply on Source</span>
