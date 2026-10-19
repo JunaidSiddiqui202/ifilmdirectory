@@ -510,6 +510,26 @@ export default function ShowreelView1() {
         }
     };
 
+    const handleBack = (e?: React.MouseEvent) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        if (window.history.state && typeof window.history.state.idx === 'number' && window.history.state.idx > 0) {
+            navigate(-1);
+        } else {
+            navigate('/home');
+        }
+    };
+
+    const handleHome = (e?: React.MouseEvent) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        navigate('/home');
+    };
+
     // Keyboard navigation (Arrow keys / M for mute)
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -615,21 +635,31 @@ export default function ShowreelView1() {
                         <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/75 via-transparent to-black/90 pointer-events-none" />
 
                         {/* Top Bar Header (ZERO OVERLAP - Single Unified Row) */}
-                        <header className="relative z-30 flex items-center justify-between p-3.5 sm:p-4 bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-auto">
-                            {/* Left: Back Button */}
-                            <button
-                                type="button"
-                                onClick={() => navigate(-1)}
-                                className="size-10 flex items-center justify-center rounded-full bg-black/50 hover:bg-black/75 backdrop-blur-md border border-white/20 text-white shadow-xl active:scale-90 transition-all cursor-pointer"
-                                title="Back to Directory"
-                            >
-                                <span className="material-symbols-outlined text-white text-lg drop-shadow">arrow_back_ios_new</span>
-                            </button>
+                        <header className="relative z-30 flex items-center justify-between p-3.5 sm:p-4 bg-gradient-to-b from-black/85 via-black/40 to-transparent pointer-events-auto">
+                            {/* Left: Back & Home Navigation Buttons */}
+                            <div className="flex items-center gap-2">
+                                <button
+                                    type="button"
+                                    onClick={handleBack}
+                                    className="size-10 flex items-center justify-center rounded-full bg-black/60 hover:bg-black/85 backdrop-blur-md border border-white/20 text-white shadow-xl active:scale-90 transition-all cursor-pointer group"
+                                    title="Go Back"
+                                >
+                                    <span className="material-symbols-outlined text-white text-xl drop-shadow group-hover:-translate-x-0.5 transition-transform">arrow_back</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleHome}
+                                    className="size-10 flex items-center justify-center rounded-full bg-black/60 hover:bg-black/85 backdrop-blur-md border border-white/20 text-white shadow-xl active:scale-90 transition-all cursor-pointer group"
+                                    title="Go to Home Feed"
+                                >
+                                    <span className="material-symbols-outlined text-white text-xl drop-shadow group-hover:scale-110 transition-transform">home</span>
+                                </button>
+                            </div>
 
                             {/* Center: Live Showreels Badge */}
-                            <div className="flex items-center gap-1.5 bg-black/50 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/15 shadow-xl">
-                                <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
-                                <span className="text-white text-xs font-black uppercase tracking-widest drop-shadow">Showreels</span>
+                            <div className="flex items-center gap-1.5 bg-black/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20 shadow-xl">
+                                <span className="size-2 rounded-full bg-amber-400 animate-pulse shadow-sm shadow-amber-400" />
+                                <span className="text-white text-xs font-black uppercase tracking-wider drop-shadow">Showreels</span>
                             </div>
 
                             {/* Right: Exactly ONE Sound Button + More Options */}
@@ -639,7 +669,7 @@ export default function ShowreelView1() {
                                     onClick={toggleSound}
                                     className={`size-10 flex items-center justify-center rounded-full backdrop-blur-md border transition-all active:scale-90 shadow-xl cursor-pointer ${
                                         isMuted
-                                            ? 'bg-black/50 hover:bg-black/75 border-white/20 text-white/90'
+                                            ? 'bg-black/60 hover:bg-black/85 border-white/20 text-white/90'
                                             : 'bg-amber-500 border-amber-400 text-white shadow-amber-500/40 ring-2 ring-amber-400/40'
                                     }`}
                                     title={isMuted ? "Unmute Audio (M)" : "Mute Audio (M)"}
@@ -652,7 +682,7 @@ export default function ShowreelView1() {
                                 <button
                                     type="button"
                                     onClick={() => setActiveMoreMenuReelId(reel.id)}
-                                    className="size-10 flex items-center justify-center rounded-full bg-black/50 hover:bg-black/75 backdrop-blur-md border border-white/20 text-white shadow-xl active:scale-90 transition-all cursor-pointer"
+                                    className="size-10 flex items-center justify-center rounded-full bg-black/60 hover:bg-black/85 backdrop-blur-md border border-white/20 text-white shadow-xl active:scale-90 transition-all cursor-pointer"
                                     title="More Options"
                                 >
                                     <span className="material-symbols-outlined text-white text-xl drop-shadow">more_vert</span>
@@ -768,8 +798,15 @@ export default function ShowreelView1() {
                                 {currentUser?.uid !== reel.creatorId && (
                                     <button
                                         type="button"
-                                        onClick={() => handleFollow(reel.creatorId)}
-                                        className={`${reel.isFollowing ? 'bg-white/15 border border-white/20 text-white/80' : 'bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/30'} text-[10px] font-black px-3.5 py-1 rounded-full uppercase tracking-wider active:scale-95 transition-all`}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleFollow(reel.creatorId);
+                                        }}
+                                        className={`${
+                                            reel.isFollowing
+                                                ? 'bg-zinc-800/90 border border-white/20 text-white hover:bg-zinc-700'
+                                                : 'bg-amber-500 hover:bg-amber-400 text-black font-black shadow-md shadow-amber-500/20'
+                                        } text-[10px] px-3.5 py-1 rounded-full uppercase tracking-wider active:scale-95 transition-all shrink-0 cursor-pointer`}
                                     >
                                         {reel.isFollowing ? 'Following' : 'Follow'}
                                     </button>
