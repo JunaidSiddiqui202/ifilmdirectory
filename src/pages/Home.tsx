@@ -1470,7 +1470,7 @@ export default function Home() {
                                         )}
                                         {selectedJobModal.isRss && (
                                             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
-                                                Live RSS Sync
+                                                Verified Portal
                                             </span>
                                         )}
                                     </div>

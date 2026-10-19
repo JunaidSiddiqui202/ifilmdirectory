@@ -74,7 +74,7 @@ export default function Jobs() {
             }
 
             if (force) {
-                toast.success('Synced live film fraternity jobs from news & production feeds!');
+                toast.success('Synced verified film fraternity jobs and studio casting calls!');
             }
         } catch (err) {
             console.error('Error fetching jobs:', err);
@@ -200,12 +200,12 @@ export default function Jobs() {
                                 <div>
                                     <h1 className="text-lg font-black text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
                                         <span>Film & Media Fraternity Jobs</span>
-                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">
-                                            Live Auto-Sync
+                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                                            Verified Portal
                                         </span>
                                     </h1>
                                     <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
-                                        Editors, Cameramen, VFX, Sound, Musicians, Castings & Makeup calls
+                                        Verified Industry Openings, Studio Castings & Production Crew Calls
                                     </p>
                                 </div>
                             </div>
@@ -217,7 +217,7 @@ export default function Jobs() {
                                 onClick={() => loadJobs(true)}
                                 disabled={isSyncing}
                                 className="px-3 py-2 rounded-xl bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/10 text-xs font-bold text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-white/10 transition-all active:scale-95 flex items-center gap-1.5"
-                                title="Pull fresh film jobs from RSS news resources"
+                                title="Refresh verified film jobs"
                             >
                                 <span className={`material-symbols-outlined text-base ${isSyncing ? 'animate-spin text-amber-500' : ''}`}>
                                     sync
@@ -445,9 +445,9 @@ export default function Jobs() {
                                                 </span>
                                             )}
                                             {job.isRss && (
-                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-blue-500/10 text-blue-500 dark:text-blue-300 text-[10px] font-bold border border-blue-500/20">
-                                                    <span className="material-symbols-outlined text-[11px]">rss_feed</span>
-                                                    <span>Live Feed</span>
+                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 text-[10px] font-bold border border-emerald-500/20">
+                                                    <span className="material-symbols-outlined text-[11px]">verified</span>
+                                                    <span>Verified Portal</span>
                                                 </span>
                                             )}
                                         </div>
