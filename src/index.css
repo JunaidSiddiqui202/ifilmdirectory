@@ -299,11 +299,7 @@ a[class~="from-amber-500"],
 a[class~="from-amber-600"],
 span[class~="from-amber-500"],
 span[class~="from-amber-600"],
-.sent-message-bubble,
-div[class*="from-amber-500"],
-div[class*="from-amber-600"],
-div[class*="bg-amber-500"],
-div[class*="bg-amber-600"] {
+.sent-message-bubble {
   color: #ffffff !important;
 }
 
@@ -322,11 +318,7 @@ a[class~="from-amber-500"] *,
 a[class~="from-amber-600"] *,
 span[class~="from-amber-500"] *,
 span[class~="from-amber-600"] *,
-.sent-message-bubble *,
-div[class*="from-amber-500"] *,
-div[class*="from-amber-600"] *,
-div[class*="bg-amber-500"] *,
-div[class*="bg-amber-600"] * {
+.sent-message-bubble * {
   color: #ffffff !important;
   fill: #ffffff !important;
 }
@@ -345,11 +337,7 @@ html:not(.dark) button[class~="from-amber-500"],
 html:not(.dark) button[class~="from-amber-600"],
 html:not(.dark) a[class~="from-amber-500"],
 html:not(.dark) a[class~="from-amber-600"],
-html:not(.dark) .sent-message-bubble,
-html:not(.dark) div[class*="from-amber-500"],
-html:not(.dark) div[class*="from-amber-600"],
-html:not(.dark) div[class*="bg-amber-500"],
-html:not(.dark) div[class*="bg-amber-600"] {
+html:not(.dark) .sent-message-bubble {
   color: #ffffff !important;
 }
 
@@ -366,11 +354,7 @@ html:not(.dark) button[class~="from-amber-500"] *,
 html:not(.dark) button[class~="from-amber-600"] *,
 html:not(.dark) a[class~="from-amber-500"] *,
 html:not(.dark) a[class~="from-amber-600"] *,
-html:not(.dark) .sent-message-bubble *,
-html:not(.dark) div[class*="from-amber-500"] *,
-html:not(.dark) div[class*="from-amber-600"] *,
-html:not(.dark) div[class*="bg-amber-500"] *,
-html:not(.dark) div[class*="bg-amber-600"] * {
+html:not(.dark) .sent-message-bubble * {
   color: #ffffff !important;
   fill: #ffffff !important;
 }

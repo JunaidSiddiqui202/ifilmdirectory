@@ -350,30 +350,30 @@ export default function JobDetails() {
                     </section>
 
                     {/* CASTING & RECRUITMENT SAFETY DISCLAIMER */}
-                    <section className="rounded-3xl bg-amber-500/5 dark:bg-amber-500/[0.03] border border-amber-500/20 p-5 sm:p-6 space-y-3">
+                    <section className="rounded-3xl bg-amber-50/90 dark:bg-[#1a1714] border border-amber-300/80 dark:border-amber-500/30 p-5 sm:p-6 space-y-3 shadow-xs">
                         <div className="flex items-center gap-2.5">
-                            <span className="material-symbols-outlined text-amber-500 text-xl">verified_user</span>
-                            <h3 className="text-sm font-extrabold text-zinc-900 dark:text-white">
+                            <span className="material-symbols-outlined text-amber-800 dark:text-amber-400 text-xl">verified_user</span>
+                            <h3 className="text-sm font-extrabold text-amber-950 dark:text-white">
                                 iFilmDirectory Casting & Opportunity Safety Notice
                             </h3>
                         </div>
-                        <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                        <p className="text-xs text-zinc-800 dark:text-zinc-200 leading-relaxed font-normal">
                             iFilmDirectory is an open directory for film fraternity opportunities. <strong>Never pay money for auditions, registration, security deposits, or artist cards.</strong> Legitimate productions and casting directors never charge talent. Always verify production banners independently before attending private auditions or sharing sensitive personal data.
                         </p>
-                        <div className="pt-2 border-t border-amber-500/15 flex flex-wrap items-center justify-between gap-3 text-xs">
-                            <div className="flex items-center gap-1.5 text-zinc-600 dark:text-zinc-400 text-[11px]">
-                                <span className="material-symbols-outlined text-sm text-amber-500">report</span>
+                        <div className="pt-2 border-t border-amber-300/50 dark:border-amber-500/20 flex flex-wrap items-center justify-between gap-3 text-xs">
+                            <div className="flex items-center gap-1.5 text-zinc-700 dark:text-zinc-300 text-[11px]">
+                                <span className="material-symbols-outlined text-sm text-red-600 dark:text-red-400">report</span>
                                 <span>Report suspicious activity or fee demands:</span>
                                 <a
                                     href={`mailto:jobs@ifilmdirectory.com?subject=${encodeURIComponent(`Report Suspicious Job: ${job.title} (${job.company})`)}`}
-                                    className="font-bold text-amber-600 dark:text-amber-400 hover:underline"
+                                    className="font-extrabold text-amber-800 dark:text-amber-400 hover:underline"
                                 >
                                     jobs@ifilmdirectory.com
                                 </a>
                             </div>
                             <a
                                 href="mailto:support@ifilmdirectory.com"
-                                className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 hover:text-amber-500 transition-colors"
+                                className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 hover:text-amber-600 transition-colors"
                             >
                                 Help & Support Desk
                             </a>

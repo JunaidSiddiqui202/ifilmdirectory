@@ -1390,25 +1390,25 @@ export default function Home() {
                             </div>
 
                             {/* Editorial & Review Attribution Box */}
-                            <div className="p-3.5 rounded-xl bg-amber-500/5 dark:bg-amber-400/[0.04] border border-amber-500/20 text-xs space-y-2">
-                                <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-bold text-[11px] uppercase tracking-wider">
+                            <div className="p-3.5 rounded-xl bg-amber-50/90 dark:bg-[#1a1714] border border-amber-300/80 dark:border-amber-500/30 text-xs space-y-2">
+                                <div className="flex items-center gap-1.5 text-amber-900 dark:text-amber-400 font-extrabold text-[11px] uppercase tracking-wider">
                                     <span className="material-symbols-outlined text-sm">verified_user</span>
                                     <span>Editorial Attribution & Fair Use</span>
                                 </div>
-                                <p className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                                <p className="text-[11px] text-zinc-800 dark:text-zinc-200 leading-relaxed font-normal">
                                     Aggregated under fair use and public RSS syndication. All trademarks, story excerpts, and copyright belong exclusively to {selectedNewsArticle.source}. Film reviews represent independent viewpoints of their respective critics.
                                 </p>
-                                <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] border-t border-amber-500/15">
-                                    <span className="text-zinc-500 dark:text-zinc-400">Queries & DMCA:</span>
+                                <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] border-t border-amber-300/50 dark:border-amber-500/20">
+                                    <span className="text-zinc-700 dark:text-zinc-300 font-medium">Queries & DMCA:</span>
                                     <a
                                         href={`mailto:editorial@ifilmdirectory.com?subject=Editorial Inquiry: ${encodeURIComponent(selectedNewsArticle.title)}`}
-                                        className="text-amber-600 dark:text-amber-400 font-bold hover:underline inline-flex items-center gap-1"
+                                        className="text-amber-800 dark:text-amber-400 font-extrabold hover:underline inline-flex items-center gap-1"
                                     >
                                         <span className="material-symbols-outlined text-xs">mail</span>
                                         editorial@ifilmdirectory.com
                                     </a>
-                                    <span className="text-zinc-400 dark:text-zinc-600">•</span>
-                                    <a href="mailto:contact@ifilmdirectory.com" className="text-zinc-600 dark:text-zinc-400 hover:text-amber-500">
+                                    <span className="text-zinc-400 dark:text-zinc-500">•</span>
+                                    <a href="mailto:contact@ifilmdirectory.com" className="text-zinc-700 dark:text-zinc-300 hover:text-amber-600 font-medium">
                                         contact@ifilmdirectory.com
                                     </a>
                                 </div>
@@ -1559,30 +1559,30 @@ export default function Home() {
                             )}
 
                             {/* In-Modal Casting & Opportunity Safety Alert */}
-                            <div className="p-3.5 rounded-xl bg-amber-500/10 dark:bg-amber-400/[0.05] border border-amber-500/20 text-xs space-y-2">
+                            <div className="p-3.5 rounded-xl bg-amber-50/90 dark:bg-[#1a1714] border border-amber-300/80 dark:border-amber-500/30 text-xs space-y-2">
                                 <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-bold text-[11px] uppercase tracking-wider">
+                                    <div className="flex items-center gap-1.5 text-amber-900 dark:text-amber-400 font-extrabold text-[11px] uppercase tracking-wider">
                                         <span className="material-symbols-outlined text-sm">shield</span>
                                         <span>Safety & Anti-Fraud Notice</span>
                                     </div>
                                     <a
                                         href={`mailto:jobs@ifilmdirectory.com?subject=Job Safety Report: ${encodeURIComponent(selectedJobModal.title)} at ${encodeURIComponent(selectedJobModal.company)}`}
-                                        className="text-[10px] font-bold text-red-500 hover:text-red-600 dark:text-red-400 flex items-center gap-1 hover:underline"
+                                        className="text-[10px] font-extrabold text-red-600 dark:text-red-400 flex items-center gap-1 hover:underline"
                                     >
                                         <span className="material-symbols-outlined text-xs">flag</span>
                                         <span>Report Listing</span>
                                     </a>
                                 </div>
-                                <p className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                                <p className="text-[11px] text-zinc-800 dark:text-zinc-200 leading-relaxed font-normal">
                                     iFilmDirectory never charges fees for auditions or applications. Never pay anyone for roles, screen tests, or job processing. Legitimate productions never charge talent. Verify producer credentials before attending private auditions.
                                 </p>
-                                <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] border-t border-amber-500/15">
-                                    <span className="text-zinc-500 dark:text-zinc-400">Fraud Helpline:</span>
-                                    <a href="mailto:jobs@ifilmdirectory.com" className="text-amber-600 dark:text-amber-400 font-bold hover:underline">
+                                <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] border-t border-amber-300/50 dark:border-amber-500/20">
+                                    <span className="text-zinc-700 dark:text-zinc-300 font-medium">Fraud Helpline:</span>
+                                    <a href="mailto:jobs@ifilmdirectory.com" className="text-amber-800 dark:text-amber-400 font-extrabold hover:underline">
                                         jobs@ifilmdirectory.com
                                     </a>
-                                    <span className="text-zinc-400 dark:text-zinc-600">•</span>
-                                    <a href="mailto:support@ifilmdirectory.com" className="text-zinc-600 dark:text-zinc-400 hover:text-amber-500">
+                                    <span className="text-zinc-400 dark:text-zinc-500">•</span>
+                                    <a href="mailto:support@ifilmdirectory.com" className="text-zinc-700 dark:text-zinc-300 hover:text-amber-600 font-medium">
                                         support@ifilmdirectory.com
                                     </a>
                                 </div>
