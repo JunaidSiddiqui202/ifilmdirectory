@@ -208,10 +208,10 @@ export default function MessagesList() {
                         </button>
                         <button 
                             onClick={() => navigate('/browse-profiles')}
-                            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs transition-all shadow-md shadow-amber-500/10"
+                            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-white font-bold text-xs transition-all shadow-md shadow-amber-500/20"
                         >
-                            <span className="material-symbols-outlined text-base">edit_square</span>
-                            <span className="hidden sm:inline">New Thread</span>
+                            <span className="material-symbols-outlined text-base text-white">edit_square</span>
+                            <span className="hidden sm:inline text-white">New Thread</span>
                         </button>
                     </div>
                 </div>
@@ -252,8 +252,8 @@ export default function MessagesList() {
                                         className="w-full h-full object-cover"
                                     />
                                 </div>
-                                <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-amber-500 text-black rounded-full flex items-center justify-center border-2 border-white dark:border-[#090A0C] shadow-sm">
-                                    <span className="material-symbols-outlined text-[13px] font-bold">add</span>
+                                <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-amber-500 text-white rounded-full flex items-center justify-center border-2 border-white dark:border-[#090A0C] shadow-sm">
+                                    <span className="material-symbols-outlined text-[13px] font-bold text-white">add</span>
                                 </div>
                             </div>
                             <span className="text-[11px] font-semibold text-zinc-800 dark:text-zinc-200">Your Status</span>
@@ -292,7 +292,7 @@ export default function MessagesList() {
                         onClick={() => setActiveTab('primary')}
                         className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap shadow-xs ${
                             activeTab === 'primary'
-                                ? 'bg-amber-500 text-black shadow-md shadow-amber-500/20'
+                                ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20'
                                 : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-white/5 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >
@@ -302,7 +302,7 @@ export default function MessagesList() {
                         onClick={() => setActiveTab('requests')}
                         className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap shadow-xs ${
                             activeTab === 'requests'
-                                ? 'bg-amber-500 text-black shadow-md shadow-amber-500/20'
+                                ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20'
                                 : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-white/5 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >
@@ -312,7 +312,7 @@ export default function MessagesList() {
                         onClick={() => setActiveTab('general')}
                         className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap shadow-xs ${
                             activeTab === 'general'
-                                ? 'bg-amber-500 text-black shadow-md shadow-amber-500/20'
+                                ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20'
                                 : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-white/5 hover:text-zinc-900 dark:hover:text-white'
                         }`}
                     >
@@ -338,7 +338,7 @@ export default function MessagesList() {
                             </p>
                             <button
                                 onClick={() => navigate('/browse-profiles')}
-                                className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs transition-all shadow-lg shadow-amber-500/20"
+                                className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-white font-bold text-xs transition-all shadow-lg shadow-amber-500/20"
                             >
                                 Explore Filmmakers
                             </button>

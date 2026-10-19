@@ -117,7 +117,7 @@ export default function Notifications() {
                         <h1 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
                             <span>Notifications</span>
                             {unreadCount > 0 && (
-                                <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-500 text-black font-extrabold shadow-sm">
+                                <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-500 text-white font-extrabold shadow-sm">
                                     {unreadCount} New
                                 </span>
                             )}
@@ -173,7 +173,7 @@ export default function Notifications() {
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
                                     isActive
-                                        ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-black border-amber-400 shadow-md shadow-amber-500/20'
+                                        ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white border-transparent shadow-md shadow-amber-500/20'
                                         : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-white/[0.06] hover:text-zinc-900 dark:hover:text-white hover:border-zinc-300 dark:hover:border-white/20 shadow-sm'
                                 }`}
                             >
@@ -246,7 +246,7 @@ export default function Notifications() {
                                                         e.stopPropagation();
                                                         handleNotificationClick(notification);
                                                     }}
-                                                    className="px-3 py-1.5 bg-amber-500 text-black text-xs font-bold rounded-xl hover:bg-amber-400 transition-all shadow-sm"
+                                                    className="px-3 py-1.5 bg-amber-500 text-white text-xs font-bold rounded-xl hover:bg-amber-400 transition-all shadow-sm"
                                                 >
                                                     View
                                                 </button>
@@ -269,7 +269,7 @@ export default function Notifications() {
                             </p>
                             <button
                                 onClick={() => navigate('/jobs')}
-                                className="px-4 py-2 rounded-xl bg-amber-500 text-black text-xs font-bold hover:bg-amber-400 transition-all shadow-md shadow-amber-500/10"
+                                className="px-4 py-2 rounded-xl bg-amber-500 text-white text-xs font-bold hover:bg-amber-400 transition-all shadow-md shadow-amber-500/10"
                             >
                                 Explore Casting Calls
                             </button>

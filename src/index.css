@@ -233,43 +233,35 @@ html:not(.dark) figure .text-white {
   color: #ffffff !important;
 }
 
-/* Ensure amber buttons with black text keep black text */
-html:not(.dark) [class*="bg-amber-"].text-black,
-html:not(.dark) [class*="bg-amber-"] .text-black,
-html:not(.dark) button[class*="bg-amber-"],
-html:not(.dark) [class*="bg-amber-500"].text-black {
-  color: #000000 !important;
-}
-
 /* General Headings and Titles on cards/pages */
-html:not(.dark) h1.text-white:not([class*="aspect-"] [class*="absolute"] *),
-html:not(.dark) h2.text-white:not([class*="aspect-"] [class*="absolute"] *),
-html:not(.dark) h3.text-white:not([class*="aspect-"] [class*="absolute"] *),
-html:not(.dark) h4.text-white:not([class*="aspect-"] [class*="absolute"] *),
-html:not(.dark) h5.text-white:not([class*="aspect-"] [class*="absolute"] *),
-html:not(.dark) h6.text-white:not([class*="aspect-"] [class*="absolute"] *) {
+html:not(.dark) h1.text-white:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-amber-"] *):not([class*="from-amber-"] *):not([class*="bg-primary"] *):not([class*="btn-primary"] *):not(button *):not(button),
+html:not(.dark) h2.text-white:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-amber-"] *):not([class*="from-amber-"] *):not([class*="bg-primary"] *):not([class*="btn-primary"] *):not(button *):not(button),
+html:not(.dark) h3.text-white:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-amber-"] *):not([class*="from-amber-"] *):not([class*="bg-primary"] *):not([class*="btn-primary"] *):not(button *):not(button),
+html:not(.dark) h4.text-white:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-amber-"] *):not([class*="from-amber-"] *):not([class*="bg-primary"] *):not([class*="btn-primary"] *):not(button *):not(button),
+html:not(.dark) h5.text-white:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-amber-"] *):not([class*="from-amber-"] *):not([class*="bg-primary"] *):not([class*="btn-primary"] *):not(button *):not(button),
+html:not(.dark) h6.text-white:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-amber-"] *):not([class*="from-amber-"] *):not([class*="bg-primary"] *):not([class*="btn-primary"] *):not(button *):not(button) {
   color: #0f172a !important;
 }
 
 /* Body / Secondary Text on light cards */
-html:not(.dark) p.text-white:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-amber-"] *):not([class*="bg-primary"] *):not([class*="btn-primary"] *):not([class*="bg-gradient-"] *):not([class*="bg-red-"] *):not([class*="bg-blue-"] *):not([class*="bg-black/"] *),
-html:not(.dark) span.text-white:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-amber-"] *):not([class*="bg-primary"] *):not([class*="btn-primary"] *):not([class*="bg-gradient-"] *):not([class*="bg-red-"] *):not([class*="bg-emerald-"] *):not([class*="bg-blue-"] *):not([class*="bg-purple-"] *):not([class*="bg-black/"] *),
-html:not(.dark) strong.text-white:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-amber-"] *):not([class*="bg-primary"] *):not([class*="btn-primary"] *):not([class*="bg-gradient-"] *):not([class*="bg-black/"] *),
-html:not(.dark) b.text-white:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-amber-"] *):not([class*="bg-primary"] *):not([class*="btn-primary"] *):not([class*="bg-gradient-"] *):not([class*="bg-black/"] *),
-html:not(.dark) li.text-white:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-amber-"] *):not([class*="bg-primary"] *):not([class*="btn-primary"] *):not([class*="bg-gradient-"] *):not([class*="bg-black/"] *),
-html:not(.dark) div.text-white:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-amber-"] *):not([class*="bg-primary"] *):not([class*="btn-primary"] *):not([class*="bg-gradient-"] *):not([class*="bg-black/"] *),
-html:not(.dark) label.text-white:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-amber-"] *):not([class*="bg-black/"] *),
-html:not(.dark) a.text-white:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-amber-"] *):not([class*="bg-primary"] *):not([class*="btn-primary"] *):not([class*="bg-black/"] *) {
+html:not(.dark) p.text-white:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-amber-"] *):not([class*="from-amber-"] *):not([class*="bg-primary"] *):not([class*="btn-primary"] *):not([class*="bg-gradient-"] *):not([class*="bg-red-"] *):not([class*="bg-blue-"] *):not([class*="bg-black/"] *):not(button *):not(button),
+html:not(.dark) span.text-white:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-amber-"] *):not([class*="from-amber-"] *):not([class*="bg-primary"] *):not([class*="btn-primary"] *):not([class*="bg-gradient-"] *):not([class*="bg-red-"] *):not([class*="bg-emerald-"] *):not([class*="bg-blue-"] *):not([class*="bg-purple-"] *):not([class*="bg-black/"] *):not(button *):not(button),
+html:not(.dark) strong.text-white:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-amber-"] *):not([class*="from-amber-"] *):not([class*="bg-primary"] *):not([class*="btn-primary"] *):not([class*="bg-gradient-"] *):not([class*="bg-black/"] *):not(button *):not(button),
+html:not(.dark) b.text-white:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-amber-"] *):not([class*="from-amber-"] *):not([class*="bg-primary"] *):not([class*="btn-primary"] *):not([class*="bg-gradient-"] *):not([class*="bg-black/"] *):not(button *):not(button),
+html:not(.dark) li.text-white:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-amber-"] *):not([class*="from-amber-"] *):not([class*="bg-primary"] *):not([class*="btn-primary"] *):not([class*="bg-gradient-"] *):not([class*="bg-black/"] *):not(button *):not(button),
+html:not(.dark) div.text-white:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-amber-"] *):not([class*="from-amber-"] *):not([class*="bg-primary"] *):not([class*="btn-primary"] *):not([class*="bg-gradient-"] *):not([class*="bg-black/"] *):not(button *):not(button),
+html:not(.dark) label.text-white:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-amber-"] *):not([class*="from-amber-"] *):not([class*="bg-black/"] *):not(button *):not(button),
+html:not(.dark) a.text-white:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-amber-"] *):not([class*="from-amber-"] *):not([class*="bg-primary"] *):not([class*="btn-primary"] *):not([class*="bg-black/"] *):not(button *):not(button) {
   color: #0f172a !important;
 }
 
 /* Secondary / muted text in Day theme (zinc-300 / zinc-400 / zinc-500) */
-html:not(.dark) .text-zinc-300:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-black/"] *),
-html:not(.dark) .text-zinc-400:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-black/"] *) {
+html:not(.dark) .text-zinc-300:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-black/"] *):not([class*="bg-amber-"] *):not([class*="from-amber-"] *):not(button *),
+html:not(.dark) .text-zinc-400:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-black/"] *):not([class*="bg-amber-"] *):not([class*="from-amber-"] *):not(button *) {
   color: #475569 !important;
 }
 
-html:not(.dark) .text-zinc-500:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-black/"] *) {
+html:not(.dark) .text-zinc-500:not([class*="aspect-"] [class*="absolute"] *):not([class*="bg-black/"] *):not([class*="bg-amber-"] *):not([class*="from-amber-"] *):not(button *) {
   color: #64748b !important;
 }
 
@@ -287,17 +279,78 @@ html:not(.dark) textarea::placeholder {
   color: #94a3b8 !important;
 }
 
-/* Ensure Royal Indigo & Sapphire buttons and badges have crisp white typography */
-.bg-amber-500.text-black,
-.bg-amber-400.text-black,
-.bg-amber-600.text-black,
-[class*="bg-amber-500"].text-black,
-[class*="bg-amber-600"].text-black,
-[class*="from-amber-500"].text-black,
-[class*="from-amber-"].text-black,
-[class*="from-amber-"] .text-black,
-[class*="bg-amber-"] > span.text-black,
-button[class*="bg-amber-"].text-black,
-a[class*="bg-amber-"].text-black {
+/* ========================================================
+   CRISP WHITE TYPOGRAPHY ON SOLID BRAND / PRIMARY / AMBER / SAPPHIRE
+   Guarantees high contrast white text in both Day & Night modes.
+   ======================================================== */
+.btn-primary,
+button[class*="bg-amber-"]:not([class*="/10"]):not([class*="/15"]):not([class*="/20"]):not([class*="/25"]):not([class*="/30"]):not([class*="/5"]):not([class*="/0."]),
+button[class*="from-amber-"],
+button[class*="bg-primary"],
+a[class*="bg-amber-"]:not([class*="/10"]):not([class*="/15"]):not([class*="/20"]):not([class*="/25"]):not([class*="/30"]):not([class*="/5"]):not([class*="/0."]),
+a[class*="from-amber-"],
+a[class*="bg-primary"],
+span[class*="bg-amber-"]:not([class*="/10"]):not([class*="/15"]):not([class*="/20"]):not([class*="/25"]):not([class*="/30"]):not([class*="/5"]):not([class*="/0."]),
+span[class*="from-amber-"],
+[class*="bg-amber-500"]:not([class*="/"]):not(input):not(textarea),
+[class*="bg-amber-600"]:not([class*="/"]):not(input):not(textarea),
+[class*="from-amber-500"] {
   color: #ffffff !important;
+}
+
+.btn-primary *,
+button[class*="bg-amber-"]:not([class*="/10"]):not([class*="/15"]):not([class*="/20"]):not([class*="/25"]):not([class*="/30"]):not([class*="/5"]):not([class*="/0."]) *,
+button[class*="from-amber-"] *,
+button[class*="bg-primary"] *,
+a[class*="bg-amber-"]:not([class*="/10"]):not([class*="/15"]):not([class*="/20"]):not([class*="/25"]):not([class*="/30"]):not([class*="/5"]):not([class*="/0."]) *,
+a[class*="from-amber-"] *,
+a[class*="bg-primary"] *,
+span[class*="bg-amber-"]:not([class*="/10"]):not([class*="/15"]):not([class*="/20"]):not([class*="/25"]):not([class*="/30"]):not([class*="/5"]):not([class*="/0."]) *,
+span[class*="from-amber-"] * {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+/* Explicit Day Theme (Light Mode) High-Contrast Override */
+html:not(.dark) .btn-primary,
+html:not(.dark) button[class*="bg-amber-"]:not([class*="/10"]):not([class*="/15"]):not([class*="/20"]):not([class*="/25"]):not([class*="/30"]):not([class*="/5"]):not([class*="/0."]),
+html:not(.dark) button[class*="from-amber-"],
+html:not(.dark) button[class*="bg-primary"],
+html:not(.dark) a[class*="bg-amber-"]:not([class*="/10"]):not([class*="/15"]):not([class*="/20"]):not([class*="/25"]):not([class*="/30"]):not([class*="/5"]):not([class*="/0."]),
+html:not(.dark) a[class*="from-amber-"],
+html:not(.dark) a[class*="bg-primary"],
+html:not(.dark) span[class*="bg-amber-"]:not([class*="/10"]):not([class*="/15"]):not([class*="/20"]):not([class*="/25"]):not([class*="/30"]):not([class*="/5"]):not([class*="/0."]),
+html:not(.dark) span[class*="from-amber-"],
+html:not(.dark) [class*="bg-amber-500"]:not([class*="/"]):not(input):not(textarea),
+html:not(.dark) [class*="bg-amber-600"]:not([class*="/"]):not(input):not(textarea),
+html:not(.dark) [class*="from-amber-500"],
+html:not(.dark) .btn-primary *,
+html:not(.dark) button[class*="bg-amber-"]:not([class*="/10"]):not([class*="/15"]):not([class*="/20"]):not([class*="/25"]):not([class*="/30"]):not([class*="/5"]):not([class*="/0."]) *,
+html:not(.dark) button[class*="from-amber-"] *,
+html:not(.dark) button[class*="bg-primary"] *,
+html:not(.dark) a[class*="bg-amber-"]:not([class*="/10"]):not([class*="/15"]):not([class*="/20"]):not([class*="/25"]):not([class*="/30"]):not([class*="/5"]):not([class*="/0."]) *,
+html:not(.dark) a[class*="from-amber-"] *,
+html:not(.dark) a[class*="bg-primary"] *,
+html:not(.dark) span[class*="bg-amber-"]:not([class*="/10"]):not([class*="/15"]):not([class*="/20"]):not([class*="/25"]):not([class*="/30"]):not([class*="/5"]):not([class*="/0."]) *,
+html:not(.dark) span[class*="from-amber-"] * {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+/* Translucent pills / tags in Day theme */
+html:not(.dark) [class*="bg-amber-"][class*="/10"]:not(button):not(a),
+html:not(.dark) [class*="bg-amber-"][class*="/15"]:not(button):not(a),
+html:not(.dark) [class*="bg-amber-"][class*="/20"]:not(button):not(a),
+html:not(.dark) [class*="bg-amber-"][class*="/25"]:not(button):not(a),
+html:not(.dark) [class*="bg-amber-"][class*="/30"]:not(button):not(a),
+html:not(.dark) [class*="bg-amber-"][class*="/5"]:not(button):not(a) {
+  color: #4f46e5 !important;
+}
+html:not(.dark) [class*="bg-amber-"][class*="/10"]:not(button):not(a) *,
+html:not(.dark) [class*="bg-amber-"][class*="/15"]:not(button):not(a) *,
+html:not(.dark) [class*="bg-amber-"][class*="/20"]:not(button):not(a) *,
+html:not(.dark) [class*="bg-amber-"][class*="/25"]:not(button):not(a) *,
+html:not(.dark) [class*="bg-amber-"][class*="/30"]:not(button):not(a) *,
+html:not(.dark) [class*="bg-amber-"][class*="/5"]:not(button):not(a) * {
+  color: #4f46e5 !important;
 }

@@ -850,7 +850,7 @@ export default function Terms() {
                                     disabled={!isChecked}
                                     className={`py-3.5 px-8 rounded-2xl text-xs sm:text-sm font-black flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95 ${
                                         isChecked
-                                            ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black cursor-pointer shadow-amber-500/20'
+                                            ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white cursor-pointer shadow-amber-500/20'
                                             : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 cursor-not-allowed border border-zinc-200 dark:border-white/5'
                                     }`}
                                 >

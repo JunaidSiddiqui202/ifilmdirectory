@@ -439,7 +439,7 @@ export default function BrowseProfiles() {
                                 onClick={() => setViewMode(prev => prev === 'grid' ? 'directory' : 'grid')}
                                 className={`size-9 rounded-xl flex items-center justify-center transition-all ${
                                     viewMode === 'directory'
-                                        ? 'bg-amber-500 text-black shadow-md'
+                                        ? 'bg-amber-500 text-white shadow-md'
                                         : 'bg-white dark:bg-[#121316] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/10 hover:text-zinc-900 dark:hover:text-white'
                                 }`}
                                 title={viewMode === 'grid' ? "Switch to Directory List" : "Switch to Grid View"}
@@ -461,14 +461,14 @@ export default function BrowseProfiles() {
                                 onClick={() => setShowFilterModal(true)}
                                 className={`size-9 rounded-xl flex items-center justify-center relative transition-all ${
                                     activeFilterCount > 0
-                                        ? 'bg-amber-500 text-black font-bold'
+                                        ? 'bg-amber-500 text-white font-bold'
                                         : 'bg-white dark:bg-[#121316] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/10'
                                 }`}
                                 title="Filters"
                             >
                                 <span className="material-symbols-outlined text-xl">tune</span>
                                 {activeFilterCount > 0 && (
-                                    <span className="absolute -top-1 -right-1 size-4 bg-amber-400 text-black font-black text-[9px] rounded-full flex items-center justify-center shadow-md">
+                                    <span className="absolute -top-1 -right-1 size-4 bg-amber-400 text-white font-black text-[9px] rounded-full flex items-center justify-center shadow-md">
                                         {activeFilterCount}
                                     </span>
                                 )}
@@ -501,7 +501,7 @@ export default function BrowseProfiles() {
                                         onClick={() => setViewMode('grid')}
                                         className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
                                             viewMode === 'grid'
-                                                ? 'bg-amber-500 text-black shadow-sm'
+                                                ? 'bg-amber-500 text-white shadow-sm'
                                                 : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                         }`}
                                     >
@@ -512,7 +512,7 @@ export default function BrowseProfiles() {
                                         onClick={() => setViewMode('directory')}
                                         className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
                                             viewMode === 'directory'
-                                                ? 'bg-amber-500 text-black shadow-sm'
+                                                ? 'bg-amber-500 text-white shadow-sm'
                                                 : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                         }`}
                                     >
@@ -540,13 +540,13 @@ export default function BrowseProfiles() {
                             onClick={() => { setPillar('talent'); setSearchQuery(''); }}
                             className={`py-2.5 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${
                                 pillar === 'talent'
-                                    ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-black font-extrabold shadow-md shadow-amber-500/20'
+                                    ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white font-extrabold shadow-md shadow-amber-500/20'
                                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                             }`}
                         >
                             <span className="material-symbols-outlined text-base">person</span>
                             <span>Key Talent</span>
-                            <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${pillar === 'talent' ? 'bg-black/20 text-black font-black' : 'bg-black/5 dark:bg-white/10 text-zinc-700 dark:text-zinc-300'}`}>
+                            <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${pillar === 'talent' ? 'bg-white/20 text-white font-black' : 'bg-black/5 dark:bg-white/10 text-zinc-700 dark:text-zinc-300'}`}>
                                 {profiles.length}
                             </span>
                         </button>
@@ -555,13 +555,13 @@ export default function BrowseProfiles() {
                             onClick={() => { setPillar('guilds'); setSearchQuery(''); }}
                             className={`py-2.5 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${
                                 pillar === 'guilds'
-                                    ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-black font-extrabold shadow-md shadow-amber-500/20'
+                                    ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white font-extrabold shadow-md shadow-amber-500/20'
                                     : 'text-zinc-400 hover:text-white'
                             }`}
                         >
                             <span className="material-symbols-outlined text-base">groups</span>
                             <span>Film Guilds</span>
-                            <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${pillar === 'guilds' ? 'bg-black/20 text-black font-black' : 'bg-white/10 text-zinc-300'}`}>
+                            <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${pillar === 'guilds' ? 'bg-white/20 text-white font-black' : 'bg-white/10 text-zinc-300'}`}>
                                 {guilds.length || 18}
                             </span>
                         </button>
@@ -570,13 +570,13 @@ export default function BrowseProfiles() {
                             onClick={() => { setPillar('studios'); setSearchQuery(''); }}
                             className={`py-2.5 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${
                                 pillar === 'studios'
-                                    ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-black font-extrabold shadow-md shadow-amber-500/20'
+                                    ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white font-extrabold shadow-md shadow-amber-500/20'
                                     : 'text-zinc-400 hover:text-white'
                             }`}
                         >
                             <span className="material-symbols-outlined text-base">videocam</span>
                             <span>Studios & Gear</span>
-                            <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${pillar === 'studios' ? 'bg-black/20 text-black font-black' : 'bg-white/10 text-zinc-300'}`}>
+                            <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${pillar === 'studios' ? 'bg-white/20 text-white font-black' : 'bg-white/10 text-zinc-300'}`}>
                                 {facilities.length || 34}
                             </span>
                         </button>
@@ -624,7 +624,7 @@ export default function BrowseProfiles() {
                                 onClick={() => setActiveLocation(hub.value)}
                                 className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all shrink-0 ${
                                     activeLocation === hub.value
-                                        ? 'bg-amber-500 text-black font-bold shadow-md'
+                                        ? 'bg-amber-500 text-white font-bold shadow-md'
                                         : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/5 shadow-xs'
                                 }`}
                             >
@@ -667,11 +667,11 @@ export default function BrowseProfiles() {
                                         onClick={() => setAvailabilityOnly(prev => !prev)}
                                         className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition-all ${
                                             availabilityOnly
-                                                ? 'bg-emerald-500 text-black shadow-sm'
+                                                ? 'bg-emerald-500 text-white shadow-sm'
                                                 : 'bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/10'
                                         }`}
                                     >
-                                        <span className={`size-1.5 rounded-full ${availabilityOnly ? 'bg-black' : 'bg-emerald-500 animate-pulse'}`} />
+                                        <span className={`size-1.5 rounded-full ${availabilityOnly ? 'bg-white' : 'bg-emerald-500 animate-pulse'}`} />
                                         <span>Available Now</span>
                                     </button>
 
@@ -679,7 +679,7 @@ export default function BrowseProfiles() {
                                         onClick={() => setVerifiedOnly(prev => !prev)}
                                         className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition-all ${
                                             verifiedOnly
-                                                ? 'bg-amber-500 text-black shadow-sm'
+                                                ? 'bg-amber-500 text-white shadow-sm'
                                                 : 'bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/10'
                                         }`}
                                     >
@@ -697,7 +697,7 @@ export default function BrowseProfiles() {
                                         onClick={() => setActiveCraft(craft.value)}
                                         className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${
                                             activeCraft === craft.value
-                                                ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-black font-extrabold shadow-md'
+                                                ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white font-extrabold shadow-md'
                                                 : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/5 shadow-xs'
                                         }`}
                                     >
@@ -787,7 +787,7 @@ export default function BrowseProfiles() {
                                                     <div className="absolute top-2 right-2 flex items-center gap-1">
                                                         <button
                                                             onClick={(e) => handleShortlist(e, profile)}
-                                                            className="size-7 rounded-lg bg-black/70 hover:bg-amber-500 hover:text-black text-white border border-white/10 backdrop-blur-md flex items-center justify-center transition-all hover:scale-110"
+                                                            className="size-7 rounded-lg bg-black/70 hover:bg-amber-500 hover:text-white text-white border border-white/10 backdrop-blur-md flex items-center justify-center transition-all hover:scale-110"
                                                             title="Add to Project Shortlist"
                                                         >
                                                             <span className="material-symbols-outlined text-[15px]">playlist_add</span>
@@ -798,7 +798,7 @@ export default function BrowseProfiles() {
                                                                 onClick={(e) => handleToggleFollow(e, profile)}
                                                                 className={`size-7 rounded-lg backdrop-blur-md flex items-center justify-center transition-all hover:scale-110 border ${
                                                                     profile.isFollowing
-                                                                        ? 'bg-amber-500 text-black border-amber-500 font-bold'
+                                                                        ? 'bg-amber-500 text-white border-amber-500 font-bold'
                                                                         : 'bg-black/70 text-white border-white/10 hover:text-amber-400'
                                                                 }`}
                                                                 title={profile.isFollowing ? "Following" : "Follow"}
@@ -859,7 +859,7 @@ export default function BrowseProfiles() {
 
                                                 <button
                                                     onClick={() => handleProfileClick(profile)}
-                                                    className="py-1 px-2.5 rounded-lg bg-amber-500/10 hover:bg-amber-500 hover:text-black text-amber-600 dark:text-amber-400 border border-amber-500/20 text-xs font-bold flex items-center justify-center gap-0.5 transition-all"
+                                                    className="py-1 px-2.5 rounded-lg bg-amber-500/10 hover:bg-amber-500 hover:text-white text-amber-600 dark:text-amber-400 border border-amber-500/20 text-xs font-bold flex items-center justify-center gap-0.5 transition-all"
                                                 >
                                                     <span>View</span>
                                                     <span className="material-symbols-outlined text-xs">arrow_forward</span>
@@ -950,7 +950,7 @@ export default function BrowseProfiles() {
                                                         onClick={(e) => handleToggleFollow(e, profile)}
                                                         className={`p-2 sm:px-3 sm:py-1.5 rounded-xl text-xs font-bold transition-all border ${
                                                             profile.isFollowing
-                                                                ? 'bg-amber-500 text-black border-amber-500 shadow-sm'
+                                                                ? 'bg-amber-500 text-white border-amber-500 shadow-sm'
                                                                 : 'bg-white/5 text-zinc-300 border-white/10 hover:text-amber-400'
                                                         }`}
                                                     >
@@ -1028,7 +1028,7 @@ export default function BrowseProfiles() {
                                                 e.stopPropagation();
                                                 navigate('/guilds');
                                             }}
-                                            className="px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500 hover:text-black text-amber-600 dark:text-amber-400 border border-amber-500/20 text-xs font-bold transition-all flex items-center gap-1"
+                                            className="px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500 hover:text-white text-amber-600 dark:text-amber-400 border border-amber-500/20 text-xs font-bold transition-all flex items-center gap-1"
                                         >
                                             <span>Enter Guild</span>
                                             <span className="material-symbols-outlined text-xs">arrow_forward</span>
@@ -1081,7 +1081,7 @@ export default function BrowseProfiles() {
                                             </span>
 
                                             {facility.price && (
-                                                <span className="absolute bottom-2.5 right-2.5 px-2.5 py-1 rounded-lg bg-amber-500 text-black text-xs font-black shadow-md">
+                                                <span className="absolute bottom-2.5 right-2.5 px-2.5 py-1 rounded-lg bg-amber-500 text-white text-xs font-black shadow-md">
                                                     {facility.price}
                                                 </span>
                                             )}
@@ -1108,10 +1108,10 @@ export default function BrowseProfiles() {
                                                 e.stopPropagation();
                                                 navigate(`/booking/details/${facility.id}`);
                                             }}
-                                            className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-xs font-extrabold transition-all shadow-md active:scale-95 flex items-center gap-1"
+                                            className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-white text-xs font-extrabold transition-all shadow-md active:scale-95 flex items-center gap-1"
                                         >
-                                            <span>Inquire</span>
-                                            <span className="material-symbols-outlined text-xs">arrow_forward</span>
+                                            <span className="text-white">Inquire</span>
+                                            <span className="material-symbols-outlined text-xs text-white">arrow_forward</span>
                                         </button>
                                     </div>
                                 </div>
@@ -1188,7 +1188,7 @@ export default function BrowseProfiles() {
                                             onClick={() => setActiveCraft(craft.value)}
                                             className={`flex items-center justify-between p-3 rounded-xl text-xs font-semibold transition-all border ${
                                                 activeCraft === craft.value
-                                                    ? 'bg-amber-500 text-black border-amber-500 font-bold'
+                                                    ? 'bg-amber-500 text-white border-transparent font-bold'
                                                     : 'bg-zinc-100 dark:bg-white/[0.03] text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-white/5 hover:border-zinc-300 dark:hover:border-white/20'
                                             }`}
                                         >
@@ -1216,7 +1216,7 @@ export default function BrowseProfiles() {
                                             onClick={() => setActiveLocation(hub.value)}
                                             className={`p-2.5 rounded-xl text-xs font-semibold transition-all text-left border ${
                                                 activeLocation === hub.value
-                                                    ? 'bg-amber-500 text-black border-amber-500 font-bold'
+                                                    ? 'bg-amber-500 text-white border-transparent font-bold'
                                                     : 'bg-zinc-100 dark:bg-white/[0.03] text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-white/5 hover:border-zinc-300 dark:hover:border-white/20'
                                             }`}
                                         >
@@ -1273,7 +1273,7 @@ export default function BrowseProfiles() {
                             </button>
                             <button
                                 onClick={() => setShowFilterModal(false)}
-                                className="flex-1 py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs transition-all shadow-md"
+                                className="flex-1 py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-white font-extrabold text-xs transition-all shadow-md"
                             >
                                 Apply Filters ({activeFilterCount})
                             </button>

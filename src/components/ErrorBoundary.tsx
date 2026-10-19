@@ -154,10 +154,10 @@ export class ErrorBoundary extends Component<Props, State> {
                         <div className="flex flex-col gap-3">
                             <button
                                 onClick={this.handleHardReload}
-                                className="w-full py-3.5 px-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-amber-500/20 transition-all active:scale-95 flex items-center justify-center gap-2"
+                                className="w-full py-3.5 px-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-amber-500/20 transition-all active:scale-95 flex items-center justify-center gap-2"
                             >
-                                <span className="material-symbols-outlined text-base">refresh</span>
-                                <span>{isChunkError ? 'Update & Reload' : 'Reload & Try Again'}</span>
+                                <span className="material-symbols-outlined text-base text-white">refresh</span>
+                                <span className="text-white">{isChunkError ? 'Update & Reload' : 'Reload & Try Again'}</span>
                             </button>
 
                             <button

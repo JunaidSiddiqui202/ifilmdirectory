@@ -265,7 +265,7 @@ export default function BlogsEvents() {
                                             key={category}
                                             onClick={() => setSelectedCategory(category)}
                                             className={`whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${selectedCategory === category
-                                                ? 'bg-amber-500 text-black font-bold shadow-sm'
+                                                ? 'bg-amber-500 text-white font-bold shadow-sm'
                                                 : 'bg-white dark:bg-[#121316] text-zinc-500 dark:text-zinc-400 border border-black/[0.04] dark:border-white/[0.07] hover:bg-black/5 dark:hover:bg-white/5'
                                                 }`}
                                         >

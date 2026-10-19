@@ -794,10 +794,10 @@ export default function AdminDashboard() {
                             <button
                                 onClick={handleClaimSuperAdmin}
                                 disabled={isClaimingSuperAdmin}
-                                className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md shadow-amber-500/20 active:scale-95 transition-all"
+                                className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-white text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md shadow-amber-500/20 active:scale-95 transition-all"
                             >
-                                <span className="material-symbols-outlined text-sm">stars</span>
-                                <span>{isClaimingSuperAdmin ? 'Claiming...' : 'Claim Super Admin'}</span>
+                                <span className="material-symbols-outlined text-sm text-white">stars</span>
+                                <span className="text-white">{isClaimingSuperAdmin ? 'Claiming...' : 'Claim Super Admin'}</span>
                             </button>
                         ) : (
                             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs font-black tracking-wider uppercase">
@@ -1045,7 +1045,7 @@ export default function AdminDashboard() {
                                         <button
                                             key={tab}
                                             onClick={() => setBlogFilter(tab)}
-                                            className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${blogFilter === tab ? 'bg-amber-500 text-black shadow-md shadow-amber-500/20' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'}`}
+                                            className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${blogFilter === tab ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'}`}
                                         >
                                             {tab} ({tab === 'all' ? blogs.length : blogs.filter(b => (b.status || 'pending') === tab).length})
                                         </button>
@@ -1076,7 +1076,7 @@ export default function AdminDashboard() {
                                                     <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider backdrop-blur-md shadow-md ${
                                                         blog.status === 'published' ? 'bg-green-500 text-white' :
                                                         blog.status === 'rejected' ? 'bg-red-500 text-white' :
-                                                        'bg-amber-500 text-black'
+                                                        'bg-amber-500 text-white'
                                                     }`}>
                                                         {blog.status || 'pending review'}
                                                     </span>
@@ -1165,7 +1165,7 @@ export default function AdminDashboard() {
                                     <button
                                         key={item.id}
                                         onClick={() => setModerationTab(item.id)}
-                                        className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap ${moderationTab === item.id ? 'bg-amber-500 text-black shadow-md shadow-amber-500/20' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'}`}
+                                        className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap ${moderationTab === item.id ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'}`}
                                     >
                                         <span className="material-symbols-outlined text-base">{item.icon}</span>
                                         <span>{item.label}</span>
@@ -1424,10 +1424,10 @@ export default function AdminDashboard() {
                                         <button
                                             type="submit"
                                             disabled={isPostingNotice}
-                                            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-extrabold text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 active:scale-95 transition-all flex items-center gap-2"
+                                            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white font-extrabold text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 active:scale-95 transition-all flex items-center gap-2"
                                         >
-                                            <span className="material-symbols-outlined text-base">send</span>
-                                            <span>{isPostingNotice ? 'Broadcasting...' : 'Broadcast Notice Now'}</span>
+                                            <span className="material-symbols-outlined text-base text-white">send</span>
+                                            <span className="text-white">{isPostingNotice ? 'Broadcasting...' : 'Broadcast Notice Now'}</span>
                                         </button>
                                     </div>
                                 </form>
@@ -1509,10 +1509,10 @@ export default function AdminDashboard() {
                                 </div>
                                 <button
                                     onClick={() => setIsCreateAdOpen(true)}
-                                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-extrabold text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 flex items-center gap-2 active:scale-95 transition-all"
+                                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white font-extrabold text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 flex items-center gap-2 active:scale-95 transition-all"
                                 >
-                                    <span className="material-symbols-outlined text-base font-bold">add_circle</span>
-                                    <span>New Ad Campaign</span>
+                                    <span className="material-symbols-outlined text-base font-bold text-white">add_circle</span>
+                                    <span className="text-white">New Ad Campaign</span>
                                 </button>
                             </div>
 
@@ -1530,7 +1530,7 @@ export default function AdminDashboard() {
                                             <div className="h-44 bg-zinc-100 dark:bg-zinc-800 relative group overflow-hidden">
                                                 <img src={ad.imageUrl} alt={ad.title} className="w-full h-full object-cover" />
                                                 <div className="absolute top-2 right-2">
-                                                    <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${ad.status === 'active' ? 'bg-green-500 text-white' : 'bg-amber-500 text-black'}`}>
+                                                    <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${ad.status === 'active' ? 'bg-green-500 text-white' : 'bg-amber-500 text-white'}`}>
                                                         {ad.status}
                                                     </span>
                                                 </div>
@@ -1603,25 +1603,25 @@ export default function AdminDashboard() {
                                 <div className="flex bg-white dark:bg-[#0e1014] p-1.5 rounded-2xl border border-zinc-200 dark:border-white/10 overflow-x-auto custom-scrollbar">
                                     <button
                                         onClick={() => setFilterStatus('all')}
-                                        className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap ${filterStatus === 'all' ? 'bg-amber-500 text-black shadow-md shadow-amber-500/20' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'}`}
+                                        className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap ${filterStatus === 'all' ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'}`}
                                     >
                                         All Accounts ({users.length})
                                     </button>
                                     <button
                                         onClick={() => setFilterStatus('pending')}
-                                        className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap ${filterStatus === 'pending' ? 'bg-amber-500 text-black shadow-md shadow-amber-500/20' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'}`}
+                                        className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap ${filterStatus === 'pending' ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'}`}
                                     >
                                         Pending Verifications ({users.filter(u => u.verification?.status === 'pending').length})
                                     </button>
                                     <button
                                         onClick={() => setFilterStatus('applications')}
-                                        className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap ${filterStatus === 'applications' ? 'bg-amber-500 text-black shadow-md shadow-amber-500/20' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'}`}
+                                        className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap ${filterStatus === 'applications' ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'}`}
                                     >
                                         Access Pool ({accessRequests.filter(r => r.status === 'pending').length})
                                     </button>
                                     <button
                                         onClick={() => setFilterStatus('verified')}
-                                        className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap ${filterStatus === 'verified' ? 'bg-amber-500 text-black shadow-md shadow-amber-500/20' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'}`}
+                                        className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap ${filterStatus === 'verified' ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'}`}
                                     >
                                         Elite Members ({users.filter(u => u.verification?.status === 'verified').length})
                                     </button>
@@ -1629,10 +1629,10 @@ export default function AdminDashboard() {
 
                                 <button
                                     onClick={() => setIsInviteOpen(true)}
-                                    className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-md shadow-amber-500/20"
+                                    className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-white font-extrabold text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-md shadow-amber-500/20"
                                 >
-                                    <span className="material-symbols-outlined text-base">person_add</span>
-                                    <span>Issue Invite</span>
+                                    <span className="material-symbols-outlined text-base text-white">person_add</span>
+                                    <span className="text-white">Issue Invite</span>
                                 </button>
                             </div>
 

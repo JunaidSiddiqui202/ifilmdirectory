@@ -1282,10 +1282,10 @@ export default function Home() {
                                         href={selectedJobModal.sourceUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 hover:brightness-105 transition-all"
+                                        className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 hover:brightness-105 transition-all"
                                     >
-                                        <span>Apply on Source</span>
-                                        <span className="material-symbols-outlined text-sm">launch</span>
+                                        <span className="text-white">Apply on Source</span>
+                                        <span className="material-symbols-outlined text-sm text-white">launch</span>
                                     </a>
                                 )}
 
@@ -1296,10 +1296,10 @@ export default function Home() {
                                             setSelectedJobModal(null);
                                             navigate(`/job/${id}`);
                                         }}
-                                        className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 hover:brightness-105 transition-all"
+                                        className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 hover:brightness-105 transition-all"
                                     >
-                                        <span>Apply in iFilm</span>
-                                        <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                                        <span className="text-white">Apply in iFilm</span>
+                                        <span className="material-symbols-outlined text-sm text-white">arrow_forward</span>
                                     </button>
                                 )}
                             </div>

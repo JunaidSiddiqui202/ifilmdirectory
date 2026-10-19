@@ -177,7 +177,7 @@ export default function GroupsForums() {
                             onClick={() => setActiveFilter(filter)}
                             className={`whitespace-nowrap rounded-xl px-4 py-2 text-xs font-bold transition-all border ${
                                 activeFilter === filter
-                                    ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-black border-amber-400 shadow-md shadow-amber-500/20'
+                                    ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white border-transparent shadow-md shadow-amber-500/20'
                                     : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-white/[0.06] hover:text-zinc-900 dark:hover:text-white hover:border-zinc-300 dark:hover:border-white/20 shadow-sm dark:shadow-none'
                             }`}
                         >

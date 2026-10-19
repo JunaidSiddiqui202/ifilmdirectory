@@ -107,7 +107,7 @@ export default function Privacy() {
                                     const el = document.getElementById('user-acknowledgement');
                                     el?.scrollIntoView({ behavior: 'smooth' });
                                 }}
-                                className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-xs font-extrabold transition-all active:scale-95 shadow-md flex items-center gap-1"
+                                className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-white text-xs font-extrabold transition-all active:scale-95 shadow-md flex items-center gap-1"
                             >
                                 <span>Review & Acknowledge</span>
                                 <span className="material-symbols-outlined text-sm">arrow_downward</span>
@@ -581,7 +581,7 @@ export default function Privacy() {
                                     hasAgreed
                                         ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 cursor-default"
                                         : isChecked
-                                        ? "bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black shadow-amber-500/20 cursor-pointer"
+                                        ? "bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white shadow-amber-500/20 cursor-pointer"
                                         : "bg-zinc-200 dark:bg-white/10 text-zinc-400 dark:text-zinc-500 border border-zinc-300 dark:border-white/10 cursor-not-allowed"
                                 }`}
                             >

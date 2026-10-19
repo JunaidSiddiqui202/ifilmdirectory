@@ -222,16 +222,16 @@ export default function CreateCampaignModal({ isOpen, onClose, onSuccess }: Crea
                         <button
                             type="submit"
                             disabled={loading}
-                            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-extrabold text-xs uppercase tracking-wider disabled:opacity-50 shadow-lg shadow-amber-500/20 transition-all active:scale-95 flex items-center gap-2"
+                            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white font-extrabold text-xs uppercase tracking-wider disabled:opacity-50 shadow-lg shadow-amber-500/20 transition-all active:scale-95 flex items-center gap-2"
                         >
                             {loading ? (
                                 <>
-                                    <span className="size-4 border-2 border-black border-t-transparent rounded-full animate-spin"></span>
+                                    <span className="size-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                                     <span>Deploying...</span>
                                 </>
                             ) : (
                                 <>
-                                    <span className="material-symbols-outlined text-base">rocket_launch</span>
+                                    <span className="material-symbols-outlined text-base text-white">rocket_launch</span>
                                     <span>Launch Campaign</span>
                                 </>
                             )}

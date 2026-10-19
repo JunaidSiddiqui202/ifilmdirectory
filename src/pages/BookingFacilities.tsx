@@ -142,14 +142,14 @@ export default function BookingFacilities() {
                                 onClick={() => setActiveCategory(cat.id)}
                                 className={`flex h-10 shrink-0 items-center gap-2 rounded-xl px-4 text-xs font-bold transition-all border ${
                                     isActive
-                                        ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-black border-amber-400 shadow-md shadow-amber-500/20'
+                                        ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white border-transparent shadow-md shadow-amber-500/20'
                                         : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-white/[0.06] hover:text-zinc-900 dark:hover:text-white hover:border-zinc-300 dark:hover:border-white/20'
                                 }`}
                             >
-                                <span className={`material-symbols-outlined text-base ${isActive ? 'text-black' : 'text-amber-500 dark:text-amber-400'}`}>
+                                <span className={`material-symbols-outlined text-base ${isActive ? 'text-white' : 'text-amber-500 dark:text-amber-400'}`}>
                                     {cat.icon}
                                 </span>
-                                <span>{cat.label}</span>
+                                <span className={isActive ? 'text-white font-bold' : ''}>{cat.label}</span>
                             </button>
                         );
                     })}
@@ -195,7 +195,7 @@ export default function BookingFacilities() {
 
                                             {/* Price Tag */}
                                             {facility.price && (
-                                                <span className="absolute bottom-2.5 right-2.5 px-3 py-1 rounded-lg bg-amber-500 text-black text-xs font-black shadow-lg">
+                                                <span className="absolute bottom-2.5 right-2.5 px-3 py-1 rounded-lg bg-amber-500 text-white text-xs font-black shadow-lg">
                                                     {facility.price}
                                                 </span>
                                             )}
@@ -230,10 +230,10 @@ export default function BookingFacilities() {
                                                 e.stopPropagation();
                                                 navigate(`/booking/details/${facility.id}`);
                                             }}
-                                            className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold transition-all active:scale-95 flex items-center gap-1.5 shadow-md shadow-amber-500/10"
+                                            className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-white text-xs font-bold transition-all active:scale-95 flex items-center gap-1.5 shadow-md shadow-amber-500/20"
                                         >
-                                            <span>View Details</span>
-                                            <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                                            <span className="text-white">View Details</span>
+                                            <span className="material-symbols-outlined text-sm text-white">arrow_forward</span>
                                         </button>
                                     </div>
                                 </div>
@@ -252,7 +252,7 @@ export default function BookingFacilities() {
                             </p>
                             <button
                                 onClick={() => { setSearchQuery(''); setActiveCategory('All'); }}
-                                className="px-4 py-2 rounded-xl bg-amber-500 text-black text-xs font-bold hover:bg-amber-400 transition-all"
+                                className="px-4 py-2 rounded-xl bg-amber-500 text-white text-xs font-bold hover:bg-amber-400 transition-all shadow-md shadow-amber-500/20"
                             >
                                 Reset Search Filters
                             </button>

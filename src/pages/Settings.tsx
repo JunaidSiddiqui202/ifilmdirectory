@@ -144,7 +144,7 @@ export default function Settings() {
                                                 backgroundImage: `url(${profile?.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop'})`
                                             }}
                                         />
-                                        <div className="absolute -bottom-1 -right-1 size-5 rounded-full bg-amber-500 flex items-center justify-center text-zinc-950 text-[10px]">
+                                        <div className="absolute -bottom-1 -right-1 size-5 rounded-full bg-amber-500 flex items-center justify-center text-white text-[10px]">
                                             <span className="material-symbols-outlined text-xs">verified</span>
                                         </div>
                                     </div>
@@ -279,7 +279,7 @@ export default function Settings() {
                             >
                                 <div className={`size-12 rounded-2xl flex items-center justify-center mb-2.5 transition-transform group-hover:scale-105 ${
                                     isDarkMode
-                                        ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/30'
+                                        ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/30'
                                         : 'bg-zinc-100 dark:bg-white/[0.06] text-zinc-400'
                                 }`}>
                                     <span className="material-symbols-outlined text-2xl">dark_mode</span>

@@ -279,7 +279,7 @@ export default function Jobs() {
                                 onClick={() => setFilter(item.id as any)}
                                 className={`whitespace-nowrap flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all ${
                                     filter === item.id
-                                        ? 'bg-amber-500 text-black shadow-md shadow-amber-500/20'
+                                        ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20'
                                         : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 border border-zinc-200 dark:border-white/5 shadow-sm'
                                 }`}
                             >
@@ -496,7 +496,7 @@ export default function Jobs() {
                         <div className="p-5 sm:p-6 space-y-5">
                             {/* Tags Strip */}
                             <div className="flex flex-wrap items-center gap-2">
-                                <span className="rounded-lg px-2.5 py-1 text-xs font-black bg-amber-500 text-black">
+                                <span className="rounded-lg px-2.5 py-1 text-xs font-black bg-amber-500 text-white">
                                     {selectedJobModal.type}
                                 </span>
                                 {selectedJobModal.fraternityRole && (
@@ -617,10 +617,10 @@ export default function Jobs() {
                                         href={selectedJobModal.sourceUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 hover:brightness-105 transition-all"
+                                        className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 hover:brightness-105 transition-all"
                                     >
-                                        <span>Apply on Source</span>
-                                        <span className="material-symbols-outlined text-sm">launch</span>
+                                        <span className="text-white">Apply on Source</span>
+                                        <span className="material-symbols-outlined text-sm text-white">launch</span>
                                     </a>
                                 )}
 

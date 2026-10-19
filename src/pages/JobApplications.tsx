@@ -221,13 +221,13 @@ export default function JobApplications() {
                                 onClick={() => setSelectedFilter(filter)}
                                 className={`px-4 py-2 rounded-xl text-xs font-semibold capitalize whitespace-nowrap transition-all flex items-center gap-2 border ${
                                     isSelected
-                                        ? 'bg-amber-500 text-black border-amber-400 shadow-md shadow-amber-500/20'
+                                        ? 'bg-amber-500 text-white border-transparent shadow-md shadow-amber-500/20'
                                         : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-white/[0.06] hover:text-zinc-900 dark:hover:text-white hover:border-zinc-300 dark:hover:border-white/20'
                                 }`}
                             >
                                 <span>{filter}</span>
                                 <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
-                                    isSelected ? 'bg-black/20 text-black' : 'bg-zinc-100 dark:bg-white/[0.06] text-zinc-600 dark:text-zinc-400'
+                                    isSelected ? 'bg-white/20 text-white' : 'bg-zinc-100 dark:bg-white/[0.06] text-zinc-600 dark:text-zinc-400'
                                 }`}>
                                     {count}
                                 </span>
@@ -349,10 +349,10 @@ export default function JobApplications() {
                                         <div className="flex items-center gap-2 pt-3 border-t border-white/[0.06]">
                                             <button
                                                 onClick={() => navigate(`/profile/${app.applicantId}`)}
-                                                className="flex-1 py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold transition-all shadow-md shadow-amber-500/10 flex items-center justify-center gap-1.5"
+                                                className="flex-1 py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-white text-xs font-bold transition-all shadow-md shadow-amber-500/20 flex items-center justify-center gap-1.5"
                                             >
-                                                <span className="material-symbols-outlined text-sm">person</span>
-                                                View Profile
+                                                <span className="material-symbols-outlined text-sm text-white">person</span>
+                                                <span className="text-white">View Profile</span>
                                             </button>
                                             <button
                                                 onClick={() => navigate(`/messaging/${app.applicantId}`)}

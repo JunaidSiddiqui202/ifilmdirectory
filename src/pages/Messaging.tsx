@@ -464,11 +464,11 @@ export default function Messaging() {
                         return message.isSent ? (
                             <div key={message.id} className="flex items-start gap-2.5 justify-end">
                                 <div className="flex flex-col gap-1 w-full max-w-[340px] items-end">
-                                    <div className="flex flex-col leading-relaxed p-3.5 bg-gradient-to-r from-amber-500 to-amber-600 text-black font-semibold rounded-2xl rounded-tr-xs shadow-lg shadow-amber-500/10">
+                                    <div className="flex flex-col leading-relaxed p-3.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-semibold rounded-2xl rounded-tr-xs shadow-lg shadow-amber-500/20">
                                         {message.type === 'audio' ? (
                                             <div className="flex items-center gap-2 min-w-[200px]">
                                                 {failedAudioIds.has(message.id) ? (
-                                                    <div className="flex items-center gap-2 text-black/70 text-xs italic py-1">
+                                                    <div className="flex items-center gap-2 text-white/70 text-xs italic py-1">
                                                         <span className="material-symbols-outlined text-sm">error</span>
                                                         Audio expired
                                                     </div>
@@ -476,16 +476,16 @@ export default function Messaging() {
                                                     <>
                                                         <button
                                                             onClick={() => toggleMessageAudio(message.id, message.mediaUrl || '')}
-                                                            className="w-8 h-8 flex items-center justify-center bg-black/20 rounded-full hover:bg-black/30 transition-colors"
+                                                            className="w-8 h-8 flex items-center justify-center bg-white/20 rounded-full hover:bg-white/30 transition-colors"
                                                         >
-                                                            <span className="material-symbols-outlined text-black">
+                                                            <span className="material-symbols-outlined text-white">
                                                                 {playingMessageId === message.id ? 'pause' : 'play_arrow'}
                                                             </span>
                                                         </button>
-                                                        <div className="h-1 flex-1 bg-black/20 rounded-full overflow-hidden">
-                                                            <div className="h-full w-1/3 bg-black rounded-full" />
+                                                        <div className="h-1 flex-1 bg-white/20 rounded-full overflow-hidden">
+                                                            <div className="h-full w-1/3 bg-white rounded-full" />
                                                         </div>
-                                                        <span className="text-xs text-black font-mono">0:15</span>
+                                                        <span className="text-xs text-white font-mono">0:15</span>
                                                         <audio
                                                             id={`audio-${message.id}`}
                                                             src={message.mediaUrl}

@@ -135,7 +135,7 @@ export default function SettingsDetail() {
                                         Active Membership
                                     </span>
                                 </div>
-                                <span className="px-3 py-1 rounded-full bg-amber-500 text-zinc-950 text-[10px] font-black uppercase tracking-wider shadow-sm">
+                                <span className="px-3 py-1 rounded-full bg-amber-500 text-white text-[10px] font-black uppercase tracking-wider shadow-sm">
                                     Pro Creator
                                 </span>
                             </div>
@@ -163,7 +163,7 @@ export default function SettingsDetail() {
                                 ))}
                             </div>
 
-                            <button className="w-full py-3.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 font-black text-xs uppercase tracking-widest rounded-xl shadow-lg shadow-amber-500/20 transition-all active:scale-[0.99] cursor-pointer">
+                            <button className="w-full py-3.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-lg shadow-amber-500/20 transition-all active:scale-[0.99] cursor-pointer">
                                 Manage Billing & Invoices
                             </button>
                         </div>
@@ -260,7 +260,7 @@ export default function SettingsDetail() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full py-3.5 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold text-xs uppercase tracking-widest rounded-xl shadow-lg shadow-amber-500/20 transition-all disabled:opacity-50 active:scale-95 cursor-pointer"
+                            className="w-full py-3.5 bg-amber-500 hover:bg-amber-400 text-white font-bold text-xs uppercase tracking-widest rounded-xl shadow-lg shadow-amber-500/20 transition-all disabled:opacity-50 active:scale-95 cursor-pointer"
                         >
                             {loading ? 'Updating Credentials...' : 'Update Password'}
                         </button>
@@ -319,10 +319,10 @@ export default function SettingsDetail() {
                             </p>
                             <a
                                 href="mailto:support@ifilmdirectory.com"
-                                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-zinc-950 text-xs font-bold uppercase tracking-wider transition-all"
+                                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-white text-xs font-bold uppercase tracking-wider transition-all shadow-md shadow-amber-500/20"
                             >
-                                <span className="material-symbols-outlined text-sm">mail</span>
-                                <span>support@ifilmdirectory.com</span>
+                                <span className="material-symbols-outlined text-sm text-white">mail</span>
+                                <span className="text-white">support@ifilmdirectory.com</span>
                             </a>
                         </div>
 
