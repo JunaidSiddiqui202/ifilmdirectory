@@ -27,8 +27,7 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
         if (path === '/browse-profiles') return location.pathname === '/browse-profiles';
         if (path === '/booking-facilities') return location.pathname === '/booking-facilities' || location.pathname.startsWith('/booking/');
         if (path === '/groups-forums') return location.pathname === '/groups-forums';
-        if (path === '/messaging') return (location.pathname === '/messaging' && !location.search.includes('tab=notifications')) || location.pathname.startsWith('/chat/');
-        if (path === '/notifications') return location.pathname === '/notifications' || (location.pathname === '/messaging' && location.search.includes('tab=notifications'));
+        if (path === '/messaging') return location.pathname === '/messaging' || location.pathname.startsWith('/chat/');
         if (path === '/projects') return location.pathname === '/projects' || location.pathname.startsWith('/project/');
         if (path === '/saved') return location.pathname === '/saved';
         if (path === '/profile') return location.pathname === '/profile' || location.pathname === `/profile/${currentUser?.uid}`;
@@ -44,24 +43,15 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
         { path: '/browse-profiles', label: 'Talent Directory', icon: 'explore' },
         { path: '/booking-facilities', label: 'Facilities & Gear', icon: 'domain' },
         { path: '/groups-forums', label: 'Guilds & Forums', icon: 'forum' },
-        { path: '/messaging', label: 'Messages', icon: 'chat_bubble', hasBadge: hasUnreadMessages },
-        { path: '/notifications', label: 'Notifications', icon: 'notifications', hasDot: hasUnreadNotifications },
+        { path: '/messaging', label: 'Messages', icon: 'chat_bubble', hasBadge: hasUnreadMessages || hasUnreadNotifications },
         { path: '/projects', label: 'My Projects', icon: 'architecture' },
         { path: '/saved', label: 'Saved Items', icon: 'bookmarks' },
         { path: '/profile', label: 'Profile', icon: 'person', isProfile: true },
     ];
 
     const handleNavClick = (item: typeof navItems[0]) => {
-        if (!currentUser && ['/messaging', '/notifications', '/projects', '/saved', '/profile'].includes(item.path)) {
+        if (!currentUser && ['/messaging', '/projects', '/saved', '/profile'].includes(item.path)) {
             openAuthModal(`Sign in to access your ${item.label.toLowerCase()}`);
-            return;
-        }
-        if (item.path === '/notifications') {
-            navigate('/messaging?tab=notifications');
-            return;
-        }
-        if (item.path === '/messaging') {
-            navigate('/messaging?tab=messages');
             return;
         }
         navigate(item.path);
@@ -122,12 +112,9 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                                         </span>
                                     )}
 
-                                    {/* Unread Indicator Dots */}
+                                    {/* Unread Indicator Dot */}
                                     {item.hasBadge && (
                                         <span className="absolute -top-1 -right-1 size-2.5 bg-red-500 rounded-full ring-2 ring-white dark:ring-[#090A0C] animate-pulse shadow-sm shadow-red-500/60" />
-                                    )}
-                                    {item.hasDot && !item.hasBadge && (
-                                        <span className="absolute -top-0.5 -right-0.5 size-2 bg-amber-500 rounded-full animate-pulse shadow-sm shadow-amber-500/50" />
                                     )}
                                 </div>
 
