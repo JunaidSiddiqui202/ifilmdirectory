@@ -27,8 +27,8 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
         if (path === '/browse-profiles') return location.pathname === '/browse-profiles';
         if (path === '/booking-facilities') return location.pathname === '/booking-facilities' || location.pathname.startsWith('/booking/');
         if (path === '/groups-forums') return location.pathname === '/groups-forums';
-        if (path === '/messaging') return location.pathname === '/messaging' || location.pathname.startsWith('/chat/');
-        if (path === '/notifications') return location.pathname === '/notifications';
+        if (path === '/messaging') return (location.pathname === '/messaging' && !location.search.includes('tab=notifications')) || location.pathname.startsWith('/chat/');
+        if (path === '/notifications') return location.pathname === '/notifications' || (location.pathname === '/messaging' && location.search.includes('tab=notifications'));
         if (path === '/projects') return location.pathname === '/projects' || location.pathname.startsWith('/project/');
         if (path === '/saved') return location.pathname === '/saved';
         if (path === '/profile') return location.pathname === '/profile' || location.pathname === `/profile/${currentUser?.uid}`;
@@ -54,6 +54,14 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
     const handleNavClick = (item: typeof navItems[0]) => {
         if (!currentUser && ['/messaging', '/notifications', '/projects', '/saved', '/profile'].includes(item.path)) {
             openAuthModal(`Sign in to access your ${item.label.toLowerCase()}`);
+            return;
+        }
+        if (item.path === '/notifications') {
+            navigate('/messaging?tab=notifications');
+            return;
+        }
+        if (item.path === '/messaging') {
+            navigate('/messaging?tab=messages');
             return;
         }
         navigate(item.path);

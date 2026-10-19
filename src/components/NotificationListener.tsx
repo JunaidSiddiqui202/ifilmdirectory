@@ -87,7 +87,7 @@ export default function NotificationListener() {
             onClick={() => {
                 setToast(null);
                 if (toast.actionLink) navigate(toast.actionLink);
-                else navigate('/notifications');
+                else navigate('/messaging?tab=notifications');
             }}
         >
             <div className={`size-12 rounded-full flex items-center justify-center text-white shrink-0 shadow-lg ${

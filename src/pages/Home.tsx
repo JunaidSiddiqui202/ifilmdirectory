@@ -562,7 +562,7 @@ export default function Home() {
                                     openAuthModal('Sign in to view notifications & alerts');
                                     return;
                                 }
-                                navigate('/notifications');
+                                navigate('/messaging?tab=notifications');
                             }}
                             className="relative p-2 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:border-amber-500/30 transition-all active:scale-95"
                             aria-label="Notifications"

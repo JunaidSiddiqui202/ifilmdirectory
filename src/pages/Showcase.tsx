@@ -1097,7 +1097,7 @@ export default function Showcase() {
                         <button
                             onClick={() => {
                                 if (!currentUser) return openAuthModal('Sign in to view notifications');
-                                navigate('/notifications');
+                                navigate('/messaging?tab=notifications');
                             }}
                             className="relative size-8 sm:size-9 rounded-lg sm:rounded-xl flex items-center justify-center text-zinc-600 dark:text-zinc-400 hover:text-amber-500 hover:bg-black/5 dark:hover:bg-white/5 transition-all"
                             title="Notifications"

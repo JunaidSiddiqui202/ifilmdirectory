@@ -82,7 +82,6 @@ const BusinessProfile = lazyWithRetry(() => import('./pages/BusinessProfile'), '
 const BookingFacilities = lazyWithRetry(() => import('./pages/BookingFacilities'), 'BookingFacilities');
 const Settings = lazyWithRetry(() => import('./pages/Settings'), 'Settings');
 const SettingsDetail = lazyWithRetry(() => import('./pages/SettingsDetail'), 'SettingsDetail');
-const Notifications = lazyWithRetry(() => import('./pages/Notifications'), 'Notifications');
 const Search = lazyWithRetry(() => import('./pages/Search'), 'Search');
 const Showcase = lazyWithRetry(() => import('./pages/Showcase'), 'Showcase');
 const Guilds = lazyWithRetry(() => import('./pages/Guilds'), 'Guilds');
@@ -151,7 +150,7 @@ function App() {
                 <Route path="/showreel/upload" element={<ProtectedRoute><UploadShowreel /></ProtectedRoute>} />
                 <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
                 <Route path="/settings/:section" element={<ProtectedRoute><SettingsDetail /></ProtectedRoute>} />
-                <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+                <Route path="/notifications" element={<Navigate to="/messaging?tab=notifications" replace />} />
                 <Route path="/saved" element={<ProtectedRoute><SavedItems /></ProtectedRoute>} />
                 <Route path="/projects" element={<ProtectedRoute><ProductionProjects /></ProtectedRoute>} />
                 <Route path="/project/:id" element={<ProtectedRoute><ProjectDetails /></ProtectedRoute>} />
