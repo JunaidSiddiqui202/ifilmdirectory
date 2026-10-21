@@ -2,10 +2,10 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import * as Sentry from "@sentry/react";
 import './index.css'
-import App from './App.tsx'
+import App from './App'
 
-import { ThemeProvider } from './context/ThemeContext.tsx'
-import { AuthProvider } from './context/AuthContext.tsx'
+import { ThemeProvider } from './context/ThemeContext'
+import { AuthProvider } from './context/AuthContext'
 import { initializeAnalytics } from './utils/analytics';
 import ErrorBoundary from './components/ErrorBoundary';
 

@@ -327,6 +327,16 @@
 <body>
   <!-- Semantic Crawlable Fallback: Provides instantaneous crawl indexability for Googlebot, Bingbot & AI bots before JS execution -->
   <div id="root">
+    <!-- Clean App Preloader while React loads -->
+    <div style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #f8fafc; font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;">
+      <div style="width: 44px; height: 44px; border: 3px solid rgba(37, 99, 235, 0.15); border-top-color: #2563eb; border-radius: 50%; animation: ifilm-spin 0.8s linear infinite;"></div>
+      <p style="margin-top: 16px; font-size: 13px; font-weight: 700; color: #64748b; letter-spacing: 0.08em; text-transform: uppercase;">Loading iFilmDirectory...</p>
+    </div>
+    <style>@keyframes ifilm-spin { to { transform: rotate(360deg); } }</style>
+  </div>
+
+  <!-- Semantic Crawlable Fallback for Web Crawlers & Non-JS Clients (Powers Rank #1 SEO) -->
+  <noscript>
     <main aria-label="iFilmDirectory Overview" style="padding: 24px; font-family: sans-serif; max-width: 900px; margin: 0 auto; line-height: 1.6; color: #1e293b;">
       <h1 style="font-size: 28px; font-weight: 800; color: #da620b; margin-bottom: 12px;">iFilmDirectory - The Premier Film Fraternity Directory</h1>
       <p style="font-size: 16px; margin-bottom: 20px;">
@@ -353,7 +363,7 @@
         </p>
       </section>
     </main>
-  </div>
+  </noscript>
 
   <script type="module" src="/src/main.tsx"></script>
 

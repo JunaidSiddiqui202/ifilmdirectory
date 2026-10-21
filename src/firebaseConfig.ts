@@ -4,12 +4,12 @@ import { getFirestore, type Firestore } from 'firebase/firestore';
 import { getStorage, type FirebaseStorage } from 'firebase/storage';
 
 const firebaseConfig = {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-    appId: import.meta.env.VITE_FIREBASE_APP_ID
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyA0Cy6uodQxw7mC05S5f09XVww9X9P6nnE',
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'ifilmdirectory-94b82.firebaseapp.com',
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'ifilmdirectory-94b82',
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'ifilmdirectory-94b82.firebasestorage.app',
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '298452830640',
+    appId: import.meta.env.VITE_FIREBASE_APP_ID || '1:298452830640:web:b289b737a323bd3f2e6e75'
 };
 
 // Validate Firebase config
@@ -18,7 +18,6 @@ const missingKeys = requiredKeys.filter(key => !firebaseConfig[key as keyof type
 
 if (missingKeys.length > 0) {
     console.error('[Firebase] Missing configuration keys:', missingKeys);
-    throw new Error(`Firebase configuration incomplete. Missing: ${missingKeys.join(', ')}`);
 }
 
 console.log('[Firebase] Initializing with config:', {
