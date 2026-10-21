@@ -13,6 +13,7 @@ import { useAuth } from '../context/AuthContext';
 import { useAuthModal } from '../context/AuthModalContext';
 import { useToast } from '../context/ToastContext';
 import { useUnread } from '../context/UnreadContext';
+import { useTheme } from '../context/ThemeContext';
 import PostMedia from '../components/PostMedia';
 import BreakingTicker from '../components/BreakingTicker';
 import SEO from '../components/SEO';
@@ -51,6 +52,7 @@ export default function Home() {
     const navigate = useNavigate();
     const { currentUser } = useAuth();
     const { openAuthModal } = useAuthModal();
+    const { isDarkMode, toggleDarkMode } = useTheme();
     const toast = useToast();
     const { hasUnreadMessages, hasUnreadNotifications } = useUnread();
     const [blogs, setBlogs] = useState<BlogPost[]>([]);
@@ -770,18 +772,31 @@ export default function Home() {
                 
                 {/* 1. CINEMA TOP HEADER: Official Logo + Quick Search + Comms (Mobile Only; on desktop the left sidebar provides full nav and branding) */}
                 <header className="md:hidden sticky top-0 z-30 flex items-center justify-between py-3.5 bg-white/95 dark:bg-[#090A0C]/95 backdrop-blur-md border-b border-zinc-200 dark:border-white/5">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2.5 min-w-0">
                         <HamburgerMenu />
                         <Logo size="sm" showText={true} />
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                        {/* Day/Night Theme Toggle Icon */}
+                        <button
+                            onClick={toggleDarkMode}
+                            type="button"
+                            className="p-1.5 sm:p-2 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-amber-400 hover:text-zinc-900 dark:hover:text-white hover:border-amber-500/30 transition-all active:scale-95 flex items-center justify-center shrink-0 cursor-pointer"
+                            title={isDarkMode ? "Switch to Day Theme" : "Switch to Night Theme"}
+                            aria-label="Toggle Theme"
+                        >
+                            <span className="material-symbols-outlined text-lg sm:text-xl">
+                                {isDarkMode ? 'light_mode' : 'dark_mode'}
+                            </span>
+                        </button>
+
                         <button
                             onClick={() => navigate('/search')}
-                            className="p-2 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:border-amber-500/30 transition-all active:scale-95"
+                            className="p-1.5 sm:p-2 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:border-amber-500/30 transition-all active:scale-95 shrink-0"
                             aria-label="Search"
                         >
-                            <span className="material-symbols-outlined text-xl">search</span>
+                            <span className="material-symbols-outlined text-lg sm:text-xl">search</span>
                         </button>
                         <button
                             onClick={() => {
@@ -791,13 +806,13 @@ export default function Home() {
                                 }
                                 navigate('/messaging?tab=notifications');
                             }}
-                            className="relative p-2 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:border-amber-500/30 transition-all active:scale-95"
+                            className="relative p-1.5 sm:p-2 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:border-amber-500/30 transition-all active:scale-95 shrink-0"
                             aria-label="Notifications"
                             title="Notifications & Alerts"
                         >
-                            <span className="material-symbols-outlined text-xl">notifications</span>
+                            <span className="material-symbols-outlined text-lg sm:text-xl">notifications</span>
                             {hasUnreadNotifications && (
-                                <span className="absolute top-1.5 right-1.5 size-2 bg-amber-500 rounded-full animate-pulse shadow-sm shadow-amber-500/50" />
+                                <span className="absolute top-1 right-1 size-2 bg-amber-500 rounded-full animate-pulse shadow-sm shadow-amber-500/50" />
                             )}
                         </button>
                         <button
@@ -808,19 +823,19 @@ export default function Home() {
                                 }
                                 navigate('/messaging');
                             }}
-                            className="relative p-2 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:border-amber-500/30 transition-all active:scale-95"
+                            className="relative p-1.5 sm:p-2 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:border-amber-500/30 transition-all active:scale-95 shrink-0"
                             aria-label="Messages"
                             title="Direct Messages"
                         >
-                            <span className="material-symbols-outlined text-xl">chat_bubble</span>
+                            <span className="material-symbols-outlined text-lg sm:text-xl">chat_bubble</span>
                             {hasUnreadMessages && (
-                                <span className="absolute top-1.5 right-1.5 size-2.5 bg-red-500 rounded-full ring-2 ring-white dark:ring-[#121316] animate-pulse shadow-sm shadow-red-500/60" />
+                                <span className="absolute top-1 right-1 size-2.5 bg-red-500 rounded-full ring-2 ring-white dark:ring-[#121316] animate-pulse shadow-sm shadow-red-500/60" />
                             )}
                         </button>
                         {currentUser ? (
                             <div
                                 onClick={() => navigate('/profile')}
-                                className="size-9 rounded-full overflow-hidden border border-zinc-300 dark:border-white/20 ml-1 cursor-pointer hover:border-amber-500 transition-colors shrink-0"
+                                className="size-8 sm:size-9 rounded-full overflow-hidden border border-zinc-300 dark:border-white/20 ml-0.5 cursor-pointer hover:border-amber-500 transition-colors shrink-0"
                                 title="My Profile"
                             >
                                 <PostMedia
@@ -832,7 +847,7 @@ export default function Home() {
                         ) : (
                             <button
                                 onClick={() => openAuthModal('Sign in to join the filmmaker network')}
-                                className="ml-1 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white font-extrabold text-xs flex items-center gap-1 shadow-sm active:scale-95 transition-all cursor-pointer"
+                                className="ml-0.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white font-extrabold text-xs flex items-center gap-1 shadow-sm active:scale-95 transition-all cursor-pointer shrink-0"
                                 title="Sign In"
                             >
                                 <span className="material-symbols-outlined text-[15px] font-black">login</span>
@@ -855,7 +870,7 @@ export default function Home() {
                                     <span className="size-1.5 rounded-full bg-amber-500" />
                                     Filmmaker Network & Production Hub
                                 </span>
-                                <h1 className="text-xl sm:text-2xl font-black tracking-tight text-zinc-900 dark:text-white mt-0.5">
+                                <h1 className="text-sm sm:text-base font-extrabold tracking-tight text-zinc-900 dark:text-white mt-0.5">
                                     {currentUser ? `Welcome back, ${currentUser.displayName?.split(' ')[0] || 'Creator'}!` : 'Welcome to iFilmDirectory!'}
                                 </h1>
                             </div>

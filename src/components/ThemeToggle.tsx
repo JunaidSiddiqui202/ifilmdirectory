@@ -12,7 +12,7 @@ export const ThemeToggle = ({ className = '' }: { className?: string }) => {
             type="button"
             className={`
                 relative w-14 h-7 rounded-full p-1
-                bg-zinc-200 dark:bg-[#0E2452] border border-zinc-300 dark:border-blue-400/30
+                bg-zinc-200 dark:bg-[#0a1c3e] border border-zinc-300 dark:border-blue-400/30
                 transition-colors duration-300 cursor-pointer focus:outline-none select-none
                 ${className}
             `}

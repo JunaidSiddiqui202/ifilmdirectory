@@ -10,16 +10,16 @@ export default {
       colors: {
         'primary': 'var(--color-primary)',
         'background-light': '#f8fafc',
-        'background-dark': '#081636', // Deep Midnight Sapphire (AccountsMan)
+        'background-dark': '#050f26', // Deep Midnight Sapphire (20% darker)
         'text-light': '#0f172a',
         'text-dark': '#ffffff',
         'text-subtle-light': '#64748b',
         'text-subtle-dark': '#93c5fd', // Ice Blue Subtitle & Accent Text
         'surface-light': '#ffffff',
-        'surface-dark': '#0e2452', // Sapphire Card Surface
-        'surface-dark-elevated': '#122c64', // Elevated Floating Card
+        'surface-dark': '#0a1c3e', // Deep Sapphire Card Surface
+        'surface-dark-elevated': '#0f2758', // Elevated Floating Card
         'border-light': '#e2e8f0',
-        'border-dark': 'rgba(96, 165, 250, 0.18)', // Luminous Sapphire Border
+        'border-dark': 'rgba(96, 165, 250, 0.16)', // Luminous Sapphire Border
         // Electric Blue Accent from AccountsMan
         'electric-blue': {
           DEFAULT: '#2563eb',

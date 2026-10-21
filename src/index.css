@@ -7,16 +7,16 @@
     --color-primary: #CC0000;
     /* CNN Editorial Newsroom Theme */
     --color-background: #f8fafc;
-    --color-background-dark: #081636; /* AccountsMan Midnight Sapphire */
+    --color-background-dark: #050f26; /* AccountsMan Deep Midnight Sapphire */
     --color-surface: #ffffff;
-    --color-surface-dark: #0e2452; /* AccountsMan Sapphire Surface */
-    --color-surface-dark-elevated: #122c64;
+    --color-surface-dark: #0a1c3e; /* Deep Sapphire Surface */
+    --color-surface-dark-elevated: #0f2758;
     --color-text: #0f172a;
     --color-text-dark: #ffffff;
     --color-text-secondary: #64748b;
     --color-text-secondary-dark: #93c5fd; /* AccountsMan Ice Blue */
     --color-border: #e2e8f0;
-    --color-border-dark: rgba(96, 165, 250, 0.18);
+    --color-border-dark: rgba(96, 165, 250, 0.16);
   }
 
   .theme-blue {
@@ -396,12 +396,12 @@ html:not(.dark) [data-reel-page] .material-symbols-outlined {
    ======================================================== */
 html.dark {
   color-scheme: dark;
-  background-color: #081636;
+  background-color: #050f26;
 }
 
 html.dark body {
-  background-color: #081636 !important;
-  background-image: radial-gradient(130% 90% at 50% 0%, #102e72 0%, #081636 50%, #051026 100%) !important;
+  background-color: #050f26 !important;
+  background-image: radial-gradient(130% 90% at 50% 0%, #0c2152 0%, #050f26 50%, #020713 100%) !important;
   background-attachment: fixed !important;
   color: #ffffff !important;
 }
@@ -421,8 +421,8 @@ html.dark [class*="min-h-[100dvh]"][class*="bg-[#08090B]"],
 html.dark [class*="min-h-[100dvh]"][class*="bg-[#000000]"],
 html.dark [class*="min-h-[100dvh]"][class*="bg-zinc-950"],
 html.dark [class*="min-h-[100dvh]"][class*="bg-background-dark"] {
-  background-color: #081636 !important;
-  background-image: radial-gradient(130% 90% at 50% 0%, #102e72 0%, #081636 50%, #051026 100%) !important;
+  background-color: #050f26 !important;
+  background-image: radial-gradient(130% 90% at 50% 0%, #0c2152 0%, #050f26 50%, #020713 100%) !important;
   background-attachment: fixed !important;
   color: #ffffff !important;
 }
@@ -441,10 +441,10 @@ html.dark aside[class*="dark:bg-[#090a0c]"],
 html.dark header.dark\:bg-background-dark,
 html.dark nav.dark\:bg-background-dark,
 html.dark aside.dark\:bg-background-dark {
-  background-color: rgba(10, 26, 62, 0.92) !important;
+  background-color: rgba(6, 17, 42, 0.94) !important;
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
-  border-color: rgba(96, 165, 250, 0.18) !important;
+  border-color: rgba(96, 165, 250, 0.16) !important;
 }
 
 /* Cards, List Rows, Search Bars, Modals, Dropdowns, Sheets, Pill Filters */
@@ -480,9 +480,9 @@ html.dark [class*="bg-surface-dark"],
 html.dark [class*="bg-zinc-900"]:not([class*="aspect-"] *):not([class*="fixed inset-0"] *),
 html.dark [class*="bg-[#090A0C]"]:not([class*="min-h-"]):not([class*="fixed inset-0"]):not(header):not(nav):not(aside),
 html.dark [class*="bg-[#090a0c]"]:not([class*="min-h-"]):not([class*="fixed inset-0"]):not(header):not(nav):not(aside) {
-  background-color: #0e2452 !important;
-  border-color: rgba(96, 165, 250, 0.18) !important;
-  box-shadow: 0 4px 20px -2px rgba(2, 6, 23, 0.45) !important;
+  background-color: #0a1c3e !important;
+  border-color: rgba(96, 165, 250, 0.16) !important;
+  box-shadow: 0 4px 20px -2px rgba(1, 4, 15, 0.55) !important;
   color: #ffffff;
 }
 
@@ -494,8 +494,8 @@ html.dark [class*="hover:bg-zinc-800"]:hover,
 html.dark [class*="dark:hover:bg-white/[0.05]"]:hover,
 html.dark [class*="dark:hover:bg-white/[0.08]"]:hover,
 html.dark [class*="dark:hover:bg-[#18191D]"]:hover {
-  background-color: #122c64 !important;
-  border-color: rgba(96, 165, 250, 0.35) !important;
+  background-color: #0f2758 !important;
+  border-color: rgba(96, 165, 250, 0.3) !important;
 }
 
 /* Inner containers and subtle item fills */
@@ -506,8 +506,8 @@ html.dark [class*="bg-white/[0.05]"],
 html.dark [class*="bg-white/5"],
 html.dark [class*="bg-white/10"]:not([class*="aspect-"] [class*="absolute"]):not([class*="fixed inset-0"] *),
 html.dark [class*="bg-zinc-800"]:not([class*="aspect-"] *):not([class*="fixed inset-0"] *) {
-  background-color: rgba(14, 36, 82, 0.65) !important;
-  border-color: rgba(96, 165, 250, 0.18) !important;
+  background-color: rgba(10, 28, 62, 0.65) !important;
+  border-color: rgba(96, 165, 250, 0.16) !important;
 }
 
 /* Dark borders to sapphire borders */
@@ -522,7 +522,7 @@ html.dark [class*="dark:border-white/[0.08]"]:not([class*="aspect-"] [class*="ab
 html.dark [class*="divide-zinc-800"] > *,
 html.dark [class*="divide-white/10"] > *,
 html.dark [class*="divide-white/5"] > * {
-  border-color: rgba(96, 165, 250, 0.18) !important;
+  border-color: rgba(96, 165, 250, 0.16) !important;
 }
 
 /* Form inputs & textareas in night theme */
@@ -533,9 +533,9 @@ html.dark input.bg-surface-dark,
 html.dark textarea.bg-surface-dark,
 html.dark [class*="dark:bg-[#121316]"] input,
 html.dark [class*="dark:bg-[#121316]"] textarea {
-  background-color: #091b3e !important;
+  background-color: #06132b !important;
   color: #ffffff !important;
-  border-color: rgba(96, 165, 250, 0.25) !important;
+  border-color: rgba(96, 165, 250, 0.22) !important;
 }
 
 html.dark input::placeholder,
