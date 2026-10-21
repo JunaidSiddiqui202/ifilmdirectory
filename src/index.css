@@ -435,11 +435,12 @@ html.dark div.sticky[class*="bg-[#"],
 html.dark header[class*="dark:bg-[#090A0C]"],
 html.dark nav[class*="dark:bg-[#090A0C]"],
 html.dark aside[class*="dark:bg-[#090A0C]"],
+html.dark header[class*="dark:bg-[#090a0c]"],
+html.dark nav[class*="dark:bg-[#090a0c]"],
+html.dark aside[class*="dark:bg-[#090a0c]"],
 html.dark header.dark\:bg-background-dark,
 html.dark nav.dark\:bg-background-dark,
-html.dark aside.dark\:bg-background-dark,
-html.dark [class*="dark:bg-[#090A0C]"],
-html.dark [class*="dark:bg-[#090a0c]"] {
+html.dark aside.dark\:bg-background-dark {
   background-color: rgba(10, 26, 62, 0.92) !important;
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;

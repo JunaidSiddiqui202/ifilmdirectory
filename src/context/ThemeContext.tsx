@@ -27,7 +27,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
             if (savedTheme === 'dark') return true;
             if (savedTheme === 'light') return false;
         }
-        // Day theme (Studio Light) is the DEFAULT
+        // Day theme (Studio Light Mode) is the DEFAULT for fresh visitors
         return false;
     });
 
