@@ -844,16 +844,7 @@ export default function Home() {
                                     className="w-full h-full object-cover"
                                 />
                             </div>
-                        ) : (
-                            <button
-                                onClick={() => openAuthModal('Sign in to join the filmmaker network')}
-                                className="ml-0.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white font-extrabold text-xs flex items-center gap-1 shadow-sm active:scale-95 transition-all cursor-pointer shrink-0"
-                                title="Sign In"
-                            >
-                                <span className="material-symbols-outlined text-[15px] font-black">login</span>
-                                <span>Sign In</span>
-                            </button>
-                        )}
+                        ) : null}
                     </div>
                 </header>
 
@@ -864,7 +855,7 @@ export default function Home() {
                     <div className="xl:col-span-2 space-y-6">
                         
                         {/* Welcome Banner */}
-                        <div className="flex items-center justify-between pb-1">
+                        <div className="flex items-center justify-between pb-1 gap-2">
                             <div>
                                 <span className="text-[10px] font-bold uppercase tracking-widest text-amber-500 flex items-center gap-1.5">
                                     <span className="size-1.5 rounded-full bg-amber-500" />
@@ -874,13 +865,24 @@ export default function Home() {
                                     {currentUser ? `Welcome back, ${currentUser.displayName?.split(' ')[0] || 'Creator'}!` : 'Welcome to iFilmDirectory!'}
                                 </h1>
                             </div>
-                            <button
-                                onClick={() => navigate('/showcase')}
-                                className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/20 text-xs font-bold transition-all active:scale-95"
-                            >
-                                <span className="material-symbols-outlined text-base">movie</span>
-                                <span>Feed</span>
-                            </button>
+                            {currentUser ? (
+                                <button
+                                    onClick={() => navigate('/showcase')}
+                                    className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/20 text-xs font-bold transition-all active:scale-95 shrink-0"
+                                >
+                                    <span className="material-symbols-outlined text-base">movie</span>
+                                    <span>Feed</span>
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={() => openAuthModal('Sign in to join the filmmaker network')}
+                                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-extrabold text-xs shadow-md shadow-red-500/20 active:scale-95 transition-all cursor-pointer shrink-0"
+                                    title="Sign In to iFilmDirectory"
+                                >
+                                    <span className="material-symbols-outlined text-[15px] font-black">login</span>
+                                    <span>Sign In</span>
+                                </button>
+                            )}
                         </div>
 
                         {/* Live South Cinema Breaking RSS Ticker with Jobs Arrivals & Instant Readers */}
