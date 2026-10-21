@@ -15,10 +15,26 @@ interface BreakingTickerProps {
     onItemClick?: (item: NewsItem) => void; // backwards compat
 }
 
+const formatTickerTime = (timestamp?: number | string) => {
+    if (!timestamp) return '';
+    const time = typeof timestamp === 'string' ? new Date(timestamp).getTime() : timestamp;
+    if (isNaN(time)) return '';
+    const diffMs = Date.now() - time;
+    const mins = Math.max(1, Math.floor(diffMs / (60 * 1000)));
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    const days = Math.floor(hrs / 24);
+    return `${days}d ago`;
+};
+
 export default function BreakingTicker({ variant = 'home', onNewsClick, onJobClick, onItemClick }: BreakingTickerProps) {
     const navigate = useNavigate();
     const [tickerItems, setTickerItems] = useState<TickerEntry[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [mode, setMode] = useState<'rotator' | 'marquee'>('rotator');
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [isPaused, setIsPaused] = useState(false);
 
     useEffect(() => {
         let mounted = true;
@@ -71,6 +87,17 @@ export default function BreakingTicker({ variant = 'home', onNewsClick, onJobCli
         };
     }, []);
 
+    // Auto-advance Rotator every 4.5 seconds when not paused
+    useEffect(() => {
+        if (mode !== 'rotator' || isPaused || tickerItems.length <= 1) return;
+
+        const timer = setInterval(() => {
+            setCurrentIndex((prev) => (prev + 1) % tickerItems.length);
+        }, 4500);
+
+        return () => clearInterval(timer);
+    }, [mode, isPaused, tickerItems.length]);
+
     if (isLoading && tickerItems.length === 0) {
         return (
             <div className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl bg-white dark:bg-[#0a1c3e] border border-zinc-200 dark:border-blue-400/20 animate-pulse ${variant === 'home' ? 'my-2' : 'mb-6'}`}>
@@ -110,8 +137,117 @@ export default function BreakingTicker({ variant = 'home', onNewsClick, onJobCli
         }
     };
 
-    // Duplicate list for infinite smooth marquee
+    const currentEntry = tickerItems[currentIndex] || tickerItems[0];
     const marqueeItems = [...tickerItems, ...tickerItems];
+
+    const renderSingleEntry = (entry?: TickerEntry) => {
+        if (!entry) return null;
+
+        if (entry.kind === 'job') {
+            const job = entry.data;
+            const isAudition = job.type === 'Audition';
+
+            return (
+                <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 w-full animate-ticker-slide">
+                    {/* Job Type Tag */}
+                    <span className={`shrink-0 text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border flex items-center gap-1 ${
+                        isAudition 
+                            ? 'bg-amber-500 text-white border-amber-600' 
+                            : 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
+                    }`}>
+                        <span className="material-symbols-outlined text-[11px]">
+                            {isAudition ? 'theater_comedy' : 'work'}
+                        </span>
+                        <span>{isAudition ? 'Casting Call' : 'New Job'}</span>
+                    </span>
+
+                    {/* Fraternity Role Tag */}
+                    {job.fraternityRole && (
+                        <span className="hidden sm:inline-flex shrink-0 text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-purple-500/15 text-purple-600 dark:text-purple-300 border border-purple-500/30">
+                            {job.fraternityRole}
+                        </span>
+                    )}
+
+                    {/* Job Title & Company */}
+                    <div className="min-w-0 flex-1 flex items-center gap-1.5 text-xs sm:text-sm font-bold text-zinc-900 dark:text-white group-hover:text-amber-500 transition-colors">
+                        <span className="truncate">
+                            {job.title}
+                        </span>
+                        <span className="shrink-0 text-amber-600 dark:text-amber-400 font-extrabold text-[11px] sm:text-xs">
+                            @{job.company}
+                        </span>
+                        {job.location && (
+                            <span className="hidden md:inline-flex shrink-0 text-[11px] text-zinc-500 dark:text-zinc-400 font-normal">
+                                ({job.location})
+                            </span>
+                        )}
+                    </div>
+
+                    {/* Compensation */}
+                    {job.salary && (
+                        <span className="hidden lg:inline-flex shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-white/10 text-zinc-600 dark:text-zinc-300">
+                            {job.salary}
+                        </span>
+                    )}
+                </div>
+            );
+        }
+
+        // News item
+        const item = entry.data;
+        const badge = getIndustryBadge(item.industry);
+        const isReview = item.category === 'review' || Boolean(item.rating);
+        const isRelease = item.category === 'release' || Boolean(item.releaseDate);
+        const isOpening = item.category === 'opening' || Boolean(item.openingType);
+
+        return (
+            <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 w-full animate-ticker-slide">
+                {/* Specific Category Badges */}
+                {isRelease ? (
+                    <span className="shrink-0 text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-emerald-500 text-white border border-emerald-600 flex items-center gap-1 shadow-xs">
+                        <span className="material-symbols-outlined text-[11px]">calendar_month</span>
+                        <span>Release</span>
+                    </span>
+                ) : isOpening ? (
+                    <span className="shrink-0 text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-rose-500 text-white border border-rose-600 flex items-center gap-1 shadow-xs">
+                        <span className="material-symbols-outlined text-[11px]">celebration</span>
+                        <span>{item.openingType === 'pooja_launch' ? 'Pooja Launch' : 'Opening'}</span>
+                    </span>
+                ) : isReview ? (
+                    <span className="shrink-0 text-[9px] sm:text-[10px] font-extrabold px-1.5 py-0.5 rounded-md bg-amber-500 text-white flex items-center gap-0.5 shadow-xs">
+                        <span className="material-symbols-outlined text-[11px] filled text-white">star</span>
+                        <span>{item.rating || 'REVIEW'}</span>
+                    </span>
+                ) : (
+                    <span className={`shrink-0 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md border ${badge.color}`}>
+                        {badge.label}
+                    </span>
+                )}
+
+                {/* News Headline Title - FULL TEXT CLEARLY VISIBLE */}
+                <span 
+                    className="min-w-0 flex-1 truncate text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors"
+                    title={item.title}
+                >
+                    {item.title}
+                </span>
+
+                {/* Release Date info if present */}
+                {item.releaseDate && (
+                    <span className="hidden md:inline-flex shrink-0 text-[10px] font-black px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                        📅 {item.releaseDate}
+                    </span>
+                )}
+
+                {/* Source & Timestamp */}
+                <div className="hidden sm:flex items-center gap-1.5 text-[11px] text-zinc-400 dark:text-zinc-500 shrink-0">
+                    <span className="font-semibold text-zinc-600 dark:text-zinc-300">{item.source}</span>
+                    <span>•</span>
+                    <span>{formatTickerTime(item.timestamp)}</span>
+                </div>
+            </div>
+        );
+    };
 
     return (
         <div
@@ -120,106 +256,185 @@ export default function BreakingTicker({ variant = 'home', onNewsClick, onJobCli
             }`}
         >
             {/* Fixed Left Live Badge */}
-            <div className="z-10 shrink-0 flex items-center pl-3 sm:pl-4 pr-3 py-2 bg-white/95 dark:bg-[#0a1c3e]/95 backdrop-blur-md border-r border-zinc-200 dark:border-blue-400/20 shadow-[4px_0_12px_rgba(0,0,0,0.04)] dark:shadow-[4px_0_12px_rgba(2,6,23,0.5)]">
-                <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-500 text-white font-black text-[10px] sm:text-xs uppercase tracking-wider shadow-sm">
+            <div className="z-10 shrink-0 flex items-center pl-3 sm:pl-3.5 pr-2.5 sm:pr-3 py-2 bg-white/95 dark:bg-[#0a1c3e]/95 backdrop-blur-md border-r border-zinc-200 dark:border-blue-400/20 shadow-[4px_0_12px_rgba(0,0,0,0.04)] dark:shadow-[4px_0_12px_rgba(2,6,23,0.5)]">
+                <button
+                    onClick={() => navigate('/south-cinema')}
+                    className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-xl bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-black text-[10px] sm:text-xs uppercase tracking-wider shadow-sm transition-all active:scale-95 cursor-pointer"
+                    title="View South Cinema Live Wire"
+                >
                     <span className="relative flex size-2">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
                         <span className="relative inline-flex rounded-full size-2 bg-white"></span>
                     </span>
                     <span>Live Wire</span>
-                </div>
+                </button>
             </div>
 
-            {/* Continuous Horizontally Moving Marquee Track */}
-            <div className="flex-1 overflow-hidden relative py-2.5">
-                <div 
-                    className="animate-marquee-scroll flex items-center gap-8 cursor-pointer"
-                    style={{ animationDuration: `${Math.max(120, tickerItems.length * 10)}s` }}
+            {/* Center: Full Visible Headline Area */}
+            {mode === 'rotator' ? (
+                <div
+                    className="flex-1 min-w-0 px-3 sm:px-4 py-2.5 flex items-center cursor-pointer group overflow-hidden"
+                    onClick={() => currentEntry && handleEntryClick(currentEntry)}
+                    onMouseEnter={() => setIsPaused(true)}
+                    onMouseLeave={() => setIsPaused(false)}
                 >
-                    {marqueeItems.map((entry, idx) => {
-                        if (entry.kind === 'job') {
-                            const job = entry.data;
-                            const isAudition = job.type === 'Audition';
+                    {renderSingleEntry(currentEntry)}
+                </div>
+            ) : (
+                /* Continuous Horizontally Moving Marquee Track */
+                <div 
+                    className="flex-1 overflow-hidden relative py-2.5 px-3"
+                    onMouseEnter={() => setIsPaused(true)}
+                    onMouseLeave={() => setIsPaused(false)}
+                >
+                    <div 
+                        className="animate-marquee-scroll flex items-center gap-8 cursor-pointer"
+                        style={{ animationDuration: `${Math.max(60, tickerItems.length * 4)}s` }}
+                    >
+                        {marqueeItems.map((entry, idx) => {
+                            if (entry.kind === 'job') {
+                                const job = entry.data;
+                                const isAudition = job.type === 'Audition';
+
+                                return (
+                                    <div
+                                        key={`job-${job.id}-${idx}`}
+                                        onClick={() => handleEntryClick(entry)}
+                                        className="flex items-center gap-2 shrink-0 group hover:opacity-100 transition-opacity"
+                                    >
+                                        <span className={`text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border flex items-center gap-1 ${
+                                            isAudition 
+                                                ? 'bg-amber-500 text-white border-amber-600' 
+                                                : 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/40'
+                                        }`}>
+                                            <span className="material-symbols-outlined text-[11px]">
+                                                {isAudition ? 'theater_comedy' : 'work'}
+                                            </span>
+                                            <span>{isAudition ? 'CASTING CALL' : 'NEW JOB'}</span>
+                                        </span>
+
+                                        {job.fraternityRole && (
+                                            <span className="text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-purple-500/15 text-purple-600 dark:text-purple-300 border border-purple-500/30">
+                                                {job.fraternityRole}
+                                            </span>
+                                        )}
+
+                                        <span className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-white group-hover:text-amber-500 transition-colors whitespace-nowrap">
+                                            {job.title} <strong className="text-amber-600 dark:text-amber-400 font-extrabold">@{job.company}</strong> ({job.location})
+                                        </span>
+
+                                        <span className="text-zinc-300 dark:text-blue-300/40 text-xs font-bold pl-3">•</span>
+                                    </div>
+                                );
+                            }
+
+                            const item = entry.data;
+                            const badge = getIndustryBadge(item.industry);
+                            const isReview = item.category === 'review' || Boolean(item.rating);
+                            const isRelease = item.category === 'release' || Boolean(item.releaseDate);
+                            const isOpening = item.category === 'opening' || Boolean(item.openingType);
 
                             return (
                                 <div
-                                    key={`job-${job.id}-${idx}`}
+                                    key={`news-${item.id}-${idx}`}
                                     onClick={() => handleEntryClick(entry)}
                                     className="flex items-center gap-2 shrink-0 group hover:opacity-100 transition-opacity"
                                 >
-                                    {/* Job Tag */}
-                                    <span className={`text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border flex items-center gap-1 ${
-                                        isAudition 
-                                            ? 'bg-amber-500 text-white border-amber-600' 
-                                            : 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/40'
-                                    }`}>
-                                        <span className="material-symbols-outlined text-[11px]">
-                                            {isAudition ? 'theater_comedy' : 'work'}
+                                    {isRelease ? (
+                                        <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-emerald-500 text-white border border-emerald-600 flex items-center gap-1">
+                                            <span className="material-symbols-outlined text-[11px]">calendar_month</span>
+                                            <span>Release</span>
                                         </span>
-                                        <span>{isAudition ? 'CASTING CALL' : 'NEW JOB'}</span>
-                                    </span>
-
-                                    {/* Fraternity Role Tag */}
-                                    {job.fraternityRole && (
-                                        <span className="text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-purple-500/15 text-purple-600 dark:text-purple-300 border border-purple-500/30">
-                                            {job.fraternityRole}
+                                    ) : isOpening ? (
+                                        <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-rose-500 text-white border border-rose-600 flex items-center gap-1">
+                                            <span className="material-symbols-outlined text-[11px]">celebration</span>
+                                            <span>Opening</span>
+                                        </span>
+                                    ) : (
+                                        <span className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md border ${badge.color}`}>
+                                            {badge.label}
                                         </span>
                                     )}
 
-                                    {/* Job Title & Studio */}
-                                    <span className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-white group-hover:text-amber-500 transition-colors whitespace-nowrap">
-                                        {job.title} <strong className="text-amber-600 dark:text-amber-400 font-extrabold">@{job.company}</strong> ({job.location})
+                                    {isReview && (
+                                        <span className="text-[9px] sm:text-[10px] font-extrabold px-1.5 py-0.5 rounded-md bg-amber-500 text-white flex items-center gap-0.5 shadow-sm">
+                                            <span className="material-symbols-outlined text-[10px] filled text-white">star</span>
+                                            <span>{item.rating || 'REVIEW'}</span>
+                                        </span>
+                                    )}
+
+                                    <span className="text-xs sm:text-sm font-semibold text-zinc-800 dark:text-zinc-100 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors whitespace-nowrap">
+                                        {item.title}
                                     </span>
 
-                                    {/* Separator */}
                                     <span className="text-zinc-300 dark:text-blue-300/40 text-xs font-bold pl-3">•</span>
                                 </div>
                             );
-                        }
-
-                        // News / Review item
-                        const item = entry.data;
-                        const badge = getIndustryBadge(item.industry);
-                        const isReview = item.category === 'review' || Boolean(item.rating);
-
-                        return (
-                            <div
-                                key={`news-${item.id}-${idx}`}
-                                onClick={() => handleEntryClick(entry)}
-                                className="flex items-center gap-2 shrink-0 group hover:opacity-100 transition-opacity"
-                            >
-                                {/* Industry Tag */}
-                                <span className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md border ${badge.color}`}>
-                                    {badge.label}
-                                </span>
-
-                                {/* Review Star Tag */}
-                                {isReview && (
-                                    <span className="text-[9px] sm:text-[10px] font-extrabold px-1.5 py-0.5 rounded-md bg-amber-500 text-white flex items-center gap-0.5 shadow-sm">
-                                        <span className="material-symbols-outlined text-[10px] filled text-white">star</span>
-                                        <span>{item.rating || 'REVIEW'}</span>
-                                    </span>
-                                )}
-
-                                {/* Headline Title */}
-                                <span className="text-xs sm:text-sm font-semibold text-zinc-800 dark:text-zinc-100 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors whitespace-nowrap">
-                                    {item.title}
-                                </span>
-
-                                {/* Bullet Separator */}
-                                <span className="text-zinc-300 dark:text-blue-300/40 text-xs font-bold pl-3">•</span>
-                            </div>
-                        );
-                    })}
+                        })}
+                    </div>
                 </div>
-            </div>
+            )}
 
-            {/* Fixed Right Shortcut to South Cinema News */}
-            <div className="z-10 shrink-0 flex items-center pr-3 sm:pr-4 pl-2 py-2 bg-white/95 dark:bg-[#0a1c3e]/95 backdrop-blur-md border-l border-zinc-200 dark:border-blue-400/20 shadow-[-4px_0_12px_rgba(0,0,0,0.04)] dark:shadow-[-4px_0_12px_rgba(2,6,23,0.5)]">
+            {/* Controls & Navigation */}
+            <div className="z-10 shrink-0 flex items-center gap-1 sm:gap-1.5 pr-2.5 sm:pr-3 pl-2 py-1.5 bg-white/95 dark:bg-[#0a1c3e]/95 backdrop-blur-md border-l border-zinc-200 dark:border-blue-400/20 shadow-[-4px_0_12px_rgba(0,0,0,0.04)] dark:shadow-[-4px_0_12px_rgba(2,6,23,0.5)]">
+                {/* Counter */}
+                {mode === 'rotator' && tickerItems.length > 0 && (
+                    <span className="hidden sm:inline-block text-[10px] font-black px-1.5 py-0.5 rounded-md bg-zinc-100 dark:bg-white/10 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-white/5 tabular-nums">
+                        {currentIndex + 1}/{tickerItems.length}
+                    </span>
+                )}
+
+                {/* Previous Button */}
+                {mode === 'rotator' && (
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setCurrentIndex((prev) => (prev - 1 + tickerItems.length) % tickerItems.length);
+                        }}
+                        className="size-6 sm:size-7 rounded-lg bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/15 text-zinc-700 dark:text-zinc-300 flex items-center justify-center transition-all cursor-pointer"
+                        title="Previous Headline"
+                    >
+                        <span className="material-symbols-outlined text-sm">chevron_left</span>
+                    </button>
+                )}
+
+                {/* Next Button */}
+                {mode === 'rotator' && (
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setCurrentIndex((prev) => (prev + 1) % tickerItems.length);
+                        }}
+                        className="size-6 sm:size-7 rounded-lg bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/15 text-zinc-700 dark:text-zinc-300 flex items-center justify-center transition-all cursor-pointer"
+                        title="Next Headline"
+                    >
+                        <span className="material-symbols-outlined text-sm">chevron_right</span>
+                    </button>
+                )}
+
+                {/* Mode Switcher (Headline View / Continuous Ticker) */}
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setMode(m => m === 'rotator' ? 'marquee' : 'rotator');
+                    }}
+                    className={`size-6 sm:size-7 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
+                        mode === 'marquee'
+                            ? 'bg-amber-500 text-white shadow-xs'
+                            : 'bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/15 text-zinc-600 dark:text-zinc-400'
+                    }`}
+                    title={mode === 'rotator' ? 'Switch to Continuous Marquee' : 'Switch to Headline Rotator'}
+                >
+                    <span className="material-symbols-outlined text-sm">
+                        {mode === 'rotator' ? 'view_carousel' : 'featured_play_list'}
+                    </span>
+                </button>
+
+                {/* Full Wire Link */}
                 <button
                     onClick={() => navigate('/south-cinema')}
-                    className="size-7 rounded-xl bg-amber-500/10 hover:bg-amber-500/25 text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 flex items-center justify-center transition-all"
-                    title="View Full Wire"
+                    className="size-6 sm:size-7 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center transition-all cursor-pointer"
+                    title="Open Full Cinema Wire & Reviews"
                 >
                     <span className="material-symbols-outlined text-sm">open_in_new</span>
                 </button>
