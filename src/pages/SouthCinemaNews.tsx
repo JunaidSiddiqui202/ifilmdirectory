@@ -369,7 +369,7 @@ export default function SouthCinemaNews() {
                         </div>
                         <div className="flex items-center gap-1.5">
                             <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
-                                2025 Calendar
+                                2026–2027 Calendar
                             </span>
                             <button
                                 onClick={() => setActiveTab('releases')}

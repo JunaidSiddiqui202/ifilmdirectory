@@ -51,7 +51,7 @@ export interface RSSFeedSource {
 }
 
 const STORAGE_KEYS = {
-    CACHE: 'ifilm_rss_news_cache_v3',
+    CACHE: 'ifilm_rss_news_cache_v_oct2026',
     LAST_SYNC: 'ifilm_rss_last_sync_timestamp',
     FEEDS: 'ifilm_rss_sources_config_v3',
     AUTO_REFRESH_MINS: 'ifilm_rss_auto_refresh_minutes_v90'
@@ -104,13 +104,73 @@ export const DEFAULT_FEEDS: RSSFeedSource[] = [
 
 export const UPCOMING_MOVIE_RELEASES: UpcomingMovieRelease[] = [
     {
+        id: 'rel-pushpa2',
+        title: 'Pushpa 2: The Rule',
+        starring: 'Icon Star Allu Arjun, Rashmika Mandanna, Fahadh Faasil',
+        director: 'Sukumar',
+        productionHouse: 'Mythri Movie Makers & Sukumar Writings',
+        releaseDate: 'December 5, 2026 Worldwide',
+        releaseTimestamp: new Date('2026-12-05').getTime(),
+        industry: 'telugu',
+        status: 'Worldwide Grand Release',
+        banner: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&h=450&fit=crop',
+        trailerUrl: 'https://www.youtube.com/watch?v=1kVK0MZlbI4',
+        openingType: 'theatrical',
+        synopsis: 'Icon Star Allu Arjun and Sukumar unite for the most colossal Pan-India wildfire spectacle in Indian cinema.'
+    },
+    {
+        id: 'rel-diwali-clash',
+        title: 'Amaran & Lucky Baskhar',
+        starring: 'Sivakarthikeyan, Sai Pallavi, Dulquer Salmaan, Meenakshi',
+        director: 'Rajkumar Periasamy / Venky Atluri',
+        productionHouse: 'Raaj Kamal Films / Sithara Entertainments',
+        releaseDate: 'October 31, 2026 (Diwali Worldwide)',
+        releaseTimestamp: new Date('2026-10-31').getTime(),
+        industry: 'south',
+        status: 'FDFS Booking Open',
+        banner: 'https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=800&h=450&fit=crop',
+        trailerUrl: 'https://www.youtube.com/watch?v=hylixgkQd4k',
+        openingType: 'theatrical',
+        synopsis: 'Major Mukund Varadarajan’s heroic biopic Amaran faces off with high-stakes financial crime thriller Lucky Baskhar this Diwali.'
+    },
+    {
+        id: 'rel-thalapathy69',
+        title: 'Thalapathy 69',
+        starring: 'Thalapathy Vijay, Bobby Deol, Pooja Hegde',
+        director: 'H. Vinoth',
+        productionHouse: 'KVN Productions',
+        releaseDate: 'October 2026 (Diwali / Pooja Launch)',
+        releaseTimestamp: new Date('2026-10-31').getTime(),
+        industry: 'tamil',
+        status: 'Pooja Launched',
+        banner: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&h=450&fit=crop',
+        trailerUrl: 'https://www.youtube.com/watch?v=8V4c3k_5_2g',
+        openingType: 'pooja_launch',
+        synopsis: 'Thalapathy Vijay’s monumental final film, directed by H. Vinoth with explosive political thriller undercurrents.'
+    },
+    {
+        id: 'rel-game-changer',
+        title: 'Game Changer',
+        starring: 'Ram Charan, Kiara Advani, SJ Suryah',
+        director: 'S. Shankar',
+        productionHouse: 'Sri Venkateswara Creations',
+        releaseDate: 'December 25, 2026 / Sankranthi 2027',
+        releaseTimestamp: new Date('2026-12-25').getTime(),
+        industry: 'telugu',
+        status: 'Worldwide Grand Release',
+        banner: 'https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=800&h=450&fit=crop',
+        trailerUrl: 'https://www.youtube.com/watch?v=k4x8W4J00eM',
+        openingType: 'theatrical',
+        synopsis: 'Political action thriller following an honest IAS officer waging a crusade against corrupt electoral systems.'
+    },
+    {
         id: 'rel-raja-saab',
         title: 'The Raja Saab',
         starring: 'Prabhas, Malavika Mohanan, Nidhhi Agerwal',
         director: 'Maruthi',
         productionHouse: 'People Media Factory',
-        releaseDate: 'April 10, 2026',
-        releaseTimestamp: new Date('2026-04-10').getTime(),
+        releaseDate: 'January 14, 2027 (Sankranthi)',
+        releaseTimestamp: new Date('2027-01-14').getTime(),
         industry: 'telugu',
         status: 'Worldwide Grand Release',
         banner: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800&h=450&fit=crop',
@@ -119,58 +179,13 @@ export const UPCOMING_MOVIE_RELEASES: UpcomingMovieRelease[] = [
         synopsis: 'A high-voltage romantic horror comedy starring Rebel Star Prabhas in a charismatic, stylish mass avatar.'
     },
     {
-        id: 'rel-game-changer',
-        title: 'Game Changer',
-        starring: 'Ram Charan, Kiara Advani, SJ Suryah',
-        director: 'S. Shankar',
-        productionHouse: 'Sri Venkateswara Creations',
-        releaseDate: 'January 10, 2026',
-        releaseTimestamp: new Date('2026-01-10').getTime(),
-        industry: 'telugu',
-        status: 'FDFS Booking Open',
-        banner: 'https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=800&h=450&fit=crop',
-        trailerUrl: 'https://www.youtube.com/watch?v=k4x8W4J00eM',
-        openingType: 'theatrical',
-        synopsis: 'Political action thriller following an honest IAS officer waging a crusade against corrupt electoral systems.'
-    },
-    {
-        id: 'rel-toxic',
-        title: 'Toxic: A Fairy Tale for Grown-ups',
-        starring: 'Yash, Kiara Advani, Huma Qureshi',
-        director: 'Geetu Mohandas',
-        productionHouse: 'KVN Productions & Monster Mind',
-        releaseDate: 'April 10, 2026',
-        releaseTimestamp: new Date('2026-04-10').getTime(),
-        industry: 'kannada',
-        status: 'Worldwide Grand Release',
-        banner: 'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?w=800&h=450&fit=crop',
-        trailerUrl: 'https://www.youtube.com/watch?v=F3_aHwL6R74',
-        openingType: 'theatrical',
-        synopsis: 'Rocking Star Yash stars in a stylized drug cartel action-drama set in a dark fairy tale universe.'
-    },
-    {
-        id: 'rel-thalapathy69',
-        title: 'Thalapathy 69',
-        starring: 'Thalapathy Vijay, Bobby Deol, Pooja Hegde',
-        director: 'H. Vinoth',
-        productionHouse: 'KVN Productions',
-        releaseDate: 'October 2026 (Diwali)',
-        releaseTimestamp: new Date('2026-10-20').getTime(),
-        industry: 'tamil',
-        status: 'Pooja Launched',
-        banner: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&h=450&fit=crop',
-        trailerUrl: 'https://www.youtube.com/watch?v=8V4c3k_5_2g',
-        openingType: 'pooja_launch',
-        synopsis: 'Thalapathy Vijay’s landmark film, directed by H. Vinoth with explosive political thriller undercurrents.'
-    },
-    {
         id: 'rel-vishwambhara',
         title: 'Vishwambhara',
         starring: 'Megastar Chiranjeevi, Trisha Krishnan, Kunal Kapoor',
         director: 'Mallidi Vassishta',
         productionHouse: 'UV Creations',
-        releaseDate: 'May 9, 2026',
-        releaseTimestamp: new Date('2026-05-09').getTime(),
+        releaseDate: 'January 10, 2027 (Sankranthi)',
+        releaseTimestamp: new Date('2027-01-10').getTime(),
         industry: 'telugu',
         status: 'Worldwide Grand Release',
         banner: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&h=450&fit=crop',
@@ -179,28 +194,13 @@ export const UPCOMING_MOVIE_RELEASES: UpcomingMovieRelease[] = [
         synopsis: 'A grand socio-fantasy mega spectacle journeying through celestial realms and earthly conflicts.'
     },
     {
-        id: 'rel-kantara1',
-        title: 'Kantara: A Legend Chapter 1',
-        starring: 'Rishab Shetty, Jayaram, Rukmini Vasanth',
-        director: 'Rishab Shetty',
-        productionHouse: 'Hombale Films',
-        releaseDate: 'October 2, 2026',
-        releaseTimestamp: new Date('2026-10-02').getTime(),
-        industry: 'kannada',
-        status: 'In Theatres Soon',
-        banner: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=800&h=450&fit=crop',
-        trailerUrl: 'https://www.youtube.com/watch?v=Vj81N_Kq-z0',
-        openingType: 'theatrical',
-        synopsis: 'The sacred prequel recounting the origins of the Panjurli deity and the Kadamba kingdom.'
-    },
-    {
         id: 'rel-empuraan',
         title: 'L2: Empuraan',
         starring: 'Mohanlal, Prithviraj Sukumaran, Manju Warrier',
         director: 'Prithviraj Sukumaran',
         productionHouse: 'Aashirvad Cinemas & Lyca',
-        releaseDate: 'March 27, 2026',
-        releaseTimestamp: new Date('2026-03-27').getTime(),
+        releaseDate: 'March 26, 2027',
+        releaseTimestamp: new Date('2027-03-26').getTime(),
         industry: 'malayalam',
         status: 'Worldwide Grand Release',
         banner: 'https://images.unsplash.com/photo-1574267432553-4b4628081c31?w=800&h=450&fit=crop',
@@ -209,13 +209,43 @@ export const UPCOMING_MOVIE_RELEASES: UpcomingMovieRelease[] = [
         synopsis: 'Khureshi-Ab’raam returns to battle international syndicates in the massive globe-trotting sequel to Lucifer.'
     },
     {
+        id: 'rel-toxic',
+        title: 'Toxic: A Fairy Tale for Grown-ups',
+        starring: 'Yash, Kiara Advani, Huma Qureshi',
+        director: 'Geetu Mohandas',
+        productionHouse: 'KVN Productions & Monster Mind',
+        releaseDate: 'April 9, 2027',
+        releaseTimestamp: new Date('2027-04-09').getTime(),
+        industry: 'kannada',
+        status: 'Worldwide Grand Release',
+        banner: 'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?w=800&h=450&fit=crop',
+        trailerUrl: 'https://www.youtube.com/watch?v=F3_aHwL6R74',
+        openingType: 'theatrical',
+        synopsis: 'Rocking Star Yash stars in a stylized drug cartel action-drama set in a dark fairy tale universe.'
+    },
+    {
+        id: 'rel-kantara1',
+        title: 'Kantara: A Legend Chapter 1',
+        starring: 'Rishab Shetty, Jayaram, Rukmini Vasanth',
+        director: 'Rishab Shetty',
+        productionHouse: 'Hombale Films',
+        releaseDate: 'October 2, 2027',
+        releaseTimestamp: new Date('2027-10-02').getTime(),
+        industry: 'kannada',
+        status: 'In Theatres Soon',
+        banner: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=800&h=450&fit=crop',
+        trailerUrl: 'https://www.youtube.com/watch?v=Vj81N_Kq-z0',
+        openingType: 'theatrical',
+        synopsis: 'The sacred prequel recounting the origins of the Panjurli deity and the Kadamba kingdom.'
+    },
+    {
         id: 'rel-ssmb29',
         title: 'SSMB29: African Jungle Adventure',
         starring: 'Superstar Mahesh Babu, Chelsea Islan',
         director: 'S.S. Rajamouli',
         productionHouse: 'Durga Arts & Global Studios',
-        releaseDate: 'Late 2026 / 2027',
-        releaseTimestamp: new Date('2026-12-15').getTime(),
+        releaseDate: 'Late 2027 / 2028',
+        releaseTimestamp: new Date('2027-12-15').getTime(),
         industry: 'telugu',
         status: 'Pooja Launched',
         banner: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&h=450&fit=crop',
@@ -228,20 +258,20 @@ export const UPCOMING_MOVIE_RELEASES: UpcomingMovieRelease[] = [
 // Fallback high quality cinema items for offline resilience (Latest release dates & openings at the top!)
 const SEED_BACKUP_ITEMS: NewsItem[] = [
     {
-        id: 'seed-rel-1',
-        title: 'The Raja Saab Theatrical Release Date Locked: Rebel Star Prabhas Sets Massive Summer Opening on April 10',
+        id: 'seed-rel-0',
+        title: 'Pushpa 2: The Rule Worldwide Theatrical Release Date Locked for December 5: Wildfire Advance Bookings Open',
         link: 'https://tracktollywood.com/',
         pubDate: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
         timestamp: Date.now() - 5 * 60 * 1000,
         source: 'TrackTollywood',
-        description: 'Director Maruthi and producer TG Vishwa Prasad lock April 10, 2026 worldwide for The Raja Saab. High expectations surround Prabhas’s vintage romantic horror comedy avatar.',
-        content: `The makers of 'The Raja Saab' have officially locked April 10, 2026 for a colossal worldwide theatrical release across Telugu, Tamil, Malayalam, Kannada, and Hindi.\n\nDirected by Maruthi and backed by People Media Factory, the romantic horror comedy features Rebel Star Prabhas in a dashing, vintage look alongside Malavika Mohanan, Nidhhi Agerwal, and Riddhi Kumar.\n\nComposer Thaman S is finishing the remaining mass dance numbers and theatrical opening themes. The grand theatrical release is planned across more than 4,500 screens worldwide with advance bookings expected to shatter Day 1 records.`,
-        thumbnail: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800&h=450&fit=crop',
+        description: 'Icon Star Allu Arjun and Sukumar’s action juggernaut Pushpa 2: The Rule locked for December 5 worldwide across 11,000+ screens.',
+        content: `The countdown begins for Indian cinema's most anticipated sequel! Mythri Movie Makers have locked December 5, 2026 for the colossal worldwide release of 'Pushpa 2: The Rule'.\n\nStarring Icon Star Allu Arjun alongside Rashmika Mandanna and Fahadh Faasil, the mass extravaganza has smashed historical pre-release business records across Telugu, Hindi, Tamil, Kannada, and Malayalam.\n\nAdvance bookings are being rolled out across global markets with phenomenal opening response. Director Sukumar has delivered an electrifying final cut with music by Devi Sri Prasad.`,
+        thumbnail: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&h=450&fit=crop',
         category: 'release',
         industry: 'telugu',
-        releaseDate: 'April 10, 2026',
+        releaseDate: 'December 5, 2026 Worldwide',
         openingType: 'theatrical',
-        trailerUrl: 'https://www.youtube.com/watch?v=0kF63N6l5F0'
+        trailerUrl: 'https://www.youtube.com/watch?v=1kVK0MZlbI4'
     },
     {
         id: 'seed-open-1',
@@ -260,20 +290,20 @@ const SEED_BACKUP_ITEMS: NewsItem[] = [
         trailerUrl: 'https://www.youtube.com/watch?v=8V4c3k_5_2g'
     },
     {
-        id: 'seed-rel-2',
-        title: 'Game Changer Sankranti Theatrical Opening Confirmed: Shankar & Ram Charan Spectacle Ready for Worldwide Debut',
+        id: 'seed-rel-1',
+        title: 'The Raja Saab Sankranthi Release Confirmed: Rebel Star Prabhas Romantic Horror Spectacle Set for Jan 14, 2027',
         link: 'https://tracktollywood.com/',
         pubDate: new Date(Date.now() - 25 * 60 * 1000).toISOString(),
         timestamp: Date.now() - 25 * 60 * 1000,
         source: 'TrackTollywood',
-        description: 'Mega Powerstar Ram Charan and visionary director Shankar’s political action epic Game Changer locked for January 10, 2026 worldwide theatrical release.',
-        content: `Producer Dil Raju has officially reaffirmed that 'Game Changer' will arrive in theatres worldwide for Sankranti on January 10, 2026.\n\nRam Charan plays a dual role as an unyielding election officer alongside Kiara Advani and SJ Suryah. The music by Thaman S has already created record-breaking social media records.\n\nThe global theatrical distribution rights have been finalized across North America, UK, Europe, and the Middle East, setting the stage for one of the grandest box office openings in Indian cinema history.`,
-        thumbnail: 'https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=800&h=450&fit=crop',
+        description: 'Director Maruthi and producer TG Vishwa Prasad lock January 14, 2027 (Sankranthi) worldwide for The Raja Saab. High expectations surround Prabhas’s vintage mass avatar.',
+        content: `The makers of 'The Raja Saab' have officially reaffirmed January 14, 2027 for a colossal Sankranthi worldwide theatrical release across Telugu, Tamil, Malayalam, Kannada, and Hindi.\n\nDirected by Maruthi and backed by People Media Factory, the romantic horror comedy features Rebel Star Prabhas in a dashing, vintage look alongside Malavika Mohanan, Nidhhi Agerwal, and Riddhi Kumar.\n\nComposer Thaman S is finishing the remaining mass dance numbers and theatrical opening themes. The grand theatrical release is planned across more than 4,500 screens worldwide with advance bookings expected to shatter Day 1 records.`,
+        thumbnail: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800&h=450&fit=crop',
         category: 'release',
         industry: 'telugu',
-        releaseDate: 'January 10, 2026',
+        releaseDate: 'January 14, 2027 (Sankranthi)',
         openingType: 'theatrical',
-        trailerUrl: 'https://www.youtube.com/watch?v=k4x8W4J00eM'
+        trailerUrl: 'https://www.youtube.com/watch?v=0kF63N6l5F0'
     },
     {
         id: 'seed-open-2',
@@ -287,23 +317,39 @@ const SEED_BACKUP_ITEMS: NewsItem[] = [
         thumbnail: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&h=450&fit=crop',
         category: 'opening',
         industry: 'telugu',
-        releaseDate: 'Late 2026',
+        releaseDate: 'Late 2027',
         openingType: 'pooja_launch',
         trailerUrl: 'https://www.youtube.com/watch?v=1uR1o7L8nU0'
     },
     {
+        id: 'seed-rel-2',
+        title: 'Game Changer Massive Release: Shankar & Ram Charan Spectacle Ready for December 25 Worldwide Debut',
+        link: 'https://tracktollywood.com/',
+        pubDate: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
+        timestamp: Date.now() - 45 * 60 * 1000,
+        source: 'TrackTollywood',
+        description: 'Mega Powerstar Ram Charan and visionary director Shankar’s political action epic Game Changer locked for festive worldwide theatrical release.',
+        content: `Producer Dil Raju has officially reaffirmed that 'Game Changer' will arrive in theatres worldwide for Christmas & Sankranti.\n\nRam Charan plays a dual role as an unyielding election officer alongside Kiara Advani and SJ Suryah. The music by Thaman S has already created record-breaking social media records.\n\nThe global theatrical distribution rights have been finalized across North America, UK, Europe, and the Middle East, setting the stage for one of the grandest box office openings in Indian cinema history.`,
+        thumbnail: 'https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=800&h=450&fit=crop',
+        category: 'release',
+        industry: 'telugu',
+        releaseDate: 'Dec 25, 2026 / Jan 10, 2027',
+        openingType: 'theatrical',
+        trailerUrl: 'https://www.youtube.com/watch?v=k4x8W4J00eM'
+    },
+    {
         id: 'seed-rel-3',
-        title: 'Toxic Worldwide Theatrical Release Date Locked: Yash & Geetu Mohandas Film to Hit Screens on April 10',
+        title: 'Toxic Worldwide Theatrical Release Date Locked: Yash & Geetu Mohandas Spectacle Set for April 9, 2027',
         link: 'https://www.onlykollywood.com/',
-        pubDate: new Date(Date.now() - 50 * 60 * 1000).toISOString(),
-        timestamp: Date.now() - 50 * 60 * 1000,
+        pubDate: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
+        timestamp: Date.now() - 60 * 60 * 1000,
         source: 'Only Kollywood',
-        description: 'Rocking Star Yash’s much-anticipated next outing Toxic: A Fairy Tale for Grown-ups locks April 10, 2026 for a massive global theatrical rollout.',
-        content: `KVN Productions and Monster Mind Creations have officially confirmed April 10, 2026 as the theatrical release date for 'Toxic: A Fairy Tale for Grown-ups'.\n\nDirected by critically acclaimed auteur Geetu Mohandas, the multi-lingual action spectacle presents Yash in a gritty, enigmatic persona. The film features an international technical crew and music by Jeremy Stack.\n\nShooting schedules in London and Mumbai are nearing completion with grand IMAX master prints slated for international festival premiers ahead of the worldwide theatrical opening.`,
+        description: 'Rocking Star Yash’s much-anticipated next outing Toxic: A Fairy Tale for Grown-ups locks April 9, 2027 for a massive global theatrical rollout.',
+        content: `KVN Productions and Monster Mind Creations have officially confirmed April 9, 2027 as the theatrical release date for 'Toxic: A Fairy Tale for Grown-ups'.\n\nDirected by critically acclaimed auteur Geetu Mohandas, the multi-lingual action spectacle presents Yash in a gritty, enigmatic persona. The film features an international technical crew and music by Jeremy Stack.\n\nShooting schedules in London and Mumbai are nearing completion with grand IMAX master prints slated for international festival premiers ahead of the worldwide theatrical opening.`,
         thumbnail: 'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?w=800&h=450&fit=crop',
         category: 'release',
         industry: 'kannada',
-        releaseDate: 'April 10, 2026',
+        releaseDate: 'April 9, 2027',
         openingType: 'theatrical',
         trailerUrl: 'https://www.youtube.com/watch?v=F3_aHwL6R74'
     },
@@ -512,8 +558,17 @@ class RSSNewsService {
             if (raw) {
                 const items: NewsItem[] = JSON.parse(raw);
                 if (Array.isArray(items) && items.length > 0) {
-                    items.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-                    return items;
+                    // Freshness filter: keep only from today onwards or latest from yesterday (48 hours)
+                    // Upcoming releases and openings are kept regardless
+                    const YESTERDAY_CUTOFF = Date.now() - 48 * 60 * 60 * 1000;
+                    const freshItems = items.filter(it => {
+                        if (it.category === 'release' || it.category === 'opening' || it.releaseDate) return true;
+                        return (it.timestamp || 0) >= YESTERDAY_CUTOFF;
+                    });
+                    if (freshItems.length > 0) {
+                        freshItems.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                        return freshItems;
+                    }
                 }
             }
         } catch (e) {
@@ -595,11 +650,31 @@ class RSSNewsService {
             }
         }
 
-        // Sort descending by timestamp
-        deduplicated.sort((a, b) => b.timestamp - a.timestamp);
+        // Enforce freshness: keep content from today onwards or latest from yesterday (48-hour cutoff)
+        const YESTERDAY_CUTOFF = Date.now() - 48 * 60 * 60 * 1000;
+        const freshItems = deduplicated.filter(item => {
+            if (item.category === 'release' || item.category === 'opening' || item.releaseDate) return true;
+            return item.timestamp >= YESTERDAY_CUTOFF;
+        });
+
+        // Combine with recent seeds if too few
+        const finalCandidates = freshItems.length >= 5 ? freshItems : [...freshItems, ...SEED_BACKUP_ITEMS];
+
+        const finalSeen = new Set<string>();
+        const finalDeduplicated: NewsItem[] = [];
+        for (const item of finalCandidates) {
+            const key = this.normalizeTitle(item.title);
+            if (!finalSeen.has(key)) {
+                finalSeen.add(key);
+                finalDeduplicated.push(item);
+            }
+        }
+
+        // Sort descending by timestamp (latest strictly on top!)
+        finalDeduplicated.sort((a, b) => b.timestamp - a.timestamp);
 
         // Keep top 120 most recent stories
-        const finalItems = deduplicated.slice(0, 120);
+        const finalItems = finalDeduplicated.slice(0, 120);
 
         // Update storage
         try {
