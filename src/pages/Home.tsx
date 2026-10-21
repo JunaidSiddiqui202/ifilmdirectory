@@ -567,7 +567,7 @@ export default function Home() {
                     <div className="flex items-center gap-2">
                         <span className="size-2 rounded-full bg-amber-400 animate-pulse" />
                         <h2 className="text-base font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-1.5">
-                            Certified Movie Reviews
+                            Movie Reviews from All Over
                         </h2>
                     </div>
                     <button
@@ -1034,26 +1034,6 @@ export default function Home() {
                                     </button>
                                 </div>
                             )}
-
-                            {/* South Cinema Wire Editorial & Review Disclaimer */}
-                            <div className="p-3 sm:p-3.5 rounded-xl bg-zinc-100/70 dark:bg-white/[0.02] border border-zinc-200 dark:border-white/5 text-[11px] text-zinc-500 dark:text-zinc-400 flex items-start gap-2.5">
-                                <span className="material-symbols-outlined text-amber-500 text-base shrink-0 mt-0.5">verified_user</span>
-                                <div className="space-y-1">
-                                    <p className="leading-relaxed">
-                                        <strong className="text-zinc-700 dark:text-zinc-300">Editorial & Review Notice:</strong> Film headlines and certified reviews are aggregated via public RSS feeds under fair use. Copyrights and trademarks belong to original publishers. Reviews reflect critic opinions.
-                                    </p>
-                                    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                                        <span>Editorial inquiries & DMCA:</span>
-                                        <a href="mailto:editorial@ifilmdirectory.com" className="text-amber-600 dark:text-amber-400 font-semibold hover:underline">
-                                            editorial@ifilmdirectory.com
-                                        </a>
-                                        <span>•</span>
-                                        <a href="mailto:contact@ifilmdirectory.com" className="hover:text-amber-500">
-                                            contact@ifilmdirectory.com
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
                         </section>
 
                         {/* On Mobile / Tablet: Prioritize Jobs & Featured Talent right after News & Reviews */}
@@ -1417,7 +1397,7 @@ export default function Home() {
                                         </span>
                                     </div>
                                     <span className="text-sm font-black text-white bg-amber-500 px-2.5 py-0.5 rounded-lg">
-                                        {selectedNewsArticle.rating || '★ CERTIFIED'}
+                                        {selectedNewsArticle.rating || '★ REVIEW'}
                                     </span>
                                 </div>
                             )}
