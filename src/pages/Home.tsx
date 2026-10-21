@@ -72,6 +72,9 @@ export default function Home() {
     // Film & Media Fraternity Jobs modal state
     const [selectedJobModal, setSelectedJobModal] = useState<Job | null>(null);
 
+    // Desktop Search Bar query state
+    const [desktopSearchQuery, setDesktopSearchQuery] = useState('');
+
     // Platform Disclaimer Modal (1st time check)
     const [showDisclaimerModal, setShowDisclaimerModal] = useState(false);
     const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
@@ -836,6 +839,102 @@ export default function Home() {
                             <div
                                 onClick={() => navigate('/profile')}
                                 className="size-8 sm:size-9 rounded-full overflow-hidden border border-zinc-300 dark:border-white/20 ml-0.5 cursor-pointer hover:border-amber-500 transition-colors shrink-0"
+                                title="My Profile"
+                            >
+                                <PostMedia
+                                    src={currentUser?.photoURL || ''}
+                                    fallbackType="USER_MALE"
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                        ) : null}
+                    </div>
+                </header>
+
+                {/* 1.5 DESKTOP TOP HEADER & SEARCH BAR (Strictly hidden on mobile, shown on md: / xl:) */}
+                <header className="hidden md:flex items-center justify-between gap-4 pt-4 pb-2 border-b border-zinc-200/80 dark:border-blue-500/20">
+                    {/* Desktop Search Bar */}
+                    <div className="relative flex-1 max-w-xl">
+                        <form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                const q = desktopSearchQuery.trim();
+                                navigate(q ? `/search?q=${encodeURIComponent(q)}` : '/search');
+                            }}
+                            className="relative"
+                        >
+                            <input
+                                type="text"
+                                value={desktopSearchQuery}
+                                onChange={(e) => setDesktopSearchQuery(e.target.value)}
+                                placeholder="Search talent, studios, gear, cinema wire, reviews, jobs..."
+                                className="w-full h-11 pl-11 pr-24 rounded-2xl bg-white dark:bg-[#0a1c3e] border border-zinc-200 dark:border-blue-500/20 text-xs sm:text-sm font-medium text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all shadow-sm"
+                            />
+                            <span className="material-symbols-outlined absolute left-3.5 top-2.5 text-zinc-400 dark:text-zinc-500 text-xl pointer-events-none">
+                                search
+                            </span>
+                            <div className="absolute right-2 top-1.5 flex items-center gap-1.5">
+                                {desktopSearchQuery && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setDesktopSearchQuery('')}
+                                        className="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-white transition-colors cursor-pointer"
+                                    >
+                                        <span className="material-symbols-outlined text-base">close</span>
+                                    </button>
+                                )}
+                                <button
+                                    type="submit"
+                                    className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-white font-extrabold text-xs shadow-sm active:scale-95 transition-all cursor-pointer"
+                                >
+                                    Search
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    {/* Desktop Quick Controls */}
+                    <div className="flex items-center gap-2 shrink-0">
+                        <button
+                            onClick={toggleDarkMode}
+                            type="button"
+                            className="p-2.5 rounded-xl bg-white dark:bg-[#0a1c3e] border border-zinc-200 dark:border-blue-500/20 text-zinc-600 dark:text-amber-400 hover:text-zinc-900 dark:hover:text-white hover:border-amber-500/30 transition-all active:scale-95 flex items-center justify-center shrink-0 cursor-pointer shadow-sm"
+                            title={isDarkMode ? "Switch to Day Theme" : "Switch to Night Theme"}
+                        >
+                            <span className="material-symbols-outlined text-xl">
+                                {isDarkMode ? 'light_mode' : 'dark_mode'}
+                            </span>
+                        </button>
+                        <button
+                            onClick={() => {
+                                if (!currentUser) return openAuthModal('Sign in to view notifications');
+                                navigate('/messaging?tab=notifications');
+                            }}
+                            className="relative p-2.5 rounded-xl bg-white dark:bg-[#0a1c3e] border border-zinc-200 dark:border-blue-500/20 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:border-amber-500/30 transition-all active:scale-95 shrink-0 cursor-pointer shadow-sm"
+                            title="Notifications"
+                        >
+                            <span className="material-symbols-outlined text-xl">notifications</span>
+                            {hasUnreadNotifications && (
+                                <span className="absolute top-1.5 right-1.5 size-2 bg-amber-500 rounded-full animate-pulse shadow-sm shadow-amber-500/50" />
+                            )}
+                        </button>
+                        <button
+                            onClick={() => {
+                                if (!currentUser) return openAuthModal('Sign in to view messages');
+                                navigate('/messaging');
+                            }}
+                            className="relative p-2.5 rounded-xl bg-white dark:bg-[#0a1c3e] border border-zinc-200 dark:border-blue-500/20 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:border-amber-500/30 transition-all active:scale-95 shrink-0 cursor-pointer shadow-sm"
+                            title="Messages"
+                        >
+                            <span className="material-symbols-outlined text-xl">chat_bubble</span>
+                            {hasUnreadMessages && (
+                                <span className="absolute top-1.5 right-1.5 size-2.5 bg-red-500 rounded-full ring-2 ring-white dark:ring-[#0a1c3e] animate-pulse shadow-sm shadow-red-500/60" />
+                            )}
+                        </button>
+                        {currentUser ? (
+                            <div
+                                onClick={() => navigate('/profile')}
+                                className="size-10 rounded-full overflow-hidden border-2 border-zinc-300 dark:border-blue-500/30 ml-1 cursor-pointer hover:border-amber-500 transition-colors shrink-0 shadow-sm"
                                 title="My Profile"
                             >
                                 <PostMedia

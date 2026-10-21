@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useAuthModal } from '../context/AuthModalContext';
@@ -19,8 +20,21 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
     const { isDarkMode, toggleDarkMode } = useTheme();
     const { hasUnreadMessages, hasUnreadNotifications } = useUnread();
 
+    // Global keyboard shortcut: Cmd+K / Ctrl+K opens search
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+                e.preventDefault();
+                navigate('/search');
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [navigate]);
+
     const isActive = (path: string) => {
         if (path === '/home') return location.pathname === '/home';
+        if (path === '/search') return location.pathname === '/search';
         if (path === '/showcase') return location.pathname === '/showcase';
         if (path === '/south-cinema') return location.pathname === '/south-cinema' || location.pathname === '/news';
         if (path === '/jobs') return location.pathname === '/jobs' || location.pathname.startsWith('/job/');
@@ -37,6 +51,7 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
 
     const navItems = [
         { path: '/home', label: 'Home', icon: 'home' },
+        { path: '/search', label: 'Search', icon: 'search' },
         { path: '/showcase', label: 'Feed', icon: 'movie' },
         { path: '/south-cinema', label: 'Cinema Wire', icon: 'newspaper' },
         { path: '/jobs', label: 'Jobs & Castings', icon: 'work' },
@@ -58,9 +73,9 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
     };
 
     return (
-        <aside className="hidden md:flex flex-col fixed left-0 top-0 bottom-0 z-40 bg-white dark:bg-[#090A0C] border-r border-zinc-200 dark:border-white/[0.08] w-20 xl:w-64 select-none px-3 py-4 font-display transition-colors duration-200 overflow-y-auto overscroll-contain custom-scrollbar">
+        <aside className="hidden md:flex flex-col fixed left-0 top-0 bottom-0 z-40 bg-white dark:bg-[#050f26] border-r border-zinc-200 dark:border-blue-500/20 w-20 xl:w-64 select-none px-3 py-4 font-display transition-colors duration-200 overflow-y-auto overscroll-contain custom-scrollbar">
             {/* Top: Brand Header & Navigation */}
-            <div className="flex flex-col gap-4 shrink-0">
+            <div className="flex flex-col gap-3.5 shrink-0">
                 {/* Logo */}
                 <div
                     onClick={() => navigate('/home')}
@@ -74,6 +89,24 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                         <Logo size="md" showText={true} />
                     </div>
                 </div>
+
+                {/* Desktop Sidebar Quick Search Bar (xl:) */}
+                <button
+                    onClick={() => navigate('/search')}
+                    type="button"
+                    className="hidden xl:flex items-center gap-2.5 px-3 py-2 rounded-xl bg-zinc-100 dark:bg-[#0a1c3e] border border-zinc-200 dark:border-blue-500/20 text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:border-amber-500/40 cursor-pointer transition-all group shadow-sm text-left"
+                    title="Search across all iFilm (Press ⌘K)"
+                >
+                    <span className="material-symbols-outlined text-lg text-zinc-400 group-hover:text-amber-500 transition-colors">
+                        search
+                    </span>
+                    <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white truncate">
+                        Search directory...
+                    </span>
+                    <kbd className="ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded bg-white dark:bg-[#06132b] border border-zinc-200 dark:border-blue-500/30 text-zinc-400 shrink-0">
+                        ⌘K
+                    </kbd>
+                </button>
 
                 {/* Primary Nav Links */}
                 <nav className="flex flex-col gap-1" aria-label="Desktop Primary Navigation">
