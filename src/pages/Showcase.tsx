@@ -53,6 +53,10 @@ interface Post {
     isSaved: boolean;
     isFollowing?: boolean;
     postType?: 'blog' | 'job' | 'regular';
+    videoUrl?: string;
+    videoType?: 'trailer' | 'teaser' | 'lyrical' | 'opening';
+    movieTitle?: string;
+    releaseDate?: string;
 }
 
 const formatTimeAgo = (date: any) => {
@@ -128,7 +132,7 @@ export default function Showcase() {
     const [commentText, setCommentText] = useState('');
     const [userProfile, setUserProfile] = useState<any>(null);
     const [replyingTo, setReplyingTo] = useState<{ id: string | number, author: string } | null>(null);
-    const [feedFilter, setFeedFilter] = useState<'All' | 'Trailers' | 'BTS' | 'Cinematography' | 'Opportunities'>('All');
+    const [feedFilter, setFeedFilter] = useState<'All' | 'Trailers' | 'Teasers' | 'Lyrical' | 'Openings' | 'BTS' | 'Cinematography' | 'Opportunities'>('All');
     
     // Feed Mode: News & Reviews vs Creators Feed
     const [mainFeedTab, setMainFeedTab] = useState<'news' | 'creators'>(
@@ -136,7 +140,7 @@ export default function Showcase() {
     );
     const [news, setNews] = useState<NewsItem[]>([]);
     const [newsLoading, setNewsLoading] = useState(true);
-    const [newsFilter, setNewsFilter] = useState<'all' | 'reviews' | 'telugu' | 'tamil' | 'malayalam' | 'kannada'>('all');
+    const [newsFilter, setNewsFilter] = useState<'all' | 'releases' | 'openings' | 'reviews' | 'telugu' | 'tamil' | 'malayalam' | 'kannada'>('all');
     const [selectedNewsArticle, setSelectedNewsArticle] = useState<NewsItem | null>(null);
     const [expandedNewsId, setExpandedNewsId] = useState<string | null>(null);
 
@@ -499,7 +503,16 @@ export default function Showcase() {
         const text = (post.content || '').toLowerCase();
         const role = (post.role || '').toLowerCase();
         if (feedFilter === 'Trailers') {
-            return text.includes('trailer') || text.includes('teaser') || text.includes('short film') || text.includes('film');
+            return post.videoType === 'trailer' || text.includes('trailer');
+        }
+        if (feedFilter === 'Teasers') {
+            return post.videoType === 'teaser' || text.includes('teaser');
+        }
+        if (feedFilter === 'Lyrical') {
+            return post.videoType === 'lyrical' || text.includes('lyrical') || text.includes('song') || text.includes('track');
+        }
+        if (feedFilter === 'Openings') {
+            return post.videoType === 'opening' || text.includes('opening') || text.includes('pooja') || text.includes('muhurtham');
         }
         if (feedFilter === 'BTS') {
             return text.includes('bts') || text.includes('behind') || text.includes('set') || text.includes('shoot') || text.includes('production');
@@ -549,6 +562,8 @@ export default function Showcase() {
     };
 
     const filteredNews = news.filter((item) => {
+        if (newsFilter === 'releases') return item.category === 'release';
+        if (newsFilter === 'openings') return item.category === 'opening';
         if (newsFilter === 'reviews') return item.category === 'review';
         if (newsFilter === 'telugu') return item.industry === 'telugu';
         if (newsFilter === 'tamil') return item.industry === 'tamil';
@@ -558,6 +573,8 @@ export default function Showcase() {
     });
 
     const reviewsCount = news.filter(n => n.category === 'review').length;
+    const releasesCount = news.filter(n => n.category === 'release').length;
+    const openingsCount = news.filter(n => n.category === 'opening').length;
 
     type CombinedFeedItem =
         | { type: 'post'; key: string; data: Post }
@@ -639,7 +656,25 @@ export default function Showcase() {
                                 {post.role}
                             </span>
                         )}
-                        {mainFeedTab === 'news' && (
+                        {post.videoType && (
+                            <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 border shrink-0 ${
+                                post.videoType === 'trailer'
+                                    ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30'
+                                    : post.videoType === 'teaser'
+                                    ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30'
+                                    : post.videoType === 'lyrical'
+                                    ? 'bg-pink-500/10 text-pink-600 dark:text-pink-400 border-pink-500/30'
+                                    : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
+                            }`}>
+                                <span className="material-symbols-outlined text-xs">
+                                    {post.videoType === 'trailer' ? 'play_circle' : post.videoType === 'teaser' ? 'bolt' : post.videoType === 'lyrical' ? 'music_note' : 'movie'}
+                                </span>
+                                <span>
+                                    {post.videoType === 'trailer' ? 'Trailer' : post.videoType === 'teaser' ? 'Teaser' : post.videoType === 'lyrical' ? 'Lyrical' : 'Opening'}
+                                </span>
+                            </span>
+                        )}
+                        {mainFeedTab === 'news' && !post.videoType && (
                             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
                                 Filmmaker
                             </span>
@@ -692,6 +727,21 @@ export default function Showcase() {
                     )}
                 </div>
             </div>
+
+            {/* Movie Title & Release Date Tag if present */}
+            {(post.movieTitle || post.releaseDate) && (
+                <div className="px-3.5 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-between text-xs">
+                    <span className="font-bold text-zinc-900 dark:text-white flex items-center gap-1.5">
+                        <span className="material-symbols-outlined text-sm text-amber-500">movie</span>
+                        <span>{post.movieTitle}</span>
+                    </span>
+                    {post.releaseDate && (
+                        <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
+                            Release: {post.releaseDate}
+                        </span>
+                    )}
+                </div>
+            )}
 
             {/* Content Text */}
             <div className="text-zinc-800 dark:text-zinc-200 text-sm sm:text-[15px] leading-relaxed">
@@ -760,7 +810,11 @@ export default function Showcase() {
             )}
 
             {/* Media (Images/Videos) */}
-            {post.images && post.images.length > 0 ? (
+            {post.videoUrl ? (
+                <div className="w-full aspect-video rounded-xl overflow-hidden border border-black/5 dark:border-white/5 bg-black">
+                    <PostMedia src={post.videoUrl} className="w-full h-full object-cover" />
+                </div>
+            ) : post.images && post.images.length > 0 ? (
                 <div className="relative group rounded-xl overflow-hidden border border-black/5 dark:border-white/5 bg-black">
                     <div id={`carousel-${post.id}`} className={`flex gap-2 overflow-x-auto pb-0 snap-x scrollbar-hide scroll-smooth ${post.images.length === 1 ? 'justify-center' : ''}`}>
                         {post.images.map((img, idx) => (
@@ -979,6 +1033,18 @@ export default function Showcase() {
                                     <span>{item.rating || 'REVIEW'}</span>
                                 </span>
                             )}
+                            {item.category === 'release' && (
+                                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-lg bg-emerald-500 text-white shadow-md flex items-center gap-1">
+                                    <span className="material-symbols-outlined text-[12px]">calendar_month</span>
+                                    <span>{item.releaseDate ? `Release: ${item.releaseDate}` : 'RELEASE'}</span>
+                                </span>
+                            )}
+                            {item.category === 'opening' && (
+                                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-lg bg-rose-500 text-white shadow-md flex items-center gap-1">
+                                    <span className="material-symbols-outlined text-[12px]">celebration</span>
+                                    <span>{item.openingType === 'pooja_launch' ? 'POOJA LAUNCH' : item.openingType === 'fdfs_boxoffice' ? 'BOX OFFICE' : 'OPENING'}</span>
+                                </span>
+                            )}
                         </div>
 
                         <div className="absolute top-3 right-3 bg-black/75 backdrop-blur-md px-2.5 py-0.5 rounded-lg border border-white/10 text-[10px] font-bold text-zinc-300">
@@ -1194,6 +1260,8 @@ export default function Showcase() {
                     <div className="flex gap-1.5 overflow-x-auto no-scrollbar py-0.5 -mx-1 px-1">
                         {[
                             { id: 'all', label: `All Wire & Feed (${news.length + posts.length})` },
+                            { id: 'releases', label: `📅 Releases (${releasesCount})` },
+                            { id: 'openings', label: `🍿 Openings (${openingsCount})` },
                             { id: 'reviews', label: `Reviews ⭐ (${reviewsCount})` },
                             { id: 'telugu', label: 'Tollywood' },
                             { id: 'tamil', label: 'Kollywood' },
@@ -1215,7 +1283,7 @@ export default function Showcase() {
                     </div>
                 ) : (
                     <div className="flex gap-1.5 overflow-x-auto no-scrollbar py-0.5 -mx-1 px-1">
-                        {(['All', 'Trailers', 'BTS', 'Cinematography', 'Opportunities'] as const).map((cat) => (
+                        {(['All', 'Trailers', 'Teasers', 'Lyrical', 'Openings', 'BTS', 'Cinematography', 'Opportunities'] as const).map((cat) => (
                             <button
                                 key={cat}
                                 onClick={() => setFeedFilter(cat)}
@@ -1225,7 +1293,7 @@ export default function Showcase() {
                                         : 'bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-transparent dark:border-white/5'
                                 }`}
                             >
-                                {cat === 'BTS' ? 'BTS & Stills' : cat === 'Trailers' ? 'Trailers & Teasers' : cat}
+                                {cat === 'BTS' ? 'BTS & Stills' : cat === 'Trailers' ? '🎬 Trailers' : cat === 'Teasers' ? '⚡ Teasers' : cat === 'Lyrical' ? '🎵 Lyrical' : cat === 'Openings' ? '🍿 Openings' : cat}
                             </button>
                         ))}
                     </div>

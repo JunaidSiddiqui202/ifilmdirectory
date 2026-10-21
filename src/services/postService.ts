@@ -29,6 +29,10 @@ export interface PostData {
     authorVerified?: boolean;
     image?: string;
     images?: string[];
+    videoUrl?: string;
+    videoType?: 'trailer' | 'teaser' | 'lyrical' | 'opening';
+    movieTitle?: string;
+    releaseDate?: string;
     likes: number;
     likedBy?: string[]; // Array of user IDs who liked the post
     comments: number;
@@ -36,6 +40,94 @@ export interface PostData {
     jobId?: string;
     deadline?: string;
 }
+
+export const LATEST_CINEMA_FEED_VIDEOS: PostData[] = [
+    {
+        id: 'feed-video-pushpa2',
+        author: 'Mythri Movie Makers',
+        authorId: 'mythri-official',
+        authorImage: 'https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?w=120&h=120&fit=crop',
+        role: 'Production House (Official)',
+        authorVerified: true,
+        movieTitle: 'Pushpa 2: The Rule',
+        videoType: 'trailer',
+        releaseDate: 'In Theatres Worldwide',
+        videoUrl: 'https://www.youtube.com/watch?v=1kVK0MZlbI4',
+        image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&h=450&fit=crop',
+        content: '🎬 [OFFICIAL TRAILER] Witness Icon Star Allu Arjun and Sukumar’s monumental cinematic spectacle Pushpa 2: The Rule! The wildfire blazes across world cinema screens. Watch the explosive trailer right here! 🔥🌲 #Pushpa2TheRule #WildFire #Trailer',
+        likes: 18450,
+        comments: 2120,
+        createdAt: new Date(Date.now() - 10 * 60 * 1000) // 10 mins ago (Latest at top!)
+    },
+    {
+        id: 'feed-video-gamechanger',
+        author: 'Sri Venkateswara Creations',
+        authorId: 'svc-official',
+        authorImage: 'https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=120&h=120&fit=crop',
+        role: 'Production House (Official)',
+        authorVerified: true,
+        movieTitle: 'Game Changer',
+        videoType: 'lyrical',
+        releaseDate: 'Jan 10, 2026 Worldwide',
+        videoUrl: 'https://www.youtube.com/watch?v=k4x8W4J00eM',
+        image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=450&fit=crop',
+        content: '🎵 [LATEST LYRICAL VIDEO] "Jaragandi" & "Raa Macha Macha" – Mega Powerstar Ram Charan in sensational dancing rhythm! Thaman S mass beats meets Shankar grand visual choreography. Crank the volume up! 🎶💃 #GameChanger #RamCharan #LyricalVideo',
+        likes: 12840,
+        comments: 1420,
+        createdAt: new Date(Date.now() - 22 * 60 * 1000) // 22 mins ago
+    },
+    {
+        id: 'feed-video-rajasaab',
+        author: 'People Media Factory',
+        authorId: 'pmf-official',
+        authorImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop',
+        role: 'Production House (Official)',
+        authorVerified: true,
+        movieTitle: 'The Raja Saab',
+        videoType: 'teaser',
+        releaseDate: 'April 10, 2026',
+        videoUrl: 'https://www.youtube.com/watch?v=0kF63N6l5F0',
+        image: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800&h=450&fit=crop',
+        content: '⚡ [OFFICIAL TEASER] Rebel Star Prabhas in a dashing, vintage avatar in Maruthi’s romantic horror-comedy spectacle The Raja Saab! Witness the king of masses back with peerless swag. 👑✨ #Prabhas #TheRajaSaab #Teaser',
+        likes: 21300,
+        comments: 3490,
+        createdAt: new Date(Date.now() - 38 * 60 * 1000) // 38 mins ago
+    },
+    {
+        id: 'feed-video-thalapathy69',
+        author: 'KVN Productions',
+        authorId: 'kvn-official',
+        authorImage: 'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?w=120&h=120&fit=crop',
+        role: 'Production House (Official)',
+        authorVerified: true,
+        movieTitle: 'Thalapathy 69',
+        videoType: 'opening',
+        releaseDate: 'October 2026 (Diwali)',
+        videoUrl: 'https://www.youtube.com/watch?v=8V4c3k_5_2g',
+        image: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&h=450&fit=crop',
+        content: '🍿 [GRAND MOVIE OPENING] Thalapathy 69 officially begins with an auspicious Pooja Ceremony in Chennai! Thalapathy Vijay, director H. Vinoth, Pooja Hegde, and composer Anirudh unite for this political action spectacle. 🎬🪔 #Thalapathy69 #PoojaLaunch #MovieOpening',
+        likes: 24900,
+        comments: 4200,
+        createdAt: new Date(Date.now() - 52 * 60 * 1000) // 52 mins ago
+    },
+    {
+        id: 'feed-video-kantara',
+        author: 'Hombale Films',
+        authorId: 'hombale-official',
+        authorImage: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=120&h=120&fit=crop',
+        role: 'Production House (Official)',
+        authorVerified: true,
+        movieTitle: 'Kantara: Chapter 1',
+        videoType: 'teaser',
+        releaseDate: 'Oct 2, 2026',
+        videoUrl: 'https://www.youtube.com/watch?v=Vj81N_Kq-z0',
+        image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&h=450&fit=crop',
+        content: '🔥 [MYTHOLOGICAL TEASER] Step into the divine realm of Kantara: A Legend Chapter 1. Rishab Shetty unveils the roaring prequel that unravels centuries of myth, sacred forests and folklore. 🌿🔱 #KantaraChapter1 #RishabShetty #HombaleFilms',
+        likes: 16200,
+        comments: 1890,
+        createdAt: new Date(Date.now() - 68 * 60 * 1000) // 68 mins ago
+    }
+];
 
 export interface CommentData {
     postId: number | string; // Changed to allow string IDs
@@ -53,7 +145,7 @@ export interface CommentData {
 
 // Client-side cache to protect free daily Firestore read quota
 let postsCache: { posts: PostData[]; timestamp: number } | null = null;
-const POSTS_CACHE_TTL = 2 * 60 * 1000; // 2 minutes
+const POSTS_CACHE_TTL = 90 * 60 * 1000; // 90 minutes cache update cycle
 
 export const createPost = async (postData: Omit<PostData, 'id'>) => {
     try {
@@ -67,6 +159,20 @@ export const createPost = async (postData: Omit<PostData, 'id'>) => {
     }
 };
 
+const mergeWithCinemaVideos = (firestorePosts: PostData[]): PostData[] => {
+    const existingIds = new Set(firestorePosts.map(p => p.id));
+    const newCinemaVideos = LATEST_CINEMA_FEED_VIDEOS.filter(v => !existingIds.has(v.id));
+    const combined = [...newCinemaVideos, ...firestorePosts];
+    
+    // Sort strictly so the latest trailer, teaser, lyrical video or post is at the top
+    combined.sort((a, b) => {
+        const timeA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : (a.createdAt ? new Date(a.createdAt).getTime() : 0);
+        const timeB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : (b.createdAt ? new Date(b.createdAt).getTime() : 0);
+        return timeB - timeA;
+    });
+    return combined;
+};
+
 export const getPosts = async (limitCount: number = 40, bypassCache: boolean = false) => {
     if (!bypassCache && postsCache && Date.now() - postsCache.timestamp < POSTS_CACHE_TTL) {
         return postsCache.posts;
@@ -75,25 +181,28 @@ export const getPosts = async (limitCount: number = 40, bypassCache: boolean = f
     try {
         const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'), limit(limitCount));
         const querySnapshot = await getDocs(q);
-        const posts = querySnapshot.docs.map(doc => ({
+        const firestorePosts = querySnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
         })) as PostData[];
+        const posts = mergeWithCinemaVideos(firestorePosts);
         postsCache = { posts, timestamp: Date.now() };
         return posts;
     } catch (error) {
         console.error("Error getting posts: ", error);
-        return postsCache?.posts || [];
+        const fallback = mergeWithCinemaVideos(postsCache?.posts || []);
+        return fallback;
     }
 };
 
 export const subscribeToPosts = (callback: (posts: PostData[]) => void, limitCount: number = 40) => {
     const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'), limit(limitCount));
     return onSnapshot(q, (snapshot) => {
-        const posts = snapshot.docs.map(doc => ({
+        const firestorePosts = snapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
         })) as PostData[];
+        const posts = mergeWithCinemaVideos(firestorePosts);
         postsCache = { posts, timestamp: Date.now() };
         callback(posts);
     }, (error) => {

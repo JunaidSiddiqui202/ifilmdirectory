@@ -4,7 +4,7 @@ import BottomNav from '../components/BottomNav';
 import HamburgerMenu from '../components/HamburgerMenu';
 import Logo from '../components/Logo';
 import BreakingTicker from '../components/BreakingTicker';
-import { rssNewsService, type NewsItem, type RSSFeedSource } from '../services/rssNewsService';
+import { rssNewsService, type NewsItem, type RSSFeedSource, type UpcomingMovieRelease } from '../services/rssNewsService';
 import { generateText } from '../services/groqService';
 import { useToast } from '../context/ToastContext';
 import SEO from '../components/SEO';
@@ -18,7 +18,7 @@ export default function SouthCinemaNews() {
     const [isLoading, setIsLoading] = useState(true);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [lastSyncTime, setLastSyncTime] = useState<number>(0);
-    const [activeTab, setActiveTab] = useState<'all' | 'news' | 'review' | 'telugu' | 'tamil' | 'malayalam' | 'kannada'>('all');
+    const [activeTab, setActiveTab] = useState<'all' | 'news' | 'review' | 'releases' | 'openings' | 'telugu' | 'tamil' | 'malayalam' | 'kannada'>('all');
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedArticle, setSelectedArticle] = useState<NewsItem | null>(null);
     const [expandedStories, setExpandedStories] = useState<{ [id: string]: string }>({});
@@ -208,12 +208,16 @@ export default function SouthCinemaNews() {
         }
     };
 
+    const upcomingReleases: UpcomingMovieRelease[] = rssNewsService.getUpcomingReleases();
+
     // Filter & sort news items (new news always strictly on top)
     const filteredNews = news
         .filter((item) => {
             // Tab filter
             if (activeTab === 'news' && item.category !== 'news') return false;
             if (activeTab === 'review' && item.category !== 'review') return false;
+            if (activeTab === 'releases' && item.category !== 'release') return false;
+            if (activeTab === 'openings' && item.category !== 'opening') return false;
             if (activeTab === 'telugu' && item.industry !== 'telugu') return false;
             if (activeTab === 'tamil' && item.industry !== 'tamil') return false;
             if (activeTab === 'malayalam' && item.industry !== 'malayalam') return false;
@@ -224,7 +228,8 @@ export default function SouthCinemaNews() {
                 const q = searchQuery.toLowerCase();
                 return item.title.toLowerCase().includes(q) ||
                     item.description.toLowerCase().includes(q) ||
-                    item.source.toLowerCase().includes(q);
+                    item.source.toLowerCase().includes(q) ||
+                    (item.releaseDate && item.releaseDate.toLowerCase().includes(q));
             }
 
             return true;
@@ -233,6 +238,8 @@ export default function SouthCinemaNews() {
 
     const reviewsCount = news.filter(n => n.category === 'review').length;
     const newsCount = news.filter(n => n.category === 'news').length;
+    const releasesCount = news.filter(n => n.category === 'release').length;
+    const openingsCount = news.filter(n => n.category === 'opening').length;
 
     const formatTimeAgo = (timestamp: number) => {
         const diffMs = Date.now() - timestamp;
@@ -325,7 +332,7 @@ export default function SouthCinemaNews() {
                             <span>
                                 {lastSyncTime ? `Synced ${formatTimeAgo(lastSyncTime)}` : 'Connecting...'}
                             </span>
-                            <span className="text-zinc-400 dark:text-zinc-600">• Auto 15m</span>
+                            <span className="text-zinc-400 dark:text-zinc-600">• Auto 90m</span>
                         </div>
 
                         <button
@@ -351,6 +358,73 @@ export default function SouthCinemaNews() {
                 {/* 3. LIVE BREAKING TICKER */}
                 <BreakingTicker variant="page" onItemClick={(item) => setSelectedArticle(item)} />
 
+                {/* 3.5 UPCOMING MOVIE RELEASES & GRAND OPENINGS SHOWCASE */}
+                <div className="my-4 p-4 rounded-2xl bg-gradient-to-br from-amber-500/10 via-zinc-900/5 to-red-500/10 dark:from-amber-500/10 dark:via-[#121316] dark:to-red-500/10 border border-amber-500/20 shadow-sm">
+                    <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                            <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+                            <h2 className="text-sm sm:text-base font-black text-zinc-900 dark:text-white tracking-tight flex items-center gap-1.5">
+                                <span>Upcoming Movie Release Dates & Grand Openings</span>
+                            </h2>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                                2025 Calendar
+                            </span>
+                            <button
+                                onClick={() => setActiveTab('releases')}
+                                className="text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-0.5"
+                            >
+                                <span>Filter All</span>
+                                <span className="material-symbols-outlined text-xs">chevron_right</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="flex gap-3 overflow-x-auto no-scrollbar py-1">
+                        {upcomingReleases.map((movie) => (
+                            <div
+                                key={movie.id}
+                                onClick={() => {
+                                    setSearchQuery(movie.title);
+                                }}
+                                className="group shrink-0 w-52 sm:w-60 rounded-xl bg-white dark:bg-[#18191D] border border-zinc-200 dark:border-white/10 p-3 hover:border-amber-500/50 transition-all cursor-pointer shadow-xs hover:shadow-md flex flex-col justify-between"
+                            >
+                                <div className="space-y-2">
+                                    <div className="aspect-[16/9] w-full rounded-lg overflow-hidden relative bg-black">
+                                        <img
+                                            src={movie.banner || movie.poster}
+                                            alt={movie.title}
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                            loading="lazy"
+                                        />
+                                        <span className="absolute top-1.5 left-1.5 text-[9px] font-black uppercase px-2 py-0.5 rounded bg-black/75 text-amber-400 backdrop-blur-xs">
+                                            {movie.industry || movie.language}
+                                        </span>
+                                        <span className="absolute bottom-1.5 right-1.5 text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-600 text-white backdrop-blur-xs shadow-xs">
+                                            {movie.releaseDate}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <h4 className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-white group-hover:text-amber-500 transition-colors line-clamp-1">
+                                            {movie.title}
+                                        </h4>
+                                        <p className="text-[11px] text-zinc-500 dark:text-zinc-400 line-clamp-1">
+                                            {movie.starring}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="mt-2 pt-2 border-t border-zinc-100 dark:border-white/5 flex items-center justify-between text-[10px]">
+                                    <span className="text-zinc-400 font-medium">Dir: {movie.director}</span>
+                                    <span className="font-extrabold text-amber-600 dark:text-amber-400 group-hover:translate-x-0.5 transition-transform flex items-center">
+                                        News <span className="material-symbols-outlined text-[11px]">arrow_forward</span>
+                                    </span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
                 {/* 4. SEARCH & FILTER SECTION */}
                 <div className="space-y-3 mb-6">
                     {/* Search Bar */}
@@ -358,7 +432,7 @@ export default function SouthCinemaNews() {
                         <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 text-lg">search</span>
                         <input
                             type="text"
-                            placeholder="Search stars, films, reviews or breaking headlines..."
+                            placeholder="Search movie releases, grand openings, stars, or reviews..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="w-full h-11 pl-10 pr-10 rounded-xl bg-white dark:bg-[#121316] border border-zinc-300 dark:border-white/10 text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 text-xs sm:text-sm focus:outline-none focus:border-amber-500 transition-colors shadow-xs dark:shadow-none"
@@ -384,6 +458,30 @@ export default function SouthCinemaNews() {
                             }`}
                         >
                             All Stories ({news.length})
+                        </button>
+
+                        <button
+                            onClick={() => setActiveTab('releases')}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 flex items-center gap-1.5 transition-all ${
+                                activeTab === 'releases'
+                                    ? 'bg-emerald-600 text-white shadow-md'
+                                    : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/5'
+                            }`}
+                        >
+                            <span className="material-symbols-outlined text-sm">calendar_month</span>
+                            Release Dates ({releasesCount})
+                        </button>
+
+                        <button
+                            onClick={() => setActiveTab('openings')}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 flex items-center gap-1.5 transition-all ${
+                                activeTab === 'openings'
+                                    ? 'bg-gradient-to-r from-red-600 to-amber-600 text-white shadow-md'
+                                    : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/5'
+                            }`}
+                        >
+                            <span className="material-symbols-outlined text-sm">celebration</span>
+                            Movie Openings ({openingsCount})
                         </button>
 
                         <button
@@ -527,6 +625,18 @@ export default function SouthCinemaNews() {
                                                     <span>{item.rating || 'REVIEW'}</span>
                                                 </span>
                                             )}
+                                            {(item.category === 'release' || item.releaseDate) && (
+                                                <span className="text-[10px] font-black px-2 py-0.5 rounded-lg bg-emerald-600 text-white shadow-md flex items-center gap-0.5 border border-emerald-400/30">
+                                                    <span className="material-symbols-outlined text-[10px]">calendar_month</span>
+                                                    <span>{item.releaseDate ? item.releaseDate : 'RELEASE'}</span>
+                                                </span>
+                                            )}
+                                            {item.category === 'opening' && (
+                                                <span className="text-[10px] font-black px-2 py-0.5 rounded-lg bg-gradient-to-r from-red-600 to-amber-600 text-white shadow-md flex items-center gap-0.5 border border-amber-400/30">
+                                                    <span className="material-symbols-outlined text-[10px]">celebration</span>
+                                                    <span>{item.openingType === 'pooja_launch' ? 'Pooja Launch' : item.openingType === 'fdfs_boxoffice' ? 'FDFS Box Office' : 'Movie Opening'}</span>
+                                                </span>
+                                            )}
                                         </div>
 
                                         {/* Source Tag */}
@@ -543,6 +653,19 @@ export default function SouthCinemaNews() {
                                     {/* Content Body */}
                                     <div className="p-4 flex flex-col flex-1 justify-between">
                                         <div className="space-y-2.5">
+                                            {item.releaseDate && (
+                                                <div className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20 w-fit">
+                                                    <span className="material-symbols-outlined text-xs text-emerald-500">event</span>
+                                                    <span>Theatrical Release: <strong className="text-emerald-600 dark:text-emerald-400">{item.releaseDate}</strong></span>
+                                                </div>
+                                            )}
+                                            {item.category === 'opening' && !item.releaseDate && (
+                                                <div className="flex items-center gap-1.5 text-[11px] font-bold text-amber-700 dark:text-amber-300 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/20 w-fit">
+                                                    <span className="material-symbols-outlined text-xs text-amber-500">celebration</span>
+                                                    <span>{item.openingType === 'pooja_launch' ? 'Grand Pooja & Shoot Launch' : item.openingType === 'fdfs_boxoffice' ? 'FDFS Opening Day Box Office' : 'Grand Theatrical Opening'}</span>
+                                                </div>
+                                            )}
+
                                             <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors leading-snug">
                                                 {item.title}
                                             </h3>
@@ -724,6 +847,46 @@ export default function SouthCinemaNews() {
                                     <span className="text-sm font-black text-white bg-amber-500 px-2.5 py-0.5 rounded-lg">
                                         {selectedArticle.rating || '★ RATED'}
                                     </span>
+                                </div>
+                            )}
+
+                            {selectedArticle.releaseDate && (
+                                <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <span className="material-symbols-outlined text-emerald-500">calendar_month</span>
+                                        <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+                                            Confirmed Theatrical Release Date
+                                        </span>
+                                    </div>
+                                    <span className="text-sm font-black text-white bg-emerald-600 px-3 py-1 rounded-xl shadow-xs">
+                                        {selectedArticle.releaseDate}
+                                    </span>
+                                </div>
+                            )}
+
+                            {selectedArticle.category === 'opening' && !selectedArticle.releaseDate && (
+                                <div className="p-3.5 rounded-2xl bg-gradient-to-r from-red-500/10 via-amber-500/10 to-transparent border border-amber-500/30 flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <span className="material-symbols-outlined text-amber-500">celebration</span>
+                                        <span className="text-xs font-black text-amber-600 dark:text-amber-300 uppercase tracking-wider">
+                                            {selectedArticle.openingType === 'pooja_launch' ? 'Grand Pooja Ceremony & Shoot Launch' : selectedArticle.openingType === 'fdfs_boxoffice' ? 'FDFS Theatrical Opening Day Box Office' : 'Grand Theatrical Opening'}
+                                        </span>
+                                    </div>
+                                    <span className="text-xs font-black text-white bg-amber-500 px-2.5 py-1 rounded-xl">
+                                        EXCLUSIVE
+                                    </span>
+                                </div>
+                            )}
+
+                            {selectedArticle.trailerUrl && (
+                                <div className="w-full aspect-video rounded-2xl overflow-hidden bg-black border border-zinc-200 dark:border-white/10 shadow-md">
+                                    <iframe
+                                        src={`https://www.youtube-nocookie.com/embed/${selectedArticle.trailerUrl.split('/').pop()?.split('?')[0]}?rel=0`}
+                                        className="w-full h-full"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowFullScreen
+                                        title="Official Video Trailer / Teaser"
+                                    />
                                 </div>
                             )}
 

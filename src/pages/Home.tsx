@@ -62,6 +62,7 @@ export default function Home() {
     const [networkPosts, setNetworkPosts] = useState<PostData[]>([]);
     const [likedPostsMap, setLikedPostsMap] = useState<Record<string, boolean>>({});
     const [selectedPollOption, setSelectedPollOption] = useState<number | null>(null);
+    const [communityFilter, setCommunityFilter] = useState<'all' | 'trailers' | 'teasers' | 'lyrical' | 'openings'>('all');
 
     // Film News & Movie Reviews state
     const [cinemaNews, setCinemaNews] = useState<NewsItem[]>([]);
@@ -124,7 +125,7 @@ export default function Home() {
                 setNewUsers(fetchedUsers);
 
                 if (fetchedPosts && fetchedPosts.length > 0) {
-                    setNetworkPosts(fetchedPosts.slice(0, 4));
+                    setNetworkPosts(fetchedPosts.slice(0, 10));
                 }
                 
                 if (fetchedReels && fetchedReels.length > 0) {
@@ -478,6 +479,14 @@ export default function Home() {
     ];
 
     const displayPosts = networkPosts.length > 0 ? networkPosts : defaultCommunityPosts;
+    const filteredDisplayPosts = displayPosts.filter(post => {
+        if (communityFilter === 'all') return true;
+        if (communityFilter === 'trailers') return post.videoType === 'trailer' || post.content?.toLowerCase().includes('trailer');
+        if (communityFilter === 'teasers') return post.videoType === 'teaser' || post.content?.toLowerCase().includes('teaser');
+        if (communityFilter === 'lyrical') return post.videoType === 'lyrical' || post.content?.toLowerCase().includes('lyrical') || post.content?.toLowerCase().includes('song');
+        if (communityFilter === 'openings') return post.videoType === 'opening' || post.content?.toLowerCase().includes('opening') || post.content?.toLowerCase().includes('pooja');
+        return true;
+    });
 
     // Featured Editorial Articles & Blog Section (Rendered in Main Feed Column)
     const EditorialArticlesSection = () => (
@@ -1146,12 +1155,35 @@ export default function Home() {
                                 </button>
                             </div>
 
+                            {/* Feed Category Pills: Trailers, Teasers, Lyrical, Openings */}
+                            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+                                {[
+                                    { id: 'all', label: 'All Feed' },
+                                    { id: 'trailers', label: '🎬 Trailers' },
+                                    { id: 'teasers', label: '⚡ Teasers' },
+                                    { id: 'lyrical', label: '🎵 Lyrical Videos' },
+                                    { id: 'openings', label: '🍿 Movie Openings' }
+                                ].map(pill => (
+                                    <button
+                                        key={pill.id}
+                                        onClick={() => setCommunityFilter(pill.id as any)}
+                                        className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap shrink-0 transition-all ${
+                                            communityFilter === pill.id
+                                                ? 'bg-amber-500 text-white shadow-xs'
+                                                : 'bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/5'
+                                        }`}
+                                    >
+                                        {pill.label}
+                                    </button>
+                                ))}
+                            </div>
+
                             <div className="space-y-4">
-                                {displayPosts.slice(0, 3).map((post, pIdx) => {
+                                {filteredDisplayPosts.slice(0, 5).map((post, pIdx) => {
                                     const postKey = post.id || `post-${pIdx}`;
                                     const isLiked = !!likedPostsMap[postKey];
                                     const currentLikes = (post.likes || 12) + (isLiked ? 1 : 0);
-                                    const mediaUrl = post.image || (post.images && post.images[0]);
+                                    const mediaUrl = post.videoUrl || post.image || (post.images && post.images[0]);
 
                                     return (
                                         <div
@@ -1165,10 +1197,10 @@ export default function Home() {
                                                     <div
                                                         className="size-10 rounded-full overflow-hidden border border-zinc-200 dark:border-white/10 shrink-0 cursor-pointer"
                                                         onClick={(e) => {
-                                                            if (post.authorId) {
-                                                                e.stopPropagation();
-                                                                navigate(`/profile/${post.authorId}`);
-                                                            }
+                                                             if (post.authorId) {
+                                                                 e.stopPropagation();
+                                                                 navigate(`/profile/${post.authorId}`);
+                                                             }
                                                         }}
                                                     >
                                                         <PostMedia
@@ -1193,10 +1225,44 @@ export default function Home() {
                                                         </p>
                                                     </div>
                                                 </div>
-                                                <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-white/10 shrink-0">
-                                                    Post
-                                                </span>
+                                                {post.videoType ? (
+                                                    <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 border shrink-0 ${
+                                                        post.videoType === 'trailer'
+                                                            ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30'
+                                                            : post.videoType === 'teaser'
+                                                            ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30'
+                                                            : post.videoType === 'lyrical'
+                                                            ? 'bg-pink-500/10 text-pink-600 dark:text-pink-400 border-pink-500/30'
+                                                            : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
+                                                    }`}>
+                                                        <span className="material-symbols-outlined text-xs">
+                                                            {post.videoType === 'trailer' ? 'play_circle' : post.videoType === 'teaser' ? 'bolt' : post.videoType === 'lyrical' ? 'music_note' : 'movie'}
+                                                        </span>
+                                                        <span>
+                                                            {post.videoType === 'trailer' ? 'Trailer' : post.videoType === 'teaser' ? 'Teaser' : post.videoType === 'lyrical' ? 'Lyrical' : 'Opening'}
+                                                        </span>
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-white/10 shrink-0">
+                                                        Post
+                                                    </span>
+                                                )}
                                             </div>
+
+                                            {/* Movie Title & Release Date Tag if available */}
+                                            {(post.movieTitle || post.releaseDate) && (
+                                                <div className="mb-2.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-between text-xs">
+                                                    <span className="font-bold text-zinc-900 dark:text-white flex items-center gap-1.5">
+                                                        <span className="material-symbols-outlined text-sm text-amber-500">movie</span>
+                                                        <span>{post.movieTitle}</span>
+                                                    </span>
+                                                    {post.releaseDate && (
+                                                        <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
+                                                            Release: {post.releaseDate}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            )}
 
                                             {/* Post Text */}
                                             <p className="text-xs sm:text-sm text-zinc-800 dark:text-zinc-200 leading-relaxed mb-3 line-clamp-3">

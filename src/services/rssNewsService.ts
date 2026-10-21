@@ -15,9 +15,30 @@ export interface NewsItem {
     description: string;
     content?: string;
     thumbnail?: string;
-    category: 'news' | 'review';
+    category: 'news' | 'review' | 'release' | 'opening';
     industry: 'telugu' | 'tamil' | 'malayalam' | 'kannada' | 'south';
     rating?: string; // e.g., "3.5/5"
+    releaseDate?: string;
+    openingType?: 'theatrical' | 'pooja_launch' | 'fdfs_boxoffice';
+    trailerUrl?: string;
+}
+
+export interface UpcomingMovieRelease {
+    id: string;
+    title: string;
+    starring: string;
+    director: string;
+    productionHouse?: string;
+    releaseDate: string;
+    releaseTimestamp: number;
+    industry: 'telugu' | 'tamil' | 'malayalam' | 'kannada' | 'south';
+    status: 'In Theatres Soon' | 'Worldwide Grand Release' | 'Pooja Launched' | 'FDFS Booking Open' | 'Grand Opening';
+    banner: string;
+    poster?: string;
+    language?: string;
+    trailerUrl?: string;
+    openingType: 'theatrical' | 'pooja_launch' | 'fdfs_boxoffice';
+    synopsis: string;
 }
 
 export interface RSSFeedSource {
@@ -30,10 +51,10 @@ export interface RSSFeedSource {
 }
 
 const STORAGE_KEYS = {
-    CACHE: 'ifilm_rss_news_cache_v2',
+    CACHE: 'ifilm_rss_news_cache_v3',
     LAST_SYNC: 'ifilm_rss_last_sync_timestamp',
-    FEEDS: 'ifilm_rss_sources_config_v2',
-    AUTO_REFRESH_MINS: 'ifilm_rss_auto_refresh_minutes'
+    FEEDS: 'ifilm_rss_sources_config_v3',
+    AUTO_REFRESH_MINS: 'ifilm_rss_auto_refresh_minutes_v90'
 };
 
 export const DEFAULT_FEEDS: RSSFeedSource[] = [
@@ -71,11 +92,221 @@ export const DEFAULT_FEEDS: RSSFeedSource[] = [
         url: 'https://news.google.com/rss/search?q=Telugu+movie+review+OR+Tamil+movie+review+OR+Malayalam+movie+review&hl=en-IN&gl=IN&ceid=IN:en',
         industry: 'south',
         enabled: true
+    },
+    {
+        id: 'google_south_releases',
+        name: 'South Movie Releases & Openings',
+        url: 'https://news.google.com/rss/search?q=Telugu+OR+Tamil+OR+Malayalam+OR+Kannada+"release+date"+OR+"movie+launch"+OR+"pooja"&hl=en-IN&gl=IN&ceid=IN:en',
+        industry: 'south',
+        enabled: true
     }
 ];
 
-// Fallback high quality cinema items for offline resilience
+export const UPCOMING_MOVIE_RELEASES: UpcomingMovieRelease[] = [
+    {
+        id: 'rel-raja-saab',
+        title: 'The Raja Saab',
+        starring: 'Prabhas, Malavika Mohanan, Nidhhi Agerwal',
+        director: 'Maruthi',
+        productionHouse: 'People Media Factory',
+        releaseDate: 'April 10, 2026',
+        releaseTimestamp: new Date('2026-04-10').getTime(),
+        industry: 'telugu',
+        status: 'Worldwide Grand Release',
+        banner: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800&h=450&fit=crop',
+        trailerUrl: 'https://www.youtube.com/watch?v=0kF63N6l5F0',
+        openingType: 'theatrical',
+        synopsis: 'A high-voltage romantic horror comedy starring Rebel Star Prabhas in a charismatic, stylish mass avatar.'
+    },
+    {
+        id: 'rel-game-changer',
+        title: 'Game Changer',
+        starring: 'Ram Charan, Kiara Advani, SJ Suryah',
+        director: 'S. Shankar',
+        productionHouse: 'Sri Venkateswara Creations',
+        releaseDate: 'January 10, 2026',
+        releaseTimestamp: new Date('2026-01-10').getTime(),
+        industry: 'telugu',
+        status: 'FDFS Booking Open',
+        banner: 'https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=800&h=450&fit=crop',
+        trailerUrl: 'https://www.youtube.com/watch?v=k4x8W4J00eM',
+        openingType: 'theatrical',
+        synopsis: 'Political action thriller following an honest IAS officer waging a crusade against corrupt electoral systems.'
+    },
+    {
+        id: 'rel-toxic',
+        title: 'Toxic: A Fairy Tale for Grown-ups',
+        starring: 'Yash, Kiara Advani, Huma Qureshi',
+        director: 'Geetu Mohandas',
+        productionHouse: 'KVN Productions & Monster Mind',
+        releaseDate: 'April 10, 2026',
+        releaseTimestamp: new Date('2026-04-10').getTime(),
+        industry: 'kannada',
+        status: 'Worldwide Grand Release',
+        banner: 'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?w=800&h=450&fit=crop',
+        trailerUrl: 'https://www.youtube.com/watch?v=F3_aHwL6R74',
+        openingType: 'theatrical',
+        synopsis: 'Rocking Star Yash stars in a stylized drug cartel action-drama set in a dark fairy tale universe.'
+    },
+    {
+        id: 'rel-thalapathy69',
+        title: 'Thalapathy 69',
+        starring: 'Thalapathy Vijay, Bobby Deol, Pooja Hegde',
+        director: 'H. Vinoth',
+        productionHouse: 'KVN Productions',
+        releaseDate: 'October 2026 (Diwali)',
+        releaseTimestamp: new Date('2026-10-20').getTime(),
+        industry: 'tamil',
+        status: 'Pooja Launched',
+        banner: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&h=450&fit=crop',
+        trailerUrl: 'https://www.youtube.com/watch?v=8V4c3k_5_2g',
+        openingType: 'pooja_launch',
+        synopsis: 'Thalapathy Vijay’s landmark film, directed by H. Vinoth with explosive political thriller undercurrents.'
+    },
+    {
+        id: 'rel-vishwambhara',
+        title: 'Vishwambhara',
+        starring: 'Megastar Chiranjeevi, Trisha Krishnan, Kunal Kapoor',
+        director: 'Mallidi Vassishta',
+        productionHouse: 'UV Creations',
+        releaseDate: 'May 9, 2026',
+        releaseTimestamp: new Date('2026-05-09').getTime(),
+        industry: 'telugu',
+        status: 'Worldwide Grand Release',
+        banner: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&h=450&fit=crop',
+        trailerUrl: 'https://www.youtube.com/watch?v=D-w_q7hYqI4',
+        openingType: 'theatrical',
+        synopsis: 'A grand socio-fantasy mega spectacle journeying through celestial realms and earthly conflicts.'
+    },
+    {
+        id: 'rel-kantara1',
+        title: 'Kantara: A Legend Chapter 1',
+        starring: 'Rishab Shetty, Jayaram, Rukmini Vasanth',
+        director: 'Rishab Shetty',
+        productionHouse: 'Hombale Films',
+        releaseDate: 'October 2, 2026',
+        releaseTimestamp: new Date('2026-10-02').getTime(),
+        industry: 'kannada',
+        status: 'In Theatres Soon',
+        banner: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=800&h=450&fit=crop',
+        trailerUrl: 'https://www.youtube.com/watch?v=Vj81N_Kq-z0',
+        openingType: 'theatrical',
+        synopsis: 'The sacred prequel recounting the origins of the Panjurli deity and the Kadamba kingdom.'
+    },
+    {
+        id: 'rel-empuraan',
+        title: 'L2: Empuraan',
+        starring: 'Mohanlal, Prithviraj Sukumaran, Manju Warrier',
+        director: 'Prithviraj Sukumaran',
+        productionHouse: 'Aashirvad Cinemas & Lyca',
+        releaseDate: 'March 27, 2026',
+        releaseTimestamp: new Date('2026-03-27').getTime(),
+        industry: 'malayalam',
+        status: 'Worldwide Grand Release',
+        banner: 'https://images.unsplash.com/photo-1574267432553-4b4628081c31?w=800&h=450&fit=crop',
+        trailerUrl: 'https://www.youtube.com/watch?v=5V92v4V0q-k',
+        openingType: 'theatrical',
+        synopsis: 'Khureshi-Ab’raam returns to battle international syndicates in the massive globe-trotting sequel to Lucifer.'
+    },
+    {
+        id: 'rel-ssmb29',
+        title: 'SSMB29: African Jungle Adventure',
+        starring: 'Superstar Mahesh Babu, Chelsea Islan',
+        director: 'S.S. Rajamouli',
+        productionHouse: 'Durga Arts & Global Studios',
+        releaseDate: 'Late 2026 / 2027',
+        releaseTimestamp: new Date('2026-12-15').getTime(),
+        industry: 'telugu',
+        status: 'Pooja Launched',
+        banner: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&h=450&fit=crop',
+        trailerUrl: 'https://www.youtube.com/watch?v=1uR1o7L8nU0',
+        openingType: 'pooja_launch',
+        synopsis: 'SS Rajamouli’s monumental globe-trotting adventure featuring Mahesh Babu inspired by Indiana Jones.'
+    }
+];
+
+// Fallback high quality cinema items for offline resilience (Latest release dates & openings at the top!)
 const SEED_BACKUP_ITEMS: NewsItem[] = [
+    {
+        id: 'seed-rel-1',
+        title: 'The Raja Saab Theatrical Release Date Locked: Rebel Star Prabhas Sets Massive Summer Opening on April 10',
+        link: 'https://tracktollywood.com/',
+        pubDate: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+        timestamp: Date.now() - 5 * 60 * 1000,
+        source: 'TrackTollywood',
+        description: 'Director Maruthi and producer TG Vishwa Prasad lock April 10, 2026 worldwide for The Raja Saab. High expectations surround Prabhas’s vintage romantic horror comedy avatar.',
+        content: `The makers of 'The Raja Saab' have officially locked April 10, 2026 for a colossal worldwide theatrical release across Telugu, Tamil, Malayalam, Kannada, and Hindi.\n\nDirected by Maruthi and backed by People Media Factory, the romantic horror comedy features Rebel Star Prabhas in a dashing, vintage look alongside Malavika Mohanan, Nidhhi Agerwal, and Riddhi Kumar.\n\nComposer Thaman S is finishing the remaining mass dance numbers and theatrical opening themes. The grand theatrical release is planned across more than 4,500 screens worldwide with advance bookings expected to shatter Day 1 records.`,
+        thumbnail: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800&h=450&fit=crop',
+        category: 'release',
+        industry: 'telugu',
+        releaseDate: 'April 10, 2026',
+        openingType: 'theatrical',
+        trailerUrl: 'https://www.youtube.com/watch?v=0kF63N6l5F0'
+    },
+    {
+        id: 'seed-open-1',
+        title: 'Thalapathy 69 Grand Opening: Thalapathy Vijay & H. Vinoth Film Launched with Spectacular Pooja Ceremony',
+        link: 'https://www.onlykollywood.com/',
+        pubDate: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+        timestamp: Date.now() - 15 * 60 * 1000,
+        source: 'Only Kollywood',
+        description: 'Thalapathy Vijay’s final mass commercial spectacle has officially commenced with an auspicious pooja in Chennai, attended by director H. Vinoth, Pooja Hegde, and Bobby Deol.',
+        content: `The biggest cinematic opening event in South cinema took place today in Chennai as Thalapathy 69 was launched with a star-studded traditional Pooja Ceremony.\n\nProduced on a monumental scale by KVN Productions, the high-octane political action drama marks Thalapathy Vijay's final film prior to his full-time political journey. Acclaimed director H. Vinoth held the clapperboard for the first muhurtham shot.\n\nWith Anirudh Ravichander composing the soundtrack and Sathyan Sooryan handling cinematography, regular shooting is progressing at top speed toward a Diwali 2026 worldwide theatrical opening.`,
+        thumbnail: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&h=450&fit=crop',
+        category: 'opening',
+        industry: 'tamil',
+        releaseDate: 'October 2026 (Diwali)',
+        openingType: 'pooja_launch',
+        trailerUrl: 'https://www.youtube.com/watch?v=8V4c3k_5_2g'
+    },
+    {
+        id: 'seed-rel-2',
+        title: 'Game Changer Sankranti Theatrical Opening Confirmed: Shankar & Ram Charan Spectacle Ready for Worldwide Debut',
+        link: 'https://tracktollywood.com/',
+        pubDate: new Date(Date.now() - 25 * 60 * 1000).toISOString(),
+        timestamp: Date.now() - 25 * 60 * 1000,
+        source: 'TrackTollywood',
+        description: 'Mega Powerstar Ram Charan and visionary director Shankar’s political action epic Game Changer locked for January 10, 2026 worldwide theatrical release.',
+        content: `Producer Dil Raju has officially reaffirmed that 'Game Changer' will arrive in theatres worldwide for Sankranti on January 10, 2026.\n\nRam Charan plays a dual role as an unyielding election officer alongside Kiara Advani and SJ Suryah. The music by Thaman S has already created record-breaking social media records.\n\nThe global theatrical distribution rights have been finalized across North America, UK, Europe, and the Middle East, setting the stage for one of the grandest box office openings in Indian cinema history.`,
+        thumbnail: 'https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=800&h=450&fit=crop',
+        category: 'release',
+        industry: 'telugu',
+        releaseDate: 'January 10, 2026',
+        openingType: 'theatrical',
+        trailerUrl: 'https://www.youtube.com/watch?v=k4x8W4J00eM'
+    },
+    {
+        id: 'seed-open-2',
+        title: 'SSMB29 Grand Launch: SS Rajamouli & Mahesh Babu Begin Global Jungle Odyssey with Landmark Muhurtham',
+        link: 'https://filmyfocus.com/',
+        pubDate: new Date(Date.now() - 35 * 60 * 1000).toISOString(),
+        timestamp: Date.now() - 35 * 60 * 1000,
+        source: 'Filmy Focus',
+        description: 'The globe-trotting jungle adventure directed by SS Rajamouli starring Superstar Mahesh Babu has commenced initial production tests following a private pooja ceremony.',
+        content: `Mahesh Babu and SS Rajamouli's highly awaited cinematic masterpiece, tentatively titled SSMB29, has completed its inaugural opening ceremony and camera tests.\n\nConceived as an international globetrotting action-adventure inspired by Indiana Jones and Wilbur Smith novels, the film features groundbreaking visual techniques and an international ensemble cast.\n\nMM Keeravaani has begun composing the musical suite. Production across African rainforests and European studios is slated to start in upcoming months, promising a new benchmark for Indian cinema on the world stage.`,
+        thumbnail: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&h=450&fit=crop',
+        category: 'opening',
+        industry: 'telugu',
+        releaseDate: 'Late 2026',
+        openingType: 'pooja_launch',
+        trailerUrl: 'https://www.youtube.com/watch?v=1uR1o7L8nU0'
+    },
+    {
+        id: 'seed-rel-3',
+        title: 'Toxic Worldwide Theatrical Release Date Locked: Yash & Geetu Mohandas Film to Hit Screens on April 10',
+        link: 'https://www.onlykollywood.com/',
+        pubDate: new Date(Date.now() - 50 * 60 * 1000).toISOString(),
+        timestamp: Date.now() - 50 * 60 * 1000,
+        source: 'Only Kollywood',
+        description: 'Rocking Star Yash’s much-anticipated next outing Toxic: A Fairy Tale for Grown-ups locks April 10, 2026 for a massive global theatrical rollout.',
+        content: `KVN Productions and Monster Mind Creations have officially confirmed April 10, 2026 as the theatrical release date for 'Toxic: A Fairy Tale for Grown-ups'.\n\nDirected by critically acclaimed auteur Geetu Mohandas, the multi-lingual action spectacle presents Yash in a gritty, enigmatic persona. The film features an international technical crew and music by Jeremy Stack.\n\nShooting schedules in London and Mumbai are nearing completion with grand IMAX master prints slated for international festival premiers ahead of the worldwide theatrical opening.`,
+        thumbnail: 'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?w=800&h=450&fit=crop',
+        category: 'release',
+        industry: 'kannada',
+        releaseDate: 'April 10, 2026',
+        openingType: 'theatrical',
+        trailerUrl: 'https://www.youtube.com/watch?v=F3_aHwL6R74'
+    },
     {
         id: 'seed-1',
         title: 'Nani Teams Up With 96 Director Prem Kumar for an Emotional Love Story',
@@ -159,7 +390,14 @@ const SEED_BACKUP_ITEMS: NewsItem[] = [
 ];
 
 class RSSNewsService {
-    private defaultIntervalMinutes = 20;
+    private defaultIntervalMinutes = 90; // User specified 90 minutes update cycle
+
+    /**
+     * Get upcoming movie release dates & grand openings
+     */
+    getUpcomingReleases(): UpcomingMovieRelease[] {
+        return UPCOMING_MOVIE_RELEASES;
+    }
 
     /**
      * Get configured RSS feed sources from storage or defaults
@@ -223,14 +461,14 @@ class RSSNewsService {
     }
 
     /**
-     * Get auto-refresh interval in minutes (default 20 mins)
+     * Get auto-refresh interval in minutes (default 90 mins)
      */
     getAutoRefreshMinutes(): number {
         try {
             const val = localStorage.getItem(STORAGE_KEYS.AUTO_REFRESH_MINS);
             if (val) {
                 const parsed = parseInt(val, 10);
-                if (!isNaN(parsed) && parsed >= 5 && parsed <= 120) {
+                if (!isNaN(parsed) && parsed >= 5 && parsed <= 360) {
                     return parsed;
                 }
             }
@@ -468,7 +706,7 @@ class RSSNewsService {
                     }
 
                     const source = el.querySelector('source')?.textContent || feed.name;
-                    const { category, rating, detectedIndustry } = this.classifyItem(title, content || description, feed.industry);
+                    const { category, rating, releaseDate, openingType, detectedIndustry } = this.classifyItem(title, content || description, feed.industry);
 
                     items.push({
                         id: `item_${Math.abs(this.hashCode(link + title))}`,
@@ -483,7 +721,9 @@ class RSSNewsService {
                         thumbnail,
                         category,
                         industry: detectedIndustry,
-                        rating
+                        rating,
+                        releaseDate,
+                        openingType
                     });
                 }
                 return items;
@@ -510,7 +750,7 @@ class RSSNewsService {
                         thumbnail = this.getFallbackImage(feed.industry, title);
                     }
 
-                    const { category, rating, detectedIndustry } = this.classifyItem(title, content || description, feed.industry);
+                    const { category, rating, releaseDate, openingType, detectedIndustry } = this.classifyItem(title, content || description, feed.industry);
 
                     items.push({
                         id: `atom_${Math.abs(this.hashCode(link + title))}`,
@@ -525,7 +765,9 @@ class RSSNewsService {
                         thumbnail,
                         category,
                         industry: detectedIndustry,
-                        rating
+                        rating,
+                        releaseDate,
+                        openingType
                     });
                 }
             }
@@ -558,7 +800,7 @@ class RSSNewsService {
                 thumbnail = this.getFallbackImage(feed.industry, title);
             }
 
-            const { category, rating, detectedIndustry } = this.classifyItem(title, content || description, feed.industry);
+            const { category, rating, releaseDate, openingType, detectedIndustry } = this.classifyItem(title, content || description, feed.industry);
 
             let source = item.author || feedTitle || feed.name;
             if (source.includes('Google News') || source.length > 28 || source.includes(' OR ') || source.includes('"')) {
@@ -583,17 +825,21 @@ class RSSNewsService {
                 thumbnail,
                 category,
                 industry: detectedIndustry,
-                rating
+                rating,
+                releaseDate,
+                openingType
             };
         }).filter(item => item.title && item.link);
     }
 
     /**
-     * Classify whether an item is a Movie Review or News, detect ratings and regional cinema industry
+     * Classify whether an item is a Movie Review, Release Date, Movie Opening, or News
      */
     private classifyItem(title: string, desc: string, defaultIndustry: RSSFeedSource['industry']): {
-        category: 'news' | 'review';
+        category: 'news' | 'review' | 'release' | 'opening';
         rating?: string;
+        releaseDate?: string;
+        openingType?: 'theatrical' | 'pooja_launch' | 'fdfs_boxoffice';
         detectedIndustry: RSSFeedSource['industry'];
     } {
         const combined = `${title} ${desc}`.toLowerCase();
@@ -602,17 +848,36 @@ class RSSNewsService {
         const isReview = /\b(movie review|film review|review:|verdict|rating:|\brating\b|critic review|theatrical review|ott review)\b/i.test(title) ||
             /\b(movie review|ratings?:\s*\d(\.\d)?\/5)\b/i.test(desc);
 
-        // 2. Rating extraction (e.g. 3.5/5, 3/5, 4/5)
+        // 2. Movie Opening Detection (pooja, muhurtham, fdfs, theatrical launch)
+        const isOpening = /\b(pooja ceremony|movie launch|grand opening|project launched|launched with pooja|clapper board|muhurtham|first day first show|fdfs|box office opening|day 1 box office|theatrical opening)\b/i.test(combined);
+
+        // 3. Release Date Detection
+        const isReleaseDate = /\b(release date|releasing on|hits screens|in theatres from|theatrical release|worldwide release|locks release|eyes release date|arriving in cinemas)\b/i.test(combined);
+
+        // 4. Rating extraction (e.g. 3.5/5, 3/5, 4/5)
         let rating: string | undefined;
         const ratingMatch = title.match(/(\d(?:\.\d)?)\s*\/\s*5/) || desc.match(/(?:rating|ratings?)\s*:?\s*(\d(?:\.\d)?)\s*\/\s*5/i);
         if (ratingMatch) {
             rating = `${ratingMatch[1]}/5`;
         } else if (isReview) {
-            // Default placeholder rating if tagged as review
             rating = '★ Reviewed';
         }
 
-        // 3. Industry Detection (if feed is 'south', detect specific language)
+        // 5. Date extraction for upcoming releases
+        let releaseDate: string | undefined;
+        const dateMatch = combined.match(/\b(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\s+\d{1,2}(?:st|nd|rd|th)?(?:\s*,\s*\d{4})?\b/i) ||
+                          combined.match(/\b\d{1,2}(?:st|nd|rd|th)?\s+(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)(?:\s*,\s*\d{4})?\b/i);
+        if (dateMatch) {
+            releaseDate = dateMatch[0].trim();
+        }
+
+        // 6. Opening Type extraction
+        let openingType: 'theatrical' | 'pooja_launch' | 'fdfs_boxoffice' | undefined;
+        if (/pooja|muhurtham|launch/i.test(combined)) openingType = 'pooja_launch';
+        else if (/box office|day 1|fdfs/i.test(combined)) openingType = 'fdfs_boxoffice';
+        else if (isOpening || isReleaseDate) openingType = 'theatrical';
+
+        // 7. Industry Detection (if feed is 'south', detect specific language)
         let detectedIndustry = defaultIndustry;
         if (defaultIndustry === 'south') {
             if (/\b(telugu|tollywood|prabhas|allu arjun|mahesh babu|jr ntr|ram charan|pawan kalyan|nani|chiranjeevi|vijay deverakonda|balakrishna)\b/i.test(combined)) {
@@ -626,9 +891,20 @@ class RSSNewsService {
             }
         }
 
+        let category: 'news' | 'review' | 'release' | 'opening' = 'news';
+        if (isReview) {
+            category = 'review';
+        } else if (isOpening) {
+            category = 'opening';
+        } else if (isReleaseDate) {
+            category = 'release';
+        }
+
         return {
-            category: isReview ? 'review' : 'news',
+            category,
             rating,
+            releaseDate,
+            openingType,
             detectedIndustry
         };
     }
