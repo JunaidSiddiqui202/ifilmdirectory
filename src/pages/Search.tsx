@@ -14,7 +14,7 @@ type TabType = 'all' | 'people' | 'studios' | 'feed' | 'news' | 'jobs' | 'blogs'
 
 interface SearchPrediction {
     id: string;
-    type: 'people' | 'studio' | 'feed' | 'news' | 'job' | 'blog' | 'keyword';
+    type: 'people' | 'studio' | 'feed' | 'news' | 'job' | 'blog' | 'keyword' | 'craft';
     title: string;
     subtitle?: string;
     badge: string;
@@ -23,6 +23,362 @@ interface SearchPrediction {
     image?: string;
     fallbackType?: 'USER_MALE' | 'COMPANY_LOGO' | 'FILM_SET' | 'CINEMA_HALL';
     action: () => void;
+}
+
+export interface CinematicCraft {
+    id: string;
+    title: string;
+    shortLabel: string;
+    subtitle: string;
+    badge: string;
+    badgeColor: string;
+    icon: string;
+    triggers: string[];
+    rolePatterns: RegExp[];
+}
+
+export const CINEMATIC_CRAFTS: CinematicCraft[] = [
+    {
+        id: 'ad',
+        title: 'Assistant Directors (AD) & Associate Directors',
+        shortLabel: 'AD / Assistant Director',
+        subtitle: 'Assistant Directors, Associate Directors, Chief ADs & Co-Directors',
+        badge: 'Direction Craft',
+        badgeColor: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20',
+        icon: 'movie_filter',
+        triggers: [
+            'ad', 'ads', 'a.d.', 'a.d', 'assistant director', 'assistant directors',
+            'associate director', 'associate directors', 'chief ad', 'chief assistant director',
+            'co-director', 'co director', 'co-directors', 'co directors', '1st ad', 'first ad',
+            '2nd ad', 'second ad', 'da', 'directors assistant', 'direction department'
+        ],
+        rolePatterns: [
+            /\b(assistant[_\s-]?director|associate[_\s-]?director|co[_\s-]?director|chief[_\s-]?ad|1st[_\s-]?ad|2nd[_\s-]?ad|\bad\b)\b/i
+        ]
+    },
+    {
+        id: 'dop',
+        title: 'Cinematographers & Directors of Photography (DOP)',
+        shortLabel: 'DOP / Cameraman',
+        subtitle: 'Cinematographers, Directors of Photography, Cameramen & Camera Operators',
+        badge: 'Camera Craft',
+        badgeColor: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20',
+        icon: 'videocam',
+        triggers: [
+            'dop', 'd.o.p', 'd.o.p.', 'dp', 'd.p.', 'cameraman', 'camera man', 'camera men',
+            'camera operator', 'camera operators', 'cinematographer', 'cinematographers',
+            'cinematography', 'director of photography', 'directors of photography',
+            'lighting cameraman', 'focus puller', 'gaffer', 'steadicam'
+        ],
+        rolePatterns: [
+            /\b(cinematographer|cinematography|director[_\s-]?of[_\s-]?photography|cameraman|camera[_\s-]?operator|focus[_\s-]?puller|gaffer|\bdop\b|\bdp\b)\b/i
+        ]
+    },
+    {
+        id: 'editor',
+        title: 'Film & Video Editors, Colorists',
+        shortLabel: 'Editor / Colorist',
+        subtitle: 'Film Editors, Video Editors, Colorists & DI Artists',
+        badge: 'Post-Production',
+        badgeColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+        icon: 'content_cut',
+        triggers: [
+            'editor', 'editors', 'film editor', 'film editors', 'video editor', 'video editors',
+            'editing', 'colorist', 'colorists', 'di colorist', 'di editor', 'offline editor',
+            'online editor', 'davinci resolve', 'post production'
+        ],
+        rolePatterns: [
+            /\b(editor|film[_\s-]?editor|video[_\s-]?editor|colorist|di[_\s-]?colorist|di[_\s-]?editor|offline[_\s-]?editor|online[_\s-]?editor)\b/i
+        ]
+    },
+    {
+        id: 'lyricist',
+        title: 'Lyricists & Songwriters',
+        shortLabel: 'Lyricist / Lyric Writer',
+        subtitle: 'Lyricists, Lyric Writers, Songwriters & Poets',
+        badge: 'Music & Lyrics',
+        badgeColor: 'bg-pink-500/10 text-pink-600 dark:text-pink-400 border-pink-500/20',
+        icon: 'lyrics',
+        triggers: [
+            'lyricist', 'lyricists', 'lyric writer', 'lyric writers', 'lyrics writer',
+            'lyrics writers', 'lyrics', 'lyric', 'songwriter', 'songwriters', 'song writer',
+            'song writers', 'poet', 'geetharachayitha', 'padarachayitha'
+        ],
+        rolePatterns: [
+            /\b(lyricist|lyric[_\s-]?writer|lyrics[_\s-]?writer|lyrics|songwriter|song[_\s-]?writer|poet)\b/i
+        ]
+    },
+    {
+        id: 'writer',
+        title: 'Screenwriters, Dialogue & Story Writers',
+        shortLabel: 'Screenwriter / Writer',
+        subtitle: 'Screenplay, Dialogue, Story & Script Writers',
+        badge: 'Writing Craft',
+        badgeColor: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+        icon: 'edit_note',
+        triggers: [
+            'writer', 'writers', 'screenwriter', 'screenwriters', 'scriptwriter',
+            'scriptwriters', 'script writer', 'script writers', 'screenplay', 'screenplay writer',
+            'dialogue writer', 'dialogue writers', 'dialogues', 'story writer', 'story writers',
+            'script', 'katha'
+        ],
+        rolePatterns: [
+            /\b(screenwriter|scriptwriter|script[_\s-]?writer|dialogue[_\s-]?writer|dialogue|story[_\s-]?writer|screenplay|\bwriter\b)\b/i
+        ]
+    },
+    {
+        id: 'director',
+        title: 'Film Directors & Filmmakers',
+        shortLabel: 'Director / Filmmaker',
+        subtitle: 'Feature Film, Short Film & Commercial Directors',
+        badge: 'Direction Craft',
+        badgeColor: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20',
+        icon: 'movie',
+        triggers: [
+            'director', 'directors', 'filmmaker', 'filmmakers', 'film director', 'movie director', 'direction'
+        ],
+        rolePatterns: [
+            /^(?!.*(assistant|associate|art|casting|music|technical|creative)).*\b(director|filmmaker)\b/i
+        ]
+    },
+    {
+        id: 'actor',
+        title: 'Actors, Actresses & Cast',
+        shortLabel: 'Actor / Actress',
+        subtitle: 'Lead Actors, Actresses, Character Artists & Models',
+        badge: 'Performance',
+        badgeColor: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20',
+        icon: 'theater_comedy',
+        triggers: [
+            'actor', 'actors', 'actress', 'actresses', 'hero', 'heroine', 'artist', 'artists',
+            'cast', 'casting', 'junior artist', 'character artist', 'performing artist', 'model', 'acting'
+        ],
+        rolePatterns: [
+            /\b(actor|actress|artist|cast|hero|heroine|performing[_\s-]?artist|model)\b/i
+        ]
+    },
+    {
+        id: 'music_director',
+        title: 'Music Directors & Composers',
+        shortLabel: 'Music Director / Composer',
+        subtitle: 'Music Composers, Background Score & Music Producers',
+        badge: 'Music Craft',
+        badgeColor: 'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20',
+        icon: 'music_note',
+        triggers: [
+            'music director', 'music directors', 'composer', 'composers', 'music composer',
+            'music producer', 'bgm', 'background score', 'soundtrack composer', 'musician'
+        ],
+        rolePatterns: [
+            /\b(music[_\s-]?composer|music[_\s-]?director|composer|music[_\s-]?producer|bgm)\b/i
+        ]
+    },
+    {
+        id: 'sound',
+        title: 'Sound Designers & Audio Engineers',
+        shortLabel: 'Sound Designer / Audiographer',
+        subtitle: 'Sync Sound, Audiographers, Foley & Audio Engineers',
+        badge: 'Sound Craft',
+        badgeColor: 'bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20',
+        icon: 'graphic_eq',
+        triggers: [
+            'sound designer', 'sound designers', 'sound engineer', 'sound recordist',
+            'audiographer', 'audiography', 'sync sound', 'sound mixer', 'foley', 'boom operator'
+        ],
+        rolePatterns: [
+            /\b(sound[_\s-]?designer|sound[_\s-]?recordist|audiographer|sync[_\s-]?sound|foley|boom[_\s-]?operator|audio[_\s-]?engineer)\b/i
+        ]
+    },
+    {
+        id: 'art',
+        title: 'Art Directors & Production Designers',
+        shortLabel: 'Art Director / Set Designer',
+        subtitle: 'Production Designers, Art Directors & Set Decorators',
+        badge: 'Art Craft',
+        badgeColor: 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20',
+        icon: 'palette',
+        triggers: [
+            'art director', 'art directors', 'production designer', 'production designers',
+            'set designer', 'set decorator', 'art department'
+        ],
+        rolePatterns: [
+            /\b(art[_\s-]?director|production[_\s-]?designer|set[_\s-]?designer)\b/i
+        ]
+    },
+    {
+        id: 'stunt',
+        title: 'Action Directors & Fight Masters',
+        shortLabel: 'Action / Fight Master',
+        subtitle: 'Stunt Masters, Action Choreographers & Fight Directors',
+        badge: 'Action Craft',
+        badgeColor: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20',
+        icon: 'sports_kabaddi',
+        triggers: [
+            'stunt', 'stunts', 'stunt master', 'fight master', 'action director',
+            'action choreographer', 'stunt coordinator', 'action'
+        ],
+        rolePatterns: [
+            /\b(stunt[_\s-]?performer|stunt|fight[_\s-]?master|action[_\s-]?director|action[_\s-]?choreographer)\b/i
+        ]
+    },
+    {
+        id: 'costume_makeup',
+        title: 'Costume Designers & Makeup Artists',
+        shortLabel: 'Costume / Makeup',
+        subtitle: 'Wardrobe Designers, Makeup Artists & Stylists',
+        badge: 'Styling & Look',
+        badgeColor: 'bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400 border-fuchsia-500/20',
+        icon: 'checkroom',
+        triggers: [
+            'costume designer', 'costume', 'costumes', 'wardrobe', 'stylist',
+            'makeup artist', 'make-up', 'makeup', 'hair stylist'
+        ],
+        rolePatterns: [
+            /\b(costume[_\s-]?designer|makeup[_\s-]?artist|hair[_\s-]?stylist|wardrobe|stylist)\b/i
+        ]
+    },
+    {
+        id: 'vfx',
+        title: 'VFX & Animation Artists',
+        shortLabel: 'VFX / CGI',
+        subtitle: 'Visual Effects Artists, Animators & Compositors',
+        badge: 'VFX & CGI',
+        badgeColor: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
+        icon: 'auto_fix_high',
+        triggers: [
+            'vfx', 'vfx artist', 'visual effects', 'cgi', 'compositor', '3d artist',
+            'animator', 'animation', 'motion graphics'
+        ],
+        rolePatterns: [
+            /\b(vfx|vfx[_\s-]?artist|visual[_\s-]?effects|motion[_\s-]?graphics|animator|cgi)\b/i
+        ]
+    },
+    {
+        id: 'producer',
+        title: 'Producers & Line Producers',
+        shortLabel: 'Producer / Line Producer',
+        subtitle: 'Executive Producers, Line Producers & Production Heads',
+        badge: 'Production Craft',
+        badgeColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+        icon: 'assignment',
+        triggers: [
+            'producer', 'producers', 'executive producer', 'line producer',
+            'production manager', 'production controller'
+        ],
+        rolePatterns: [
+            /\b(producer|line[_\s-]?producer|production[_\s-]?manager|production[_\s-]?coordinator)\b/i
+        ]
+    }
+];
+
+// Helper to find which cinematic craft(s) match user's search query
+export function findMatchingCinematicCrafts(rawQuery: string): CinematicCraft[] {
+    const trimmed = rawQuery.trim();
+    if (!trimmed) return [];
+
+    const lower = trimmed.toLowerCase();
+    const compact = lower.replace(/[^a-z0-9]/g, '');
+    const tokens = lower.split(/[\s,./\-_]+/).filter(t => t.length > 0);
+    const stopWords = new Set(['list', 'lists', 'show', 'all', 'find', 'top', 'best', 'who', 'the', 'a', 'in', 'of', 'for', 'me']);
+    const meaningfulTokens = tokens.filter(t => !stopWords.has(t));
+    const cleanPhrase = meaningfulTokens.join(' ');
+    const stemPhrase = cleanPhrase.endsWith('s') && cleanPhrase.length > 3 ? cleanPhrase.slice(0, -1) : cleanPhrase;
+
+    const matched: CinematicCraft[] = [];
+
+    for (const craft of CINEMATIC_CRAFTS) {
+        let isMatch = false;
+        for (const trigger of craft.triggers) {
+            const cleanTrigger = trigger.toLowerCase();
+            const compactTrigger = cleanTrigger.replace(/[^a-z0-9]/g, '');
+
+            // 1. Direct or compact match (e.g. "ad", "AD", "dop", "DOP", "d.o.p", "cameraman", "editor", "lyricist")
+            if (compact === compactTrigger || lower === cleanTrigger) {
+                isMatch = true;
+                break;
+            }
+
+            // 2. Clean phrase without "list", "show", etc. (e.g. "editors list" -> "editor")
+            if (cleanPhrase === cleanTrigger || stemPhrase === cleanTrigger) {
+                isMatch = true;
+                break;
+            }
+
+            // 3. Substring match for longer trigger terms (>= 4 chars)
+            if (cleanTrigger.length >= 4 && (cleanPhrase.includes(cleanTrigger) || cleanTrigger.includes(cleanPhrase))) {
+                isMatch = true;
+                break;
+            }
+
+            // 4. Token boundary match (e.g. "show me editors")
+            if (cleanTrigger.length >= 3 && meaningfulTokens.includes(cleanTrigger)) {
+                isMatch = true;
+                break;
+            }
+        }
+
+        if (isMatch) {
+            matched.push(craft);
+        }
+    }
+
+    return matched;
+}
+
+// Helper to test if a UserProfile matches a CinematicCraft
+export function doesUserMatchCraft(user: UserProfile, craft: CinematicCraft): boolean {
+    const role = (user.role || '').toLowerCase();
+    const customRole = (user.customRole || '').toLowerCase();
+    const bio = (user.bio || '').toLowerCase();
+
+    // 1. Regex test on role and customRole
+    for (const pattern of craft.rolePatterns) {
+        if (pattern.test(role) || pattern.test(customRole)) {
+            return true;
+        }
+    }
+
+    // 2. Direct string triggers match on role
+    for (const trigger of craft.triggers) {
+        const cleanTrigger = trigger.toLowerCase();
+        if (role === cleanTrigger || role.includes(cleanTrigger)) return true;
+        if (customRole && (customRole === cleanTrigger || customRole.includes(cleanTrigger))) return true;
+    }
+
+    // 3. For bio: only match if longer trigger (>= 4 chars) or bounded abbreviation
+    for (const trigger of craft.triggers) {
+        if (trigger.length >= 4) {
+            if (bio.includes(trigger.toLowerCase())) return true;
+        } else {
+            const regex = new RegExp(`\\b${trigger}\\b`, 'i');
+            if (regex.test(bio)) return true;
+        }
+    }
+
+    return false;
+}
+
+// Helper to test if a Job matches a CinematicCraft
+export function doesJobMatchCraft(job: Job, craft: CinematicCraft): boolean {
+    const title = (job.title || '').toLowerCase();
+    const type = (job.type || '').toLowerCase();
+    const desc = (job.description || '').toLowerCase();
+
+    for (const pattern of craft.rolePatterns) {
+        if (pattern.test(title) || pattern.test(type)) return true;
+    }
+
+    for (const trigger of craft.triggers) {
+        const cleanTrigger = trigger.toLowerCase();
+        if (title.includes(cleanTrigger) || type.includes(cleanTrigger)) return true;
+        if (trigger.length >= 4 && desc.includes(cleanTrigger)) return true;
+        if (trigger.length < 4) {
+            const regex = new RegExp(`\\b${trigger}\\b`, 'i');
+            if (regex.test(title) || regex.test(desc)) return true;
+        }
+    }
+
+    return false;
 }
 
 interface SearchResultsState {
@@ -57,6 +413,7 @@ export default function Search() {
     const [locationLoading, setLocationLoading] = useState(false);
     const [loading, setLoading] = useState(false);
     const [selectedNewsArticle, setSelectedNewsArticle] = useState<NewsItem | null>(null);
+    const [activeCrafts, setActiveCrafts] = useState<CinematicCraft[]>([]);
 
     const inputRef = useRef<HTMLInputElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -175,7 +532,7 @@ export default function Search() {
         return `${days}d ago`;
     };
 
-    // 1. GENERATE INSTANT SEARCH PREDICTIONS ACROSS ALL ENTITIES
+    // 1. GENERATE INSTANT SEARCH PREDICTIONS ACROSS ALL ENTITIES & CINEMATIC CRAFTS
     useEffect(() => {
         const trimmed = query.trim();
         if (!trimmed || trimmed.length < 2) {
@@ -189,9 +546,59 @@ export default function Search() {
             const lowerQuery = trimmed.toLowerCase();
             const matches: SearchPrediction[] = [];
 
-            // 1. Users / Talent Predictions
+            // Detect any cinematic craft triggers (e.g. "ad", "dop", "cameraman", "editor", "lyricist", etc.)
+            const matchingCrafts = findMatchingCinematicCrafts(trimmed);
+            const addedUserUids = new Set<string>();
+
+            // 0. CINEMATIC CRAFT HIGHLIGHT PREDICTIONS
+            for (const craft of matchingCrafts) {
+                const craftUsers = datasets.users.filter(u => doesUserMatchCraft(u, craft));
+                const craftJobs = datasets.jobs.filter(j => doesJobMatchCraft(j, craft));
+                const totalCraftCount = craftUsers.length + craftJobs.length;
+
+                matches.push({
+                    id: `craft-${craft.id}`,
+                    type: 'craft',
+                    title: `All ${craft.title}`,
+                    subtitle: `${craft.subtitle}${totalCraftCount > 0 ? ` • ${totalCraftCount} listings found` : ''}`,
+                    badge: craft.badge,
+                    badgeColor: craft.badgeColor,
+                    icon: craft.icon,
+                    action: () => {
+                        setShowPredictions(false);
+                        setActiveTab('people');
+                        triggerFullSearch(craft.triggers[0]);
+                    }
+                });
+
+                // Inject top matching creators directly into predictions
+                for (const user of craftUsers.slice(0, 4)) {
+                    if (matches.length >= 10) break;
+                    addedUserUids.add(user.uid);
+                    const name = user.displayName || user.username || 'Creator';
+                    const role = user.role || user.customRole || craft.shortLabel;
+                    matches.push({
+                        id: `craft-user-${user.uid}`,
+                        type: 'people',
+                        title: name,
+                        subtitle: `${role}${user.location ? ` • ${user.location}` : ''}`,
+                        badge: craft.shortLabel,
+                        badgeColor: craft.badgeColor,
+                        icon: craft.icon,
+                        image: user.photoURL || undefined,
+                        fallbackType: 'USER_MALE',
+                        action: () => {
+                            setShowPredictions(false);
+                            navigate(`/profile/${user.uid}`);
+                        }
+                    });
+                }
+            }
+
+            // 1. Users / Talent Predictions (General name / role match)
             for (const user of datasets.users) {
                 if (matches.length >= 10) break;
+                if (addedUserUids.has(user.uid)) continue;
                 const name = user.displayName || user.username || '';
                 const role = user.role || 'Filmmaker';
                 if (
@@ -199,6 +606,7 @@ export default function Search() {
                     role.toLowerCase().includes(lowerQuery) ||
                     fuzzyMatch(name, trimmed)
                 ) {
+                    addedUserUids.add(user.uid);
                     matches.push({
                         id: `user-${user.uid}`,
                         type: 'people',
@@ -303,7 +711,9 @@ export default function Search() {
             // 5. Jobs & Castings Predictions
             for (const job of datasets.jobs) {
                 if (matches.length >= 10) break;
+                const matchesCraft = matchingCrafts.some(c => doesJobMatchCraft(job, c));
                 if (
+                    matchesCraft ||
                     job.title.toLowerCase().includes(lowerQuery) ||
                     job.company.toLowerCase().includes(lowerQuery) ||
                     job.location.toLowerCase().includes(lowerQuery) ||
@@ -365,6 +775,7 @@ export default function Search() {
                 jobs: [],
                 blogs: []
             });
+            setActiveCrafts([]);
             setSearchMessage('');
             return;
         }
@@ -376,15 +787,35 @@ export default function Search() {
             try {
                 const lowerQuery = query.toLowerCase();
                 const datasets = await loadAllDatasets();
+                const matchingCrafts = findMatchingCinematicCrafts(query);
+                setActiveCrafts(matchingCrafts);
 
-                // 1. Search Users / Talent
-                const filteredPeople = datasets.users.filter(user =>
-                    (user.displayName && (user.displayName.toLowerCase().includes(lowerQuery) || fuzzyMatch(user.displayName, query))) ||
-                    (user.role && (user.role.toLowerCase().includes(lowerQuery) || fuzzyMatch(user.role, query))) ||
-                    (user.location && (user.location.toLowerCase().includes(lowerQuery) || fuzzyMatch(user.location, query))) ||
-                    (user.bio && user.bio.toLowerCase().includes(lowerQuery)) ||
-                    (user.username && (user.username.toLowerCase().includes(lowerQuery) || fuzzyMatch(user.username, query)))
-                );
+                // 1. Search Users / Talent (Cinematic Crafts priority + general query)
+                const peopleMap = new Map<string, UserProfile>();
+
+                // Priority 1: Users matching any identified cinematic craft(s)
+                if (matchingCrafts.length > 0) {
+                    for (const user of datasets.users) {
+                        if (matchingCrafts.some(c => doesUserMatchCraft(user, c))) {
+                            peopleMap.set(user.uid, user);
+                        }
+                    }
+                }
+
+                // Priority 2: General text matching (name, bio, role, location, username)
+                for (const user of datasets.users) {
+                    if (peopleMap.has(user.uid)) continue;
+                    if (
+                        (user.displayName && (user.displayName.toLowerCase().includes(lowerQuery) || fuzzyMatch(user.displayName, query))) ||
+                        (user.role && (user.role.toLowerCase().includes(lowerQuery) || fuzzyMatch(user.role, query))) ||
+                        (user.location && (user.location.toLowerCase().includes(lowerQuery) || fuzzyMatch(user.location, query))) ||
+                        (user.bio && user.bio.toLowerCase().includes(lowerQuery)) ||
+                        (user.username && (user.username.toLowerCase().includes(lowerQuery) || fuzzyMatch(user.username, query)))
+                    ) {
+                        peopleMap.set(user.uid, user);
+                    }
+                }
+                const filteredPeople = Array.from(peopleMap.values());
 
                 // 2. Search Studios & Facilities
                 const filteredStudios = datasets.studios.filter(facility =>
@@ -413,15 +844,31 @@ export default function Search() {
                     fuzzyMatch(news.title, query)
                 );
 
-                // 5. Search Jobs & Castings
-                let filteredJobs = datasets.jobs.filter(job =>
-                    job.title.toLowerCase().includes(lowerQuery) ||
-                    job.company.toLowerCase().includes(lowerQuery) ||
-                    job.location.toLowerCase().includes(lowerQuery) ||
-                    job.type.toLowerCase().includes(lowerQuery) ||
-                    fuzzyMatch(job.title, query) ||
-                    fuzzyMatch(job.company, query)
-                );
+                // 5. Search Jobs & Castings (Craft priority + general query)
+                const jobMap = new Map<string, Job>();
+                if (matchingCrafts.length > 0) {
+                    for (const job of datasets.jobs) {
+                        const jid = job.id || `${job.title}-${job.company}`;
+                        if (matchingCrafts.some(c => doesJobMatchCraft(job, c))) {
+                            jobMap.set(jid, job);
+                        }
+                    }
+                }
+                for (const job of datasets.jobs) {
+                    const jid = job.id || `${job.title}-${job.company}`;
+                    if (jobMap.has(jid)) continue;
+                    if (
+                        job.title.toLowerCase().includes(lowerQuery) ||
+                        job.company.toLowerCase().includes(lowerQuery) ||
+                        job.location.toLowerCase().includes(lowerQuery) ||
+                        job.type.toLowerCase().includes(lowerQuery) ||
+                        fuzzyMatch(job.title, query) ||
+                        fuzzyMatch(job.company, query)
+                    ) {
+                        jobMap.set(jid, job);
+                    }
+                }
+                let filteredJobs = Array.from(jobMap.values());
 
                 // 6. Search Blogs
                 const filteredBlogs = datasets.blogs.filter(blog =>
@@ -442,7 +889,12 @@ export default function Search() {
 
                 let msg = '';
                 if (totalFound > 0) {
-                    msg = `Found ${totalFound} result${totalFound > 1 ? 's' : ''} matching "${query}"`;
+                    if (matchingCrafts.length > 0) {
+                        const craftTitles = matchingCrafts.map(c => c.shortLabel).join(', ');
+                        msg = `Found ${totalFound} result${totalFound > 1 ? 's' : ''} for "${query}" (Cinematic Craft: ${craftTitles})`;
+                    } else {
+                        msg = `Found ${totalFound} result${totalFound > 1 ? 's' : ''} matching "${query}"`;
+                    }
                 }
 
                 setResults({
@@ -524,6 +976,7 @@ export default function Search() {
         setQuery('');
         setPredictions([]);
         setShowPredictions(false);
+        setActiveCrafts([]);
         setSearchParams({});
         inputRef.current?.focus();
     };
@@ -612,51 +1065,62 @@ export default function Search() {
                                         <span>{predictions.length} Suggestions</span>
                                     </div>
 
-                                    {predictions.map((p) => (
-                                        <div
-                                            key={p.id}
-                                            onClick={p.action}
-                                            className="px-3.5 py-2.5 flex items-center gap-3 hover:bg-zinc-50 dark:hover:bg-[#0f2758] transition-colors cursor-pointer group"
-                                        >
-                                            {/* Preview Image or Icon */}
-                                            <div className="size-9 rounded-xl overflow-hidden bg-zinc-100 dark:bg-[#06132b] border border-zinc-200 dark:border-blue-500/20 shrink-0 flex items-center justify-center">
-                                                {p.image ? (
-                                                    <PostMedia
-                                                        src={p.image}
-                                                        fallbackType={p.fallbackType || 'FILM_SET'}
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                ) : (
-                                                    <span className="material-symbols-outlined text-zinc-400 dark:text-blue-300 text-lg">
-                                                        {p.icon}
-                                                    </span>
-                                                )}
-                                            </div>
-
-                                            {/* Title & Subtitle */}
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center gap-1.5">
-                                                    <h5 className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-white truncate group-hover:text-amber-500 transition-colors">
-                                                        {p.title}
-                                                    </h5>
+                                    {predictions.map((p) => {
+                                        const isCraft = p.type === 'craft';
+                                        return (
+                                            <div
+                                                key={p.id}
+                                                onClick={p.action}
+                                                className={`px-3.5 py-2.5 flex items-center gap-3 transition-colors cursor-pointer group ${
+                                                    isCraft
+                                                        ? 'bg-amber-500/10 hover:bg-amber-500/15 border-l-4 border-amber-500'
+                                                        : 'hover:bg-zinc-50 dark:hover:bg-[#0f2758]'
+                                                }`}
+                                            >
+                                                {/* Preview Image or Icon */}
+                                                <div className={`size-9 rounded-xl overflow-hidden border shrink-0 flex items-center justify-center ${
+                                                    isCraft
+                                                        ? 'bg-amber-500/20 border-amber-500/35 text-amber-500 dark:text-amber-400'
+                                                        : 'bg-zinc-100 dark:bg-[#06132b] border-zinc-200 dark:border-blue-500/20 text-zinc-400 dark:text-blue-300'
+                                                }`}>
+                                                    {p.image ? (
+                                                        <PostMedia
+                                                            src={p.image}
+                                                            fallbackType={p.fallbackType || 'FILM_SET'}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <span className="material-symbols-outlined text-lg">
+                                                            {p.icon}
+                                                        </span>
+                                                    )}
                                                 </div>
-                                                {p.subtitle && (
-                                                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">
-                                                        {p.subtitle}
-                                                    </p>
-                                                )}
+
+                                                {/* Title & Subtitle */}
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center gap-1.5">
+                                                        <h5 className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-white truncate group-hover:text-amber-500 transition-colors">
+                                                            {p.title}
+                                                        </h5>
+                                                    </div>
+                                                    {p.subtitle && (
+                                                        <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">
+                                                            {p.subtitle}
+                                                        </p>
+                                                    )}
+                                                </div>
+
+                                                {/* Category Badge */}
+                                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border shrink-0 ${p.badgeColor}`}>
+                                                    {p.badge}
+                                                </span>
+
+                                                <span className="material-symbols-outlined text-zinc-400 group-hover:text-amber-500 group-hover:translate-x-0.5 text-base transition-all">
+                                                    arrow_forward
+                                                </span>
                                             </div>
-
-                                            {/* Category Badge */}
-                                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border shrink-0 ${p.badgeColor}`}>
-                                                {p.badge}
-                                            </span>
-
-                                            <span className="material-symbols-outlined text-zinc-400 group-hover:text-amber-500 group-hover:translate-x-0.5 text-base transition-all">
-                                                arrow_forward
-                                            </span>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             )}
                         </div>
@@ -713,17 +1177,27 @@ export default function Search() {
                             </p>
 
                             {/* Popular Suggestions Chips */}
-                            <div className="mt-6 flex flex-wrap items-center justify-center gap-2 max-w-md mx-auto">
-                                {['Director', 'Cinematographer', 'Annapurna Studios', 'Devara Review', 'Camera Rental', 'Hyderabad', 'Audition'].map((chip) => (
+                            <div className="mt-6 flex flex-wrap items-center justify-center gap-2 max-w-lg mx-auto">
+                                {[
+                                    { label: '🎬 AD (Assistant Director)', query: 'AD' },
+                                    { label: '🎥 DOP / Cameraman', query: 'DOP' },
+                                    { label: '✂️ Film Editor', query: 'editor' },
+                                    { label: '✍️ Lyricist & Lyric Writer', query: 'lyricist' },
+                                    { label: '📝 Screenwriter', query: 'writer' },
+                                    { label: '🎭 Actors & Cast', query: 'actor' },
+                                    { label: '🎵 Music Director', query: 'music director' },
+                                    { label: '🔊 Sound Designer', query: 'sound designer' },
+                                    { label: '🏢 Studios & Gear', query: 'studios' }
+                                ].map((chip) => (
                                     <button
-                                        key={chip}
+                                        key={chip.query}
                                         onClick={() => {
-                                            setQuery(chip);
-                                            triggerFullSearch(chip);
+                                            setQuery(chip.query);
+                                            triggerFullSearch(chip.query);
                                         }}
                                         className="px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-[#0a1c3e] border border-zinc-200 dark:border-blue-500/20 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:border-amber-500/40 hover:text-amber-500 transition-all cursor-pointer"
                                     >
-                                        {chip}
+                                        {chip.label}
                                     </button>
                                 ))}
                             </div>
@@ -741,6 +1215,37 @@ export default function Search() {
                     {/* Results Content */}
                     {!loading && query.trim() && (
                         <>
+                            {/* Cinematic Craft Callout Banner */}
+                            {activeCrafts.length > 0 && (
+                                <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-purple-500/10 to-blue-500/10 border border-amber-500/25 flex items-center justify-between gap-3 shadow-sm">
+                                    <div className="flex items-center gap-3 min-w-0">
+                                        <div className="size-10 sm:size-11 rounded-xl bg-amber-500/20 text-amber-500 flex items-center justify-center shrink-0 border border-amber-500/30">
+                                            <span className="material-symbols-outlined text-2xl">{activeCrafts[0].icon}</span>
+                                        </div>
+                                        <div className="min-w-0">
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <span className="text-xs sm:text-sm font-extrabold text-zinc-900 dark:text-white truncate">
+                                                    {activeCrafts[0].title}
+                                                </span>
+                                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${activeCrafts[0].badgeColor}`}>
+                                                    {activeCrafts[0].badge}
+                                                </span>
+                                            </div>
+                                            <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 truncate">
+                                                {activeCrafts[0].subtitle}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => setActiveTab('people')}
+                                        className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-white text-xs font-bold shrink-0 transition-all shadow-sm active:scale-95 cursor-pointer flex items-center gap-1.5"
+                                    >
+                                        <span>View Talent</span>
+                                        <span className="bg-white/20 text-[10px] px-1.5 py-0.2 rounded-full font-extrabold">{results.people.length}</span>
+                                    </button>
+                                </div>
+                            )}
+
                             {searchMessage && (
                                 <div className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center justify-between">
                                     <span>{searchMessage}</span>
