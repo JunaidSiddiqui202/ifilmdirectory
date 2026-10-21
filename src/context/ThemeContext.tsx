@@ -16,14 +16,19 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
-        const saved = localStorage.getItem('isDarkMode');
-        if (saved !== null) {
-            try { return JSON.parse(saved); } catch (e) { /* ignore */ }
+        // If user explicitly chose a theme, respect their saved choice
+        const userExplicitChoice = localStorage.getItem('theme_user_chosen');
+        if (userExplicitChoice === 'true') {
+            const saved = localStorage.getItem('isDarkMode');
+            if (saved !== null) {
+                try { return JSON.parse(saved); } catch (e) { /* ignore */ }
+            }
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') return true;
+            if (savedTheme === 'light') return false;
         }
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'light') return false;
-        if (savedTheme === 'dark') return true;
-        return true; // Default to Night/Dark mode
+        // Day theme (Studio Light) is the DEFAULT
+        return false;
     });
 
     useEffect(() => {
@@ -40,8 +45,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
     }, [isDarkMode]);
 
-    const toggleDarkMode = () => setIsDarkMode(prev => !prev);
-    const setThemeMode = (mode: ThemeMode) => setIsDarkMode(mode === 'night');
+    const toggleDarkMode = () => {
+        localStorage.setItem('theme_user_chosen', 'true');
+        setIsDarkMode(prev => !prev);
+    };
+    const setThemeMode = (mode: ThemeMode) => {
+        localStorage.setItem('theme_user_chosen', 'true');
+        setIsDarkMode(mode === 'night');
+    };
 
     return (
         <ThemeContext.Provider value={{

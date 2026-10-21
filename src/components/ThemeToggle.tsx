@@ -12,16 +12,16 @@ export const ThemeToggle = ({ className = '' }: { className?: string }) => {
             type="button"
             className={`
                 relative w-14 h-7 rounded-full p-1
-                bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-white/10
+                bg-zinc-200 dark:bg-[#0E2452] border border-zinc-300 dark:border-blue-400/30
                 transition-colors duration-300 cursor-pointer focus:outline-none select-none
                 ${className}
             `}
-            title={isDarkMode ? "Switch to Day Theme (Studio Light)" : "Switch to Night Theme (Cinematic Dark)"}
+            title={isDarkMode ? "Switch to Day Theme (Studio Light)" : "Switch to Night Theme (Midnight Sapphire)"}
             aria-label="Toggle theme"
         >
             {/* Toggle circle */}
             <motion.div
-                className="w-5 h-5 rounded-full bg-white dark:bg-amber-400 shadow-md flex items-center justify-center text-zinc-800 dark:text-black"
+                className="w-5 h-5 rounded-full bg-white dark:bg-blue-600 shadow-md flex items-center justify-center text-zinc-800 dark:text-white"
                 animate={{
                     x: isDarkMode ? 28 : 0,
                 }}
@@ -46,18 +46,18 @@ export const ThemeToggleIcon = ({ className = '', showLabel = false }: { classNa
             type="button"
             className={`
                 flex items-center gap-1.5 p-2 rounded-xl
-                hover:bg-zinc-100 dark:hover:bg-white/[0.08]
-                text-zinc-700 dark:text-zinc-200
+                hover:bg-zinc-100 dark:hover:bg-blue-500/10
+                text-zinc-700 dark:text-blue-200
                 transition-colors cursor-pointer select-none
                 ${className}
             `}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            title={isDarkMode ? "Switch to Day Theme (Studio Light)" : "Switch to Night Theme (Cinematic Dark)"}
+            title={isDarkMode ? "Switch to Day Theme (Studio Light)" : "Switch to Night Theme (Midnight Sapphire)"}
             aria-label="Toggle theme"
         >
             <motion.span
-                className={`material-symbols-outlined text-xl ${isDarkMode ? 'text-amber-400' : 'text-amber-600'}`}
+                className={`material-symbols-outlined text-xl ${isDarkMode ? 'text-blue-400' : 'text-amber-600'}`}
                 initial={false}
                 animate={{ rotate: isDarkMode ? 0 : 180 }}
                 transition={{ duration: 0.3 }}

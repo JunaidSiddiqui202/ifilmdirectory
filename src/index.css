@@ -7,15 +7,16 @@
     --color-primary: #CC0000;
     /* CNN Editorial Newsroom Theme */
     --color-background: #f8fafc;
-    --color-background-dark: #090a0c;
+    --color-background-dark: #081636; /* AccountsMan Midnight Sapphire */
     --color-surface: #ffffff;
-    --color-surface-dark: #121316;
+    --color-surface-dark: #0e2452; /* AccountsMan Sapphire Surface */
+    --color-surface-dark-elevated: #122c64;
     --color-text: #0f172a;
-    --color-text-dark: #f8fafc;
+    --color-text-dark: #ffffff;
     --color-text-secondary: #64748b;
-    --color-text-secondary-dark: #94a3b8;
+    --color-text-secondary-dark: #93c5fd; /* AccountsMan Ice Blue */
     --color-border: #e2e8f0;
-    --color-border-dark: rgba(255, 255, 255, 0.08);
+    --color-border-dark: rgba(96, 165, 250, 0.18);
   }
 
   .theme-blue {
@@ -385,4 +386,211 @@ html:not(.dark) [data-reel-page] button {
 html:not(.dark) .showreel-cinema .material-symbols-outlined,
 html:not(.dark) [data-reel-page] .material-symbols-outlined {
   color: #ffffff !important;
+}
+
+/* ========================================================
+   ACCOUNTSMAN NIGHT THEME ENGINE (Deep Midnight Sapphire)
+   Transforms the app into the exact luminous sapphire &
+   nocturnal navy blue aesthetic from accountsman.in when
+   the 'dark' class is present on <html>
+   ======================================================== */
+html.dark {
+  color-scheme: dark;
+  background-color: #081636;
+}
+
+html.dark body {
+  background-color: #081636 !important;
+  background-image: radial-gradient(130% 90% at 50% 0%, #102e72 0%, #081636 50%, #051026 100%) !important;
+  background-attachment: fixed !important;
+  color: #ffffff !important;
+}
+
+/* Page canvas roots */
+html.dark [class*="min-h-screen"][class*="bg-[#090A0C]"],
+html.dark [class*="min-h-screen"][class*="bg-[#090a0c]"],
+html.dark [class*="min-h-screen"][class*="bg-[#0B0C0E]"],
+html.dark [class*="min-h-screen"][class*="bg-[#08090B]"],
+html.dark [class*="min-h-screen"][class*="bg-[#000000]"],
+html.dark [class*="min-h-screen"][class*="bg-zinc-950"],
+html.dark [class*="min-h-screen"][class*="bg-background-dark"],
+html.dark [class*="min-h-[100dvh]"][class*="bg-[#090A0C]"],
+html.dark [class*="min-h-[100dvh]"][class*="bg-[#090a0c]"],
+html.dark [class*="min-h-[100dvh]"][class*="bg-[#0B0C0E]"],
+html.dark [class*="min-h-[100dvh]"][class*="bg-[#08090B]"],
+html.dark [class*="min-h-[100dvh]"][class*="bg-[#000000]"],
+html.dark [class*="min-h-[100dvh]"][class*="bg-zinc-950"],
+html.dark [class*="min-h-[100dvh]"][class*="bg-background-dark"] {
+  background-color: #081636 !important;
+  background-image: radial-gradient(130% 90% at 50% 0%, #102e72 0%, #081636 50%, #051026 100%) !important;
+  background-attachment: fixed !important;
+  color: #ffffff !important;
+}
+
+/* Sticky App Bars, Top Headers, Navbars, Desktop Sidebar, Bottom Nav */
+html.dark header[class*="bg-[#"],
+html.dark nav[class*="bg-[#"],
+html.dark aside[class*="bg-[#"],
+html.dark div.sticky[class*="bg-[#"],
+html.dark header[class*="dark:bg-[#090A0C]"],
+html.dark nav[class*="dark:bg-[#090A0C]"],
+html.dark aside[class*="dark:bg-[#090A0C]"],
+html.dark header.dark\:bg-background-dark,
+html.dark nav.dark\:bg-background-dark,
+html.dark aside.dark\:bg-background-dark,
+html.dark [class*="dark:bg-[#090A0C]"],
+html.dark [class*="dark:bg-[#090a0c]"] {
+  background-color: rgba(10, 26, 62, 0.92) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border-color: rgba(96, 165, 250, 0.18) !important;
+}
+
+/* Cards, List Rows, Search Bars, Modals, Dropdowns, Sheets, Pill Filters */
+html.dark [class*="bg-[#121316]"],
+html.dark [class*="bg-[#14161a]"],
+html.dark [class*="bg-[#14151a]"],
+html.dark [class*="bg-[#141519]"],
+html.dark [class*="bg-[#16171b]"],
+html.dark [class*="bg-[#17191e]"],
+html.dark [class*="bg-[#18191D]"],
+html.dark [class*="bg-[#18191d]"],
+html.dark [class*="bg-[#1a1108]"],
+html.dark [class*="bg-[#1a1a1a]"],
+html.dark [class*="bg-[#1a1b1e]"],
+html.dark [class*="bg-[#1a1b20]"],
+html.dark [class*="bg-[#1a1c22]"],
+html.dark [class*="bg-[#1c1d22]"],
+html.dark [class*="bg-[#1c242e]"],
+html.dark [class*="bg-[#1e2026]"],
+html.dark [class*="bg-[#22242b]"],
+html.dark [class*="bg-[#231810]"],
+html.dark [class*="bg-[#342418]"],
+html.dark [class*="bg-[#493222]"],
+html.dark [class*="bg-[#0e0f12]"],
+html.dark [class*="bg-[#0e0f13]"],
+html.dark [class*="bg-[#111827]"],
+html.dark [class*="bg-[#0a0a0a]"],
+html.dark [class*="bg-[#0d0d0d]"],
+html.dark [class*="dark:bg-[#121316]"],
+html.dark [class*="dark:bg-[#14161a]"],
+html.dark [class*="dark:bg-[#18191D]"],
+html.dark [class*="bg-surface-dark"],
+html.dark [class*="bg-zinc-900"]:not([class*="aspect-"] *):not([class*="fixed inset-0"] *),
+html.dark [class*="bg-[#090A0C]"]:not([class*="min-h-"]):not([class*="fixed inset-0"]):not(header):not(nav):not(aside),
+html.dark [class*="bg-[#090a0c]"]:not([class*="min-h-"]):not([class*="fixed inset-0"]):not(header):not(nav):not(aside) {
+  background-color: #0e2452 !important;
+  border-color: rgba(96, 165, 250, 0.18) !important;
+  box-shadow: 0 4px 20px -2px rgba(2, 6, 23, 0.45) !important;
+  color: #ffffff;
+}
+
+/* Interactive card hover */
+html.dark [class*="hover:bg-[#18191D]"]:hover,
+html.dark [class*="hover:bg-[#1a1c22]"]:hover,
+html.dark [class*="hover:bg-[#1c1d22]"]:hover,
+html.dark [class*="hover:bg-zinc-800"]:hover,
+html.dark [class*="dark:hover:bg-white/[0.05]"]:hover,
+html.dark [class*="dark:hover:bg-white/[0.08]"]:hover,
+html.dark [class*="dark:hover:bg-[#18191D]"]:hover {
+  background-color: #122c64 !important;
+  border-color: rgba(96, 165, 250, 0.35) !important;
+}
+
+/* Inner containers and subtle item fills */
+html.dark [class*="bg-white/[0.02]"],
+html.dark [class*="bg-white/[0.03]"],
+html.dark [class*="bg-white/[0.04]"],
+html.dark [class*="bg-white/[0.05]"],
+html.dark [class*="bg-white/5"],
+html.dark [class*="bg-white/10"]:not([class*="aspect-"] [class*="absolute"]):not([class*="fixed inset-0"] *),
+html.dark [class*="bg-zinc-800"]:not([class*="aspect-"] *):not([class*="fixed inset-0"] *) {
+  background-color: rgba(14, 36, 82, 0.65) !important;
+  border-color: rgba(96, 165, 250, 0.18) !important;
+}
+
+/* Dark borders to sapphire borders */
+html.dark [class*="border-zinc-800"]:not([class*="aspect-"] [class*="absolute"]):not([class*="fixed inset-0"] *),
+html.dark [class*="border-zinc-700"]:not([class*="aspect-"] [class*="absolute"]):not([class*="fixed inset-0"] *),
+html.dark [class*="border-white/10"]:not([class*="aspect-"] [class*="absolute"]):not([class*="fixed inset-0"] *),
+html.dark [class*="border-white/5"]:not([class*="aspect-"] [class*="absolute"]):not([class*="fixed inset-0"] *),
+html.dark [class*="border-white/[0.08]"]:not([class*="aspect-"] [class*="absolute"]):not([class*="fixed inset-0"] *),
+html.dark [class*="dark:border-white/10"]:not([class*="aspect-"] [class*="absolute"]):not([class*="fixed inset-0"] *),
+html.dark [class*="dark:border-white/5"]:not([class*="aspect-"] [class*="absolute"]):not([class*="fixed inset-0"] *),
+html.dark [class*="dark:border-white/[0.08]"]:not([class*="aspect-"] [class*="absolute"]):not([class*="fixed inset-0"] *),
+html.dark [class*="divide-zinc-800"] > *,
+html.dark [class*="divide-white/10"] > *,
+html.dark [class*="divide-white/5"] > * {
+  border-color: rgba(96, 165, 250, 0.18) !important;
+}
+
+/* Form inputs & textareas in night theme */
+html.dark input[class*="bg-[#"],
+html.dark textarea[class*="bg-[#"],
+html.dark select[class*="bg-[#"],
+html.dark input.bg-surface-dark,
+html.dark textarea.bg-surface-dark,
+html.dark [class*="dark:bg-[#121316]"] input,
+html.dark [class*="dark:bg-[#121316]"] textarea {
+  background-color: #091b3e !important;
+  color: #ffffff !important;
+  border-color: rgba(96, 165, 250, 0.25) !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #64748b !important;
+}
+
+/* Subtext & muted text in night theme (Ice Blue from AccountsMan) */
+html.dark .text-zinc-400:not([class*="aspect-"] [class*="absolute"] *):not(button *):not([class*="btn-primary"] *):not(a *),
+html.dark .text-subtle-dark:not([class*="aspect-"] [class*="absolute"] *):not(button *):not(a *) {
+  color: #93c5fd !important;
+}
+
+html.dark .text-zinc-500:not([class*="aspect-"] [class*="absolute"] *):not(button *):not(a *) {
+  color: #60a5fa !important;
+}
+
+/* Headings in night theme */
+html.dark h1:not([class*="aspect-"] [class*="absolute"] *),
+html.dark h2:not([class*="aspect-"] [class*="absolute"] *),
+html.dark h3:not([class*="aspect-"] [class*="absolute"] *),
+html.dark h4:not([class*="aspect-"] [class*="absolute"] *),
+html.dark h5:not([class*="aspect-"] [class*="absolute"] *),
+html.dark h6:not([class*="aspect-"] [class*="absolute"] *) {
+  color: #ffffff !important;
+}
+
+/* Electric Royal Blue CTAs in Night Theme (AccountsMan style) */
+html.dark .btn-primary,
+html.dark button[class~="bg-primary"],
+html.dark a[class~="bg-primary"] {
+  background-color: #2563eb !important;
+  background-image: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(147, 197, 253, 0.3) !important;
+  box-shadow: 0 8px 24px -4px rgba(37, 99, 235, 0.45) !important;
+}
+
+html.dark .btn-primary:hover,
+html.dark button[class~="bg-primary"]:hover,
+html.dark a[class~="bg-primary"]:hover {
+  background-color: #1d4ed8 !important;
+  background-image: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
+  box-shadow: 0 10px 28px -4px rgba(37, 99, 235, 0.6) !important;
+}
+
+/* Active filter pills in night mode */
+html.dark [class*="bg-amber-500/10"],
+html.dark [class*="bg-amber-500/20"] {
+  background-color: rgba(37, 99, 235, 0.18) !important;
+  border-color: rgba(96, 165, 250, 0.3) !important;
+  color: #93c5fd !important;
+}
+
+/* Dark mode toggle styles */
+html.dark .theme-toggle-night {
+  background-color: #2563eb !important;
+  border-color: rgba(147, 197, 253, 0.4) !important;
 }

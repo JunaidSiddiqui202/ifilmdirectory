@@ -109,7 +109,7 @@ export default function HamburgerMenu() {
                                             className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.08] dark:hover:bg-white/[0.15] text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-white/10 text-xs font-bold font-display cursor-pointer transition-all active:scale-95 shadow-sm"
                                             title={isDarkMode ? 'Switch to Day Theme' : 'Switch to Night Theme'}
                                         >
-                                            <span className={`material-symbols-outlined text-base ${isDarkMode ? 'text-amber-400' : 'text-amber-600'}`}>
+                                            <span className={`material-symbols-outlined text-base ${isDarkMode ? 'text-blue-400' : 'text-amber-600'}`}>
                                                 {isDarkMode ? 'light_mode' : 'dark_mode'}
                                             </span>
                                             <span>{isDarkMode ? 'Day' : 'Night'}</span>
@@ -203,22 +203,22 @@ export default function HamburgerMenu() {
                                 {/* Theme Switcher Card */}
                                 <div className="p-2.5 rounded-2xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/5 flex items-center justify-between">
                                     <div className="flex items-center gap-2.5">
-                                        <span className={`material-symbols-outlined text-xl ${isDarkMode ? 'text-amber-400' : 'text-amber-600'}`}>
+                                        <span className={`material-symbols-outlined text-xl ${isDarkMode ? 'text-blue-400' : 'text-amber-600'}`}>
                                             {isDarkMode ? 'light_mode' : 'dark_mode'}
                                         </span>
                                         <div className="text-left">
                                             <p className="text-xs font-bold text-zinc-900 dark:text-white">
                                                 {isDarkMode ? 'Night Theme' : 'Day Theme'}
                                             </p>
-                                            <p className="text-[10px] text-zinc-500 dark:text-zinc-400">
-                                                {isDarkMode ? 'Cinematic Dark' : 'Studio Light'}
+                                            <p className="text-[10px] text-zinc-500 dark:text-blue-300">
+                                                {isDarkMode ? 'Midnight Sapphire' : 'Studio Light'}
                                             </p>
                                         </div>
                                     </div>
                                     <button
                                         type="button"
                                         onClick={toggleDarkMode}
-                                        className="px-2.5 py-1 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/20 text-[11px] font-bold tracking-wider uppercase transition-all active:scale-95 cursor-pointer"
+                                        className="px-2.5 py-1 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-blue-400 border border-amber-500/20 dark:border-blue-400/30 text-[11px] font-bold tracking-wider uppercase transition-all active:scale-95 cursor-pointer"
                                     >
                                         To {isDarkMode ? 'Day' : 'Night'}
                                     </button>

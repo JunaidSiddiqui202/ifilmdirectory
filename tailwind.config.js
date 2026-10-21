@@ -10,15 +10,31 @@ export default {
       colors: {
         'primary': 'var(--color-primary)',
         'background-light': '#f8fafc',
-        'background-dark': '#090a0c',
+        'background-dark': '#081636', // Deep Midnight Sapphire (AccountsMan)
         'text-light': '#0f172a',
-        'text-dark': '#f8fafc',
+        'text-dark': '#ffffff',
         'text-subtle-light': '#64748b',
-        'text-subtle-dark': '#94a3b8',
+        'text-subtle-dark': '#93c5fd', // Ice Blue Subtitle & Accent Text
         'surface-light': '#ffffff',
-        'surface-dark': '#121316',
+        'surface-dark': '#0e2452', // Sapphire Card Surface
+        'surface-dark-elevated': '#122c64', // Elevated Floating Card
         'border-light': '#e2e8f0',
-        'border-dark': 'rgba(255, 255, 255, 0.08)',
+        'border-dark': 'rgba(96, 165, 250, 0.18)', // Luminous Sapphire Border
+        // Electric Blue Accent from AccountsMan
+        'electric-blue': {
+          DEFAULT: '#2563eb',
+          50: '#eff6ff',
+          100: '#dbeafe',
+          200: '#bfdbfe',
+          300: '#93c5fd',
+          400: '#60a5fa',
+          500: '#3b82f6',
+          600: '#2563eb',
+          700: '#1d4ed8',
+          800: '#1e40af',
+          900: '#1e3a8a',
+          950: '#081636',
+        },
         // Iconic CNN Red & Editorial Newsroom palette
         amber: {
           50: '#FEF2F2',

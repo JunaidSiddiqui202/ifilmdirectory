@@ -273,27 +273,27 @@ export default function Settings() {
                                 onClick={() => !isDarkMode && toggleDarkMode()}
                                 className={`flex flex-col items-center text-center p-4 rounded-2xl border transition-all duration-200 relative group cursor-pointer ${
                                     isDarkMode
-                                        ? 'bg-[#14161a] border-amber-500 shadow-md shadow-amber-500/10 ring-2 ring-amber-500/30'
-                                        : 'bg-white dark:bg-[#121316] border-zinc-200 dark:border-white/[0.08] hover:border-zinc-300 dark:hover:border-white/[0.15] opacity-75 hover:opacity-100'
+                                        ? 'bg-[#0E2452] border-blue-500 shadow-md shadow-blue-500/20 ring-2 ring-blue-500/40'
+                                        : 'bg-white dark:bg-[#0E2452] border-zinc-200 dark:border-blue-400/20 hover:border-zinc-300 dark:hover:border-blue-400/40 opacity-75 hover:opacity-100'
                                 }`}
                             >
                                 <div className={`size-12 rounded-2xl flex items-center justify-center mb-2.5 transition-transform group-hover:scale-105 ${
                                     isDarkMode
-                                        ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/30'
-                                        : 'bg-zinc-100 dark:bg-white/[0.06] text-zinc-400'
+                                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+                                        : 'bg-zinc-100 dark:bg-blue-900/40 text-blue-400'
                                 }`}>
                                     <span className="material-symbols-outlined text-2xl">dark_mode</span>
                                 </div>
                                 <span className="text-xs font-bold text-zinc-900 dark:text-white uppercase tracking-wider font-display">
                                     Night Theme
                                 </span>
-                                <span className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
-                                    Cinematic Dark
+                                <span className="text-[11px] text-zinc-500 dark:text-blue-300 mt-0.5">
+                                    Midnight Sapphire
                                 </span>
 
                                 {isDarkMode && (
                                     <div className="absolute top-2.5 right-2.5">
-                                        <span className="material-symbols-outlined text-amber-400 text-base filled">
+                                        <span className="material-symbols-outlined text-blue-400 text-base filled">
                                             check_circle
                                         </span>
                                     </div>
