@@ -567,7 +567,7 @@ export default function Home() {
                     <div className="flex items-center gap-2">
                         <span className="size-2 rounded-full bg-amber-400 animate-pulse" />
                         <h2 className="text-base font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-1.5">
-                            Movie Reviews from All Over
+                            Movie Reviews
                         </h2>
                     </div>
                     <button
@@ -678,31 +678,41 @@ export default function Home() {
                                     />
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                    <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
-                                        <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 truncate max-w-[120px]">
-                                            {job.company}
-                                        </span>
-                                        {job.fraternityRole && (
-                                            <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-purple-500/10 text-purple-600 dark:text-purple-300 border border-purple-500/20">
-                                                {job.fraternityRole}
+                                    {/* Top Line: Company, Role Badge, and Time Ago */}
+                                    <div className="flex items-center justify-between gap-1 mb-0.5">
+                                        <div className="flex items-center gap-1.5 min-w-0">
+                                            <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 truncate max-w-[100px]" title={job.company}>
+                                                {job.company}
+                                            </span>
+                                            {job.fraternityRole && (
+                                                <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-purple-500/10 text-purple-600 dark:text-purple-300 border border-purple-500/20 truncate max-w-[85px]">
+                                                    {job.fraternityRole}
+                                                </span>
+                                            )}
+                                        </div>
+                                        {job.postedAt && (
+                                            <span className="text-[10px] text-zinc-400 dark:text-zinc-500 shrink-0 whitespace-nowrap">
+                                                {formatJobTimeAgo(job.postedAt)}
                                             </span>
                                         )}
                                     </div>
-                                    <h4 className="text-xs font-bold text-zinc-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors line-clamp-1 leading-snug">
+
+                                    {/* Job Title */}
+                                    <h4 className="text-xs font-bold text-zinc-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors truncate leading-snug" title={job.title}>
                                         {job.title}
                                     </h4>
-                                    <div className="flex items-center gap-2 text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">
-                                        <span>{job.location}</span>
+
+                                    {/* Location & Salary cleanly truncated on single row */}
+                                    <div className="flex items-center gap-1.5 text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5 min-w-0">
+                                        <span className="truncate min-w-0" title={job.location}>
+                                            {job.location ? job.location.split('(')[0].trim() : ''}
+                                        </span>
                                         {job.salary && (
                                             <>
-                                                <span>•</span>
-                                                <span className="font-semibold text-zinc-700 dark:text-zinc-300">{job.salary}</span>
-                                            </>
-                                        )}
-                                        {job.postedAt && (
-                                            <>
-                                                <span>•</span>
-                                                <span>{formatJobTimeAgo(job.postedAt)}</span>
+                                                <span className="text-zinc-300 dark:text-zinc-600 shrink-0">•</span>
+                                                <span className="font-semibold text-emerald-600 dark:text-emerald-400 truncate min-w-0" title={job.salary}>
+                                                    {job.salary}
+                                                </span>
                                             </>
                                         )}
                                     </div>

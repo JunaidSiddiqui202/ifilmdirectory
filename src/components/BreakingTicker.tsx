@@ -73,7 +73,7 @@ export default function BreakingTicker({ variant = 'home', onNewsClick, onJobCli
 
     if (isLoading && tickerItems.length === 0) {
         return (
-            <div className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 animate-pulse ${variant === 'home' ? 'my-2' : 'mb-6'}`}>
+            <div className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl bg-white dark:bg-[#0e2452] border border-zinc-200 dark:border-blue-400/20 animate-pulse ${variant === 'home' ? 'my-2' : 'mb-6'}`}>
                 <div className="size-2 rounded-full bg-red-500 animate-ping" />
                 <span className="text-xs font-bold tracking-wider uppercase text-zinc-500 dark:text-zinc-400">Loading Live Cinema Wire & Job Alerts...</span>
             </div>
@@ -115,12 +115,12 @@ export default function BreakingTicker({ variant = 'home', onNewsClick, onJobCli
 
     return (
         <div
-            className={`w-full relative flex items-center overflow-hidden rounded-2xl bg-white dark:bg-gradient-to-r dark:from-[#14151a] dark:via-[#0e0f13] dark:to-[#14151a] border border-zinc-200 dark:border-white/10 hover:border-amber-500/40 shadow-sm dark:shadow-lg transition-all select-none ${
+            className={`w-full relative flex items-center overflow-hidden rounded-2xl bg-white dark:bg-[#0e2452] border border-zinc-200 dark:border-blue-400/20 hover:border-amber-500/40 dark:hover:border-blue-400/50 shadow-sm dark:shadow-[0_4px_20px_rgba(2,6,23,0.4)] transition-all select-none ${
                 variant === 'home' ? 'my-2' : 'mb-6'
             }`}
         >
             {/* Fixed Left Live Badge */}
-            <div className="z-10 shrink-0 flex items-center pl-3 sm:pl-4 pr-3 py-2 bg-white/95 dark:bg-[#14151a]/95 backdrop-blur-md border-r border-zinc-200 dark:border-white/10 shadow-[4px_0_12px_rgba(0,0,0,0.04)] dark:shadow-[4px_0_12px_rgba(0,0,0,0.5)]">
+            <div className="z-10 shrink-0 flex items-center pl-3 sm:pl-4 pr-3 py-2 bg-white/95 dark:bg-[#0e2452]/95 backdrop-blur-md border-r border-zinc-200 dark:border-blue-400/20 shadow-[4px_0_12px_rgba(0,0,0,0.04)] dark:shadow-[4px_0_12px_rgba(2,6,23,0.5)]">
                 <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-500 text-white font-black text-[10px] sm:text-xs uppercase tracking-wider shadow-sm">
                     <span className="relative flex size-2">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
@@ -172,7 +172,7 @@ export default function BreakingTicker({ variant = 'home', onNewsClick, onJobCli
                                     </span>
 
                                     {/* Separator */}
-                                    <span className="text-zinc-300 dark:text-zinc-600 text-xs font-bold pl-3">•</span>
+                                    <span className="text-zinc-300 dark:text-blue-300/40 text-xs font-bold pl-3">•</span>
                                 </div>
                             );
                         }
@@ -207,7 +207,7 @@ export default function BreakingTicker({ variant = 'home', onNewsClick, onJobCli
                                 </span>
 
                                 {/* Bullet Separator */}
-                                <span className="text-zinc-300 dark:text-zinc-600 text-xs font-bold pl-3">•</span>
+                                <span className="text-zinc-300 dark:text-blue-300/40 text-xs font-bold pl-3">•</span>
                             </div>
                         );
                     })}
@@ -215,7 +215,7 @@ export default function BreakingTicker({ variant = 'home', onNewsClick, onJobCli
             </div>
 
             {/* Fixed Right Shortcut to South Cinema News */}
-            <div className="z-10 shrink-0 flex items-center pr-3 sm:pr-4 pl-2 py-2 bg-white/95 dark:bg-[#14151a]/95 backdrop-blur-md border-l border-zinc-200 dark:border-white/10 shadow-[-4px_0_12px_rgba(0,0,0,0.04)] dark:shadow-[-4px_0_12px_rgba(0,0,0,0.5)]">
+            <div className="z-10 shrink-0 flex items-center pr-3 sm:pr-4 pl-2 py-2 bg-white/95 dark:bg-[#0e2452]/95 backdrop-blur-md border-l border-zinc-200 dark:border-blue-400/20 shadow-[-4px_0_12px_rgba(0,0,0,0.04)] dark:shadow-[-4px_0_12px_rgba(2,6,23,0.5)]">
                 <button
                     onClick={() => navigate('/south-cinema')}
                     className="size-7 rounded-xl bg-amber-500/10 hover:bg-amber-500/25 text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 flex items-center justify-center transition-all"
