@@ -39,6 +39,54 @@ const MOCK_SERVICES: Facility[] = [
         description: 'One of Indias largest film production companies.'
     },
     {
+        id: 'heritage-old-house',
+        name: 'Heritage Courtyard Old House',
+        location: 'Gandipet, Hyderabad',
+        rating: 4.8,
+        reviews: 72,
+        price: '₹22,000/day',
+        image: 'https://images.unsplash.com/photo-1544984243-ec57ea16fe25?w=800&q=80',
+        type: 'Location',
+        description: 'Authentic 70-year-old traditional courtyard house with vintage wooden pillars and antique corridors ideal for periodic & emotional cinema shoots.',
+        amenities: ['Courtyard', 'Traditional Kitchen', 'Vintage Furniture', 'Generator Backup', 'Actor Green Room']
+    },
+    {
+        id: 'chettinad-bungalow',
+        name: 'Vintage Chettinad Film House',
+        location: 'Film Nagar, Hyderabad',
+        rating: 4.9,
+        reviews: 110,
+        price: '₹25,000/day',
+        image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&q=80',
+        type: 'Location',
+        description: 'Spacious retro style old house with antique verandah, vintage windows, and red oxide flooring for feature films.',
+        amenities: ['Retro Verandah', 'Red Oxide Floors', '2 Acre Compound', 'AC Makeup Suite']
+    },
+    {
+        id: 'royal-haveli',
+        name: 'Old Nizam Haveli & Vintage House',
+        location: 'Old City, Hyderabad',
+        rating: 4.7,
+        reviews: 54,
+        price: '₹24,000/day',
+        image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80',
+        type: 'Location',
+        description: 'Colonial era heritage stone house with high ceilings, arched doorways and authentic vintage architecture.',
+        amenities: ['Arched Doorways', 'Vintage Stone Walls', 'Spacious Parking', 'Crew Dining Space']
+    },
+    {
+        id: 'police-court-set',
+        name: 'Cinema Police Station & Jail Set',
+        location: 'Ramoji Road, Hyderabad',
+        rating: 4.9,
+        reviews: 135,
+        price: '₹18,000/day',
+        image: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&q=80',
+        type: 'Studio',
+        description: 'Full modular police station, lockup jail cells and interrogation room ready with film props.',
+        amenities: ['Jail Cells', 'Commissioner Office', 'Gun Rack Props', 'Interrogation Room']
+    },
+    {
         id: 'abbey-road',
         name: 'Abbey Road Studios',
         location: 'London, UK',

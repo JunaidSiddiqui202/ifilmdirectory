@@ -9,12 +9,19 @@ import { getPosts, type PostData } from '../services/postService';
 import { rssNewsService, type NewsItem } from '../services/rssNewsService';
 import EmptyState from '../components/EmptyState';
 import PostMedia from '../components/PostMedia';
+import {
+    parseNaturalProductionQuery,
+    buildAIProductionPackage,
+    parseFacilityPrice,
+    inferActorAge,
+    type ProductionPackageResult
+} from '../services/aiProductionSearchService';
 
-type TabType = 'all' | 'people' | 'studios' | 'feed' | 'news' | 'jobs' | 'blogs' | 'nearme';
+type TabType = 'all' | 'ai_package' | 'people' | 'studios' | 'feed' | 'news' | 'jobs' | 'blogs' | 'nearme';
 
 interface SearchPrediction {
     id: string;
-    type: 'people' | 'studio' | 'feed' | 'news' | 'job' | 'blog' | 'keyword' | 'craft';
+    type: 'people' | 'studio' | 'feed' | 'news' | 'job' | 'blog' | 'keyword' | 'craft' | 'ai_package';
     title: string;
     subtitle?: string;
     badge: string;
@@ -25,7 +32,7 @@ interface SearchPrediction {
     action: () => void;
 }
 
-export interface CinematicCraft {
+interface CinematicCraft {
     id: string;
     title: string;
     shortLabel: string;
@@ -37,7 +44,7 @@ export interface CinematicCraft {
     rolePatterns: RegExp[];
 }
 
-export const CINEMATIC_CRAFTS: CinematicCraft[] = [
+const CINEMATIC_CRAFTS: CinematicCraft[] = [
     {
         id: 'ad',
         title: 'Assistant Directors (AD) & Associate Directors',
@@ -272,7 +279,7 @@ export const CINEMATIC_CRAFTS: CinematicCraft[] = [
 ];
 
 // Helper to find which cinematic craft(s) match user's search query
-export function findMatchingCinematicCrafts(rawQuery: string): CinematicCraft[] {
+function findMatchingCinematicCrafts(rawQuery: string): CinematicCraft[] {
     const trimmed = rawQuery.trim();
     if (!trimmed) return [];
 
@@ -326,7 +333,7 @@ export function findMatchingCinematicCrafts(rawQuery: string): CinematicCraft[] 
 }
 
 // Helper to test if a UserProfile matches a CinematicCraft
-export function doesUserMatchCraft(user: UserProfile, craft: CinematicCraft): boolean {
+function doesUserMatchCraft(user: UserProfile, craft: CinematicCraft): boolean {
     const role = (user.role || '').toLowerCase();
     const customRole = (user.customRole || '').toLowerCase();
     const bio = (user.bio || '').toLowerCase();
@@ -359,7 +366,7 @@ export function doesUserMatchCraft(user: UserProfile, craft: CinematicCraft): bo
 }
 
 // Helper to test if a Job matches a CinematicCraft
-export function doesJobMatchCraft(job: Job, craft: CinematicCraft): boolean {
+function doesJobMatchCraft(job: Job, craft: CinematicCraft): boolean {
     const title = (job.title || '').toLowerCase();
     const type = (job.type || '').toLowerCase();
     const desc = (job.description || '').toLowerCase();
@@ -414,6 +421,9 @@ export default function Search() {
     const [loading, setLoading] = useState(false);
     const [selectedNewsArticle, setSelectedNewsArticle] = useState<NewsItem | null>(null);
     const [activeCrafts, setActiveCrafts] = useState<CinematicCraft[]>([]);
+    const [productionPackage, setProductionPackage] = useState<ProductionPackageResult | null>(null);
+    const [aiPackageDepartment, setAiPackageDepartment] = useState<'all' | 'cast' | 'crew' | 'locations'>('all');
+    const [castAgeFilter, setCastAgeFilter] = useState<'all' | 'young' | 'middle' | 'senior' | 'child'>('all');
 
     const inputRef = useRef<HTMLInputElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -549,6 +559,41 @@ export default function Search() {
             // Detect any cinematic craft triggers (e.g. "ad", "dop", "cameraman", "editor", "lyricist", etc.)
             const matchingCrafts = findMatchingCinematicCrafts(trimmed);
             const addedUserUids = new Set<string>();
+
+            // 0A. AI NATURAL LANGUAGE PRODUCTION PREDICTION (Cast & Crew package, age filters, budget location finder)
+            const parsedAi = parseNaturalProductionQuery(trimmed);
+            if (parsedAi.isNaturalAIQuery || parsedAi.isProductionPackage || !!parsedAi.locationQuery?.maxBudget || !!parsedAi.targetAgeRange) {
+                let aiTitle = '✨ AI Film Search: Assemble Cast & Crew Package';
+                let aiSubtitle = 'Auto-categorizes cast by age brackets, crew by craft, and locations by budget';
+                
+                if (parsedAi.locationQuery?.maxBudget) {
+                    aiTitle = `✨ Find Locations within ₹${parsedAi.locationQuery.maxBudget.toLocaleString('en-IN')}`;
+                    if (parsedAi.locationQuery.type) {
+                        aiSubtitle = `Search ${parsedAi.locationQuery.type} properties under ₹${parsedAi.locationQuery.maxBudget.toLocaleString('en-IN')}${parsedAi.locationQuery.nearMe ? ' near you' : ''}`;
+                    }
+                } else if (parsedAi.targetAgeRange) {
+                    aiTitle = `✨ Search Actors in Age Bracket: ${parsedAi.targetAgeRange.label}`;
+                    aiSubtitle = parsedAi.characterArchetype ? `Finding ${parsedAi.characterArchetype} profiles matching ${parsedAi.targetAgeRange.label}` : `Categorizes young leads, character artists & seniors by age`;
+                } else if (parsedAi.isProductionPackage) {
+                    aiTitle = '✨ Assemble Complete Cast & Crew Package';
+                    aiSubtitle = 'Full production breakdown: Cast by age, direction, camera, post, art & locations';
+                }
+
+                matches.push({
+                    id: 'ai-production-package-prediction',
+                    type: 'ai_package',
+                    title: aiTitle,
+                    subtitle: aiSubtitle,
+                    badge: '✨ AI Search',
+                    badgeColor: 'bg-gradient-to-r from-amber-500 to-purple-600 text-white border-amber-400/40',
+                    icon: 'auto_awesome',
+                    action: () => {
+                        setShowPredictions(false);
+                        setActiveTab('ai_package');
+                        triggerFullSearch(trimmed);
+                    }
+                });
+            }
 
             // 0. CINEMATIC CRAFT HIGHLIGHT PREDICTIONS
             for (const craft of matchingCrafts) {
@@ -776,6 +821,7 @@ export default function Search() {
                 blogs: []
             });
             setActiveCrafts([]);
+            setProductionPackage(null);
             setSearchMessage('');
             return;
         }
@@ -789,6 +835,19 @@ export default function Search() {
                 const datasets = await loadAllDatasets();
                 const matchingCrafts = findMatchingCinematicCrafts(query);
                 setActiveCrafts(matchingCrafts);
+
+                // Build AI Production Package if natural language, age bracket, or budget query
+                const parsedAi = parseNaturalProductionQuery(query);
+                let generatedPackage: ProductionPackageResult | null = null;
+                if (parsedAi.isNaturalAIQuery || parsedAi.isProductionPackage || !!parsedAi.locationQuery?.maxBudget || !!parsedAi.targetAgeRange) {
+                    generatedPackage = await buildAIProductionPackage(query, datasets.users, datasets.studios, userLocation);
+                    setProductionPackage(generatedPackage);
+                    if (parsedAi.isProductionPackage || (parsedAi.locationQuery?.maxBudget && parsedAi.locationQuery?.requested)) {
+                        setActiveTab('ai_package');
+                    }
+                } else {
+                    setProductionPackage(null);
+                }
 
                 // 1. Search Users / Talent (Cinematic Crafts priority + general query)
                 const peopleMap = new Map<string, UserProfile>();
@@ -888,8 +947,14 @@ export default function Search() {
                     filteredBlogs.length;
 
                 let msg = '';
-                if (totalFound > 0) {
-                    if (matchingCrafts.length > 0) {
+                if (totalFound > 0 || (generatedPackage && (generatedPackage.cast.allMatchingCast.length > 0 || generatedPackage.locationsAndStudios.matching.length > 0))) {
+                    if (parsedAi.isProductionPackage) {
+                        msg = `✨ Complete Cast & Crew Package assembled for "${query}"`;
+                    } else if (parsedAi.locationQuery?.maxBudget) {
+                        msg = `✨ Found ${generatedPackage?.locationsAndStudios.budgetMatchedCount || filteredStudios.length} locations matching budget ≤ ₹${parsedAi.locationQuery.maxBudget.toLocaleString('en-IN')}`;
+                    } else if (parsedAi.targetAgeRange) {
+                        msg = `✨ Found cast matching age bracket ${parsedAi.targetAgeRange.label}`;
+                    } else if (matchingCrafts.length > 0) {
                         const craftTitles = matchingCrafts.map(c => c.shortLabel).join(', ');
                         msg = `Found ${totalFound} result${totalFound > 1 ? 's' : ''} for "${query}" (Cinematic Craft: ${craftTitles})`;
                     } else {
@@ -977,6 +1042,9 @@ export default function Search() {
         setPredictions([]);
         setShowPredictions(false);
         setActiveCrafts([]);
+        setProductionPackage(null);
+        setAiPackageDepartment('all');
+        setCastAgeFilter('all');
         setSearchParams({});
         inputRef.current?.focus();
     };
@@ -989,8 +1057,24 @@ export default function Search() {
         results.jobs.length +
         results.blogs.length;
 
+    const totalAiPackageCount = productionPackage ? (
+        productionPackage.cast.allMatchingCast.length +
+        productionPackage.crew.direction.length +
+        productionPackage.crew.camera.length +
+        productionPackage.crew.postProduction.length +
+        productionPackage.crew.writingAndMusic.length +
+        productionPackage.crew.artAndStunts.length +
+        productionPackage.locationsAndStudios.matching.length
+    ) : 0;
+
     const tabs: { id: TabType; label: string; icon: string; count?: number }[] = [
         { id: 'all', label: 'All', icon: 'travel_explore', count: totalResultsCount },
+        ...(productionPackage ? [{
+            id: 'ai_package' as TabType,
+            label: '✨ Cast & Crew Package',
+            icon: 'auto_awesome',
+            count: totalAiPackageCount
+        }] : []),
         { id: 'people', label: 'Talent', icon: 'person', count: results.people.length },
         { id: 'studios', label: 'Studios & Gear', icon: 'domain', count: results.studios.length },
         { id: 'feed', label: 'Feed', icon: 'forum', count: results.feed.length },
@@ -1067,21 +1151,26 @@ export default function Search() {
 
                                     {predictions.map((p) => {
                                         const isCraft = p.type === 'craft';
+                                        const isAi = p.type === 'ai_package';
                                         return (
                                             <div
                                                 key={p.id}
                                                 onClick={p.action}
                                                 className={`px-3.5 py-2.5 flex items-center gap-3 transition-colors cursor-pointer group ${
-                                                    isCraft
-                                                        ? 'bg-amber-500/10 hover:bg-amber-500/15 border-l-4 border-amber-500'
-                                                        : 'hover:bg-zinc-50 dark:hover:bg-[#0f2758]'
+                                                    isAi
+                                                        ? 'bg-gradient-to-r from-amber-500/15 via-purple-500/15 to-transparent hover:from-amber-500/25 hover:via-purple-500/25 border-l-4 border-amber-500'
+                                                        : isCraft
+                                                            ? 'bg-amber-500/10 hover:bg-amber-500/15 border-l-4 border-amber-500'
+                                                            : 'hover:bg-zinc-50 dark:hover:bg-[#0f2758]'
                                                 }`}
                                             >
                                                 {/* Preview Image or Icon */}
                                                 <div className={`size-9 rounded-xl overflow-hidden border shrink-0 flex items-center justify-center ${
-                                                    isCraft
-                                                        ? 'bg-amber-500/20 border-amber-500/35 text-amber-500 dark:text-amber-400'
-                                                        : 'bg-zinc-100 dark:bg-[#06132b] border-zinc-200 dark:border-blue-500/20 text-zinc-400 dark:text-blue-300'
+                                                    isAi
+                                                        ? 'bg-gradient-to-br from-amber-500 to-purple-600 text-white border-amber-400/40 shadow-sm'
+                                                        : isCraft
+                                                            ? 'bg-amber-500/20 border-amber-500/35 text-amber-500 dark:text-amber-400'
+                                                            : 'bg-zinc-100 dark:bg-[#06132b] border-zinc-200 dark:border-blue-500/20 text-zinc-400 dark:text-blue-300'
                                                 }`}>
                                                     {p.image ? (
                                                         <PostMedia
@@ -1176,8 +1265,37 @@ export default function Search() {
                                 Type a keyword to instantly discover filmmakers, shooting floors, equipment rentals, cinema wire stories, movie reviews, feed posts, and casting calls.
                             </p>
 
+                            {/* AI Production Search Prompts (ChatGPT-style) */}
+                            <div className="mt-6 max-w-xl mx-auto text-left">
+                                <div className="flex items-center gap-1.5 justify-center text-xs font-bold text-amber-500 uppercase tracking-wider mb-2.5">
+                                    <span className="material-symbols-outlined text-sm">auto_awesome</span>
+                                    <span>Try AI Production Searches</span>
+                                </div>
+                                <div className="flex flex-wrap items-center justify-center gap-2">
+                                    {[
+                                        { label: '✨ Give me whole cast and crews list', query: 'give me whole cast and crews list' },
+                                        { label: '🏡 25k budget old house near me', query: '25k budget old house near me' },
+                                        { label: '🌟 Hero 25-30 age & Heroine 20-25', query: 'hero 25-30 age and heroine 20-25' },
+                                        { label: '🎭 Senior character artists 50+ age', query: 'senior character artists 50+ age' },
+                                        { label: '🎬 Complete direction & camera crew', query: 'complete direction and camera crew' }
+                                    ].map((prompt) => (
+                                        <button
+                                            key={prompt.query}
+                                            onClick={() => {
+                                                setQuery(prompt.query);
+                                                setActiveTab('ai_package');
+                                                triggerFullSearch(prompt.query);
+                                            }}
+                                            className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-amber-500/10 via-purple-500/10 to-blue-500/10 border border-amber-500/30 hover:border-amber-500 text-xs font-bold text-zinc-900 dark:text-zinc-100 hover:text-amber-500 transition-all cursor-pointer shadow-sm active:scale-95"
+                                        >
+                                            {prompt.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
                             {/* Popular Suggestions Chips */}
-                            <div className="mt-6 flex flex-wrap items-center justify-center gap-2 max-w-lg mx-auto">
+                            <div className="mt-5 flex flex-wrap items-center justify-center gap-2 max-w-lg mx-auto">
                                 {[
                                     { label: '🎬 AD (Assistant Director)', query: 'AD' },
                                     { label: '🎥 DOP / Cameraman', query: 'DOP' },
@@ -1251,6 +1369,381 @@ export default function Search() {
                                     <span>{searchMessage}</span>
                                     <span className="text-[11px] text-zinc-400">Showing {activeTab === 'all' ? 'top across all' : activeTab}</span>
                                 </div>
+                            )}
+
+                            {/* ✨ AI PRODUCTION PACKAGE & CAST/CREW/LOCATION INTELLIGENCE */}
+                            {productionPackage && (activeTab === 'all' || activeTab === 'ai_package') && (
+                                <div className="space-y-5 rounded-3xl bg-gradient-to-b from-amber-500/10 via-purple-500/5 to-transparent p-4 sm:p-5 border border-amber-500/30 shadow-lg">
+                                    {/* Package Header Banner */}
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-amber-500/20">
+                                        <div>
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-purple-600 text-white font-extrabold text-[11px] shadow-sm tracking-wide">
+                                                    <span className="material-symbols-outlined text-[15px]">auto_awesome</span>
+                                                    AI PRODUCTION PACKAGE
+                                                </span>
+                                                {productionPackage.parsed.targetAgeRange && (
+                                                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
+                                                        Age: {productionPackage.parsed.targetAgeRange.label}
+                                                    </span>
+                                                )}
+                                                {productionPackage.parsed.locationQuery?.maxBudget && (
+                                                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                                                        Budget Cap: ≤ ₹{productionPackage.parsed.locationQuery.maxBudget.toLocaleString('en-IN')}
+                                                    </span>
+                                                )}
+                                                {productionPackage.parsed.locationQuery?.type && (
+                                                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                                                        Type: {productionPackage.parsed.locationQuery.type}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <h3 className="text-base sm:text-lg font-black text-zinc-900 dark:text-white mt-1.5 flex items-center gap-2">
+                                                Cast, Crew & Location Assembly
+                                            </h3>
+                                        </div>
+
+                                        {/* Department Filter Sub-Tabs */}
+                                        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+                                            {[
+                                                { id: 'all', label: 'All Units' },
+                                                { id: 'cast', label: `🎭 Cast (${productionPackage.cast.allMatchingCast.length})` },
+                                                { id: 'crew', label: `🎬 Crew (${productionPackage.crew.direction.length + productionPackage.crew.camera.length + productionPackage.crew.postProduction.length + productionPackage.crew.writingAndMusic.length + productionPackage.crew.artAndStunts.length})` },
+                                                { id: 'locations', label: `🏡 Locations (${productionPackage.locationsAndStudios.matching.length})` }
+                                            ].map((dept) => (
+                                                <button
+                                                    key={dept.id}
+                                                    onClick={() => setAiPackageDepartment(dept.id as any)}
+                                                    className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                                                        aiPackageDepartment === dept.id
+                                                            ? 'bg-amber-500 text-white shadow-sm'
+                                                            : 'bg-white/80 dark:bg-[#06132b] text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-blue-500/20 hover:border-amber-500/40'
+                                                    }`}
+                                                >
+                                                    {dept.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* AI Recommendation Quote */}
+                                    {productionPackage.aiRecommendation && (
+                                        <div className="p-3.5 rounded-2xl bg-amber-500/10 dark:bg-[#0a1c3e]/80 border border-amber-500/25 flex items-start gap-3">
+                                            <span className="material-symbols-outlined text-amber-500 text-xl shrink-0 mt-0.5">smart_toy</span>
+                                            <p className="text-xs sm:text-sm font-medium text-zinc-800 dark:text-zinc-200 leading-relaxed italic">
+                                                "{productionPackage.aiRecommendation}"
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    {/* 1. CAST SUB-SECTION (AGE-WISE CATEGORIZATION) */}
+                                    {(aiPackageDepartment === 'all' || aiPackageDepartment === 'cast') && (
+                                        <div className="space-y-3.5 pt-2">
+                                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                                <div>
+                                                    <h4 className="text-sm font-extrabold text-zinc-900 dark:text-white flex items-center gap-2">
+                                                        <span className="material-symbols-outlined text-rose-500 text-base">theater_comedy</span>
+                                                        Cast by Age Brackets & Roles
+                                                    </h4>
+                                                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                                                        Age inferred from verified bios, experience years, and character portfolios
+                                                    </p>
+                                                </div>
+
+                                                {/* Age Filter Selector */}
+                                                <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
+                                                    {[
+                                                        { id: 'all', label: `All (${productionPackage.cast.allMatchingCast.length})` },
+                                                        { id: 'young', label: `Young Leads 18–32 (${productionPackage.cast.youngLeads.length})` },
+                                                        { id: 'middle', label: `Antagonists / Mid 33–50 (${productionPackage.cast.characterArtists.length})` },
+                                                        { id: 'senior', label: `Seniors 50+ (${productionPackage.cast.seniorArtists.length})` },
+                                                        { id: 'child', label: `Child (<18) (${productionPackage.cast.childArtists.length})` }
+                                                    ].map((bracket) => (
+                                                        <button
+                                                            key={bracket.id}
+                                                            onClick={() => setCastAgeFilter(bracket.id as any)}
+                                                            className={`px-2 py-0.5 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap cursor-pointer ${
+                                                                castAgeFilter === bracket.id
+                                                                    ? 'bg-rose-500 text-white shadow-sm'
+                                                                    : 'bg-zinc-100 dark:bg-[#06132b] text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-blue-500/20'
+                                                            }`}
+                                                        >
+                                                            {bracket.label}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            {/* Cast Members Grid */}
+                                            {(() => {
+                                                let displayCast = productionPackage.cast.allMatchingCast;
+                                                if (castAgeFilter === 'young') displayCast = productionPackage.cast.youngLeads;
+                                                else if (castAgeFilter === 'middle') displayCast = productionPackage.cast.characterArtists;
+                                                else if (castAgeFilter === 'senior') displayCast = productionPackage.cast.seniorArtists;
+                                                else if (castAgeFilter === 'child') displayCast = productionPackage.cast.childArtists;
+
+                                                if (displayCast.length === 0) {
+                                                    return (
+                                                        <div className="p-4 text-center rounded-2xl bg-white dark:bg-[#06132b] border border-zinc-200 dark:border-blue-500/20 text-xs text-zinc-400">
+                                                            No actors found in this specific age bracket. Try selecting "All" or browsing general talent.
+                                                        </div>
+                                                    );
+                                                }
+
+                                                return (
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                                                        {displayCast.slice(0, activeTab === 'all' ? 6 : 18).map((actor) => {
+                                                            const { age, bracket } = inferActorAge(actor);
+                                                            let bracketColor = 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20';
+                                                            let bracketLabel = 'Young Lead (18–32)';
+                                                            if (bracket === 'middle') {
+                                                                bracketColor = 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20';
+                                                                bracketLabel = 'Character Artist (33–50)';
+                                                            } else if (bracket === 'senior') {
+                                                                bracketColor = 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20';
+                                                                bracketLabel = 'Senior Veteran (50+)';
+                                                            } else if (bracket === 'child') {
+                                                                bracketColor = 'bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20';
+                                                                bracketLabel = 'Child Artist (<18)';
+                                                            }
+
+                                                            return (
+                                                                <div
+                                                                    key={actor.uid}
+                                                                    onClick={() => navigate(`/profile/${actor.uid}`)}
+                                                                    className="p-3 rounded-2xl bg-white dark:bg-[#06132b] border border-zinc-200 dark:border-blue-500/20 hover:border-amber-500/40 hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
+                                                                >
+                                                                    <div className="flex items-center gap-3">
+                                                                        <div className="size-12 rounded-full overflow-hidden shrink-0 border border-zinc-200 dark:border-blue-500/30">
+                                                                            <PostMedia
+                                                                                src={actor.photoURL || ''}
+                                                                                fallbackType="USER_MALE"
+                                                                                className="w-full h-full object-cover"
+                                                                            />
+                                                                        </div>
+                                                                        <div className="min-w-0 flex-1">
+                                                                            <h5 className="font-bold text-xs sm:text-sm text-zinc-900 dark:text-white truncate group-hover:text-amber-500 transition-colors">
+                                                                                {actor.displayName || 'Unknown Actor'}
+                                                                            </h5>
+                                                                            <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">
+                                                                                {actor.customRole || actor.role || 'Actor'}
+                                                                            </p>
+                                                                            {actor.location && (
+                                                                                <p className="text-[10px] text-zinc-400 truncate flex items-center gap-0.5 mt-0.5">
+                                                                                    <span className="material-symbols-outlined text-[11px]">location_on</span>
+                                                                                    {actor.location}
+                                                                                </p>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div className="mt-2.5 pt-2 border-t border-zinc-100 dark:border-blue-500/10 flex items-center justify-between">
+                                                                        <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full border ${bracketColor}`}>
+                                                                            {age ? `Age ~${age}` : bracketLabel}
+                                                                        </span>
+                                                                        <span className="text-[10px] text-zinc-400 group-hover:text-amber-500 flex items-center gap-0.5 font-bold">
+                                                                            Profile
+                                                                            <span className="material-symbols-outlined text-[13px]">arrow_forward</span>
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                );
+                                            })()}
+                                        </div>
+                                    )}
+
+                                    {/* 2. CREW & TECHNICIANS SUB-SECTION (DEPARTMENT-WISE) */}
+                                    {(aiPackageDepartment === 'all' || aiPackageDepartment === 'crew') && (
+                                        <div className="space-y-4 pt-3 border-t border-amber-500/15">
+                                            <div>
+                                                <h4 className="text-sm font-extrabold text-zinc-900 dark:text-white flex items-center gap-2">
+                                                    <span className="material-symbols-outlined text-cyan-500 text-base">video_camera_front</span>
+                                                    Technicians & Crew Department
+                                                </h4>
+                                                <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                                                    Direction, Camera, Post-Production, Music, Art & Stunt technicians ready for hire
+                                                </p>
+                                            </div>
+
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                                                {/* Direction Department Card */}
+                                                <div className="p-3.5 rounded-2xl bg-white dark:bg-[#06132b] border border-zinc-200 dark:border-blue-500/20 space-y-2">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-xs font-bold text-indigo-500 flex items-center gap-1.5">
+                                                            <span className="material-symbols-outlined text-sm">movie_filter</span>
+                                                            Direction & AD Unit
+                                                        </span>
+                                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-500 border border-indigo-500/20">
+                                                            {productionPackage.crew.direction.length} Available
+                                                        </span>
+                                                    </div>
+                                                    <div className="space-y-1.5 max-h-36 overflow-y-auto no-scrollbar">
+                                                        {productionPackage.crew.direction.slice(0, 4).map(u => (
+                                                            <div
+                                                                key={u.uid}
+                                                                onClick={() => navigate(`/profile/${u.uid}`)}
+                                                                className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-[#0a1c3e] cursor-pointer transition-colors"
+                                                            >
+                                                                <div className="size-6 rounded-full overflow-hidden shrink-0 border">
+                                                                    <PostMedia src={u.photoURL || ''} fallbackType="USER_MALE" className="w-full h-full object-cover" />
+                                                                </div>
+                                                                <div className="min-w-0 flex-1">
+                                                                    <div className="text-xs font-bold text-zinc-900 dark:text-white truncate">{u.displayName || 'Director'}</div>
+                                                                    <div className="text-[10px] text-zinc-400 truncate">{u.customRole || u.role}</div>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                {/* Camera Department Card */}
+                                                <div className="p-3.5 rounded-2xl bg-white dark:bg-[#06132b] border border-zinc-200 dark:border-blue-500/20 space-y-2">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-xs font-bold text-cyan-500 flex items-center gap-1.5">
+                                                            <span className="material-symbols-outlined text-sm">videocam</span>
+                                                            Camera & DOP Unit
+                                                        </span>
+                                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-500 border border-cyan-500/20">
+                                                            {productionPackage.crew.camera.length} Available
+                                                        </span>
+                                                    </div>
+                                                    <div className="space-y-1.5 max-h-36 overflow-y-auto no-scrollbar">
+                                                        {productionPackage.crew.camera.slice(0, 4).map(u => (
+                                                            <div
+                                                                key={u.uid}
+                                                                onClick={() => navigate(`/profile/${u.uid}`)}
+                                                                className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-[#0a1c3e] cursor-pointer transition-colors"
+                                                            >
+                                                                <div className="size-6 rounded-full overflow-hidden shrink-0 border">
+                                                                    <PostMedia src={u.photoURL || ''} fallbackType="USER_MALE" className="w-full h-full object-cover" />
+                                                                </div>
+                                                                <div className="min-w-0 flex-1">
+                                                                    <div className="text-xs font-bold text-zinc-900 dark:text-white truncate">{u.displayName || 'DOP'}</div>
+                                                                    <div className="text-[10px] text-zinc-400 truncate">{u.customRole || u.role}</div>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                {/* Post-Production Department Card */}
+                                                <div className="p-3.5 rounded-2xl bg-white dark:bg-[#06132b] border border-zinc-200 dark:border-blue-500/20 space-y-2">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-xs font-bold text-emerald-500 flex items-center gap-1.5">
+                                                            <span className="material-symbols-outlined text-sm">content_cut</span>
+                                                            Editing & Sound Unit
+                                                        </span>
+                                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                                                            {productionPackage.crew.postProduction.length} Available
+                                                        </span>
+                                                    </div>
+                                                    <div className="space-y-1.5 max-h-36 overflow-y-auto no-scrollbar">
+                                                        {productionPackage.crew.postProduction.slice(0, 4).map(u => (
+                                                            <div
+                                                                key={u.uid}
+                                                                onClick={() => navigate(`/profile/${u.uid}`)}
+                                                                className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-[#0a1c3e] cursor-pointer transition-colors"
+                                                            >
+                                                                <div className="size-6 rounded-full overflow-hidden shrink-0 border">
+                                                                    <PostMedia src={u.photoURL || ''} fallbackType="USER_MALE" className="w-full h-full object-cover" />
+                                                                </div>
+                                                                <div className="min-w-0 flex-1">
+                                                                    <div className="text-xs font-bold text-zinc-900 dark:text-white truncate">{u.displayName || 'Editor'}</div>
+                                                                    <div className="text-[10px] text-zinc-400 truncate">{u.customRole || u.role}</div>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* 3. LOCATIONS & STUDIOS SUB-SECTION (BUDGET-MATCHED) */}
+                                    {(aiPackageDepartment === 'all' || aiPackageDepartment === 'locations') && (
+                                        <div className="space-y-3 pt-3 border-t border-amber-500/15">
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <h4 className="text-sm font-extrabold text-zinc-900 dark:text-white flex items-center gap-2">
+                                                        <span className="material-symbols-outlined text-blue-500 text-base">domain</span>
+                                                        Budget-Matched Locations & Studios ({productionPackage.locationsAndStudios.matching.length})
+                                                    </h4>
+                                                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                                                        {productionPackage.parsed.locationQuery?.maxBudget
+                                                            ? `Showing shooting properties strictly within budget ≤ ₹${productionPackage.parsed.locationQuery.maxBudget.toLocaleString('en-IN')}`
+                                                            : 'Verified film shooting houses, havelis, sets & studio spaces'}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                {productionPackage.locationsAndStudios.matching.slice(0, activeTab === 'all' ? 4 : 12).map((loc) => {
+                                                    const priceNum = parseFacilityPrice(loc.price);
+                                                    const maxBudget = productionPackage.parsed.locationQuery?.maxBudget;
+                                                    const isUnderBudget = maxBudget && priceNum && priceNum <= maxBudget;
+
+                                                    return (
+                                                        <div
+                                                            key={loc.id}
+                                                            onClick={() => navigate(`/booking/details/${loc.id}`)}
+                                                            className="p-3.5 rounded-2xl bg-white dark:bg-[#06132b] border border-zinc-200 dark:border-blue-500/20 hover:border-amber-500/40 hover:shadow-md transition-all cursor-pointer group flex gap-3"
+                                                        >
+                                                            <div className="size-20 rounded-xl overflow-hidden shrink-0 border border-zinc-200 dark:border-blue-500/20 bg-zinc-100 dark:bg-[#0a1c3e]">
+                                                                <PostMedia
+                                                                    src={loc.image}
+                                                                    fallbackType="FILM_SET"
+                                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                                                                />
+                                                            </div>
+                                                            <div className="min-w-0 flex-1 flex flex-col justify-between">
+                                                                <div>
+                                                                    <div className="flex items-center justify-between gap-1">
+                                                                        <h5 className="font-bold text-xs sm:text-sm text-zinc-900 dark:text-white truncate group-hover:text-amber-500 transition-colors">
+                                                                            {loc.name}
+                                                                        </h5>
+                                                                        {isUnderBudget && (
+                                                                            <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 shrink-0">
+                                                                                Under Budget
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate mt-0.5 flex items-center gap-0.5">
+                                                                        <span className="material-symbols-outlined text-[13px] text-zinc-400">location_on</span>
+                                                                        {loc.location}
+                                                                    </p>
+                                                                </div>
+                                                                <div className="flex items-center justify-between pt-1 border-t border-zinc-100 dark:border-blue-500/10 text-xs">
+                                                                    <span className="font-black text-amber-500">{loc.price}</span>
+                                                                    <span className="text-zinc-400 text-[11px] flex items-center gap-0.5">
+                                                                        <span className="material-symbols-outlined text-[12px] text-amber-500">star</span>
+                                                                        {loc.rating} ({loc.reviews})
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Empty State when in AI Package tab and no package assembled */}
+                            {activeTab === 'ai_package' && !productionPackage && (
+                                <EmptyState
+                                    message="No AI package created yet"
+                                    subMessage="Try searching queries like 'give me whole cast and crews list' or '25k budget old house near me'"
+                                    icon="auto_awesome"
+                                    actionLabel="Try Whole Cast & Crew Query"
+                                    onAction={() => {
+                                        setQuery('give me whole cast and crews list');
+                                        triggerFullSearch('give me whole cast and crews list');
+                                    }}
+                                />
                             )}
 
                             {/* 1. TALENT & CREATORS SECTION */}
@@ -1603,7 +2096,7 @@ export default function Search() {
                             )}
 
                             {/* Total Zero Results Fallback */}
-                            {totalResultsCount === 0 && (
+                            {totalResultsCount === 0 && (!productionPackage || totalAiPackageCount === 0) && (
                                 <EmptyState
                                     message={`No results for "${query}"`}
                                     subMessage="Try checking your spelling or using broader keywords across creators, studios, news, or jobs."
