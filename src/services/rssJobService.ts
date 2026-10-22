@@ -364,8 +364,8 @@ You will be responsible for creating custom atmospheric soundscapes, Foley recor
     {
         id: 'studio_job_sound_2',
         title: 'Lead Dialogue Editor & Automated Dialogue Replacement (ADR) Supervisor',
-        company: 'Resul Pookutty Audio Lab (Can融 Sound)',
-        description: `Can融 Sound is seeking a dedicated Lead Dialogue Editor for multilingual theatrical releases.
+        company: 'Resul Pookutty Audio Lab (Can-I Sound)',
+        description: `Can-I Sound is seeking a dedicated Lead Dialogue Editor for multilingual theatrical releases.
         
 Responsibilities include noise deconstruction, room-tone matching, ADR vocal tracking in studio, and lipsync alignment across dubbed Hindi, Telugu, Tamil, and Malayalam versions.`,
         requirements: 'High proficiency in Pro Tools, VocALign, Revoice Pro, and RX Post Production Suite. Strong acoustic ear for multilingual dialects.',
@@ -379,12 +379,12 @@ Responsibilities include noise deconstruction, room-tone matching, ADR vocal tra
         applicationEmail: 'adr@canrsound.com',
         logo: 'https://images.unsplash.com/photo-1519874179391-3c016ef40373?w=120&h=120&fit=crop',
         user_details: {
-            name: 'Can融 Sound Labs',
+            name: 'Can-I Sound Labs',
             verification_tier: 'gold'
         },
         fraternityRole: 'SFX & Sound',
         isRss: true,
-        sourceName: 'Can融 Sound Careers'
+        sourceName: 'Can-I Sound Careers'
     },
 
     // 5. MUSICIANS & COMPOSERS

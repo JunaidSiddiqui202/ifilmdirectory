@@ -10,16 +10,16 @@ export default {
       colors: {
         'primary': 'var(--color-primary)',
         'background-light': '#f8fafc',
-        'background-dark': '#050f26', // Deep Midnight Sapphire (20% darker)
+        'background-dark': '#141416', // Antigravity Matte Dark Gray Canvas
         'text-light': '#0f172a',
         'text-dark': '#ffffff',
         'text-subtle-light': '#64748b',
-        'text-subtle-dark': '#93c5fd', // Ice Blue Subtitle & Accent Text
+        'text-subtle-dark': '#9ca3af', // Antigravity Muted Text Gray
         'surface-light': '#ffffff',
-        'surface-dark': '#0a1c3e', // Deep Sapphire Card Surface
-        'surface-dark-elevated': '#0f2758', // Elevated Floating Card
+        'surface-dark': '#1e1f24', // Antigravity Panel & Card Surface Gray
+        'surface-dark-elevated': '#26272e', // Antigravity Elevated Card Gray
         'border-light': '#e2e8f0',
-        'border-dark': 'rgba(96, 165, 250, 0.16)', // Luminous Sapphire Border
+        'border-dark': 'rgba(255, 255, 255, 0.09)', // Antigravity Refined Border Gray
         // Electric Blue Accent from AccountsMan
         'electric-blue': {
           DEFAULT: '#2563eb',

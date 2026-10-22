@@ -114,15 +114,15 @@ export default function BottomNav() {
             <DesktopSidebar isCreateOpen={isCreateOpen} setIsCreateOpen={setIsCreateOpen} />
 
             {/* Mobile Navigation Dock (Strictly hidden on tablet/desktop) */}
-            <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 mx-auto max-w-md border-t border-zinc-200 dark:border-white/[0.08] bg-white/95 dark:bg-[#090A0C]/95 backdrop-blur-2xl pb-safe shadow-[0_-8px_30px_rgba(0,0,0,0.06)] dark:shadow-[0_-8px_30px_rgb(0,0,0,0.6)] font-display transition-colors">
+            <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 mx-auto max-w-md border-t border-zinc-200 dark:border-white/[0.08] bg-white/95 dark:bg-[#141416]/95 backdrop-blur-2xl pb-safe shadow-[0_-8px_30px_rgba(0,0,0,0.06)] dark:shadow-[0_-8px_30px_rgb(0,0,0,0.6)] font-display transition-colors">
                 <div className="flex h-16 items-center justify-around px-2 sm:px-4">
                     {/* Home */}
                     <button
                         onClick={() => navigate('/home')}
                         className={`flex flex-col items-center justify-center flex-1 py-1 transition-all relative ${isHomeActive ? 'text-amber-600 dark:text-amber-500' : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200'}`}
                     >
-                        <span className={`material-symbols-outlined text-[23px] transition-transform ${isHomeActive ? 'filled scale-105' : ''}`}>home</span>
-                        <span className={`text-[10px] tracking-tight mt-0.5 ${isHomeActive ? 'font-bold' : 'font-medium'}`}>Home</span>
+                        <span className={`material-symbols-outlined text-[24px] transition-transform ${isHomeActive ? 'filled scale-105' : ''}`}>home</span>
+                        <span className={`text-xs tracking-tight mt-0.5 ${isHomeActive ? 'font-extrabold' : 'font-bold'}`}>Home</span>
                         {isHomeActive && (
                             <span className="absolute -bottom-1 size-1 bg-amber-500 rounded-full animate-in zoom-in" />
                         )}
@@ -133,8 +133,8 @@ export default function BottomNav() {
                         onClick={() => navigate('/showcase')}
                         className={`flex flex-col items-center justify-center flex-1 py-1 transition-all relative ${isFeedActive ? 'text-amber-600 dark:text-amber-500' : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200'}`}
                     >
-                        <span className={`material-symbols-outlined text-[23px] transition-transform ${isFeedActive ? 'filled scale-105' : ''}`}>movie</span>
-                        <span className={`text-[10px] tracking-tight mt-0.5 ${isFeedActive ? 'font-bold' : 'font-medium'}`}>Feed</span>
+                        <span className={`material-symbols-outlined text-[24px] transition-transform ${isFeedActive ? 'filled scale-105' : ''}`}>movie</span>
+                        <span className={`text-xs tracking-tight mt-0.5 ${isFeedActive ? 'font-extrabold' : 'font-bold'}`}>Feed</span>
                         {isFeedActive && (
                             <span className="absolute -bottom-1 size-1 bg-amber-500 rounded-full animate-in zoom-in" />
                         )}
@@ -156,8 +156,8 @@ export default function BottomNav() {
                         onClick={() => navigate('/browse-profiles')}
                         className={`flex flex-col items-center justify-center flex-1 py-1 transition-all relative ${isDiscoverActive ? 'text-amber-600 dark:text-amber-500' : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200'}`}
                     >
-                        <span className={`material-symbols-outlined text-[23px] transition-transform ${isDiscoverActive ? 'filled scale-105' : ''}`}>explore</span>
-                        <span className={`text-[10px] tracking-tight mt-0.5 ${isDiscoverActive ? 'font-bold' : 'font-medium'}`}>Discover</span>
+                        <span className={`material-symbols-outlined text-[24px] transition-transform ${isDiscoverActive ? 'filled scale-105' : ''}`}>explore</span>
+                        <span className={`text-xs tracking-tight mt-0.5 ${isDiscoverActive ? 'font-extrabold' : 'font-bold'}`}>Discover</span>
                         {isDiscoverActive && (
                             <span className="absolute -bottom-1 size-1 bg-amber-500 rounded-full animate-in zoom-in" />
                         )}
@@ -168,8 +168,8 @@ export default function BottomNav() {
                         onClick={() => navigate('/jobs')}
                         className={`flex flex-col items-center justify-center flex-1 py-1 transition-all relative ${isJobsActive ? 'text-amber-600 dark:text-amber-500' : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200'}`}
                     >
-                        <span className={`material-symbols-outlined text-[23px] transition-transform ${isJobsActive ? 'filled scale-105' : ''}`}>work</span>
-                        <span className={`text-[10px] tracking-tight mt-0.5 ${isJobsActive ? 'font-bold' : 'font-medium'}`}>Jobs</span>
+                        <span className={`material-symbols-outlined text-[24px] transition-transform ${isJobsActive ? 'filled scale-105' : ''}`}>work</span>
+                        <span className={`text-xs tracking-tight mt-0.5 ${isJobsActive ? 'font-extrabold' : 'font-bold'}`}>Jobs</span>
                         {isJobsActive && (
                             <span className="absolute -bottom-1 size-1 bg-amber-500 rounded-full animate-in zoom-in" />
                         )}

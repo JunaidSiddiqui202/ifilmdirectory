@@ -1,9 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import HamburgerMenu from '../components/HamburgerMenu';
 import Logo from '../components/Logo';
-import { getAllUsers, followUser, unfollowUser, isFollowing, type UserProfile } from '../services/userService';
+import { getAllUsers, followUser, unfollowUser, isFollowing, type UserProfile, getAvailabilityConfig } from '../services/userService';
 import { guildService, type Guild } from '../services/guildService';
 import { facilityService, type Facility } from '../services/facilityService';
 import EmptyState from '../components/EmptyState';
@@ -12,6 +12,7 @@ import { useAuthModal } from '../context/AuthModalContext';
 import AddToProjectModal from '../components/AddToProjectModal';
 import MapDiscovery from '../components/MapDiscovery';
 import PostMedia from '../components/PostMedia';
+import AvailabilityAvatar from '../components/AvailabilityAvatar';
 import { useToast } from '../context/ToastContext';
 import SEO from '../components/SEO';
 
@@ -331,10 +332,28 @@ export default function BrowseProfiles() {
         return null;
     };
 
-    // Filter Profiles
+    // Filter & Rank Profiles
     const filteredProfiles = useMemo(() => {
-        return profiles.filter((profile) => {
+        const list = profiles.filter((profile) => {
             if (activeTab === 'connections' && !profile.isFollowing) return false;
+
+            // Filter out obvious test/junk accounts from public showcase
+            const name = (profile.displayName || '').trim();
+            const lowerName = name.toLowerCase();
+            if (
+                lowerName.startsWith('test') ||
+                lowerName.startsWith('dummy') ||
+                lowerName === 'asdf' ||
+                lowerName === 'qwerty' ||
+                lowerName.includes('test user') ||
+                lowerName.includes('vege c') ||
+                lowerName.includes('dart jet') ||
+                lowerName.includes('dart') ||
+                (name.length < 2 && !profile.photoURL) ||
+                (!profile.bio && !profile.role && !profile.photoURL && (!profile.skills || profile.skills.length === 0))
+            ) {
+                return false;
+            }
 
             // Search query
             const searchLower = searchQuery.toLowerCase().trim();
@@ -372,8 +391,8 @@ export default function BrowseProfiles() {
 
             // Availability Filter
             if (availabilityOnly) {
-                const status = (profile.availabilityStatus || '').toLowerCase();
-                if (status === 'working' || status === 'busy' || status === 'on_set') return false;
+                const avail = getAvailabilityConfig(profile.availabilityStatus);
+                if (avail.code !== 'available') return false;
             }
 
             // Verified Only
@@ -383,6 +402,35 @@ export default function BrowseProfiles() {
             }
 
             return true;
+        });
+
+        // Rank profiles: Complete, high-credibility profiles with real credits and verification rank first
+        return list.sort((a, b) => {
+            const scoreProfile = (p: any) => {
+                let score = 0;
+                const tier = p.verification_tier || p.user_details?.verification_tier;
+                if (tier === 'gold') score += 50;
+                else if (tier === 'blue') score += 30;
+                
+                // Photo exists and is not default
+                if (p.photoURL && !p.photoURL.includes('default') && !p.photoURL.includes('ui-avatars')) score += 20;
+                
+                // Substantial bio
+                if (p.bio && p.bio.length > 20) score += 15;
+                
+                // Experience/credits
+                if (p.experience && p.experience.length > 0) score += Math.min(p.experience.length * 5, 20);
+                
+                // Skills listed
+                if (p.skills && p.skills.length > 0) score += 10;
+                
+                // Role specified
+                if (p.role && p.role !== 'Filmmaker') score += 5;
+
+                return score;
+            };
+
+            return scoreProfile(b) - scoreProfile(a);
         });
     }, [profiles, activeTab, searchQuery, activeCraft, activeLocation, availabilityOnly, verifiedOnly]);
 
@@ -412,14 +460,6 @@ export default function BrowseProfiles() {
         });
     }, [facilities, searchQuery, activeLocation]);
 
-    const handleProfileClick = (profile: any) => {
-        const role = (profile.role || '').toLowerCase();
-        if (role === 'studio' || role === 'service') {
-            navigate(`/business/${profile.uid}`);
-        } else {
-            navigate(`/profile/${profile.uid}`);
-        }
-    };
 
     const activeFilterCount = (activeCraft !== 'All' ? 1 : 0) + (activeLocation !== 'All' ? 1 : 0) + (availabilityOnly ? 1 : 0) + (verifiedOnly ? 1 : 0);
 
@@ -552,48 +592,48 @@ export default function BrowseProfiles() {
 
                 {/* 3. THREE-PILLAR MASTER SWITCHER (Talent • Film Guilds • Studios & Gear) */}
                 <div className="pt-3 pb-3">
-                    <div className="grid grid-cols-3 bg-zinc-100 dark:bg-[#121316] p-1.5 rounded-2xl border border-zinc-200 dark:border-white/10 shadow-sm dark:shadow-lg">
+                    <div className="grid grid-cols-3 bg-zinc-100 dark:bg-[#121316] p-1.5 rounded-2xl border border-zinc-200 dark:border-white/10 shadow-sm dark:shadow-lg gap-1">
                         <button
                             onClick={() => { setPillar('talent'); setSearchQuery(''); }}
-                            className={`py-2.5 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${
+                            className={`py-2 sm:py-2.5 px-1 sm:px-3 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1 sm:gap-2 min-w-0 overflow-hidden ${
                                 pillar === 'talent'
                                     ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white font-extrabold shadow-md shadow-amber-500/20'
                                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                             }`}
                         >
-                            <span className="material-symbols-outlined text-base">person</span>
-                            <span>Key Talent</span>
-                            <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${pillar === 'talent' ? 'bg-white/20 text-white font-black' : 'bg-black/5 dark:bg-white/10 text-zinc-700 dark:text-zinc-300'}`}>
+                            <span className="material-symbols-outlined text-sm sm:text-base shrink-0">person</span>
+                            <span className="truncate"><span className="hidden sm:inline">Key </span>Talent</span>
+                            <span className={`text-[10px] px-1.5 py-0.2 rounded-full shrink-0 ${pillar === 'talent' ? 'bg-white/20 text-white font-black' : 'bg-black/5 dark:bg-white/10 text-zinc-700 dark:text-zinc-300'}`}>
                                 {profiles.length}
                             </span>
                         </button>
 
                         <button
                             onClick={() => { setPillar('guilds'); setSearchQuery(''); }}
-                            className={`py-2.5 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${
+                            className={`py-2 sm:py-2.5 px-1 sm:px-3 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1 sm:gap-2 min-w-0 overflow-hidden ${
                                 pillar === 'guilds'
                                     ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white font-extrabold shadow-md shadow-amber-500/20'
                                     : 'text-zinc-400 hover:text-white'
                             }`}
                         >
-                            <span className="material-symbols-outlined text-base">groups</span>
-                            <span>Film Guilds</span>
-                            <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${pillar === 'guilds' ? 'bg-white/20 text-white font-black' : 'bg-white/10 text-zinc-300'}`}>
+                            <span className="material-symbols-outlined text-sm sm:text-base shrink-0">groups</span>
+                            <span className="truncate"><span className="hidden sm:inline">Film </span>Guilds</span>
+                            <span className={`text-[10px] px-1.5 py-0.2 rounded-full shrink-0 ${pillar === 'guilds' ? 'bg-white/20 text-white font-black' : 'bg-white/10 text-zinc-300'}`}>
                                 {guilds.length || 18}
                             </span>
                         </button>
 
                         <button
                             onClick={() => { setPillar('studios'); setSearchQuery(''); }}
-                            className={`py-2.5 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${
+                            className={`py-2 sm:py-2.5 px-1 sm:px-3 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1 sm:gap-2 min-w-0 overflow-hidden ${
                                 pillar === 'studios'
                                     ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white font-extrabold shadow-md shadow-amber-500/20'
                                     : 'text-zinc-400 hover:text-white'
                             }`}
                         >
-                            <span className="material-symbols-outlined text-base">videocam</span>
-                            <span>Studios & Gear</span>
-                            <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${pillar === 'studios' ? 'bg-white/20 text-white font-black' : 'bg-white/10 text-zinc-300'}`}>
+                            <span className="material-symbols-outlined text-sm sm:text-base shrink-0">videocam</span>
+                            <span className="truncate">Studios<span className="hidden sm:inline"> & Gear</span></span>
+                            <span className={`text-[10px] px-1.5 py-0.2 rounded-full shrink-0 ${pillar === 'studios' ? 'bg-white/20 text-white font-black' : 'bg-white/10 text-zinc-300'}`}>
                                 {facilities.length || 34}
                             </span>
                         </button>
@@ -654,11 +694,11 @@ export default function BrowseProfiles() {
                     {pillar === 'talent' && (
                         <div className="space-y-2.5 pt-1">
                             {/* All Filmmakers vs My Circle */}
-                            <div className="flex items-center justify-between border-b border-zinc-200 dark:border-white/5 pb-2">
-                                <div className="flex gap-4">
+                            <div className="flex items-center justify-between gap-3 overflow-x-auto no-scrollbar border-b border-zinc-200 dark:border-white/5 pb-2">
+                                <div className="flex gap-3 sm:gap-4 shrink-0">
                                     <button
                                         onClick={() => setActiveTab('discover')}
-                                        className={`pb-1 text-xs sm:text-sm font-bold transition-all relative ${
+                                        className={`pb-1 text-xs sm:text-sm font-bold whitespace-nowrap transition-all relative ${
                                             activeTab === 'discover'
                                                 ? 'text-amber-600 dark:text-amber-400 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-amber-500 dark:after:bg-amber-400 font-extrabold'
                                                 : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
@@ -668,7 +708,7 @@ export default function BrowseProfiles() {
                                     </button>
                                     <button
                                         onClick={() => setActiveTab('connections')}
-                                        className={`pb-1 text-xs sm:text-sm font-bold transition-all relative ${
+                                        className={`pb-1 text-xs sm:text-sm font-bold whitespace-nowrap transition-all relative ${
                                             activeTab === 'connections'
                                                 ? 'text-amber-600 dark:text-amber-400 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-amber-500 dark:after:bg-amber-400 font-extrabold'
                                                 : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
@@ -679,22 +719,22 @@ export default function BrowseProfiles() {
                                 </div>
 
                                 {/* Quick Toggle Pills */}
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 shrink-0">
                                     <button
                                         onClick={() => setAvailabilityOnly(prev => !prev)}
-                                        className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition-all ${
+                                        className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition-all whitespace-nowrap ${
                                             availabilityOnly
                                                 ? 'bg-emerald-500 text-white shadow-sm'
                                                 : 'bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/10'
                                         }`}
                                     >
                                         <span className={`size-1.5 rounded-full ${availabilityOnly ? 'bg-white' : 'bg-emerald-500 animate-pulse'}`} />
-                                        <span>Available Now</span>
+                                        <span>Available for Projects</span>
                                     </button>
 
                                     <button
                                         onClick={() => setVerifiedOnly(prev => !prev)}
-                                        className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition-all ${
+                                        className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition-all whitespace-nowrap ${
                                             verifiedOnly
                                                 ? 'bg-amber-500 text-white shadow-sm'
                                                 : 'bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/10'
@@ -770,17 +810,24 @@ export default function BrowseProfiles() {
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-3.5 sm:gap-4 pt-1">
                                 {filteredProfiles.map((profile) => {
                                     const tier = profile.verification_tier || profile.user_details?.verification_tier;
-                                    const isAvailable = (profile.availabilityStatus || 'available') === 'available';
+                                    const avail = getAvailabilityConfig(profile.availabilityStatus);
+                                    const profileHref = (profile.role || '').toLowerCase() === 'studio' || (profile.role || '').toLowerCase() === 'service' 
+                                        ? `/business/${profile.uid}` 
+                                        : `/profile/${profile.uid}`;
 
                                     return (
                                         <article
                                             key={profile.uid}
-                                            onClick={() => handleProfileClick(profile)}
                                             className="group relative flex flex-col justify-between rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.07] hover:border-amber-500/40 p-3 sm:p-3.5 transition-all duration-300 cursor-pointer shadow-sm hover:shadow-lg dark:shadow-md dark:hover:shadow-amber-500/10"
                                         >
+                                            <Link 
+                                                to={profileHref} 
+                                                className="absolute inset-0 z-0 rounded-2xl" 
+                                                aria-label={`View profile of ${profile.displayName || 'Filmmaker'}`} 
+                                            />
                                             <div>
                                                 {/* Headshot / Portfolio Visual */}
-                                                <div className="relative w-full aspect-square overflow-hidden rounded-xl bg-black mb-3 border border-white/10 group-hover:border-amber-500/30 transition-colors">
+                                                <div className="relative w-full aspect-square overflow-hidden rounded-xl bg-black mb-3 border border-white/10 group-hover:border-amber-500/30 transition-colors pointer-events-none">
                                                     <PostMedia
                                                         src={profile.photoURL || ''}
                                                         fallbackType="USER_MALE"
@@ -788,20 +835,16 @@ export default function BrowseProfiles() {
                                                     />
                                                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none" />
 
-                                                    {/* Top Badges: Availability Status */}
-                                                    <div className="absolute top-2 left-2 flex items-center gap-1">
-                                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md backdrop-blur-md flex items-center gap-1 border ${
-                                                            isAvailable
-                                                                ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500/30'
-                                                                : 'bg-amber-950/80 text-amber-300 border-amber-500/30'
-                                                        }`}>
-                                                            <span className={`size-1.5 rounded-full ${isAvailable ? 'bg-emerald-400' : 'bg-amber-400'}`} />
-                                                            <span>{isAvailable ? 'Available' : 'On Set'}</span>
+                                                    {/* Top Left: Location Badge on Photo */}
+                                                    <div className="absolute top-2 left-2 flex items-center pointer-events-none z-10 max-w-[60%]">
+                                                        <span className="truncate flex items-center gap-1 bg-black/75 backdrop-blur-md px-2 py-0.5 rounded-lg border border-white/10 text-[10px] text-zinc-200 shadow-xs">
+                                                            <span className="material-symbols-outlined text-[11px] text-amber-400 shrink-0">location_on</span>
+                                                            <span className="truncate">{profile.location || 'India'}</span>
                                                         </span>
                                                     </div>
 
                                                     {/* Top Right Quick Actions (Shortlist & Follow) */}
-                                                    <div className="absolute top-2 right-2 flex items-center gap-1">
+                                                    <div className="absolute top-2 right-2 flex items-center gap-1 pointer-events-auto z-10">
                                                         <button
                                                             onClick={(e) => handleShortlist(e, profile)}
                                                             className="size-7 rounded-lg bg-black/70 hover:bg-amber-500 hover:text-white text-white border border-white/10 backdrop-blur-md flex items-center justify-center transition-all hover:scale-110"
@@ -827,17 +870,23 @@ export default function BrowseProfiles() {
                                                         )}
                                                     </div>
 
-                                                    {/* Location Overlay at bottom of photo */}
-                                                    <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-[11px] text-zinc-300">
-                                                        <span className="truncate flex items-center gap-1 bg-black/60 backdrop-blur-md px-1.5 py-0.5 rounded-md border border-white/10">
-                                                            <span className="material-symbols-outlined text-xs text-amber-400">location_on</span>
-                                                            <span className="truncate">{profile.location || 'India'}</span>
+                                                    {/* Bottom: LinkedIn-style Availability Ribbon Overlay on Photo (Single, Non-repeating) */}
+                                                    <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between pointer-events-none z-10">
+                                                        <span className={`text-xs sm:text-[10px] font-black px-2.5 sm:px-2 py-1 sm:py-0.5 rounded-lg sm:rounded-md backdrop-blur-md flex items-center gap-1.5 border shadow-md tracking-wide uppercase ${
+                                                            avail.code === 'available'
+                                                                ? 'bg-emerald-950/90 text-emerald-300 border-emerald-500/40 shadow-emerald-500/20'
+                                                                : avail.code === 'working'
+                                                                ? 'bg-amber-950/90 text-amber-300 border-amber-500/40 shadow-amber-500/20'
+                                                                : 'bg-zinc-950/90 text-zinc-300 border-white/20'
+                                                        }`}>
+                                                            <span className={`size-2.5 sm:size-2 rounded-full ${avail.dotColor} ${avail.code === 'available' ? 'animate-pulse' : ''}`} />
+                                                            <span>#{avail.code === 'available' ? 'AVAILABLE' : avail.code === 'working' ? 'UPCOMING' : 'UNAVAILABLE'}</span>
                                                         </span>
                                                     </div>
                                                 </div>
 
                                                 {/* Profile Details */}
-                                                <div className="space-y-1">
+                                                <div className="space-y-1 relative z-0 pointer-events-none">
                                                     <div className="flex items-center justify-between gap-1">
                                                         <h3 className="text-zinc-900 dark:text-white text-sm font-bold truncate group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors flex items-center gap-1">
                                                             <span className="truncate">{profile.displayName || 'Filmmaker'}</span>
@@ -858,13 +907,13 @@ export default function BrowseProfiles() {
                                                             ? `${profile.experience.length} Notable Credits`
                                                             : profile.skills?.length
                                                             ? profile.skills.slice(0, 2).join(' • ')
-                                                            : 'Certified Guild Member'}
+                                                            : (tier === 'gold' || profile.guild ? 'Certified Guild Member' : 'Cinema Practitioner')}
                                                     </p>
                                                 </div>
                                             </div>
 
                                             {/* Action Bar */}
-                                            <div className="mt-3 pt-2.5 border-t border-zinc-100 dark:border-white/5 flex items-center justify-between gap-1.5">
+                                            <div className="mt-3 pt-2.5 border-t border-zinc-100 dark:border-white/5 flex items-center justify-between gap-1.5 relative z-10">
                                                 <button
                                                     onClick={(e) => handleDirectMessage(e, profile)}
                                                     className="flex-1 py-1 px-2 rounded-lg bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/10 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/10 text-xs font-semibold flex items-center justify-center gap-1 transition-all"
@@ -874,13 +923,13 @@ export default function BrowseProfiles() {
                                                     <span>Chat</span>
                                                 </button>
 
-                                                <button
-                                                    onClick={() => handleProfileClick(profile)}
+                                                <Link
+                                                    to={profileHref}
                                                     className="py-1 px-2.5 rounded-lg bg-amber-500/10 hover:bg-amber-500 hover:text-white text-amber-600 dark:text-amber-400 border border-amber-500/20 text-xs font-bold flex items-center justify-center gap-0.5 transition-all"
                                                 >
                                                     <span>View</span>
                                                     <span className="material-symbols-outlined text-xs">arrow_forward</span>
-                                                </button>
+                                                </Link>
                                             </div>
                                         </article>
                                     );
@@ -891,24 +940,31 @@ export default function BrowseProfiles() {
                             <div className="flex flex-col divide-y divide-zinc-200 dark:divide-white/5 bg-white dark:bg-[#121316] rounded-2xl border border-zinc-200 dark:border-white/[0.08] overflow-hidden shadow-sm dark:shadow-xl">
                                 {filteredProfiles.map((profile) => {
                                     const tier = profile.verification_tier || profile.user_details?.verification_tier;
-                                    const isAvailable = (profile.availabilityStatus || 'available') === 'available';
+                                    const avail = getAvailabilityConfig(profile.availabilityStatus);
+                                    const profileHref = (profile.role || '').toLowerCase() === 'studio' || (profile.role || '').toLowerCase() === 'service' 
+                                        ? `/business/${profile.uid}` 
+                                        : `/profile/${profile.uid}`;
 
                                     return (
                                         <div
                                             key={profile.uid}
-                                            onClick={() => handleProfileClick(profile)}
-                                            className="p-3.5 sm:p-4 hover:bg-zinc-50 dark:hover:bg-white/[0.02] transition-colors cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 group"
+                                            className="relative p-3.5 sm:p-4 hover:bg-zinc-50 dark:hover:bg-white/[0.02] transition-colors cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 group"
                                         >
-                                            <div className="flex items-center gap-3.5 min-w-0">
-                                                {/* Avatar */}
-                                                <div className="relative size-12 sm:size-14 rounded-xl overflow-hidden shrink-0 border border-zinc-200 dark:border-white/10 group-hover:border-amber-500/40 transition-colors bg-black">
-                                                    <PostMedia
-                                                        src={profile.photoURL || ''}
-                                                        fallbackType="USER_MALE"
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                    <span className={`absolute bottom-1 right-1 size-2 rounded-full border border-black ${isAvailable ? 'bg-emerald-400' : 'bg-amber-400'}`} />
-                                                </div>
+                                            <Link 
+                                                to={profileHref} 
+                                                className="absolute inset-0 z-0" 
+                                                aria-label={`View profile of ${profile.displayName || 'Filmmaker'}`} 
+                                            />
+                                            <div className="flex items-center gap-3.5 min-w-0 relative z-0 pointer-events-none">
+                                                {/* Avatar with LinkedIn-Style Cinema Availability Ribbon */}
+                                                <AvailabilityAvatar
+                                                    src={profile.photoURL || ''}
+                                                    alt={profile.displayName || 'Filmmaker'}
+                                                    status={profile.availabilityStatus}
+                                                    size="md"
+                                                    shape="circle"
+                                                    className="group-hover:scale-105 transition-transform"
+                                                />
 
                                                 <div className="min-w-0 flex-1">
                                                     <div className="flex items-center gap-2 flex-wrap">
@@ -919,6 +975,10 @@ export default function BrowseProfiles() {
                                                         <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 capitalize">
                                                             {profile.role || 'Cinema Professional'}
                                                         </span>
+                                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border flex items-center gap-1 ${avail.badgeBg} ${avail.badgeText} ${avail.badgeBorder}`}>
+                                                            <span className={`size-1.5 rounded-full ${avail.dotColor}`} />
+                                                            <span>{avail.label}</span>
+                                                        </span>
                                                         <span className="text-xs text-zinc-500 dark:text-zinc-400 flex items-center gap-1">
                                                             <span className="material-symbols-outlined text-xs text-amber-500">location_on</span>
                                                             {profile.location || 'India'}
@@ -926,7 +986,7 @@ export default function BrowseProfiles() {
                                                     </div>
 
                                                     <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-1">
-                                                        {profile.bio || (profile.experience?.length ? `${profile.experience.length} Production Credits` : 'Certified Guild Member')}
+                                                        {profile.bio || (profile.experience?.length ? `${profile.experience.length} Production Credits` : (tier === 'gold' || profile.guild ? 'Certified Guild Member' : 'Cinema Practitioner'))}
                                                     </p>
 
                                                     {/* Skills Tags */}
@@ -943,7 +1003,7 @@ export default function BrowseProfiles() {
                                             </div>
 
                                             {/* Action Button Strip */}
-                                            <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+                                            <div className="flex items-center gap-2 self-end sm:self-center shrink-0 relative z-10 pointer-events-auto">
                                                 <button
                                                     onClick={(e) => handleDirectMessage(e, profile)}
                                                     className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/10 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/10 text-xs font-semibold flex items-center gap-1 transition-all"
@@ -1117,7 +1177,7 @@ export default function BrowseProfiles() {
                                         <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-600 dark:text-zinc-300">
                                             <span className="material-symbols-outlined text-amber-500 text-sm filled" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
                                             <span className="text-zinc-900 dark:text-white font-bold">{facility.rating || 4.9}</span>
-                                            <span className="text-zinc-400 dark:text-zinc-500">({facility.reviews || 42} reviews)</span>
+                                            <span className="text-zinc-500 dark:text-zinc-400">({facility.reviews || 42} reviews)</span>
                                         </div>
 
                                         <button
@@ -1248,7 +1308,7 @@ export default function BrowseProfiles() {
                                 <label className="flex items-center justify-between p-3 rounded-xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/5 cursor-pointer">
                                     <span className="text-xs font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                                         <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-                                        <span>Available for Shoots Only</span>
+                                        <span>Available for Projects Only</span>
                                     </span>
                                     <input
                                         type="checkbox"

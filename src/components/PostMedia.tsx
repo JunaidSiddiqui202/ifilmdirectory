@@ -42,23 +42,23 @@ const isVerticalVideo = (url: string): boolean => {
     return false;
 };
 
-// Helper to get YouTube embed URL using privacy-enhanced youtube-nocookie.com
+// Helper to get YouTube embed URL using standard youtube.com/embed
 const getYouTubeEmbedUrl = (url: string): string | null => {
     // Match youtube.com/shorts/VIDEO_ID (YouTube Shorts)
     const shortsMatch = url.match(/youtube\.com\/shorts\/([^?&/]+)/);
-    if (shortsMatch) return `https://www.youtube-nocookie.com/embed/${shortsMatch[1]}`;
+    if (shortsMatch) return `https://www.youtube.com/embed/${shortsMatch[1]}`;
 
     // Match youtube.com/watch?v=VIDEO_ID
-    const watchMatch = url.match(/youtube\.com\/watch\?v=([^&]+)/);
-    if (watchMatch) return `https://www.youtube-nocookie.com/embed/${watchMatch[1]}`;
+    const watchMatch = url.match(/youtube\.com\/watch\?v=([^&#]+)/);
+    if (watchMatch) return `https://www.youtube.com/embed/${watchMatch[1]}`;
 
     // Match youtu.be/VIDEO_ID
     const shortMatch = url.match(/youtu\.be\/([^?&#/]+)/);
-    if (shortMatch) return `https://www.youtube-nocookie.com/embed/${shortMatch[1]}`;
+    if (shortMatch) return `https://www.youtube.com/embed/${shortMatch[1]}`;
 
     // Match youtube.com/embed/VIDEO_ID
     const embedMatch = url.match(/youtube\.com\/embed\/([^?&/]+)/);
-    if (embedMatch) return `https://www.youtube-nocookie.com/embed/${embedMatch[1]}`;
+    if (embedMatch) return `https://www.youtube.com/embed/${embedMatch[1]}`;
 
     return null;
 };
@@ -70,7 +70,21 @@ const getVimeoEmbedUrl = (url: string): string | null => {
     return null;
 };
 
-export default function PostMedia({ src, alt = "Post attachment", className = "", isThumbnail = false, fallbackType = 'GENERAL' }: PostMediaProps) {
+export default function PostMedia({ src, alt, className = "", isThumbnail = false, fallbackType = 'GENERAL' }: PostMediaProps) {
+    const computedAlt = alt && alt !== "Post attachment"
+        ? alt
+        : fallbackType === 'USER_MALE' || fallbackType === 'USER_FEMALE'
+            ? 'Filmmaker profile photo'
+            : fallbackType === 'ACTOR'
+                ? 'Actor casting headshot'
+                : fallbackType === 'FILM_SET'
+                    ? 'Film set and production'
+                    : fallbackType === 'EDITING'
+                        ? 'Film post-production suite'
+                        : fallbackType === 'JOB_LOGO' || fallbackType === 'COMPANY_LOGO'
+                            ? 'Film industry company logo'
+                            : 'Filmmaker portfolio media';
+
     const [isLoading, setIsLoading] = useState(true);
     const [hasError, setHasError] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
@@ -105,7 +119,7 @@ export default function PostMedia({ src, alt = "Post attachment", className = ""
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                         allowFullScreen
                         referrerPolicy="strict-origin-when-cross-origin"
-                        title={alt}
+                        title={computedAlt}
                     />
                     {!isThumbnail && (
                         <a
@@ -133,7 +147,7 @@ export default function PostMedia({ src, alt = "Post attachment", className = ""
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowFullScreen
                     referrerPolicy="strict-origin-when-cross-origin"
-                    title={alt}
+                    title={computedAlt}
                 />
                 {!isThumbnail && (
                     <a
@@ -165,7 +179,7 @@ export default function PostMedia({ src, alt = "Post attachment", className = ""
                     allow="autoplay; fullscreen; picture-in-picture"
                     allowFullScreen
                     referrerPolicy="strict-origin-when-cross-origin"
-                    title={alt}
+                    title={computedAlt}
                 />
             </div>
         );
@@ -231,7 +245,7 @@ export default function PostMedia({ src, alt = "Post attachment", className = ""
                     <div className="absolute inset-0 rounded-2xl overflow-hidden bg-black/60 flex items-center justify-center">
                         <img
                             src={CINEMATIC_PLACEHOLDERS[fallbackType]}
-                            alt={alt}
+                            alt={computedAlt}
                             className="w-full h-full object-cover opacity-60"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-center justify-center">
@@ -255,7 +269,7 @@ export default function PostMedia({ src, alt = "Post attachment", className = ""
             )}
             <img
                 src={(hasError || !src) ? CINEMATIC_PLACEHOLDERS[fallbackType] : src}
-                alt={alt}
+                alt={computedAlt}
                 className={`w-full h-full object-cover transition-opacity ${isLoading ? 'opacity-0' : 'opacity-100'} ${className.includes('object-') ? '' : 'object-center'} ${className}`}
                 loading="lazy"
                 onLoad={() => setIsLoading(false)}

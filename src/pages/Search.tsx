@@ -1085,15 +1085,15 @@ export default function Search() {
     ];
 
     return (
-        <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-[#050f26] text-zinc-900 dark:text-white font-display pb-36 md:pb-24">
+        <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-[#141416] text-zinc-900 dark:text-white font-display pb-36 md:pb-24">
             <div className="w-full max-w-md md:max-w-3xl lg:max-w-4xl mx-auto flex flex-col flex-1 px-3 sm:px-4">
                 
                 {/* 1. SEARCH HEADER & PREDICTIVE INPUT */}
-                <div className="sticky top-0 z-30 bg-white/95 dark:bg-[#050f26]/95 backdrop-blur-xl py-3 border-b border-zinc-200 dark:border-blue-500/20">
+                <div className="sticky top-0 z-30 bg-white/95 dark:bg-[#141416]/95 backdrop-blur-xl py-3 border-b border-zinc-200 dark:border-white/10">
                     <div className="flex items-center gap-2.5">
                         <button
                             onClick={() => navigate(-1)}
-                            className="p-2 rounded-xl bg-zinc-100 dark:bg-[#0a1c3e] border border-zinc-200 dark:border-blue-500/20 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white active:scale-95 transition-all shrink-0 cursor-pointer"
+                            className="p-2 rounded-xl bg-zinc-100 dark:bg-[#1e1f24] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white active:scale-95 transition-all shrink-0 cursor-pointer"
                             title="Go Back"
                             aria-label="Back"
                         >
@@ -1122,7 +1122,7 @@ export default function Search() {
                                     }
                                 }}
                                 placeholder="Search talent, studios, feed, news, reviews, jobs..."
-                                className="w-full h-11 pl-10 pr-10 rounded-xl bg-zinc-100 dark:bg-[#06132b] border border-zinc-200 dark:border-blue-500/20 text-xs sm:text-sm font-medium text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
+                                className="w-full h-11 pl-10 pr-10 rounded-xl bg-zinc-100 dark:bg-[#18191d] border border-zinc-200 dark:border-white/10 text-xs sm:text-sm font-medium text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
                             />
                             <span className="material-symbols-outlined absolute left-3 top-2.5 text-zinc-400 dark:text-zinc-500 text-lg pointer-events-none">
                                 search
@@ -1142,9 +1142,9 @@ export default function Search() {
                             {showPredictions && predictions.length > 0 && (
                                 <div
                                     ref={dropdownRef}
-                                    className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[#0a1c3e] rounded-2xl shadow-2xl border border-zinc-200 dark:border-blue-500/20 overflow-hidden z-50 divide-y divide-zinc-100 dark:divide-blue-500/10 max-h-[75vh] overflow-y-auto"
+                                    className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[#1e1f24] rounded-2xl shadow-2xl border border-zinc-200 dark:border-white/10 overflow-hidden z-50 divide-y divide-zinc-100 dark:divide-white/10 max-h-[75vh] overflow-y-auto"
                                 >
-                                    <div className="px-3.5 py-2 bg-zinc-50 dark:bg-[#06132b] text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-blue-300 flex items-center justify-between">
+                                    <div className="px-3.5 py-2 bg-zinc-50 dark:bg-[#18191d] text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-400 flex items-center justify-between">
                                         <span>Instant Predictions</span>
                                         <span>{predictions.length} Suggestions</span>
                                     </div>
@@ -1161,7 +1161,7 @@ export default function Search() {
                                                         ? 'bg-gradient-to-r from-amber-500/15 via-purple-500/15 to-transparent hover:from-amber-500/25 hover:via-purple-500/25 border-l-4 border-amber-500'
                                                         : isCraft
                                                             ? 'bg-amber-500/10 hover:bg-amber-500/15 border-l-4 border-amber-500'
-                                                            : 'hover:bg-zinc-50 dark:hover:bg-[#0f2758]'
+                                                            : 'hover:bg-zinc-50 dark:hover:bg-white/[0.06]'
                                                 }`}
                                             >
                                                 {/* Preview Image or Icon */}
@@ -1170,7 +1170,7 @@ export default function Search() {
                                                         ? 'bg-gradient-to-br from-amber-500 to-purple-600 text-white border-amber-400/40 shadow-sm'
                                                         : isCraft
                                                             ? 'bg-amber-500/20 border-amber-500/35 text-amber-500 dark:text-amber-400'
-                                                            : 'bg-zinc-100 dark:bg-[#06132b] border-zinc-200 dark:border-blue-500/20 text-zinc-400 dark:text-blue-300'
+                                                            : 'bg-zinc-100 dark:bg-[#18191d] border-zinc-200 dark:border-white/10 text-zinc-400 dark:text-zinc-400'
                                                 }`}>
                                                     {p.image ? (
                                                         <PostMedia
@@ -1229,7 +1229,7 @@ export default function Search() {
                                     className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
                                         isSelected
                                             ? 'bg-amber-500 text-white shadow-sm shadow-amber-500/30'
-                                            : 'bg-zinc-100 dark:bg-[#0a1c3e] text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-blue-500/20 hover:border-amber-500/40 hover:text-zinc-900 dark:hover:text-white'
+                                            : 'bg-zinc-100 dark:bg-[#1e1f24] text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-white/10 hover:border-amber-500/40 hover:text-zinc-900 dark:hover:text-white'
                                     }`}
                                 >
                                     <span className="material-symbols-outlined text-[15px]">{tab.icon}</span>
@@ -1313,7 +1313,7 @@ export default function Search() {
                                             setQuery(chip.query);
                                             triggerFullSearch(chip.query);
                                         }}
-                                        className="px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-[#0a1c3e] border border-zinc-200 dark:border-blue-500/20 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:border-amber-500/40 hover:text-amber-500 transition-all cursor-pointer"
+                                        className="px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-[#1e1f24] border border-zinc-200 dark:border-white/10 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:border-amber-500/40 hover:text-amber-500 transition-all cursor-pointer"
                                     >
                                         {chip.label}
                                     </button>
@@ -1417,7 +1417,7 @@ export default function Search() {
                                                     className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
                                                         aiPackageDepartment === dept.id
                                                             ? 'bg-amber-500 text-white shadow-sm'
-                                                            : 'bg-white/80 dark:bg-[#06132b] text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-blue-500/20 hover:border-amber-500/40'
+                                                            : 'bg-white/80 dark:bg-[#18191d] text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-white/10 hover:border-amber-500/40'
                                                     }`}
                                                 >
                                                     {dept.label}
@@ -1428,7 +1428,7 @@ export default function Search() {
 
                                     {/* AI Recommendation Quote */}
                                     {productionPackage.aiRecommendation && (
-                                        <div className="p-3.5 rounded-2xl bg-amber-500/10 dark:bg-[#0a1c3e]/80 border border-amber-500/25 flex items-start gap-3">
+                                        <div className="p-3.5 rounded-2xl bg-amber-500/10 dark:bg-[#1e1f24]/80 border border-amber-500/25 flex items-start gap-3">
                                             <span className="material-symbols-outlined text-amber-500 text-xl shrink-0 mt-0.5">smart_toy</span>
                                             <p className="text-xs sm:text-sm font-medium text-zinc-800 dark:text-zinc-200 leading-relaxed italic">
                                                 "{productionPackage.aiRecommendation}"
@@ -1465,7 +1465,7 @@ export default function Search() {
                                                             className={`px-2 py-0.5 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap cursor-pointer ${
                                                                 castAgeFilter === bracket.id
                                                                     ? 'bg-rose-500 text-white shadow-sm'
-                                                                    : 'bg-zinc-100 dark:bg-[#06132b] text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-blue-500/20'
+                                                                    : 'bg-zinc-100 dark:bg-[#18191d] text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-white/10'
                                                             }`}
                                                         >
                                                             {bracket.label}
@@ -1484,7 +1484,7 @@ export default function Search() {
 
                                                 if (displayCast.length === 0) {
                                                     return (
-                                                        <div className="p-4 text-center rounded-2xl bg-white dark:bg-[#06132b] border border-zinc-200 dark:border-blue-500/20 text-xs text-zinc-400">
+                                                        <div className="p-4 text-center rounded-2xl bg-white dark:bg-[#18191d] border border-zinc-200 dark:border-white/10 text-xs text-zinc-400">
                                                             No actors found in this specific age bracket. Try selecting "All" or browsing general talent.
                                                         </div>
                                                     );
@@ -1511,10 +1511,10 @@ export default function Search() {
                                                                 <div
                                                                     key={actor.uid}
                                                                     onClick={() => navigate(`/profile/${actor.uid}`)}
-                                                                    className="p-3 rounded-2xl bg-white dark:bg-[#06132b] border border-zinc-200 dark:border-blue-500/20 hover:border-amber-500/40 hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
+                                                                    className="p-3 rounded-2xl bg-white dark:bg-[#18191d] border border-zinc-200 dark:border-white/10 hover:border-amber-500/40 hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
                                                                 >
                                                                     <div className="flex items-center gap-3">
-                                                                        <div className="size-12 rounded-full overflow-hidden shrink-0 border border-zinc-200 dark:border-blue-500/30">
+                                                                        <div className="size-12 rounded-full overflow-hidden shrink-0 border border-zinc-200 dark:border-white/10">
                                                                             <PostMedia
                                                                                 src={actor.photoURL || ''}
                                                                                 fallbackType="USER_MALE"
@@ -1537,7 +1537,7 @@ export default function Search() {
                                                                         </div>
                                                                     </div>
 
-                                                                    <div className="mt-2.5 pt-2 border-t border-zinc-100 dark:border-blue-500/10 flex items-center justify-between">
+                                                                    <div className="mt-2.5 pt-2 border-t border-zinc-100 dark:border-white/10 flex items-center justify-between">
                                                                         <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full border ${bracketColor}`}>
                                                                             {age ? `Age ~${age}` : bracketLabel}
                                                                         </span>
@@ -1570,7 +1570,7 @@ export default function Search() {
 
                                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                                                 {/* Direction Department Card */}
-                                                <div className="p-3.5 rounded-2xl bg-white dark:bg-[#06132b] border border-zinc-200 dark:border-blue-500/20 space-y-2">
+                                                <div className="p-3.5 rounded-2xl bg-white dark:bg-[#18191d] border border-zinc-200 dark:border-white/10 space-y-2">
                                                     <div className="flex items-center justify-between">
                                                         <span className="text-xs font-bold text-indigo-500 flex items-center gap-1.5">
                                                             <span className="material-symbols-outlined text-sm">movie_filter</span>
@@ -1600,7 +1600,7 @@ export default function Search() {
                                                 </div>
 
                                                 {/* Camera Department Card */}
-                                                <div className="p-3.5 rounded-2xl bg-white dark:bg-[#06132b] border border-zinc-200 dark:border-blue-500/20 space-y-2">
+                                                <div className="p-3.5 rounded-2xl bg-white dark:bg-[#18191d] border border-zinc-200 dark:border-white/10 space-y-2">
                                                     <div className="flex items-center justify-between">
                                                         <span className="text-xs font-bold text-cyan-500 flex items-center gap-1.5">
                                                             <span className="material-symbols-outlined text-sm">videocam</span>
@@ -1630,7 +1630,7 @@ export default function Search() {
                                                 </div>
 
                                                 {/* Post-Production Department Card */}
-                                                <div className="p-3.5 rounded-2xl bg-white dark:bg-[#06132b] border border-zinc-200 dark:border-blue-500/20 space-y-2">
+                                                <div className="p-3.5 rounded-2xl bg-white dark:bg-[#18191d] border border-zinc-200 dark:border-white/10 space-y-2">
                                                     <div className="flex items-center justify-between">
                                                         <span className="text-xs font-bold text-emerald-500 flex items-center gap-1.5">
                                                             <span className="material-symbols-outlined text-sm">content_cut</span>
@@ -1689,9 +1689,9 @@ export default function Search() {
                                                         <div
                                                             key={loc.id}
                                                             onClick={() => navigate(`/booking/details/${loc.id}`)}
-                                                            className="p-3.5 rounded-2xl bg-white dark:bg-[#06132b] border border-zinc-200 dark:border-blue-500/20 hover:border-amber-500/40 hover:shadow-md transition-all cursor-pointer group flex gap-3"
+                                                            className="p-3.5 rounded-2xl bg-white dark:bg-[#18191d] border border-zinc-200 dark:border-white/10 hover:border-amber-500/40 hover:shadow-md transition-all cursor-pointer group flex gap-3"
                                                         >
-                                                            <div className="size-20 rounded-xl overflow-hidden shrink-0 border border-zinc-200 dark:border-blue-500/20 bg-zinc-100 dark:bg-[#0a1c3e]">
+                                                            <div className="size-20 rounded-xl overflow-hidden shrink-0 border border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-[#1e1f24]">
                                                                 <PostMedia
                                                                     src={loc.image}
                                                                     fallbackType="FILM_SET"
@@ -1715,7 +1715,7 @@ export default function Search() {
                                                                         {loc.location}
                                                                     </p>
                                                                 </div>
-                                                                <div className="flex items-center justify-between pt-1 border-t border-zinc-100 dark:border-blue-500/10 text-xs">
+                                                                <div className="flex items-center justify-between pt-1 border-t border-zinc-100 dark:border-white/10 text-xs">
                                                                     <span className="font-black text-amber-500">{loc.price}</span>
                                                                     <span className="text-zinc-400 text-[11px] flex items-center gap-0.5">
                                                                         <span className="material-symbols-outlined text-[12px] text-amber-500">star</span>
@@ -1768,9 +1768,9 @@ export default function Search() {
                                             <div
                                                 key={person.uid}
                                                 onClick={() => navigate(`/profile/${person.uid}`)}
-                                                className="flex items-center gap-3 p-3.5 rounded-2xl bg-white dark:bg-[#0a1c3e] border border-zinc-200 dark:border-blue-500/20 hover:border-amber-500/40 hover:shadow-md transition-all cursor-pointer group"
+                                                className="flex items-center gap-3 p-3.5 rounded-2xl bg-white dark:bg-[#1e1f24] border border-zinc-200 dark:border-white/10 hover:border-amber-500/40 hover:shadow-md transition-all cursor-pointer group"
                                             >
-                                                <div className="size-12 rounded-full overflow-hidden shrink-0 border border-zinc-200 dark:border-blue-500/30">
+                                                <div className="size-12 rounded-full overflow-hidden shrink-0 border border-zinc-200 dark:border-white/10">
                                                     <PostMedia
                                                         src={person.photoURL || ''}
                                                         fallbackType="USER_MALE"
@@ -1822,9 +1822,9 @@ export default function Search() {
                                             <div
                                                 key={facility.id}
                                                 onClick={() => navigate(`/booking/details/${facility.id}`)}
-                                                className="p-3.5 rounded-2xl bg-white dark:bg-[#0a1c3e] border border-zinc-200 dark:border-blue-500/20 hover:border-amber-500/40 hover:shadow-md transition-all cursor-pointer group flex gap-3"
+                                                className="p-3.5 rounded-2xl bg-white dark:bg-[#1e1f24] border border-zinc-200 dark:border-white/10 hover:border-amber-500/40 hover:shadow-md transition-all cursor-pointer group flex gap-3"
                                             >
-                                                <div className="size-16 rounded-xl overflow-hidden shrink-0 border border-zinc-200 dark:border-blue-500/20 bg-zinc-100 dark:bg-[#06132b]">
+                                                <div className="size-16 rounded-xl overflow-hidden shrink-0 border border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-[#18191d]">
                                                     <PostMedia
                                                         src={facility.image}
                                                         fallbackType="FILM_SET"
@@ -1844,7 +1844,7 @@ export default function Search() {
                                                         <span className="material-symbols-outlined text-[13px] text-zinc-400">location_on</span>
                                                         {facility.location}
                                                     </p>
-                                                    <div className="flex items-center justify-between text-xs font-semibold mt-2 pt-1 border-t border-zinc-100 dark:border-blue-500/10">
+                                                    <div className="flex items-center justify-between text-xs font-semibold mt-2 pt-1 border-t border-zinc-100 dark:border-white/10">
                                                         <span className="text-amber-500">{facility.price}</span>
                                                         <span className="text-zinc-400 flex items-center gap-0.5 text-[11px]">
                                                             <span className="material-symbols-outlined text-[12px] text-amber-500">star</span>
@@ -1882,10 +1882,10 @@ export default function Search() {
                                                 <div
                                                     key={item.id}
                                                     onClick={() => setSelectedNewsArticle(item)}
-                                                    className="p-3.5 rounded-2xl bg-white dark:bg-[#0a1c3e] border border-zinc-200 dark:border-blue-500/20 hover:border-amber-500/40 hover:shadow-md transition-all cursor-pointer group flex gap-3.5"
+                                                    className="p-3.5 rounded-2xl bg-white dark:bg-[#1e1f24] border border-zinc-200 dark:border-white/10 hover:border-amber-500/40 hover:shadow-md transition-all cursor-pointer group flex gap-3.5"
                                                 >
                                                     {item.thumbnail && (
-                                                        <div className="size-16 sm:size-20 rounded-xl overflow-hidden shrink-0 border border-zinc-200 dark:border-blue-500/20 bg-zinc-100 dark:bg-[#06132b]">
+                                                        <div className="size-16 sm:size-20 rounded-xl overflow-hidden shrink-0 border border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-[#18191d]">
                                                             <PostMedia
                                                                 src={item.thumbnail}
                                                                 fallbackType="CINEMA_HALL"
@@ -1945,10 +1945,10 @@ export default function Search() {
                                             <div
                                                 key={post.id}
                                                 onClick={() => navigate('/showcase')}
-                                                className="p-3.5 rounded-2xl bg-white dark:bg-[#0a1c3e] border border-zinc-200 dark:border-blue-500/20 hover:border-amber-500/40 hover:shadow-md transition-all cursor-pointer group"
+                                                className="p-3.5 rounded-2xl bg-white dark:bg-[#1e1f24] border border-zinc-200 dark:border-white/10 hover:border-amber-500/40 hover:shadow-md transition-all cursor-pointer group"
                                             >
                                                 <div className="flex items-center gap-2.5 mb-2">
-                                                    <div className="size-9 rounded-full overflow-hidden shrink-0 border border-zinc-200 dark:border-blue-500/30">
+                                                    <div className="size-9 rounded-full overflow-hidden shrink-0 border border-zinc-200 dark:border-white/10">
                                                         <PostMedia
                                                             src={post.authorImage || ''}
                                                             fallbackType="USER_MALE"
@@ -1970,7 +1970,7 @@ export default function Search() {
                                                 <p className="text-xs sm:text-sm text-zinc-700 dark:text-zinc-200 line-clamp-3 leading-relaxed">
                                                     {post.content}
                                                 </p>
-                                                <div className="flex items-center gap-4 text-xs text-zinc-400 mt-2.5 pt-2 border-t border-zinc-100 dark:border-blue-500/10">
+                                                <div className="flex items-center gap-4 text-xs text-zinc-400 mt-2.5 pt-2 border-t border-zinc-100 dark:border-white/10">
                                                     <span className="flex items-center gap-1">
                                                         <span className="material-symbols-outlined text-sm text-red-500">favorite</span>
                                                         {post.likes || 0}
@@ -2012,10 +2012,10 @@ export default function Search() {
                                             <div
                                                 key={job.id}
                                                 onClick={() => navigate(`/job/${job.id}`)}
-                                                className="p-3.5 rounded-2xl bg-white dark:bg-[#0a1c3e] border border-zinc-200 dark:border-blue-500/20 hover:border-amber-500/40 hover:shadow-md transition-all cursor-pointer group"
+                                                className="p-3.5 rounded-2xl bg-white dark:bg-[#1e1f24] border border-zinc-200 dark:border-white/10 hover:border-amber-500/40 hover:shadow-md transition-all cursor-pointer group"
                                             >
                                                 <div className="flex items-center gap-3 mb-2">
-                                                    <div className="size-11 rounded-xl bg-zinc-100 dark:bg-[#06132b] border border-zinc-200 dark:border-blue-500/20 flex items-center justify-center shrink-0 overflow-hidden">
+                                                    <div className="size-11 rounded-xl bg-zinc-100 dark:bg-[#18191d] border border-zinc-200 dark:border-white/10 flex items-center justify-center shrink-0 overflow-hidden">
                                                         {job.logo ? (
                                                             <img
                                                                 src={job.logo}
@@ -2080,7 +2080,7 @@ export default function Search() {
                                             <div
                                                 key={blog.id}
                                                 onClick={() => navigate(`/blog/${blog.id}`)}
-                                                className="p-3.5 rounded-2xl bg-white dark:bg-[#0a1c3e] border border-zinc-200 dark:border-blue-500/20 hover:border-amber-500/40 hover:shadow-md transition-all cursor-pointer group"
+                                                className="p-3.5 rounded-2xl bg-white dark:bg-[#1e1f24] border border-zinc-200 dark:border-white/10 hover:border-amber-500/40 hover:shadow-md transition-all cursor-pointer group"
                                             >
                                                 <span className="text-[10px] font-bold text-cyan-600 dark:text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 px-2 py-0.5 rounded-full mb-1.5 inline-block">
                                                     {blog.category}
@@ -2128,9 +2128,9 @@ export default function Search() {
                                         <div
                                             key={person.uid}
                                             onClick={() => navigate(`/profile/${person.uid}`)}
-                                            className="flex items-center gap-3 p-3.5 rounded-2xl bg-white dark:bg-[#0a1c3e] border border-zinc-200 dark:border-blue-500/20 hover:border-amber-500/40 hover:shadow-md transition-all cursor-pointer group"
+                                            className="flex items-center gap-3 p-3.5 rounded-2xl bg-white dark:bg-[#1e1f24] border border-zinc-200 dark:border-white/10 hover:border-amber-500/40 hover:shadow-md transition-all cursor-pointer group"
                                         >
-                                            <div className="size-11 rounded-full overflow-hidden shrink-0 border border-zinc-200 dark:border-blue-500/30">
+                                            <div className="size-11 rounded-full overflow-hidden shrink-0 border border-zinc-200 dark:border-white/10">
                                                 <PostMedia
                                                     src={person.photoURL || ''}
                                                     fallbackType="USER_MALE"
@@ -2163,7 +2163,7 @@ export default function Search() {
                             )}
 
                             {!locationLoading && !userLocation && (
-                                <div className="text-center py-12 px-4 rounded-2xl bg-white dark:bg-[#0a1c3e] border border-zinc-200 dark:border-blue-500/20">
+                                <div className="text-center py-12 px-4 rounded-2xl bg-white dark:bg-[#1e1f24] border border-zinc-200 dark:border-white/10">
                                     <span className="material-symbols-outlined text-4xl text-amber-500 mb-2">location_searching</span>
                                     <h5 className="text-sm font-bold text-zinc-900 dark:text-white">Enable Location</h5>
                                     <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 max-w-xs mx-auto mb-4">
@@ -2189,7 +2189,7 @@ export default function Search() {
                     onClick={() => setSelectedNewsArticle(null)}
                 >
                     <div
-                        className="relative w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-3xl bg-white dark:bg-[#0a1c3e] border border-zinc-200 dark:border-blue-500/30 shadow-2xl p-5 sm:p-6"
+                        className="relative w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-3xl bg-white dark:bg-[#1e1f24] border border-zinc-200 dark:border-white/10 shadow-2xl p-5 sm:p-6"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Close Button */}
@@ -2203,7 +2203,7 @@ export default function Search() {
 
                         {/* Thumbnail */}
                         {selectedNewsArticle.thumbnail && (
-                            <div className="relative w-full h-48 sm:h-64 rounded-2xl overflow-hidden mb-4 border border-zinc-200 dark:border-blue-500/20 bg-zinc-100 dark:bg-[#06132b]">
+                            <div className="relative w-full h-48 sm:h-64 rounded-2xl overflow-hidden mb-4 border border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-[#18191d]">
                                 <PostMedia
                                     src={selectedNewsArticle.thumbnail}
                                     fallbackType="CINEMA_HALL"
@@ -2224,7 +2224,7 @@ export default function Search() {
                                 {selectedNewsArticle.source}
                             </span>
                             <span className="text-zinc-400">• {formatNewsTime(selectedNewsArticle.timestamp)}</span>
-                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-[#06132b] text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-blue-500/20 uppercase">
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-[#18191d] text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-white/10 uppercase">
                                 {selectedNewsArticle.industry}
                             </span>
                         </div>
@@ -2240,10 +2240,10 @@ export default function Search() {
                         </p>
 
                         {/* Action Buttons */}
-                        <div className="mt-6 pt-4 border-t border-zinc-100 dark:border-blue-500/20 flex items-center justify-between gap-3">
+                        <div className="mt-6 pt-4 border-t border-zinc-100 dark:border-white/10 flex items-center justify-between gap-3">
                             <button
                                 onClick={() => setSelectedNewsArticle(null)}
-                                className="px-4 py-2 rounded-xl bg-zinc-100 dark:bg-[#06132b] text-zinc-700 dark:text-zinc-300 text-xs font-bold hover:bg-zinc-200 dark:hover:bg-[#0f2758] transition-all cursor-pointer"
+                                className="px-4 py-2 rounded-xl bg-zinc-100 dark:bg-[#18191d] text-zinc-700 dark:text-zinc-300 text-xs font-bold hover:bg-zinc-200 dark:hover:bg-white/[0.06] transition-all cursor-pointer"
                             >
                                 Close
                             </button>

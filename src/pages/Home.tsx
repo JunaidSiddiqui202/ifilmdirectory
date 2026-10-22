@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import HamburgerMenu from '../components/HamburgerMenu';
 import Logo from '../components/Logo';
 import { blogService, type BlogPost } from '../services/blogService';
 import { jobService, type Job } from '../services/jobService';
-import { getLatestUsers, type UserProfile } from '../services/userService';
+import { getLatestUsers, type UserProfile, getAvailabilityConfig, AVAILABILITY_STATUS_OPTIONS, getUserProfile, updateUserProfile } from '../services/userService';
 import { showreelService, type Showreel } from '../services/showreelService';
 import { getPosts, type PostData } from '../services/postService';
 import { rssNewsService, type NewsItem } from '../services/rssNewsService';
@@ -15,6 +15,7 @@ import { useToast } from '../context/ToastContext';
 import { useUnread } from '../context/UnreadContext';
 import { useTheme } from '../context/ThemeContext';
 import PostMedia from '../components/PostMedia';
+import AvailabilityAvatar from '../components/AvailabilityAvatar';
 import BreakingTicker from '../components/BreakingTicker';
 import SEO from '../components/SEO';
 
@@ -34,7 +35,9 @@ const formatNewsTimeAgo = (timestamp: number) => {
     if (hours < 24) return `${hours}h ago`;
     const days = Math.floor(hours / 24);
     if (days === 1) return 'Yesterday';
-    return `${days}d ago`;
+    if (days < 7) return `${days}d ago`;
+    const d = new Date(timestamp);
+    return isNaN(d.getTime()) ? `${days}d ago` : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 };
 
 const formatJobTimeAgo = (timestamp: any) => {
@@ -62,16 +65,48 @@ export default function Home() {
     const [networkPosts, setNetworkPosts] = useState<PostData[]>([]);
     const [likedPostsMap, setLikedPostsMap] = useState<Record<string, boolean>>({});
     const [selectedPollOption, setSelectedPollOption] = useState<number | null>(null);
-    const [communityFilter, setCommunityFilter] = useState<'all' | 'trailers' | 'teasers' | 'lyrical' | 'openings'>('all');
 
     // Film News & Movie Reviews state
     const [cinemaNews, setCinemaNews] = useState<NewsItem[]>([]);
     const [newsFilter, setNewsFilter] = useState<'all' | 'review' | 'news'>('all');
     const [selectedNewsArticle, setSelectedNewsArticle] = useState<NewsItem | null>(null);
     const [newsLoading, setNewsLoading] = useState(true);
+    const [postsLoading, setPostsLoading] = useState(true);
+    const [homeSearchQuery, setHomeSearchQuery] = useState('');
 
     // Film & Media Fraternity Jobs modal state
     const [selectedJobModal, setSelectedJobModal] = useState<Job | null>(null);
+
+    // Current user availability status state (for 1-click switcher & photo ribbon)
+    const [myAvailabilityStatus, setMyAvailabilityStatus] = useState<string>('available');
+    const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
+    const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+
+    useEffect(() => {
+        if (!currentUser?.uid) return;
+        getUserProfile(currentUser.uid).then((prof) => {
+            if (prof?.availabilityStatus) {
+                setMyAvailabilityStatus(prof.availabilityStatus);
+            }
+        }).catch(console.error);
+    }, [currentUser?.uid]);
+
+    const handleQuickStatusChange = async (newStatusCode: string) => {
+        if (!currentUser?.uid || isUpdatingStatus) return;
+        setIsUpdatingStatus(true);
+        setIsStatusDropdownOpen(false);
+        try {
+            await updateUserProfile(currentUser.uid, { availabilityStatus: newStatusCode as any });
+            setMyAvailabilityStatus(newStatusCode);
+            const cfg = getAvailabilityConfig(newStatusCode);
+            toast.success(`Availability updated: ${cfg.label}`);
+        } catch (err) {
+            console.error('Failed to update status', err);
+            toast.error('Failed to update availability');
+        } finally {
+            setIsUpdatingStatus(false);
+        }
+    };
 
     // Platform Disclaimer Modal (1st time check)
     const [showDisclaimerModal, setShowDisclaimerModal] = useState(false);
@@ -145,6 +180,8 @@ export default function Home() {
             } catch (err) {
                 console.error('Error loading home data:', err);
                 setNewsLoading(false);
+            } finally {
+                setPostsLoading(false);
             }
         };
         loadHomeData();
@@ -228,53 +265,105 @@ export default function Home() {
 
     const totalVotes = poll.options.reduce((acc, opt) => acc + opt.votes, 0) + (selectedPollOption ? 1 : 0);
 
-    // Reusable Quick Actions
-    const QuickActionsGrid = () => (
-        <div className="grid grid-cols-4 gap-2">
-            <button
-                onClick={() => navigate('/post-job')}
-                className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 hover:border-amber-500/40 dark:hover:border-white/20 transition-all group active:scale-95 text-center shadow-sm dark:shadow-none"
-            >
-                <div className="size-9 rounded-xl bg-amber-500 text-white flex items-center justify-center mb-1.5 shadow-sm group-hover:scale-110 transition-transform">
-                    <span className="material-symbols-outlined text-lg text-white">campaign</span>
+    // Reusable Primary Discovery Hub (Find Talent, Find Work, Search)
+    const PrimaryDiscoveryHub = () => (
+        <section className="rounded-2xl sm:rounded-3xl bg-gradient-to-br from-amber-500/10 via-white dark:via-[#121316] to-zinc-50 dark:to-[#0d0e11] border border-amber-500/20 p-4 sm:p-5 shadow-sm space-y-3.5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                <div>
+                    <h2 className="text-base sm:text-base font-black text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
+                        <span className="material-symbols-outlined text-amber-500 text-xl" aria-hidden="true">theater_comedy</span>
+                        <span>Find Talent & Production Opportunities</span>
+                    </h2>
+                    <p className="text-xs sm:text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                        Search actors, directors, cinematographers, crew & active auditions across India
+                    </p>
                 </div>
-                <span className="text-xs font-bold text-zinc-900 dark:text-white leading-tight">Post Call</span>
-                <span className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Cast & Crew</span>
-            </button>
+            </div>
 
-            <button
-                onClick={() => navigate('/browse-profiles')}
-                className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 hover:border-amber-500/40 dark:hover:border-white/20 transition-all group active:scale-95 text-center shadow-sm dark:shadow-none"
+            {/* Quick Search Field */}
+            <form
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    if (homeSearchQuery.trim()) {
+                        navigate(`/browse-profiles?q=${encodeURIComponent(homeSearchQuery.trim())}`);
+                    } else {
+                        navigate('/browse-profiles');
+                    }
+                }}
+                className="relative flex items-center"
             >
-                <div className="size-9 rounded-xl bg-zinc-100 dark:bg-white/10 text-zinc-800 dark:text-white flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform">
-                    <span className="material-symbols-outlined text-lg">group</span>
-                </div>
-                <span className="text-xs font-bold text-zinc-900 dark:text-white leading-tight">Directory</span>
-                <span className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Talent & Crew</span>
-            </button>
+                <span className="material-symbols-outlined absolute left-3.5 text-zinc-400 text-lg sm:text-xl pointer-events-none" aria-hidden="true">search</span>
+                <input
+                    type="text"
+                    value={homeSearchQuery}
+                    onChange={(e) => setHomeSearchQuery(e.target.value)}
+                    placeholder="Search actors, directors, crew, auditions, studios..."
+                    aria-label="Search film directory by name, craft, or role"
+                    className="w-full pl-10 sm:pl-11 pr-24 sm:pr-28 py-2.5 sm:py-2.5 rounded-xl sm:rounded-2xl bg-white dark:bg-black/50 border border-zinc-200 dark:border-white/10 text-sm sm:text-sm text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:border-amber-500 shadow-xs"
+                />
+                <button
+                    type="submit"
+                    className="absolute right-1.5 sm:right-2 px-3.5 sm:px-3 py-1.5 sm:py-1.5 rounded-lg sm:rounded-xl bg-amber-500 hover:bg-amber-600 text-black font-black text-xs sm:text-xs transition-all shadow-xs"
+                >
+                    Search
+                </button>
+            </form>
 
-            <button
-                onClick={() => navigate('/booking-facilities')}
-                className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 hover:border-amber-500/40 dark:hover:border-white/20 transition-all group active:scale-95 text-center shadow-sm dark:shadow-none"
-            >
-                <div className="size-9 rounded-xl bg-zinc-100 dark:bg-white/10 text-zinc-800 dark:text-white flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform">
-                    <span className="material-symbols-outlined text-lg">apartment</span>
-                </div>
-                <span className="text-xs font-bold text-zinc-900 dark:text-white leading-tight">Facilities</span>
-                <span className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Studios & Gear</span>
-            </button>
+            {/* Core Action Tiles */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-0.5">
+                <Link
+                    to="/browse-profiles"
+                    className="flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-2.5 rounded-xl sm:rounded-2xl bg-white dark:bg-[#18191d] border border-zinc-200 dark:border-white/5 hover:border-amber-500/40 transition-all group shadow-xs"
+                >
+                    <div className="size-9 sm:size-8 rounded-xl sm:rounded-lg bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <span className="material-symbols-outlined text-lg sm:text-base" aria-hidden="true">person_search</span>
+                    </div>
+                    <div className="min-w-0">
+                        <span className="text-sm sm:text-xs font-extrabold sm:font-bold text-zinc-900 dark:text-white block leading-tight truncate">Find Talent</span>
+                        <span className="text-xs sm:text-[10px] text-zinc-500 dark:text-zinc-400 block truncate mt-0.5">Cast & Crew</span>
+                    </div>
+                </Link>
 
-            <button
-                onClick={() => navigate('/groups-forums')}
-                className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 hover:border-amber-500/40 dark:hover:border-white/20 transition-all group active:scale-95 text-center shadow-sm dark:shadow-none"
-            >
-                <div className="size-9 rounded-xl bg-zinc-100 dark:bg-white/10 text-zinc-800 dark:text-white flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform">
-                    <span className="material-symbols-outlined text-lg">forum</span>
-                </div>
-                <span className="text-xs font-bold text-zinc-900 dark:text-white leading-tight">Guilds</span>
-                <span className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Discussions</span>
-            </button>
-        </div>
+                <Link
+                    to="/jobs"
+                    className="flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-2.5 rounded-xl sm:rounded-2xl bg-white dark:bg-[#18191d] border border-zinc-200 dark:border-white/5 hover:border-amber-500/40 transition-all group shadow-xs"
+                >
+                    <div className="size-9 sm:size-8 rounded-xl sm:rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <span className="material-symbols-outlined text-lg sm:text-base" aria-hidden="true">work</span>
+                    </div>
+                    <div className="min-w-0">
+                        <span className="text-sm sm:text-xs font-extrabold sm:font-bold text-zinc-900 dark:text-white block leading-tight truncate">Find Work</span>
+                        <span className="text-xs sm:text-[10px] text-zinc-500 dark:text-zinc-400 block truncate mt-0.5">Auditions & Jobs</span>
+                    </div>
+                </Link>
+
+                <Link
+                    to="/post-job"
+                    className="flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-2.5 rounded-xl sm:rounded-2xl bg-white dark:bg-[#18191d] border border-zinc-200 dark:border-white/5 hover:border-amber-500/40 transition-all group shadow-xs"
+                >
+                    <div className="size-9 sm:size-8 rounded-xl sm:rounded-lg bg-amber-500 text-black flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <span className="material-symbols-outlined text-lg sm:text-base" aria-hidden="true">campaign</span>
+                    </div>
+                    <div className="min-w-0">
+                        <span className="text-sm sm:text-xs font-extrabold sm:font-bold text-zinc-900 dark:text-white block leading-tight truncate">Post Call</span>
+                        <span className="text-xs sm:text-[10px] text-zinc-500 dark:text-zinc-400 block truncate mt-0.5">Audition / Crew</span>
+                    </div>
+                </Link>
+
+                <Link
+                    to="/booking-facilities"
+                    className="flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-2.5 rounded-xl sm:rounded-2xl bg-white dark:bg-[#18191d] border border-zinc-200 dark:border-white/5 hover:border-amber-500/40 transition-all group shadow-xs"
+                >
+                    <div className="size-9 sm:size-8 rounded-xl sm:rounded-lg bg-purple-500/15 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <span className="material-symbols-outlined text-lg sm:text-base" aria-hidden="true">apartment</span>
+                    </div>
+                    <div className="min-w-0">
+                        <span className="text-sm sm:text-xs font-extrabold sm:font-bold text-zinc-900 dark:text-white block leading-tight truncate">Studios & Gear</span>
+                        <span className="text-xs sm:text-[10px] text-zinc-500 dark:text-zinc-400 block truncate mt-0.5">Rent Facilities</span>
+                    </div>
+                </Link>
+            </div>
+        </section>
     );
 
     // Reusable Featured Talent Section
@@ -297,27 +386,34 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-2 gap-3">
-                {newUsers.slice(0, 4).map((user) => (
-                    <div
-                        key={user.uid}
-                        onClick={() => navigate(`/profile/${user.uid}`)}
-                        className="rounded-xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-200 dark:border-white/5 p-3 hover:border-amber-500/30 transition-all cursor-pointer group flex flex-col items-center text-center shadow-xs dark:shadow-none"
-                    >
-                        <div className="size-12 rounded-full overflow-hidden border-2 border-zinc-200 dark:border-white/10 group-hover:border-amber-500/50 transition-colors mb-2">
-                            <PostMedia
+                {newUsers.slice(0, 4).map((user) => {
+                    const avail = getAvailabilityConfig(user.availabilityStatus);
+                    return (
+                        <div
+                            key={user.uid}
+                            className="relative rounded-xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-200 dark:border-white/5 p-3 hover:border-amber-500/30 transition-all cursor-pointer group flex flex-col items-center text-center shadow-xs dark:shadow-none"
+                        >
+                            <Link to={`/profile/${user.uid}`} className="absolute inset-0 z-0" aria-label={`View profile of ${user.displayName || 'Filmmaker'}`} />
+                            <AvailabilityAvatar
                                 src={user.photoURL || ''}
-                                fallbackType="USER_MALE"
-                                className="w-full h-full object-cover"
+                                alt={user.displayName || 'Filmmaker'}
+                                status={user.availabilityStatus}
+                                size="md"
+                                shape="circle"
+                                className="mb-2 group-hover:scale-105 transition-transform pointer-events-none"
                             />
+                            <h3 className="font-bold text-sm sm:text-xs text-zinc-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors truncate w-full pointer-events-none">
+                                {user.displayName || 'Filmmaker'}
+                            </h3>
+                            <p className="text-xs sm:text-[11px] text-zinc-500 dark:text-zinc-400 font-medium truncate w-full mt-0.5 pointer-events-none">
+                                {(user as any).role || user.bio?.slice(0, 20) || 'Key Crew'}
+                            </p>
+                            <span className={`mt-1.5 text-[10px] sm:text-[9px] font-bold px-2 sm:px-1.5 py-0.5 rounded-md border pointer-events-none truncate max-w-full ${avail.badgeBg} ${avail.badgeText} ${avail.badgeBorder}`}>
+                                {avail.label}
+                            </span>
                         </div>
-                        <h3 className="font-bold text-xs text-zinc-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors truncate w-full">
-                            {user.displayName || 'Filmmaker'}
-                        </h3>
-                        <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium truncate w-full mt-0.5">
-                            {(user as any).role || user.bio?.slice(0, 20) || 'Key Crew'}
-                        </p>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
         </section>
     );
@@ -381,8 +477,8 @@ export default function Home() {
             title: 'The Visual Language of Modern South Indian Action Cinema',
             excerpt: 'Deconstructing slow-motion choreography, multi-camera setups, and color grading that redefined pan-India blockbuster aesthetics.',
             content: '',
-            author: 'Arun Matheswaran',
-            authorId: 'arun-matheswaran',
+            author: 'iFilm Editorial Team',
+            authorId: 'ifilm-editorial',
             authorPhoto: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop',
             image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&h=450&fit=crop',
             category: 'Cinematography',
@@ -395,8 +491,8 @@ export default function Home() {
             title: 'Independent Filmmaking in 2026: Financing, OTT Presales & Distribution',
             excerpt: 'A pragmatic survival manual for debut directors navigating international festival circuits, angel syndicates, and hybrid theatrical releases.',
             content: '',
-            author: 'Suman Kumar',
-            authorId: 'suman-kumar',
+            author: 'Film Trade Desk',
+            authorId: 'trade-desk',
             authorPhoto: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100&h=100&fit=crop',
             image: 'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?w=800&h=450&fit=crop',
             category: 'Film Trade',
@@ -409,8 +505,8 @@ export default function Home() {
             title: 'Mastering Sync Sound & Foley Recording on Challenging Indian Sets',
             excerpt: 'Why live sync sound is making a massive resurgence in multilingual productions, and how sound recordists manage chaotic urban locations.',
             content: '',
-            author: 'Resul Pookutty',
-            authorId: 'resul-pookutty',
+            author: 'Sound & Acoustic Guild',
+            authorId: 'sound-guild',
             authorPhoto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop',
             image: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&h=450&fit=crop',
             category: 'Sound Design',
@@ -423,8 +519,8 @@ export default function Home() {
             title: 'The Art of Screenplay Pacing: From 3-Act Paradigm to Non-Linear Narratives',
             excerpt: 'Examining structure, character arcs, and dialogue economy in contemporary Malayalam and Tamil screenplay masterpieces.',
             content: '',
-            author: 'Jeethu Joseph',
-            authorId: 'jeethu-joseph',
+            author: 'Screenwriting Collective',
+            authorId: 'screenwriting-collective',
             authorPhoto: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=100&h=100&fit=crop',
             image: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&h=450&fit=crop',
             category: 'Screenwriting',
@@ -435,58 +531,7 @@ export default function Home() {
     ];
 
     const displayBlogs = blogs.length > 0 ? blogs : defaultBlogs;
-
-    const defaultCommunityPosts: PostData[] = [
-        {
-            id: 'seed-post-1',
-            author: 'Karan Johar',
-            authorId: 'karan-johar',
-            authorImage: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop',
-            role: 'Producer & Director',
-            authorVerified: true,
-            content: 'Just wrapped up principal photography for our new feature film in Mumbai! Incredible work by our camera department and lighting team. Post-production starts Monday. #CinemaLife #Wrap',
-            image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&h=450&fit=crop',
-            likes: 142,
-            comments: 28,
-            createdAt: null,
-        },
-        {
-            id: 'seed-post-2',
-            author: 'Sandeep Reddy Vanga',
-            authorId: 'sandeep-vanga',
-            authorImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop',
-            role: 'Director & Writer',
-            authorVerified: true,
-            content: 'Final 7.1.4 Dolby Atmos surround mix underway. The dynamics between whispered silence and an explosive brass score are monumental. Experience it on the biggest screen possible. 🔊🎬 #SoundDesign #Cinema',
-            image: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&h=450&fit=crop',
-            likes: 389,
-            comments: 64,
-            createdAt: null,
-        },
-        {
-            id: 'seed-post-3',
-            author: 'Ravi Varman',
-            authorId: 'ravi-varman',
-            authorImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop',
-            role: 'Cinematographer (ISC)',
-            authorVerified: true,
-            content: 'Shooting natural dusk in Rajasthan with Cooke Anamorphic Full Frame primes. Always respect the shadows as much as the light. 🎥🌅 #Cinematography #Filmmaking',
-            image: 'https://images.unsplash.com/photo-1518173946687-a4c8a383392e?w=800&h=450&fit=crop',
-            likes: 215,
-            comments: 41,
-            createdAt: null,
-        }
-    ];
-
-    const displayPosts = networkPosts.length > 0 ? networkPosts : defaultCommunityPosts;
-    const filteredDisplayPosts = displayPosts.filter(post => {
-        if (communityFilter === 'all') return true;
-        if (communityFilter === 'trailers') return post.videoType === 'trailer' || post.content?.toLowerCase().includes('trailer');
-        if (communityFilter === 'teasers') return post.videoType === 'teaser' || post.content?.toLowerCase().includes('teaser');
-        if (communityFilter === 'lyrical') return post.videoType === 'lyrical' || post.content?.toLowerCase().includes('lyrical') || post.content?.toLowerCase().includes('song');
-        if (communityFilter === 'openings') return post.videoType === 'opening' || post.content?.toLowerCase().includes('opening') || post.content?.toLowerCase().includes('pooja');
-        return true;
-    });
+    const displayPosts = networkPosts;
 
     // Featured Editorial Articles & Blog Section (Rendered in Main Feed Column)
     const EditorialArticlesSection = () => (
@@ -678,43 +723,43 @@ export default function Home() {
                         displayJobs.map((job) => (
                             <div
                                 key={job.id}
-                                onClick={() => setSelectedJobModal(job)}
-                                className="group p-2.5 rounded-xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-200 dark:border-white/5 hover:border-amber-500/30 transition-all cursor-pointer flex gap-3 items-center shadow-xs dark:shadow-none"
+                                className="group relative p-2.5 rounded-xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-200 dark:border-white/5 hover:border-amber-500/30 transition-all cursor-pointer flex gap-3 items-center shadow-xs dark:shadow-none"
                             >
-                                <div className="relative size-12 rounded-xl overflow-hidden shrink-0 bg-black/60 border border-zinc-200 dark:border-white/10">
+                                <Link to={`/job/${job.id}`} className="absolute inset-0 z-0" aria-label={`View job: ${job.title}`} />
+                                <div className="relative size-12 rounded-xl overflow-hidden shrink-0 bg-black/60 border border-zinc-200 dark:border-white/10 pointer-events-none">
                                     <PostMedia
                                         src={job.logo || ''}
                                         fallbackType="COMPANY_LOGO"
                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                     />
                                 </div>
-                                <div className="min-w-0 flex-1">
+                                <div className="min-w-0 flex-1 relative z-0 pointer-events-none">
                                     {/* Top Line: Company, Role Badge, and Time Ago */}
                                     <div className="flex items-center justify-between gap-1 mb-0.5">
                                         <div className="flex items-center gap-1.5 min-w-0">
-                                            <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 truncate max-w-[100px]" title={job.company}>
+                                            <span className="text-xs sm:text-[10px] font-bold text-amber-600 dark:text-amber-400 truncate max-w-[120px]" title={job.company}>
                                                 {job.company}
                                             </span>
                                             {job.fraternityRole && (
-                                                <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-purple-500/10 text-purple-600 dark:text-purple-300 border border-purple-500/20 truncate max-w-[85px]">
+                                                <span className="text-[10px] sm:text-[9px] font-bold px-1.5 py-0.2 rounded bg-purple-500/10 text-purple-600 dark:text-purple-300 border border-purple-500/20 truncate max-w-[95px]">
                                                     {job.fraternityRole}
                                                 </span>
                                             )}
                                         </div>
                                         {job.postedAt && (
-                                            <span className="text-[10px] text-zinc-400 dark:text-zinc-500 shrink-0 whitespace-nowrap">
+                                            <span className="text-xs sm:text-[10px] text-zinc-500 dark:text-zinc-400 shrink-0 whitespace-nowrap">
                                                 {formatJobTimeAgo(job.postedAt)}
                                             </span>
                                         )}
                                     </div>
 
                                     {/* Job Title */}
-                                    <h4 className="text-xs font-bold text-zinc-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors truncate leading-snug" title={job.title}>
+                                    <h4 className="text-sm sm:text-xs font-bold text-zinc-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors truncate leading-snug" title={job.title}>
                                         {job.title}
                                     </h4>
 
                                     {/* Location & Salary cleanly truncated on single row */}
-                                    <div className="flex items-center gap-1.5 text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5 min-w-0">
+                                    <div className="flex items-center gap-1.5 text-xs sm:text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5 min-w-0">
                                         <span className="truncate min-w-0" title={job.location}>
                                             {job.location ? job.location.split('(')[0].trim() : ''}
                                         </span>
@@ -733,7 +778,7 @@ export default function Home() {
                                         e.stopPropagation();
                                         setSelectedJobModal(job);
                                     }}
-                                    className="p-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500 text-amber-600 hover:text-white transition-all shrink-0 group-hover:bg-amber-500 group-hover:text-white"
+                                    className="p-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500 text-amber-600 hover:text-white transition-all shrink-0 group-hover:bg-amber-500 group-hover:text-white relative z-10"
                                     title="View Job"
                                 >
                                     <span className="material-symbols-outlined text-sm">visibility</span>
@@ -791,21 +836,13 @@ export default function Home() {
                         <button
                             onClick={toggleDarkMode}
                             type="button"
-                            className="p-1.5 sm:p-2 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-amber-400 hover:text-zinc-900 dark:hover:text-white hover:border-amber-500/30 transition-all active:scale-95 flex items-center justify-center shrink-0 cursor-pointer"
-                            title={isDarkMode ? "Switch to Day Theme" : "Switch to Night Theme"}
+                            className="p-1.5 sm:p-2 rounded-xl bg-zinc-100 dark:bg-[#1e1f24] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-amber-400 hover:text-zinc-900 dark:hover:text-white hover:border-amber-500/30 transition-all active:scale-95 flex items-center justify-center shrink-0 cursor-pointer"
+                            title={isDarkMode ? "Switch to Day Theme" : "Switch to Night Theme (Antigravity Gray)"}
                             aria-label="Toggle Theme"
                         >
                             <span className="material-symbols-outlined text-lg sm:text-xl">
                                 {isDarkMode ? 'light_mode' : 'dark_mode'}
                             </span>
-                        </button>
-
-                        <button
-                            onClick={() => navigate('/search')}
-                            className="p-1.5 sm:p-2 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:border-amber-500/30 transition-all active:scale-95 shrink-0"
-                            aria-label="Search"
-                        >
-                            <span className="material-symbols-outlined text-lg sm:text-xl">search</span>
                         </button>
                         <button
                             onClick={() => {
@@ -842,17 +879,16 @@ export default function Home() {
                             )}
                         </button>
                         {currentUser ? (
-                            <div
+                            <AvailabilityAvatar
+                                src={currentUser?.photoURL || ''}
+                                alt={currentUser?.displayName || 'My Profile'}
+                                status={myAvailabilityStatus}
+                                size="sm"
+                                shape="circle"
                                 onClick={() => navigate('/profile')}
-                                className="size-8 sm:size-9 rounded-full overflow-hidden border border-zinc-300 dark:border-white/20 ml-0.5 cursor-pointer hover:border-amber-500 transition-colors shrink-0"
+                                className="cursor-pointer ml-0.5 hover:scale-105 transition-transform"
                                 title="My Profile"
-                            >
-                                <PostMedia
-                                    src={currentUser?.photoURL || ''}
-                                    fallbackType="USER_MALE"
-                                    className="w-full h-full object-cover"
-                                />
-                            </div>
+                            />
                         ) : null}
                     </div>
                 </header>
@@ -865,36 +901,118 @@ export default function Home() {
                     {/* PRIMARY CINEMA STREAM (Left 2 cols on xl) */}
                     <div className="xl:col-span-2 space-y-6">
                         
-                        {/* Welcome Banner */}
-                        <div className="flex items-center justify-between pb-1 gap-2">
-                            <div>
-                                <span className="text-[10px] font-bold uppercase tracking-widest text-amber-500 flex items-center gap-1.5">
-                                    <span className="size-1.5 rounded-full bg-amber-500" />
-                                    Filmmaker Network & Production Hub
-                                </span>
-                                <h1 className="text-sm sm:text-base font-extrabold tracking-tight text-zinc-900 dark:text-white mt-0.5">
-                                    {currentUser ? `Welcome back, ${currentUser.displayName?.split(' ')[0] || 'Creator'}!` : 'Welcome to iFilmDirectory!'}
-                                </h1>
+                        {/* Welcome Banner with LinkedIn-Style Cinema Availability Ribbon & 1-Click Status Switcher */}
+                        <div className="rounded-2xl sm:rounded-3xl bg-gradient-to-r from-amber-500/10 via-zinc-100/90 to-zinc-50 dark:from-amber-500/10 dark:via-[#141519] dark:to-[#18191d] border border-amber-500/20 dark:border-white/[0.08] p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div className="flex items-center gap-3.5 sm:gap-4 min-w-0">
+                                {currentUser ? (
+                                    <div className="relative group cursor-pointer" onClick={() => navigate('/profile')}>
+                                        <AvailabilityAvatar
+                                            src={currentUser?.photoURL || ''}
+                                            alt={currentUser?.displayName || 'Creator'}
+                                            status={myAvailabilityStatus}
+                                            size="lg"
+                                            shape="circle"
+                                            title="Click to view profile"
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="size-12 sm:size-14 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center text-white shadow-md shadow-amber-500/20 shrink-0">
+                                        <span className="material-symbols-outlined text-2xl sm:text-3xl font-black">movie_filter</span>
+                                    </div>
+                                )}
+
+                                <div className="min-w-0 flex-1">
+                                    <span className="text-xs sm:text-[10px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                                        <span className="size-1.5 rounded-full bg-amber-500 animate-pulse" />
+                                        Filmmaker Network & Production Hub
+                                    </span>
+                                    <h1 className="text-base sm:text-base font-black tracking-tight text-zinc-900 dark:text-white truncate mt-0.5">
+                                        {currentUser ? `Welcome back, ${currentUser.displayName?.split(' ')[0] || 'Creator'}!` : 'Welcome to iFilmDirectory!'}
+                                    </h1>
+
+                                    {/* Quick 1-Click Availability Status Switcher for logged-in user */}
+                                    {currentUser && (() => {
+                                        const myAvailConfig = getAvailabilityConfig(myAvailabilityStatus);
+                                        return (
+                                            <div className="relative mt-1.5 inline-block">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
+                                                    className={`text-xs sm:text-[11px] font-extrabold px-3 sm:px-2.5 py-1 rounded-full border flex items-center gap-1.5 shadow-2xs hover:scale-102 transition-all cursor-pointer ${myAvailConfig.badgeBg} ${myAvailConfig.badgeText} ${myAvailConfig.badgeBorder}`}
+                                                    title="Tap to change your project availability status"
+                                                >
+                                                    <span className={`size-2 rounded-full ${myAvailConfig.dotColor} ${myAvailConfig.code === 'available' ? 'animate-pulse' : ''}`} />
+                                                    <span>{myAvailConfig.label}</span>
+                                                    <span className="material-symbols-outlined text-sm">arrow_drop_down</span>
+                                                </button>
+
+                                                {/* Interactive Status Popover */}
+                                                {isStatusDropdownOpen && (
+                                                    <>
+                                                        <div
+                                                            className="fixed inset-0 z-40"
+                                                            onClick={() => setIsStatusDropdownOpen(false)}
+                                                        />
+                                                        <div className="absolute left-0 top-full mt-1.5 z-50 w-72 rounded-2xl bg-white dark:bg-[#18191d] border border-zinc-200 dark:border-white/10 shadow-xl p-2 space-y-1 backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150">
+                                                            <div className="px-2.5 py-1.5 text-xs font-black uppercase tracking-wider text-zinc-400 border-b border-zinc-100 dark:border-white/5 flex items-center justify-between">
+                                                                <span>Change Availability</span>
+                                                                <span className="text-[10px] text-amber-500 font-bold">Reflects Live</span>
+                                                            </div>
+                                                            {AVAILABILITY_STATUS_OPTIONS.map((opt) => {
+                                                                const isSelected = (opt.value === myAvailabilityStatus) ||
+                                                                    (opt.value === 'available' && !myAvailabilityStatus);
+                                                                return (
+                                                                    <button
+                                                                        key={opt.value}
+                                                                        type="button"
+                                                                        disabled={isUpdatingStatus}
+                                                                        onClick={() => handleQuickStatusChange(opt.value)}
+                                                                        className={`w-full text-left p-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-start gap-2.5 transition-colors cursor-pointer ${
+                                                                            isSelected
+                                                                                ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
+                                                                                : 'hover:bg-zinc-100 dark:hover:bg-white/5 text-zinc-700 dark:text-zinc-300'
+                                                                        }`}
+                                                                    >
+                                                                        <span className="text-base mt-0.5">{opt.emoji}</span>
+                                                                        <div className="min-w-0 flex-1">
+                                                                            <p className="font-extrabold text-xs sm:text-sm">{opt.label}</p>
+                                                                            <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal leading-tight mt-0.5">
+                                                                                {opt.statusText}
+                                                                            </p>
+                                                                        </div>
+                                                                        {isSelected && (
+                                                                            <span className="material-symbols-outlined text-amber-500 text-base mt-0.5">check</span>
+                                                                        )}
+                                                                    </button>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </div>
+                                        );
+                                    })()}
+                                </div>
                             </div>
-                            {currentUser ? (
-                                <button
-                                    onClick={() => navigate('/showcase')}
-                                    className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/20 text-xs font-bold transition-all active:scale-95 shrink-0"
-                                >
-                                    <span className="material-symbols-outlined text-base">movie</span>
-                                    <span>Feed</span>
-                                </button>
-                            ) : (
-                                <button
-                                    onClick={() => openAuthModal('Sign in to join the filmmaker network')}
-                                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-extrabold text-xs shadow-md shadow-red-500/20 active:scale-95 transition-all cursor-pointer shrink-0"
-                                    title="Sign In to iFilmDirectory"
-                                >
-                                    <span className="material-symbols-outlined text-[15px] font-black">login</span>
-                                    <span>Sign In</span>
-                                </button>
+
+                            {/* Only show Create Profile / Sign In CTA if unauthenticated */}
+                            {!currentUser && (
+                                <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+                                    <button
+                                        onClick={() => openAuthModal('Create your free profile to join the filmmaker directory')}
+                                        className="flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-xl bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-extrabold text-xs sm:text-sm shadow-md shadow-red-500/25 active:scale-95 transition-all cursor-pointer shrink-0"
+                                        title="Create Profile or Sign In to iFilmDirectory"
+                                    >
+                                        <span className="material-symbols-outlined text-base font-black">person_add</span>
+                                        <span>Create Profile</span>
+                                        <span className="text-[10px] opacity-75 font-medium hidden md:inline">/ Sign In</span>
+                                    </button>
+                                </div>
                             )}
                         </div>
+
+                        {/* Primary Discovery Hub (Find Talent, Find Work, Search) */}
+                        <PrimaryDiscoveryHub />
 
                         {/* Live South Cinema Breaking RSS Ticker with Jobs Arrivals & Instant Readers */}
                         <BreakingTicker
@@ -910,11 +1028,8 @@ export default function Home() {
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
                                         <span className="size-2 rounded-full bg-amber-500 animate-pulse shrink-0" />
-                                        <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-1.5">
-                                            <span>Film News & Reviews</span>
-                                            <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                                                Top Stories
-                                            </span>
+                                        <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white tracking-tight">
+                                            Film News & Reviews
                                         </h2>
                                     </div>
                                     <button
@@ -1023,22 +1138,22 @@ export default function Home() {
                                                                 e.stopPropagation();
                                                                 openSourcePopup(item.link, item.title);
                                                             }}
-                                                            className="text-[10px] font-bold uppercase tracking-wider text-amber-600 hover:text-amber-500 dark:text-amber-400 dark:hover:text-amber-300 truncate max-w-[120px] flex items-center gap-0.5 hover:underline"
+                                                            className="text-xs sm:text-[10px] font-bold uppercase tracking-wider text-amber-600 hover:text-amber-500 dark:text-amber-400 dark:hover:text-amber-300 truncate max-w-[140px] flex items-center gap-0.5 hover:underline"
                                                             title={`Open ${item.source} in pop-up window`}
                                                         >
                                                             <span>{item.source}</span>
-                                                            <span className="material-symbols-outlined text-[10px]">open_in_new</span>
+                                                            <span className="material-symbols-outlined text-xs sm:text-[10px]">open_in_new</span>
                                                         </button>
-                                                        <span className="text-[10px] text-zinc-400">•</span>
-                                                        <span className="text-[10px] text-zinc-500 dark:text-zinc-400">{formatNewsTimeAgo(item.timestamp)}</span>
+                                                        <span className="text-xs sm:text-[10px] text-zinc-400">•</span>
+                                                        <span className="text-xs sm:text-[10px] text-zinc-500 dark:text-zinc-400">{formatNewsTimeAgo(item.timestamp)}</span>
                                                         {isReview && !item.rating && (
-                                                            <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                                                            <span className="text-[10px] sm:text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
                                                                 REVIEW
                                                             </span>
                                                         )}
                                                     </div>
 
-                                                    <h3 className="font-bold text-xs sm:text-sm text-zinc-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors line-clamp-2 leading-snug">
+                                                    <h3 className="font-bold text-sm sm:text-xs text-zinc-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors line-clamp-2 leading-snug">
                                                         {item.title}
                                                     </h3>
                                                 </div>
@@ -1103,23 +1218,28 @@ export default function Home() {
                                     reels.map((reel) => (
                                         <div
                                             key={reel.id}
-                                            onClick={() => navigate('/showreel/view1')}
                                             className="w-[130px] sm:w-[155px] shrink-0 aspect-[9/16] relative rounded-2xl overflow-hidden snap-start group cursor-pointer shadow-lg border border-zinc-200 dark:border-white/5 hover:border-amber-500/40 transition-all bg-black"
                                         >
-                                            <PostMedia
-                                                src={reel.videoUrl || reel.thumbnail}
-                                                fallbackType="FILM_SET"
-                                                isThumbnail={true}
-                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                            />
+                                            <Link to="/showreel/view1" className="absolute inset-0 z-0" aria-label={`Watch showreel: ${reel.title || 'Cinematic Reel'}`} />
+                                            <div className="w-full h-full relative overflow-hidden bg-zinc-900 pointer-events-none">
+                                                <img
+                                                    src={reel.thumbnail || (reel.videoUrl?.includes('youtube') ? `https://img.youtube.com/vi/${reel.videoUrl.match(/(?:watch\?v=|shorts\/|youtu\.be\/)([^?&/]+)/)?.[1] || ''}/hqdefault.jpg` : 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=400&h=700&fit=crop')}
+                                                    alt={reel.title || 'Filmmaker Showreel'}
+                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                                    loading="lazy"
+                                                    onError={(e) => {
+                                                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=400&h=700&fit=crop';
+                                                    }}
+                                                />
+                                            </div>
                                             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent pointer-events-none" />
                                             
-                                            <div className="absolute top-2.5 right-2.5 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/10 flex items-center gap-1">
+                                            <div className="absolute top-2.5 right-2.5 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/10 flex items-center gap-1 pointer-events-none">
                                                 <span className="material-symbols-outlined text-[10px] text-amber-400 filled" style={{ fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
                                                 <span className="text-white text-[9px] font-bold">{formatViews(reel.views)}</span>
                                             </div>
 
-                                            <div className="absolute bottom-2.5 left-2.5 right-2.5">
+                                            <div className="absolute bottom-2.5 left-2.5 right-2.5 pointer-events-none">
                                                 <p className="text-white text-xs font-bold truncate group-hover:text-amber-400 transition-colors">
                                                     {reel.title || 'Cinematic Reel'}
                                                 </p>
@@ -1155,188 +1275,167 @@ export default function Home() {
                                 </button>
                             </div>
 
-                            {/* Feed Category Pills: Trailers, Teasers, Lyrical, Openings */}
-                            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-                                {[
-                                    { id: 'all', label: 'All Feed' },
-                                    { id: 'trailers', label: '🎬 Trailers' },
-                                    { id: 'teasers', label: '⚡ Teasers' },
-                                    { id: 'lyrical', label: '🎵 Lyrical Videos' },
-                                    { id: 'openings', label: '🍿 Movie Openings' }
-                                ].map(pill => (
-                                    <button
-                                        key={pill.id}
-                                        onClick={() => setCommunityFilter(pill.id as any)}
-                                        className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap shrink-0 transition-all ${
-                                            communityFilter === pill.id
-                                                ? 'bg-amber-500 text-white shadow-xs'
-                                                : 'bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/5'
-                                        }`}
-                                    >
-                                        {pill.label}
-                                    </button>
-                                ))}
-                            </div>
-
                             <div className="space-y-4">
-                                {filteredDisplayPosts.slice(0, 5).map((post, pIdx) => {
-                                    const postKey = post.id || `post-${pIdx}`;
-                                    const isLiked = !!likedPostsMap[postKey];
-                                    const currentLikes = (post.likes || 12) + (isLiked ? 1 : 0);
-                                    const mediaUrl = post.videoUrl || post.image || (post.images && post.images[0]);
-
-                                    return (
-                                        <div
-                                            key={postKey}
-                                            onClick={() => navigate(`/showcase${post.id ? `?id=${post.id}` : ''}`)}
-                                            className="rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 p-4 sm:p-5 hover:border-amber-500/30 transition-all cursor-pointer group shadow-sm dark:shadow-none"
-                                        >
-                                            {/* Creator Row */}
-                                            <div className="flex items-center justify-between mb-3">
-                                                <div className="flex items-center gap-2.5 min-w-0">
-                                                    <div
-                                                        className="size-10 rounded-full overflow-hidden border border-zinc-200 dark:border-white/10 shrink-0 cursor-pointer"
-                                                        onClick={(e) => {
-                                                             if (post.authorId) {
-                                                                 e.stopPropagation();
-                                                                 navigate(`/profile/${post.authorId}`);
-                                                             }
-                                                        }}
-                                                    >
-                                                        <PostMedia
-                                                            src={post.authorImage || ''}
-                                                            fallbackType="USER_MALE"
-                                                            className="w-full h-full object-cover"
-                                                        />
-                                                    </div>
-                                                    <div className="min-w-0">
-                                                        <div className="flex items-center gap-1.5 flex-wrap">
-                                                            <h3 className="text-sm font-bold text-zinc-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors truncate">
-                                                                {post.author}
-                                                            </h3>
-                                                            {(post.authorVerified || post.author === 'Karan Johar' || post.author === 'Sandeep Reddy Vanga' || post.author === 'Ravi Varman') && (
-                                                                <span className="material-symbols-outlined text-amber-500 text-[15px] filled shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>
-                                                                    verified
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                        <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
-                                                            {post.role || 'Film Professional'} • {post.createdAt ? formatNewsTimeAgo(post.createdAt.toDate ? post.createdAt.toDate().getTime() : post.createdAt) : '2h ago'}
-                                                        </p>
+                                {postsLoading ? (
+                                    <div className="space-y-4">
+                                        {[1, 2].map((i) => (
+                                            <div key={i} className="rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 p-4 sm:p-5 animate-pulse space-y-3">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="size-10 rounded-full bg-zinc-200 dark:bg-white/10" />
+                                                    <div className="space-y-1.5 flex-1">
+                                                        <div className="h-3.5 w-32 bg-zinc-200 dark:bg-white/10 rounded" />
+                                                        <div className="h-2.5 w-20 bg-zinc-200 dark:bg-white/10 rounded" />
                                                     </div>
                                                 </div>
-                                                {post.videoType ? (
-                                                    <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 border shrink-0 ${
-                                                        post.videoType === 'trailer'
-                                                            ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30'
-                                                            : post.videoType === 'teaser'
-                                                            ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30'
-                                                            : post.videoType === 'lyrical'
-                                                            ? 'bg-pink-500/10 text-pink-600 dark:text-pink-400 border-pink-500/30'
-                                                            : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
-                                                    }`}>
-                                                        <span className="material-symbols-outlined text-xs">
-                                                            {post.videoType === 'trailer' ? 'play_circle' : post.videoType === 'teaser' ? 'bolt' : post.videoType === 'lyrical' ? 'music_note' : 'movie'}
-                                                        </span>
-                                                        <span>
-                                                            {post.videoType === 'trailer' ? 'Trailer' : post.videoType === 'teaser' ? 'Teaser' : post.videoType === 'lyrical' ? 'Lyrical' : 'Opening'}
-                                                        </span>
-                                                    </span>
-                                                ) : (
+                                                <div className="h-3 w-full bg-zinc-200 dark:bg-white/10 rounded" />
+                                                <div className="h-3 w-4/5 bg-zinc-200 dark:bg-white/10 rounded" />
+                                                <div className="w-full aspect-video bg-zinc-200 dark:bg-white/10 rounded-xl" />
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : displayPosts.length > 0 ? (
+                                    displayPosts.slice(0, 5).map((post, pIdx) => {
+                                        const postKey = post.id || `post-${pIdx}`;
+                                        const isLiked = !!likedPostsMap[postKey];
+                                        const currentLikes = (post.likes || 12) + (isLiked ? 1 : 0);
+                                        const mediaUrl = post.videoUrl || post.image || (post.images && post.images[0]);
+
+                                        return (
+                                            <div
+                                                key={postKey}
+                                                onClick={() => navigate(`/showcase${post.id ? `?id=${post.id}` : ''}`)}
+                                                className="rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 p-4 sm:p-5 hover:border-amber-500/30 transition-all cursor-pointer group shadow-sm dark:shadow-none"
+                                            >
+                                                {/* Creator Row */}
+                                                <div className="flex items-center justify-between mb-3">
+                                                    <div className="flex items-center gap-2.5 min-w-0">
+                                                        <div
+                                                            className="size-10 rounded-full overflow-hidden border border-zinc-200 dark:border-white/10 shrink-0 cursor-pointer"
+                                                            onClick={(e) => {
+                                                                if (post.authorId) {
+                                                                    e.stopPropagation();
+                                                                    navigate(`/profile/${post.authorId}`);
+                                                                }
+                                                            }}
+                                                        >
+                                                            <PostMedia
+                                                                src={post.authorImage || ''}
+                                                                fallbackType="USER_MALE"
+                                                                className="w-full h-full object-cover"
+                                                            />
+                                                        </div>
+                                                        <div className="min-w-0">
+                                                            <div className="flex items-center gap-1.5 flex-wrap">
+                                                                <h3 className="text-sm font-bold text-zinc-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors truncate">
+                                                                    {post.author}
+                                                                </h3>
+                                                                {post.authorVerified && (
+                                                                    <span className="material-symbols-outlined text-amber-500 text-[15px] filled shrink-0" style={{ fontVariationSettings: "'FILL' 1" }} title="Verified Creator" aria-label="Verified Creator">
+                                                                        verified
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                            <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
+                                                                {post.role || 'Film Professional'} • {post.createdAt ? formatNewsTimeAgo(post.createdAt.toDate ? post.createdAt.toDate().getTime() : post.createdAt) : '2h ago'}
+                                                            </p>
+                                                        </div>
+                                                    </div>
                                                     <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-white/10 shrink-0">
                                                         Post
                                                     </span>
+                                                </div>
+
+                                                {/* Post Text */}
+                                                <p className="text-xs sm:text-sm text-zinc-800 dark:text-zinc-200 leading-relaxed mb-3 line-clamp-3">
+                                                    {post.content}
+                                                </p>
+
+                                                {/* Post Media Attachment */}
+                                                {mediaUrl && (
+                                                    <div className="w-full aspect-video rounded-xl overflow-hidden bg-black mb-3 border border-zinc-200 dark:border-white/5">
+                                                        <PostMedia
+                                                            src={mediaUrl}
+                                                            fallbackType="FILM_SET"
+                                                            className="w-full h-full object-cover group-hover:scale-101 transition-transform duration-500"
+                                                        />
+                                                    </div>
                                                 )}
-                                            </div>
 
-                                            {/* Movie Title & Release Date Tag if available */}
-                                            {(post.movieTitle || post.releaseDate) && (
-                                                <div className="mb-2.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-between text-xs">
-                                                    <span className="font-bold text-zinc-900 dark:text-white flex items-center gap-1.5">
-                                                        <span className="material-symbols-outlined text-sm text-amber-500">movie</span>
-                                                        <span>{post.movieTitle}</span>
-                                                    </span>
-                                                    {post.releaseDate && (
-                                                        <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
-                                                            Release: {post.releaseDate}
+                                                {/* Engagement Bar */}
+                                                <div className="flex items-center justify-between text-xs font-semibold text-zinc-500 dark:text-zinc-400 pt-2.5 border-t border-zinc-100 dark:border-white/5">
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            if (!currentUser) {
+                                                                openAuthModal('Sign in to appreciate posts and connect with creators');
+                                                                return;
+                                                            }
+                                                            setLikedPostsMap(prev => ({ ...prev, [postKey]: !prev[postKey] }));
+                                                        }}
+                                                        className={`flex items-center gap-1.5 py-1 px-2 -ml-2 rounded-lg transition-colors ${isLiked ? 'text-red-500 bg-red-500/10' : 'hover:text-zinc-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'}`}
+                                                        title="Like"
+                                                    >
+                                                        <span className={`material-symbols-outlined text-[17px] ${isLiked ? 'filled' : ''}`} style={isLiked ? { fontVariationSettings: "'FILL' 1" } : undefined}>
+                                                            {isLiked ? 'favorite' : 'favorite_border'}
                                                         </span>
-                                                    )}
+                                                        <span>{currentLikes}</span>
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            navigate(`/showcase${post.id ? `?id=${post.id}` : ''}`);
+                                                        }}
+                                                        className="flex items-center gap-1.5 py-1 px-2 rounded-lg hover:text-zinc-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                                                        title="Comments"
+                                                    >
+                                                        <span className="material-symbols-outlined text-[17px]">chat_bubble_outline</span>
+                                                        <span>{post.comments || 18} Comments</span>
+                                                    </button>
+                                                    <button
+                                                        onClick={async (e) => {
+                                                            e.stopPropagation();
+                                                            const shareUrl = `${window.location.origin}/showcase${post.id ? `?id=${post.id}` : ''}`;
+                                                            if (navigator.share) {
+                                                                try {
+                                                                    await navigator.share({
+                                                                        title: `${post.author} on iFilmDirectory`,
+                                                                        text: post.content.slice(0, 100),
+                                                                        url: shareUrl,
+                                                                    });
+                                                                } catch {}
+                                                            } else {
+                                                                await navigator.clipboard.writeText(shareUrl);
+                                                                toast.success('Post link copied to clipboard!');
+                                                            }
+                                                        }}
+                                                        className="flex items-center gap-1.5 py-1 px-2 -mr-2 rounded-lg hover:text-zinc-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                                                        title="Share"
+                                                    >
+                                                        <span className="material-symbols-outlined text-[17px]">share</span>
+                                                        <span>Share</span>
+                                                    </button>
                                                 </div>
-                                            )}
-
-                                            {/* Post Text */}
-                                            <p className="text-xs sm:text-sm text-zinc-800 dark:text-zinc-200 leading-relaxed mb-3 line-clamp-3">
-                                                {post.content}
-                                            </p>
-
-                                            {/* Post Media Attachment */}
-                                            {mediaUrl && (
-                                                <div className="w-full aspect-video rounded-xl overflow-hidden bg-black mb-3 border border-zinc-200 dark:border-white/5">
-                                                    <PostMedia
-                                                        src={mediaUrl}
-                                                        fallbackType="FILM_SET"
-                                                        className="w-full h-full object-cover group-hover:scale-101 transition-transform duration-500"
-                                                    />
-                                                </div>
-                                            )}
-
-                                            {/* Engagement Bar */}
-                                            <div className="flex items-center justify-between text-xs font-semibold text-zinc-500 dark:text-zinc-400 pt-2.5 border-t border-zinc-100 dark:border-white/5">
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        if (!currentUser) {
-                                                            openAuthModal('Sign in to appreciate posts and connect with creators');
-                                                            return;
-                                                        }
-                                                        setLikedPostsMap(prev => ({ ...prev, [postKey]: !prev[postKey] }));
-                                                    }}
-                                                    className={`flex items-center gap-1.5 py-1 px-2 -ml-2 rounded-lg transition-colors ${isLiked ? 'text-red-500 bg-red-500/10' : 'hover:text-zinc-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'}`}
-                                                    title="Like"
-                                                >
-                                                    <span className={`material-symbols-outlined text-[17px] ${isLiked ? 'filled' : ''}`} style={isLiked ? { fontVariationSettings: "'FILL' 1" } : undefined}>
-                                                        {isLiked ? 'favorite' : 'favorite_border'}
-                                                    </span>
-                                                    <span>{currentLikes}</span>
-                                                </button>
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        navigate(`/showcase${post.id ? `?id=${post.id}` : ''}`);
-                                                    }}
-                                                    className="flex items-center gap-1.5 py-1 px-2 rounded-lg hover:text-zinc-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-                                                    title="Comments"
-                                                >
-                                                    <span className="material-symbols-outlined text-[17px]">chat_bubble_outline</span>
-                                                    <span>{post.comments || 18} Comments</span>
-                                                </button>
-                                                <button
-                                                    onClick={async (e) => {
-                                                        e.stopPropagation();
-                                                        const shareUrl = `${window.location.origin}/showcase${post.id ? `?id=${post.id}` : ''}`;
-                                                        if (navigator.share) {
-                                                            try {
-                                                                await navigator.share({
-                                                                    title: `${post.author} on iFilmDirectory`,
-                                                                    text: post.content.slice(0, 100),
-                                                                    url: shareUrl,
-                                                                });
-                                                            } catch {}
-                                                        } else {
-                                                            await navigator.clipboard.writeText(shareUrl);
-                                                            toast.success('Post link copied to clipboard!');
-                                                        }
-                                                    }}
-                                                    className="flex items-center gap-1.5 py-1 px-2 -mr-2 rounded-lg hover:text-zinc-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-                                                    title="Share"
-                                                >
-                                                    <span className="material-symbols-outlined text-[17px]">share</span>
-                                                    <span>Share</span>
-                                                </button>
                                             </div>
+                                        );
+                                    })
+                                ) : (
+                                    <div className="rounded-2xl bg-white dark:bg-[#121316] border border-dashed border-zinc-300 dark:border-white/15 p-6 text-center">
+                                        <div className="size-12 rounded-2xl bg-amber-500/10 text-amber-500 mx-auto flex items-center justify-center mb-3">
+                                            <span className="material-symbols-outlined text-2xl" aria-hidden="true">movie_edit</span>
                                         </div>
-                                    );
-                                })}
+                                        <h4 className="text-sm font-bold text-zinc-900 dark:text-white mb-1">Filmmaker Community Feed</h4>
+                                        <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto mb-4">
+                                            Connect with actors, cinematographers, and directors. Share your on-set updates and creative work.
+                                        </p>
+                                        <button
+                                            onClick={() => navigate('/showcase')}
+                                            className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-black font-bold text-xs transition-colors inline-flex items-center gap-1.5 shadow-sm"
+                                        >
+                                            <span className="material-symbols-outlined text-base" aria-hidden="true">add</span>
+                                            <span>Share Creative Update</span>
+                                        </button>
+                                    </div>
+                                )}
 
                                 {/* Callout card to enter community */}
                                 <div
@@ -1386,15 +1485,7 @@ export default function Home() {
 
                     {/* DESKTOP RIGHT SIDEBAR (1 col on xl desktop) */}
                     <div className="hidden xl:flex flex-col gap-6">
-                        {/* 1. Creator Shortcuts */}
-                        <div className="rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 p-4 shadow-sm dark:shadow-none">
-                            <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-3">
-                                Creator Shortcuts
-                            </h3>
-                            <QuickActionsGrid />
-                        </div>
-
-                        {/* 2. REVIEWS LISTS VIEW */}
+                        {/* 1. REVIEWS LISTS VIEW */}
                         <TopReviewsWidget />
 
                         {/* 3. JOBS LISTS VIEW */}
@@ -1409,10 +1500,10 @@ export default function Home() {
                         {/* Footer Links & Copyright (Instagram Style) */}
                         <div className="px-2 pt-2 text-[11px] text-zinc-500 space-y-2">
                             <div className="flex flex-wrap gap-x-3 gap-y-1">
-                                <span onClick={() => navigate('/privacy')} className="hover:text-zinc-300 cursor-pointer">Privacy</span>
-                                <span onClick={() => navigate('/terms')} className="hover:text-zinc-300 cursor-pointer">Terms</span>
-                                <span onClick={() => navigate('/blogs-events')} className="hover:text-zinc-300 cursor-pointer">Editorial</span>
-                                <span onClick={() => navigate('/booking-facilities')} className="hover:text-zinc-300 cursor-pointer">Facilities</span>
+                                <Link to="/privacy" className="hover:text-zinc-800 dark:hover:text-zinc-300 transition-colors">Privacy</Link>
+                                <Link to="/terms" className="hover:text-zinc-800 dark:hover:text-zinc-300 transition-colors">Terms</Link>
+                                <Link to="/blogs-events" className="hover:text-zinc-800 dark:hover:text-zinc-300 transition-colors">Editorial</Link>
+                                <Link to="/booking-facilities" className="hover:text-zinc-800 dark:hover:text-zinc-300 transition-colors">Facilities</Link>
                             </div>
                             <p>© 2026 iFilmDirectory. A property of 5M Collective Services Pvt. Ltd. (5MC). All rights reserved.</p>
                         </div>
@@ -1505,29 +1596,10 @@ export default function Home() {
                                 {selectedNewsArticle.content || selectedNewsArticle.description}
                             </div>
 
-                            {/* Editorial & Review Attribution Box */}
-                            <div className="p-3.5 rounded-xl bg-amber-50/90 dark:bg-[#1a1714] border border-amber-300/80 dark:border-amber-500/30 text-xs space-y-2">
-                                <div className="flex items-center gap-1.5 text-amber-900 dark:text-amber-400 font-extrabold text-[11px] uppercase tracking-wider">
-                                    <span className="material-symbols-outlined text-sm">verified_user</span>
-                                    <span>Editorial Attribution & Fair Use</span>
-                                </div>
-                                <p className="text-[11px] text-zinc-800 dark:text-zinc-200 leading-relaxed font-normal">
-                                    Aggregated under fair use and public RSS syndication. All trademarks, story excerpts, and copyright belong exclusively to {selectedNewsArticle.source}. Film reviews represent independent viewpoints of their respective critics.
-                                </p>
-                                <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] border-t border-amber-300/50 dark:border-amber-500/20">
-                                    <span className="text-zinc-700 dark:text-zinc-300 font-medium">Queries & DMCA:</span>
-                                    <a
-                                        href={`mailto:editorial@ifilmdirectory.com?subject=Editorial Inquiry: ${encodeURIComponent(selectedNewsArticle.title)}`}
-                                        className="text-amber-800 dark:text-amber-400 font-extrabold hover:underline inline-flex items-center gap-1"
-                                    >
-                                        <span className="material-symbols-outlined text-xs">mail</span>
-                                        editorial@ifilmdirectory.com
-                                    </a>
-                                    <span className="text-zinc-400 dark:text-zinc-500">•</span>
-                                    <a href="mailto:contact@ifilmdirectory.com" className="text-zinc-700 dark:text-zinc-300 hover:text-amber-600 font-medium">
-                                        contact@ifilmdirectory.com
-                                    </a>
-                                </div>
+                            {/* Editorial Attribution - Compact 1-line */}
+                            <div className="py-1.5 px-3 rounded-xl bg-amber-50/60 dark:bg-amber-500/[0.04] border border-amber-200/60 dark:border-amber-500/15 flex items-center justify-center gap-1.5 text-[10px] text-zinc-500 dark:text-zinc-400 text-center">
+                                <span className="material-symbols-outlined text-xs text-amber-500 shrink-0">verified_user</span>
+                                <span className="truncate">Aggregated under fair use • Excerpts & copyright belong exclusively to {selectedNewsArticle.source}</span>
                             </div>
                         </div>
 
@@ -1579,16 +1651,22 @@ export default function Home() {
                                         <span className="text-xs font-bold text-amber-600 dark:text-amber-400">
                                             {selectedJobModal.company}
                                         </span>
-                                        {(selectedJobModal.user_details?.verification_tier || (selectedJobModal as any).verified) && (
+                                        {(selectedJobModal.user_details?.verification_tier || (selectedJobModal as any).verified) && !selectedJobModal.isRss && (
                                             <span className="material-symbols-outlined text-sm text-blue-500 filled" title="Verified Production House">
                                                 verified
                                             </span>
                                         )}
-                                        {selectedJobModal.isRss && (
-                                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
-                                                Verified Portal
+                                        {selectedJobModal.isRss ? (
+                                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-white/10 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-white/10 flex items-center gap-1">
+                                                <span className="material-symbols-outlined text-[11px]" aria-hidden="true">dynamic_feed</span>
+                                                <span>Public Aggregated Notice</span>
                                             </span>
-                                        )}
+                                        ) : (selectedJobModal.user_details?.verification_tier || (selectedJobModal as any).verified) ? (
+                                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30 flex items-center gap-1">
+                                                <span className="material-symbols-outlined text-[11px]" aria-hidden="true">verified</span>
+                                                <span>Verified Production</span>
+                                            </span>
+                                        ) : null}
                                     </div>
                                     <h2 className="text-base sm:text-xl font-black text-zinc-900 dark:text-white leading-tight">
                                         {selectedJobModal.title}

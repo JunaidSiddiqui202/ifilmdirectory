@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import HamburgerMenu from '../components/HamburgerMenu';
 import Logo from '../components/Logo';
 import { jobService, type Job } from '../services/jobService';
 import { rssJobService } from '../services/rssJobService';
 import EmptyState from '../components/EmptyState';
-import PostMedia from '../components/PostMedia';
+import AvailabilityAvatar from '../components/AvailabilityAvatar';
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
 import { useAuthModal } from '../context/AuthModalContext';
@@ -246,8 +246,8 @@ export default function Jobs() {
                                 <div>
                                     <h1 className="text-lg font-black text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
                                         <span>Film & Media Fraternity Jobs</span>
-                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
-                                            Verified Portal
+                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                                            Active Board
                                         </span>
                                     </h1>
                                     <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
@@ -442,11 +442,26 @@ export default function Jobs() {
                                     {/* Top Accents */}
                                     <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/[0.03] rounded-full blur-2xl group-hover:bg-amber-500/[0.08] transition-colors" />
 
-                                    <div>
+                                    {/* Link overlay for accessibility, SEO and open-in-new-tab */}
+                                    <Link
+                                        to={`/job/${job.id}`}
+                                        className="absolute inset-0 z-0"
+                                        aria-label={`View opportunity: ${job.title} at ${job.company}`}
+                                    />
+
+                                    <div className="relative z-10 pointer-events-none">
                                         <div className="flex items-start justify-between gap-3 mb-3">
                                             <div className="flex items-center gap-3 min-w-0">
-                                                <div className="size-12 rounded-xl overflow-hidden shrink-0 border border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-black/60 shadow-inner">
-                                                    <PostMedia src={job.logo || ''} fallbackType="COMPANY_LOGO" className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                                                <div className="shrink-0">
+                                                    <AvailabilityAvatar
+                                                        src={job.logo || ''}
+                                                        alt={job.company}
+                                                        status={job.type === 'Audition' ? 'casting' : 'available'}
+                                                        size="md"
+                                                        shape="circle"
+                                                        fallbackType="COMPANY_LOGO"
+                                                        className="group-hover:scale-105 transition-transform"
+                                                    />
                                                 </div>
                                                 <div className="min-w-0">
                                                     <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400 truncate flex items-center gap-1">
@@ -481,21 +496,26 @@ export default function Jobs() {
                                         {/* Meta Chips */}
                                         <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 mb-3">
                                             <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-zinc-100 dark:bg-white/[0.04] border border-zinc-200 dark:border-white/5">
-                                                <span className="material-symbols-outlined text-[13px] text-amber-500 dark:text-amber-400">location_on</span>
+                                                <span className="material-symbols-outlined text-[13px] text-amber-500 dark:text-amber-400" aria-hidden="true">location_on</span>
                                                 <span className="truncate max-w-[130px]">{job.location || 'India'}</span>
                                             </span>
                                             {job.salary && (
                                                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-300 font-bold border border-amber-500/20">
-                                                    <span className="material-symbols-outlined text-[13px]">payments</span>
+                                                    <span className="material-symbols-outlined text-[13px]" aria-hidden="true">payments</span>
                                                     <span>{job.salary}</span>
                                                 </span>
                                             )}
-                                            {job.isRss && (
-                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 text-[10px] font-bold border border-emerald-500/20">
-                                                    <span className="material-symbols-outlined text-[11px]">verified</span>
-                                                    <span>Verified Portal</span>
+                                            {job.isRss ? (
+                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-zinc-100 dark:bg-white/10 text-zinc-600 dark:text-zinc-300 text-[10px] font-bold border border-zinc-200 dark:border-white/10">
+                                                    <span className="material-symbols-outlined text-[11px]" aria-hidden="true">dynamic_feed</span>
+                                                    <span>Public Aggregated Notice</span>
                                                 </span>
-                                            )}
+                                            ) : ((job as any).verified || job.user_details?.verification_tier) ? (
+                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 text-[10px] font-bold border border-emerald-500/20">
+                                                    <span className="material-symbols-outlined text-[11px]" aria-hidden="true">verified</span>
+                                                    <span>Verified Production</span>
+                                                </span>
+                                            ) : null}
                                         </div>
                                     </div>
 
@@ -588,8 +608,15 @@ export default function Jobs() {
                         {/* Modal Header */}
                         <div className="sticky top-0 z-20 flex items-center justify-between p-4 sm:p-5 bg-white/95 dark:bg-[#121316]/95 backdrop-blur-md border-b border-zinc-200 dark:border-white/5">
                             <div className="flex items-center gap-3 min-w-0">
-                                <div className="size-11 rounded-xl overflow-hidden shrink-0 border border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-black/60">
-                                    <PostMedia src={selectedJobModal.logo || ''} fallbackType="COMPANY_LOGO" className="w-full h-full object-cover" />
+                                <div className="shrink-0">
+                                    <AvailabilityAvatar
+                                        src={selectedJobModal.logo || ''}
+                                        alt={selectedJobModal.company}
+                                        status={selectedJobModal.type === 'Audition' ? 'casting' : 'available'}
+                                        size="sm"
+                                        shape="circle"
+                                        fallbackType="COMPANY_LOGO"
+                                    />
                                 </div>
                                 <div className="min-w-0">
                                     <div className="flex items-center gap-1 text-xs font-bold text-zinc-500 dark:text-zinc-400">
@@ -695,18 +722,10 @@ export default function Jobs() {
                                 </div>
                             )}
 
-                            {/* Job Safety Notice */}
-                            <div className="p-3.5 rounded-xl bg-amber-50/90 dark:bg-[#1a1714] border border-amber-300/80 dark:border-amber-500/30 text-xs space-y-1.5">
-                                <div className="flex items-center gap-1.5 font-extrabold text-amber-900 dark:text-amber-400">
-                                    <span className="material-symbols-outlined text-sm">verified_user</span>
-                                    <span>Casting & Opportunity Safety Notice</span>
-                                </div>
-                                <p className="text-[11px] text-zinc-800 dark:text-zinc-200 leading-relaxed font-normal">
-                                    iFilmDirectory is an open directory for film fraternity opportunities. <strong>Never pay money for auditions, registration, security deposits, or artist cards.</strong> Legitimate productions and casting directors never charge talent. Always verify production banners independently before attending private auditions or sharing sensitive personal data.
-                                </p>
-                                <p className="text-[10px] text-zinc-600 dark:text-zinc-400 leading-relaxed pt-1 border-t border-amber-300/40 dark:border-amber-500/20">
-                                    • We are <strong>not responsible for any money transactions</strong>. This is an <strong>automated feed</strong>; we are <strong>not responsible for external apply links workings or availability</strong>.
-                                </p>
+                            {/* Job Safety Notice - Compact 1-line */}
+                            <div className="py-2 px-3.5 rounded-xl bg-amber-50/60 dark:bg-amber-500/[0.04] border border-amber-200/60 dark:border-amber-500/15 flex items-center justify-center gap-1.5 text-[10px] text-zinc-600 dark:text-zinc-400 text-center">
+                                <span className="material-symbols-outlined text-xs text-amber-500 shrink-0">verified_user</span>
+                                <span className="truncate"><strong>Safety Notice:</strong> Never pay money for auditions or registration • Automated directory feed</span>
                             </div>
                         </div>
 

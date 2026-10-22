@@ -26,7 +26,7 @@ export interface UserProfile {
     };
     bio?: string;
     statusMessage?: string;
-    availabilityStatus?: 'available' | 'busy' | 'working' | 'out_of_office' | 'on_set';
+    availabilityStatus?: 'available' | 'working' | 'unavailable' | 'busy' | 'out_of_office' | 'on_set';
     phoneNumber?: string;
     location?: string;
     socialLinks?: {
@@ -279,6 +279,108 @@ export const updateUserProfile = async (uid: string, data: Partial<UserProfile>)
     }
 };
 
+export type AvailabilityStatusCode = 'available' | 'working' | 'unavailable';
+
+export interface AvailabilityConfig {
+    code: AvailabilityStatusCode;
+    statusText: string;
+    label: string;
+    dotEmoji: string;
+    badgeBg: string;
+    badgeText: string;
+    badgeBorder: string;
+    dotColor: string;
+    icon: string;
+}
+
+export const AVAILABILITY_STATUS_OPTIONS = [
+    {
+        value: 'available',
+        statusText: 'Ready to accept projects',
+        label: 'Available for Projects',
+        emoji: '🟢'
+    },
+    {
+        value: 'working',
+        statusText: 'Currently working but accepting enquiries',
+        label: 'Open to Upcoming Projects',
+        emoji: '🟡'
+    },
+    {
+        value: 'unavailable',
+        statusText: 'Not accepting work',
+        label: 'Currently Unavailable',
+        emoji: '⚫'
+    }
+] as const;
+
+export const getAvailabilityConfig = (status?: string): AvailabilityConfig => {
+    const s = (status || 'available').toLowerCase().trim();
+
+    // 2. Currently working but accepting enquiries
+    if (s === 'working' || s === 'open_to_enquiries' || s === 'on_set') {
+        return {
+            code: 'working',
+            statusText: 'Currently working but accepting enquiries',
+            label: 'Open to Upcoming Projects',
+            dotEmoji: '🟡',
+            badgeBg: 'bg-amber-500/10 dark:bg-amber-500/15',
+            badgeText: 'text-amber-700 dark:text-amber-300',
+            badgeBorder: 'border-amber-500/30',
+            dotColor: 'bg-amber-500',
+            icon: 'schedule'
+        };
+    }
+
+    // 3. Not accepting work
+    if (s === 'unavailable' || s === 'busy' || s === 'out_of_office' || s === 'not_accepting') {
+        return {
+            code: 'unavailable',
+            statusText: 'Not accepting work',
+            label: 'Currently Unavailable',
+            dotEmoji: '⚫',
+            badgeBg: 'bg-zinc-100 dark:bg-white/10',
+            badgeText: 'text-zinc-700 dark:text-zinc-300',
+            badgeBorder: 'border-zinc-300 dark:border-white/15',
+            dotColor: 'bg-zinc-500 dark:bg-zinc-400',
+            icon: 'block'
+        };
+    }
+
+    // 1. Ready to accept projects (Default)
+    return {
+        code: 'available',
+        statusText: 'Ready to accept projects',
+        label: 'Available for Projects',
+        dotEmoji: '🟢',
+        badgeBg: 'bg-emerald-500/10 dark:bg-emerald-500/15',
+        badgeText: 'text-emerald-700 dark:text-emerald-300',
+        badgeBorder: 'border-emerald-500/30',
+        dotColor: 'bg-emerald-500',
+        icon: 'check_circle'
+    };
+};
+
+export const isTestOrEmptyUser = (user: UserProfile): boolean => {
+    const name = (user.displayName || '').trim().toLowerCase();
+    if (!name) return true;
+    if (
+        name.startsWith('test') ||
+        name.startsWith('dummy') ||
+        name === 'asdf' ||
+        name === 'qwerty' ||
+        name.includes('test user') ||
+        name.includes('vege c') ||
+        name.includes('dart jet') ||
+        name.includes('dart') ||
+        (name.length < 2 && !user.photoURL) ||
+        (!user.bio && !user.role && !user.photoURL && (!user.skills || user.skills.length === 0))
+    ) {
+        return true;
+    }
+    return false;
+};
+
 export const getAllUsers = async (bypassCache: boolean = false): Promise<UserProfile[]> => {
     if (!bypassCache && allUsersCache && Date.now() - allUsersCache.timestamp < ALL_USERS_CACHE_TTL) {
         return allUsersCache.users;
@@ -286,7 +388,8 @@ export const getAllUsers = async (bypassCache: boolean = false): Promise<UserPro
 
     try {
         const querySnapshot = await getDocs(collection(db, 'users'));
-        const users = querySnapshot.docs.map(doc => doc.data() as UserProfile);
+        const rawUsers = querySnapshot.docs.map(doc => doc.data() as UserProfile);
+        const users = rawUsers.filter(u => !isTestOrEmptyUser(u));
         allUsersCache = { users, timestamp: Date.now() };
         return users;
     } catch (error) {
@@ -300,7 +403,8 @@ export const getLatestUsers = async (limitCount: number = 8): Promise<UserProfil
         const usersRef = collection(db, 'users');
         const q = query(usersRef, orderBy('createdAt', 'desc'), limit(limitCount));
         const querySnapshot = await getDocs(q);
-        return querySnapshot.docs.map(doc => doc.data() as UserProfile);
+        const rawUsers = querySnapshot.docs.map(doc => doc.data() as UserProfile);
+        return rawUsers.filter(u => !isTestOrEmptyUser(u));
     } catch (error) {
         console.warn("Error getting latest users (might need index):", error);
         // Fallback to client-side slice if index isn't ready

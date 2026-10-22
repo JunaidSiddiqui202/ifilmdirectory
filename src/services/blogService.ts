@@ -8,6 +8,8 @@ export interface ContentBlock {
     style?: 'bold' | 'italic' | 'normal';
     imageSize?: 'small' | 'medium' | 'large' | 'full';
     imageAlign?: 'left' | 'center' | 'right';
+    caption?: string;
+    courtesy?: string;
 }
 
 export interface EventDetails {
@@ -30,6 +32,8 @@ export interface BlogPost {
     authorId: string;
     authorPhoto?: string;
     image: string; // Cover image (first image from contentBlocks or uploaded)
+    coverImageCaption?: string;
+    coverImageCourtesy?: string;
     category: string;
     language?: string;
     views: number;
@@ -55,12 +59,15 @@ export const blogService = {
         authorId: string;
         author: string;
         authorPhoto?: string;
+        coverImage?: string;
+        coverImageCaption?: string;
+        coverImageCourtesy?: string;
         eventDetails?: EventDetails;
     }) => {
         try {
-            // Extract first image as cover image
+            // Extract cover image or fallback to first image from contentBlocks
             const firstImage = blogData.contentBlocks.find(block => block.type === 'image');
-            const coverImage = firstImage?.content || '';
+            const coverImage = blogData.coverImage || firstImage?.content || '';
 
             // Generate excerpt from first text block
             const firstText = blogData.contentBlocks.find(block => block.type === 'text');
@@ -83,6 +90,8 @@ export const blogService = {
                 contentBlocks: blogData.contentBlocks,
                 excerpt,
                 image: coverImage,
+                coverImageCaption: blogData.coverImageCaption || '',
+                coverImageCourtesy: blogData.coverImageCourtesy || '',
                 category: blogData.category,
                 language: blogData.language,
                 author: blogData.author,
@@ -126,13 +135,16 @@ export const blogService = {
         contentBlocks: ContentBlock[];
         category: string;
         language: string;
+        coverImage?: string;
+        coverImageCaption?: string;
+        coverImageCourtesy?: string;
     }) => {
         try {
             const blogRef = doc(db, 'blogs', blogId);
 
-            // Extract first image as cover image
+            // Extract cover image or first image from contentBlocks
             const firstImage = blogData.contentBlocks.find(block => block.type === 'image');
-            const coverImage = firstImage?.content || '';
+            const coverImage = blogData.coverImage || firstImage?.content || '';
 
             // Generate excerpt
             const firstText = blogData.contentBlocks.find(block => block.type === 'text');
@@ -154,6 +166,8 @@ export const blogService = {
                 contentBlocks: blogData.contentBlocks,
                 excerpt,
                 image: coverImage,
+                coverImageCaption: blogData.coverImageCaption || '',
+                coverImageCourtesy: blogData.coverImageCourtesy || '',
                 category: blogData.category,
                 language: blogData.language,
                 updatedAt: Timestamp.now()

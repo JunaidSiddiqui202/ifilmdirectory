@@ -126,8 +126,8 @@ export class ErrorBoundary extends Component<Props, State> {
             const { error, isChunkError, showDetails } = this.state;
 
             return (
-                <div className="min-h-[100dvh] w-full flex items-center justify-center bg-slate-50 dark:bg-[#090A0C] text-zinc-900 dark:text-white p-4 font-display selection:bg-amber-500/20 selection:text-amber-500 dark:selection:text-amber-300 transition-colors">
-                    <div className="max-w-md w-full bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.08] rounded-3xl p-6 md:p-8 text-center shadow-2xl relative overflow-hidden">
+                <div className="min-h-[100dvh] w-full flex items-center justify-center bg-slate-50 dark:bg-[#141416] text-zinc-900 dark:text-white p-4 font-display selection:bg-amber-500/20 selection:text-amber-500 dark:selection:text-amber-300 transition-colors">
+                    <div className="max-w-md w-full bg-white dark:bg-[#1e1f24] border border-zinc-200 dark:border-white/[0.08] rounded-3xl p-6 md:p-8 text-center shadow-2xl relative overflow-hidden">
                         {/* Ambient glow */}
                         <div className="absolute top-0 right-0 w-36 h-36 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 

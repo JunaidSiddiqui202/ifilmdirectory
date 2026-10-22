@@ -4,7 +4,7 @@ import { rssNewsService, type NewsItem } from '../services/rssNewsService';
 import { rssJobService } from '../services/rssJobService';
 import { type Job } from '../services/jobService';
 
-export type TickerEntry = 
+export type TickerEntry =
     | { kind: 'news'; data: NewsItem }
     | { kind: 'job'; data: Job };
 
@@ -20,21 +20,50 @@ const formatTickerTime = (timestamp?: number | string) => {
     const time = typeof timestamp === 'string' ? new Date(timestamp).getTime() : timestamp;
     if (isNaN(time)) return '';
     const diffMs = Date.now() - time;
+    if (diffMs < 0) return 'Recent';
     const mins = Math.max(1, Math.floor(diffMs / (60 * 1000)));
     if (mins < 60) return `${mins}m ago`;
     const hrs = Math.floor(mins / 60);
     if (hrs < 24) return `${hrs}h ago`;
     const days = Math.floor(hrs / 24);
-    return `${days}d ago`;
+    if (days < 7) return `${days}d ago`;
+    return new Date(time).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+};
+
+const isExcludedFromTicker = (title?: string, desc?: string) => {
+    const text = `${title || ''} ${desc || ''}`.toLowerCase();
+    // Exclude trailers, teasers, lyrical videos, promo songs, and re-releases
+    return /\b(trailer|teaser|lyrical|glimpse|promo song|promo video|re-?release|re-?releasing|rerelease|4k re-?release)\b/i.test(text);
 };
 
 export default function BreakingTicker({ variant = 'home', onNewsClick, onJobClick, onItemClick }: BreakingTickerProps) {
     const navigate = useNavigate();
     const [tickerItems, setTickerItems] = useState<TickerEntry[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [mode, setMode] = useState<'rotator' | 'marquee'>('rotator');
+    // Defaults to continuous moving marquee so the ticker actively scrolls across the screen on load.
+    const [mode, setMode] = useState<'rotator' | 'marquee'>(() => {
+        try {
+            const saved = localStorage.getItem('ifilm_ticker_mode');
+            if (saved === 'rotator' || saved === 'marquee') return saved;
+        } catch {
+            // fallback
+        }
+        return 'marquee';
+    });
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
+
+    const toggleMode = () => {
+        setMode((prev) => {
+            const next = prev === 'rotator' ? 'marquee' : 'rotator';
+            try {
+                localStorage.setItem('ifilm_ticker_mode', next);
+            } catch {
+                // ignore
+            }
+            return next;
+        });
+    };
 
     useEffect(() => {
         let mounted = true;
@@ -47,7 +76,9 @@ export default function BreakingTicker({ variant = 'home', onNewsClick, onJobCli
 
                 if (!mounted) return;
 
-                const newsItems: NewsItem[] = (newsData && (newsData as any).items) ? (newsData as any).items : [];
+                const rawNews: NewsItem[] = (newsData && (newsData as any).items) ? (newsData as any).items : [];
+                // Filter out trailers, teasers, lyrical videos, and old re-releases
+                const newsItems = rawNews.filter(it => !isExcludedFromTicker(it.title, it.description));
                 const jobList: Job[] = Array.isArray(jobsData) ? jobsData : [];
 
                 // Interweave news and fresh job arrivals:
@@ -87,20 +118,20 @@ export default function BreakingTicker({ variant = 'home', onNewsClick, onJobCli
         };
     }, []);
 
-    // Auto-advance Rotator every 4.5 seconds when not paused
+    // Auto-advance Rotator every 7.5 seconds when not paused for relaxed reading
     useEffect(() => {
         if (mode !== 'rotator' || isPaused || tickerItems.length <= 1) return;
 
         const timer = setInterval(() => {
             setCurrentIndex((prev) => (prev + 1) % tickerItems.length);
-        }, 4500);
+        }, 7500);
 
         return () => clearInterval(timer);
     }, [mode, isPaused, tickerItems.length]);
 
     if (isLoading && tickerItems.length === 0) {
         return (
-            <div className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl bg-white dark:bg-[#0a1c3e] border border-zinc-200 dark:border-blue-400/20 animate-pulse ${variant === 'home' ? 'my-2' : 'mb-6'}`}>
+            <div className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl bg-white dark:bg-[#1e1f24] border border-zinc-200 dark:border-white/10 animate-pulse ${variant === 'home' ? 'my-2' : 'mb-6'}`}>
                 <div className="size-2 rounded-full bg-red-500 animate-ping" />
                 <span className="text-xs font-bold tracking-wider uppercase text-zinc-500 dark:text-zinc-400">Loading Live Cinema Wire & Job Alerts...</span>
             </div>
@@ -138,7 +169,15 @@ export default function BreakingTicker({ variant = 'home', onNewsClick, onJobCli
     };
 
     const currentEntry = tickerItems[currentIndex] || tickerItems[0];
-    const marqueeItems = [...tickerItems, ...tickerItems];
+    // Seamless infinite loop: duplicate items evenly so translating -50% creates an invisible loop
+    const repeatMultiplier = tickerItems.length < 8 ? 4 : 2;
+    const marqueeItems = tickerItems.length > 0
+        ? Array.from({ length: repeatMultiplier }, () => tickerItems).flat()
+        : [];
+    // Dynamic duration ensuring a very calm, slow, readable speed (~18px/sec)
+    const approxItemWidth = 280;
+    const totalHalfWidth = (repeatMultiplier / 2) * Math.max(tickerItems.length, 1) * approxItemWidth;
+    const marqueeDuration = Math.max(105, Math.round(totalHalfWidth / 18));
 
     const renderSingleEntry = (entry?: TickerEntry) => {
         if (!entry) return null;
@@ -148,13 +187,12 @@ export default function BreakingTicker({ variant = 'home', onNewsClick, onJobCli
             const isAudition = job.type === 'Audition';
 
             return (
-                <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 w-full animate-ticker-slide">
+                <div key={`job-${job.id}-${currentIndex}`} className="flex items-center gap-2 sm:gap-2.5 min-w-0 w-full animate-ticker-slide">
                     {/* Job Type Tag */}
-                    <span className={`shrink-0 text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border flex items-center gap-1 ${
-                        isAudition 
-                            ? 'bg-amber-500 text-white border-amber-600' 
-                            : 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
-                    }`}>
+                    <span className={`shrink-0 text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border flex items-center gap-1 ${isAudition
+                        ? 'bg-amber-500 text-white border-amber-600'
+                        : 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
+                        }`}>
                         <span className="material-symbols-outlined text-[11px]">
                             {isAudition ? 'theater_comedy' : 'work'}
                         </span>
@@ -169,11 +207,11 @@ export default function BreakingTicker({ variant = 'home', onNewsClick, onJobCli
                     )}
 
                     {/* Job Title & Company */}
-                    <div className="min-w-0 flex-1 flex items-center gap-1.5 text-xs sm:text-sm font-bold text-zinc-900 dark:text-white group-hover:text-amber-500 transition-colors">
+                    <div className="min-w-0 flex-1 flex items-center gap-1.5 text-sm sm:text-xs font-bold text-zinc-900 dark:text-white group-hover:text-amber-500 transition-colors">
                         <span className="truncate">
                             {job.title}
                         </span>
-                        <span className="shrink-0 text-amber-600 dark:text-amber-400 font-extrabold text-[11px] sm:text-xs">
+                        <span className="shrink-0 text-amber-600 dark:text-amber-400 font-extrabold text-xs sm:text-[11px]">
                             @{job.company}
                         </span>
                         {job.location && (
@@ -201,7 +239,7 @@ export default function BreakingTicker({ variant = 'home', onNewsClick, onJobCli
         const isOpening = item.category === 'opening' || Boolean(item.openingType);
 
         return (
-            <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 w-full animate-ticker-slide">
+            <div key={`news-${item.id}-${currentIndex}`} className="flex items-center gap-2 sm:gap-2.5 min-w-0 w-full animate-ticker-slide">
                 {/* Specific Category Badges */}
                 {isRelease ? (
                     <span className="shrink-0 text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-emerald-500 text-white border border-emerald-600 flex items-center gap-1 shadow-xs">
@@ -225,8 +263,8 @@ export default function BreakingTicker({ variant = 'home', onNewsClick, onJobCli
                 )}
 
                 {/* News Headline Title - FULL TEXT CLEARLY VISIBLE */}
-                <span 
-                    className="min-w-0 flex-1 truncate text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors"
+                <span
+                    className="min-w-0 flex-1 truncate text-sm sm:text-xs font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors"
                     title={item.title}
                 >
                     {item.title}
@@ -240,7 +278,7 @@ export default function BreakingTicker({ variant = 'home', onNewsClick, onJobCli
                 )}
 
                 {/* Source & Timestamp */}
-                <div className="hidden sm:flex items-center gap-1.5 text-[11px] text-zinc-400 dark:text-zinc-500 shrink-0">
+                <div className="hidden sm:flex items-center gap-1.5 text-[11px] text-zinc-500 dark:text-zinc-400 shrink-0">
                     <span className="font-semibold text-zinc-600 dark:text-zinc-300">{item.source}</span>
                     <span>•</span>
                     <span>{formatTickerTime(item.timestamp)}</span>
@@ -251,15 +289,14 @@ export default function BreakingTicker({ variant = 'home', onNewsClick, onJobCli
 
     return (
         <div
-            className={`w-full relative flex items-center overflow-hidden rounded-2xl bg-white dark:bg-[#0a1c3e] border border-zinc-200 dark:border-blue-400/20 hover:border-amber-500/40 dark:hover:border-blue-400/50 shadow-sm dark:shadow-[0_4px_20px_rgba(2,6,23,0.4)] transition-all select-none ${
-                variant === 'home' ? 'my-2' : 'mb-6'
-            }`}
+            className={`w-full relative flex items-center overflow-hidden rounded-2xl bg-white dark:bg-[#1e1f24] border border-zinc-200 dark:border-white/10 hover:border-amber-500/40 dark:hover:border-amber-500/30 shadow-sm dark:shadow-[0_4px_20px_rgba(0,0,0,0.5)] transition-all select-none ${variant === 'home' ? 'my-2' : 'mb-6'
+                }`}
         >
             {/* Fixed Left Live Badge */}
-            <div className="z-10 shrink-0 flex items-center pl-3 sm:pl-3.5 pr-2.5 sm:pr-3 py-2 bg-white/95 dark:bg-[#0a1c3e]/95 backdrop-blur-md border-r border-zinc-200 dark:border-blue-400/20 shadow-[4px_0_12px_rgba(0,0,0,0.04)] dark:shadow-[4px_0_12px_rgba(2,6,23,0.5)]">
+            <div className="z-10 shrink-0 flex items-center pl-3 sm:pl-3.5 pr-2.5 sm:pr-3 py-2 bg-white/95 dark:bg-[#1e1f24]/95 backdrop-blur-md border-r border-zinc-200 dark:border-white/10 shadow-[4px_0_12px_rgba(0,0,0,0.04)] dark:shadow-[4px_0_12px_rgba(0,0,0,0.5)]">
                 <button
                     onClick={() => navigate('/south-cinema')}
-                    className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-xl bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-black text-[10px] sm:text-xs uppercase tracking-wider shadow-sm transition-all active:scale-95 cursor-pointer"
+                    className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-xl bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-black text-xs sm:text-[10px] uppercase tracking-wider shadow-sm transition-all active:scale-95 cursor-pointer"
                     title="View South Cinema Live Wire"
                 >
                     <span className="relative flex size-2">
@@ -273,23 +310,35 @@ export default function BreakingTicker({ variant = 'home', onNewsClick, onJobCli
             {/* Center: Full Visible Headline Area */}
             {mode === 'rotator' ? (
                 <div
-                    className="flex-1 min-w-0 px-3 sm:px-4 py-2.5 flex items-center cursor-pointer group overflow-hidden"
+                    key={`rotator-box-${currentIndex}`}
+                    className="flex-1 min-w-0 px-3 sm:px-4 py-2.5 flex items-center cursor-pointer group overflow-hidden relative"
                     onClick={() => currentEntry && handleEntryClick(currentEntry)}
                     onMouseEnter={() => setIsPaused(true)}
                     onMouseLeave={() => setIsPaused(false)}
                 >
                     {renderSingleEntry(currentEntry)}
+
+                    {/* Active auto-advance timer progress line */}
+                    {!isPaused && tickerItems.length > 1 && (
+                        <div
+                            key={`timer-progress-${currentIndex}`}
+                            className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-red-600 to-amber-500 rounded-full animate-ticker-progress pointer-events-none"
+                        />
+                    )}
                 </div>
             ) : (
                 /* Continuous Horizontally Moving Marquee Track */
-                <div 
+                <div
                     className="flex-1 overflow-hidden relative py-2.5 px-3"
                     onMouseEnter={() => setIsPaused(true)}
                     onMouseLeave={() => setIsPaused(false)}
                 >
-                    <div 
+                    <div
                         className="animate-marquee-scroll flex items-center gap-8 cursor-pointer"
-                        style={{ animationDuration: `${Math.max(60, tickerItems.length * 4)}s` }}
+                        style={{
+                            animation: `marquee-scroll ${marqueeDuration}s linear infinite`,
+                            animationPlayState: isPaused ? 'paused' : 'running',
+                        }}
                     >
                         {marqueeItems.map((entry, idx) => {
                             if (entry.kind === 'job') {
@@ -302,11 +351,10 @@ export default function BreakingTicker({ variant = 'home', onNewsClick, onJobCli
                                         onClick={() => handleEntryClick(entry)}
                                         className="flex items-center gap-2 shrink-0 group hover:opacity-100 transition-opacity"
                                     >
-                                        <span className={`text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border flex items-center gap-1 ${
-                                            isAudition 
-                                                ? 'bg-amber-500 text-white border-amber-600' 
-                                                : 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/40'
-                                        }`}>
+                                        <span className={`text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border flex items-center gap-1 ${isAudition
+                                            ? 'bg-amber-500 text-white border-amber-600'
+                                            : 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/40'
+                                            }`}>
                                             <span className="material-symbols-outlined text-[11px]">
                                                 {isAudition ? 'theater_comedy' : 'work'}
                                             </span>
@@ -319,7 +367,7 @@ export default function BreakingTicker({ variant = 'home', onNewsClick, onJobCli
                                             </span>
                                         )}
 
-                                        <span className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-white group-hover:text-amber-500 transition-colors whitespace-nowrap">
+                                        <span className="text-sm sm:text-xs font-bold text-zinc-900 dark:text-white group-hover:text-amber-500 transition-colors whitespace-nowrap">
                                             {job.title} <strong className="text-amber-600 dark:text-amber-400 font-extrabold">@{job.company}</strong> ({job.location})
                                         </span>
 
@@ -363,7 +411,7 @@ export default function BreakingTicker({ variant = 'home', onNewsClick, onJobCli
                                         </span>
                                     )}
 
-                                    <span className="text-xs sm:text-sm font-semibold text-zinc-800 dark:text-zinc-100 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors whitespace-nowrap">
+                                    <span className="text-sm sm:text-xs font-semibold text-zinc-800 dark:text-zinc-100 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors whitespace-nowrap">
                                         {item.title}
                                     </span>
 
@@ -376,15 +424,15 @@ export default function BreakingTicker({ variant = 'home', onNewsClick, onJobCli
             )}
 
             {/* Controls & Navigation */}
-            <div className="z-10 shrink-0 flex items-center gap-1 sm:gap-1.5 pr-2.5 sm:pr-3 pl-2 py-1.5 bg-white/95 dark:bg-[#0a1c3e]/95 backdrop-blur-md border-l border-zinc-200 dark:border-blue-400/20 shadow-[-4px_0_12px_rgba(0,0,0,0.04)] dark:shadow-[-4px_0_12px_rgba(2,6,23,0.5)]">
-                {/* Counter */}
+            <div className="z-10 shrink-0 flex items-center gap-1 sm:gap-1.5 pr-2.5 sm:pr-3 pl-2 py-1.5 bg-white/95 dark:bg-[#1e1f24]/95 backdrop-blur-md border-l border-zinc-200 dark:border-white/10 shadow-[-4px_0_12px_rgba(0,0,0,0.04)] dark:shadow-[-4px_0_12px_rgba(0,0,0,0.5)]">
+                {/* Counter (Rotator mode) */}
                 {mode === 'rotator' && tickerItems.length > 0 && (
                     <span className="hidden sm:inline-block text-[10px] font-black px-1.5 py-0.5 rounded-md bg-zinc-100 dark:bg-white/10 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-white/5 tabular-nums">
                         {currentIndex + 1}/{tickerItems.length}
                     </span>
                 )}
 
-                {/* Previous Button */}
+                {/* Previous Button (Rotator mode) */}
                 {mode === 'rotator' && (
                     <button
                         onClick={(e) => {
@@ -398,7 +446,7 @@ export default function BreakingTicker({ variant = 'home', onNewsClick, onJobCli
                     </button>
                 )}
 
-                {/* Next Button */}
+                {/* Next Button (Rotator mode) */}
                 {mode === 'rotator' && (
                     <button
                         onClick={(e) => {
@@ -412,21 +460,28 @@ export default function BreakingTicker({ variant = 'home', onNewsClick, onJobCli
                     </button>
                 )}
 
-                {/* Mode Switcher (Headline View / Continuous Ticker) */}
+                {/* Paused state indicator in marquee mode */}
+                {mode === 'marquee' && isPaused && (
+                    <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+                        <span className="material-symbols-outlined text-[10px]">pause</span>
+                        <span>Paused</span>
+                    </span>
+                )}
+
+                {/* Mode Switcher (Continuous Moving Marquee / Single Story View) */}
                 <button
                     onClick={(e) => {
                         e.stopPropagation();
-                        setMode(m => m === 'rotator' ? 'marquee' : 'rotator');
+                        toggleMode();
                     }}
-                    className={`size-6 sm:size-7 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
-                        mode === 'marquee'
-                            ? 'bg-amber-500 text-white shadow-xs'
-                            : 'bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/15 text-zinc-600 dark:text-zinc-400'
-                    }`}
-                    title={mode === 'rotator' ? 'Switch to Continuous Marquee' : 'Switch to Headline Rotator'}
+                    className={`size-6 sm:size-7 rounded-lg flex items-center justify-center transition-all cursor-pointer ${mode === 'marquee'
+                        ? 'bg-amber-500 text-white shadow-xs hover:bg-amber-600'
+                        : 'bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/15 text-zinc-600 dark:text-zinc-400'
+                        }`}
+                    title={mode === 'marquee' ? 'Click for Single Headline View' : 'Click for Continuous Moving Marquee'}
                 >
                     <span className="material-symbols-outlined text-sm">
-                        {mode === 'rotator' ? 'view_carousel' : 'featured_play_list'}
+                        {mode === 'marquee' ? 'view_carousel' : 'motion_photos_on'}
                     </span>
                 </button>
 

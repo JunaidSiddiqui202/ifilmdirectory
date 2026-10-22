@@ -1,11 +1,12 @@
 import { useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useAuthModal } from '../context/AuthModalContext';
 import { useTheme } from '../context/ThemeContext';
 import { useUnread } from '../context/UnreadContext';
 import Logo from './Logo';
 import PostMedia from './PostMedia';
+import AvailabilityAvatar from './AvailabilityAvatar';
 
 interface DesktopSidebarProps {
     isCreateOpen: boolean;
@@ -34,7 +35,6 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
 
     const isActive = (path: string) => {
         if (path === '/home') return location.pathname === '/home';
-        if (path === '/search') return location.pathname === '/search';
         if (path === '/showcase') return location.pathname === '/showcase';
         if (path === '/south-cinema') return location.pathname === '/south-cinema' || location.pathname === '/news';
         if (path === '/jobs') return location.pathname === '/jobs' || location.pathname.startsWith('/job/');
@@ -51,7 +51,6 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
 
     const navItems = [
         { path: '/home', label: 'Home', icon: 'home' },
-        { path: '/search', label: 'Search', icon: 'search' },
         { path: '/showcase', label: 'Feed', icon: 'movie' },
         { path: '/south-cinema', label: 'Cinema Wire', icon: 'newspaper' },
         { path: '/jobs', label: 'Jobs & Castings', icon: 'work' },
@@ -64,21 +63,13 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
         { path: '/profile', label: 'Profile', icon: 'person', isProfile: true },
     ];
 
-    const handleNavClick = (item: typeof navItems[0]) => {
-        if (!currentUser && ['/messaging', '/projects', '/saved', '/profile'].includes(item.path)) {
-            openAuthModal(`Sign in to access your ${item.label.toLowerCase()}`);
-            return;
-        }
-        navigate(item.path);
-    };
-
     return (
-        <aside className="hidden md:flex flex-col fixed left-0 top-0 bottom-0 z-40 bg-white dark:bg-[#050f26] border-r border-zinc-200 dark:border-blue-500/20 w-20 xl:w-64 select-none px-3 py-4 font-display transition-colors duration-200 overflow-y-auto overscroll-contain custom-scrollbar">
+        <aside className="hidden md:flex flex-col fixed left-0 top-0 bottom-0 z-40 bg-white dark:bg-[#141416] border-r border-zinc-200 dark:border-white/10 w-20 xl:w-64 select-none px-3 py-4 font-display transition-colors duration-200 overflow-y-auto overscroll-contain custom-scrollbar">
             {/* Top: Brand Header & Navigation */}
             <div className="flex flex-col gap-3.5 shrink-0">
                 {/* Logo */}
-                <div
-                    onClick={() => navigate('/home')}
+                <Link
+                    to="/home"
                     className="flex items-center justify-center xl:justify-start px-2 py-1 cursor-pointer group"
                     title="iFilmDirectory"
                 >
@@ -88,34 +79,22 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                     <div className="hidden xl:flex items-center gap-2.5">
                         <Logo size="md" showText={true} />
                     </div>
-                </div>
-
-                {/* Desktop Sidebar Quick Search Bar (xl:) */}
-                <button
-                    onClick={() => navigate('/search')}
-                    type="button"
-                    className="hidden xl:flex items-center gap-2.5 px-3 py-2 rounded-xl bg-zinc-100 dark:bg-[#0a1c3e] border border-zinc-200 dark:border-blue-500/20 text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:border-amber-500/40 cursor-pointer transition-all group shadow-sm text-left"
-                    title="Search across all iFilm (Press ⌘K)"
-                >
-                    <span className="material-symbols-outlined text-lg text-zinc-400 group-hover:text-amber-500 transition-colors">
-                        search
-                    </span>
-                    <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white truncate">
-                        Search directory...
-                    </span>
-                    <kbd className="ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded bg-white dark:bg-[#06132b] border border-zinc-200 dark:border-blue-500/30 text-zinc-400 shrink-0">
-                        ⌘K
-                    </kbd>
-                </button>
+                </Link>
 
                 {/* Primary Nav Links */}
                 <nav className="flex flex-col gap-1" aria-label="Desktop Primary Navigation">
                     {navItems.map((item) => {
                         const active = isActive(item.path);
                         return (
-                            <button
+                            <Link
                                 key={item.path}
-                                onClick={() => handleNavClick(item)}
+                                to={item.path}
+                                onClick={(e) => {
+                                    if (!currentUser && ['/messaging', '/projects', '/saved', '/profile'].includes(item.path)) {
+                                        e.preventDefault();
+                                        openAuthModal(`Sign in to access your ${item.label.toLowerCase()}`);
+                                    }
+                                }}
                                 title={item.label}
                                 className={`relative group flex items-center justify-center xl:justify-start gap-4 px-3 py-2.5 rounded-2xl transition-all duration-200 ${
                                     active
@@ -147,7 +126,7 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
 
                                     {/* Unread Indicator Dot */}
                                     {item.hasBadge && (
-                                        <span className="absolute -top-1 -right-1 size-2.5 bg-red-500 rounded-full ring-2 ring-white dark:ring-[#090A0C] animate-pulse shadow-sm shadow-red-500/60" />
+                                        <span className="absolute -top-1 -right-1 size-2.5 bg-red-500 rounded-full ring-2 ring-white dark:ring-[#141416] animate-pulse shadow-sm shadow-red-500/60" />
                                     )}
                                 </div>
 
@@ -160,7 +139,7 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                                 <span className="xl:hidden opacity-0 pointer-events-none group-hover:opacity-100 absolute left-full ml-3 px-2.5 py-1 bg-zinc-900 text-white dark:bg-[#18191D] dark:text-white border border-zinc-700 dark:border-white/10 text-xs font-semibold rounded-lg shadow-xl whitespace-nowrap z-50 transition-opacity">
                                     {item.label}
                                 </span>
-                            </button>
+                            </Link>
                         );
                     })}
 
@@ -197,23 +176,23 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                 <button
                     onClick={toggleDarkMode}
                     type="button"
-                    title={isDarkMode ? 'Switch to Day Theme (Studio Light)' : 'Switch to Night Theme (Midnight Sapphire)'}
-                    className="group relative flex items-center justify-center xl:justify-start gap-4 px-3 py-2.5 rounded-2xl transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-blue-500/10 cursor-pointer"
+                    title={isDarkMode ? 'Switch to Day Theme (Studio Light)' : 'Switch to Night Theme (Antigravity Gray)'}
+                    className="group relative flex items-center justify-center xl:justify-start gap-4 px-3 py-2.5 rounded-2xl transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.05] cursor-pointer"
                     aria-label="Toggle theme"
                 >
                     <div className="relative flex items-center justify-center shrink-0">
-                        <span className={`material-symbols-outlined text-[24px] transition-transform duration-200 group-hover:scale-110 ${isDarkMode ? 'text-blue-400' : 'text-amber-600'}`}>
+                        <span className={`material-symbols-outlined text-[24px] transition-transform duration-200 group-hover:scale-110 ${isDarkMode ? 'text-amber-400' : 'text-zinc-600'}`}>
                             {isDarkMode ? 'light_mode' : 'dark_mode'}
                         </span>
                     </div>
                     <span className="hidden xl:inline text-sm font-medium text-zinc-700 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-white">
                         {isDarkMode ? 'Day Theme' : 'Night Theme'}
                     </span>
-                    <span className="hidden xl:inline-block ml-auto text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:bg-blue-500/20 dark:text-blue-300 border border-amber-500/20 dark:border-blue-400/30">
+                    <span className="hidden xl:inline-block ml-auto text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:bg-white/10 dark:text-zinc-300 border border-amber-500/20 dark:border-white/10">
                         {isDarkMode ? 'Night' : 'Day'}
                     </span>
                     {/* Tooltip on collapsed tablet/desktop (md - lg) */}
-                    <span className="xl:hidden opacity-0 pointer-events-none group-hover:opacity-100 absolute left-full ml-3 px-2.5 py-1 bg-zinc-900 text-white dark:bg-[#0E2452] dark:text-white border border-zinc-700 dark:border-blue-400/30 text-xs font-semibold rounded-lg shadow-xl whitespace-nowrap z-50 transition-opacity">
+                    <span className="xl:hidden opacity-0 pointer-events-none group-hover:opacity-100 absolute left-full ml-3 px-2.5 py-1 bg-zinc-900 text-white dark:bg-[#18191D] dark:text-white border border-zinc-700 dark:border-white/10 text-xs font-semibold rounded-lg shadow-xl whitespace-nowrap z-50 transition-opacity">
                         {isDarkMode ? 'Switch to Day Theme' : 'Switch to Night Theme'}
                     </span>
                 </button>
@@ -262,18 +241,18 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
 
                 {/* User Card on expanded (xl) or Sign In button when unauthenticated */}
                 {currentUser ? (
-                    <div
-                        onClick={() => navigate('/profile')}
+                    <Link
+                        to="/profile"
                         title="My Profile"
                         className="hidden xl:flex items-center gap-3 p-2 mt-0.5 rounded-2xl bg-zinc-100 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/5 hover:border-amber-500/40 transition-all cursor-pointer group"
                     >
-                        <div className="size-9 rounded-full overflow-hidden border border-zinc-300 dark:border-white/20 group-hover:border-amber-500 transition-colors shrink-0">
-                            <PostMedia
-                                src={currentUser?.photoURL || ''}
-                                fallbackType="USER_MALE"
-                                className="w-full h-full object-cover"
-                            />
-                        </div>
+                        <AvailabilityAvatar
+                            src={currentUser?.photoURL || ''}
+                            alt={currentUser?.displayName || 'Filmmaker'}
+                            size="sm"
+                            shape="circle"
+                            className="shrink-0 group-hover:scale-105 transition-transform"
+                        />
                         <div className="min-w-0 flex-1">
                             <p className="text-xs font-bold text-zinc-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors truncate">
                                 {currentUser?.displayName || 'Filmmaker'}
@@ -283,22 +262,22 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                             </p>
                         </div>
                         <span className="material-symbols-outlined text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-800 dark:group-hover:text-white text-base">chevron_right</span>
-                    </div>
+                    </Link>
                 ) : (
                     <button
-                        onClick={() => openAuthModal('Sign in to join the filmmaker network')}
-                        title="Sign In / Register"
-                        className="group relative flex items-center justify-center xl:justify-start gap-3 p-2.5 mt-0.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white font-extrabold shadow-md shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-95 cursor-pointer"
+                        onClick={() => openAuthModal('Create your free profile to join the filmmaker network')}
+                        title="Create Profile / Sign In"
+                        className="group relative flex items-center justify-center xl:justify-start gap-3 p-2.5 mt-0.5 rounded-2xl bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-extrabold shadow-md shadow-red-500/25 transition-all hover:scale-[1.02] active:scale-95 cursor-pointer"
                     >
                         <div className="size-8 rounded-xl bg-white/20 flex items-center justify-center text-white shrink-0">
-                            <span className="material-symbols-outlined text-[20px] font-black">login</span>
+                            <span className="material-symbols-outlined text-[20px] font-black">person_add</span>
                         </div>
                         <div className="hidden xl:flex flex-col text-left leading-tight min-w-0">
-                            <span className="text-xs font-black tracking-tight truncate">Sign In / Join</span>
-                            <span className="text-[10px] font-bold opacity-80 truncate">Free Filmmaker Access</span>
+                            <span className="text-xs font-black tracking-tight truncate">Create Profile</span>
+                            <span className="text-[10px] font-bold opacity-90 truncate">Join Free / Sign In</span>
                         </div>
-                        <span className="xl:hidden opacity-0 pointer-events-none group-hover:opacity-100 absolute left-full ml-3 px-2.5 py-1 bg-zinc-900 text-white dark:bg-[#18191D] border border-amber-500/30 text-xs font-bold rounded-lg shadow-xl whitespace-nowrap z-50 transition-opacity">
-                            Sign In / Join
+                        <span className="xl:hidden opacity-0 pointer-events-none group-hover:opacity-100 absolute left-full ml-3 px-2.5 py-1 bg-zinc-900 text-white dark:bg-[#18191D] border border-red-500/30 text-xs font-bold rounded-lg shadow-xl whitespace-nowrap z-50 transition-opacity">
+                            Create Profile / Sign In
                         </span>
                     </button>
                 )}

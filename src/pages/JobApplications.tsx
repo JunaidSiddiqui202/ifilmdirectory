@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import BottomNav from '../components/BottomNav';
 import { useNavigate, useParams } from 'react-router-dom';
 import { jobService, type Job } from '../services/jobService';
+import { getUserProfile, getAvailabilityConfig } from '../services/userService';
+import AvailabilityAvatar from '../components/AvailabilityAvatar';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 
@@ -15,6 +17,7 @@ interface Application {
     message?: string;
     appliedAt: any;
     status: 'pending' | 'reviewed' | 'shortlisted' | 'rejected';
+    availabilityStatus?: string;
 }
 
 export default function JobApplications() {
@@ -49,9 +52,28 @@ export default function JobApplications() {
 
             setJob(fetchedJob);
 
-            // Fetch applications
+            // Fetch applications and enrich with applicant availability status
             const apps = await jobService.getApplicationsForJob(id) as Application[];
-            setApplications(apps || []);
+            if (apps && apps.length > 0) {
+                const enrichedApps = await Promise.all(
+                    apps.map(async (app) => {
+                        try {
+                            if (app.applicantId) {
+                                const prof = await getUserProfile(app.applicantId);
+                                if (prof?.availabilityStatus) {
+                                    return { ...app, availabilityStatus: prof.availabilityStatus };
+                                }
+                            }
+                        } catch (e) {
+                            console.error('Failed to load profile for applicant', app.applicantId, e);
+                        }
+                        return app;
+                    })
+                );
+                setApplications(enrichedApps);
+            } else {
+                setApplications([]);
+            }
             setLoading(false);
         };
 
@@ -265,23 +287,38 @@ export default function JobApplications() {
                                         <div>
                                             {/* Candidate Header */}
                                             <div className="flex items-start justify-between gap-3 mb-4">
-                                                <div className="flex items-center gap-3">
+                                                <div className="flex items-center gap-3.5">
                                                     <div className="relative">
-                                                        <img
+                                                        <AvailabilityAvatar
                                                             src={app.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(app.name)}&background=1c1d22&color=f59e0b`}
                                                             alt={app.name}
-                                                            className="w-13 h-13 rounded-2xl object-cover shrink-0 cursor-pointer border border-zinc-200 dark:border-white/10 group-hover:border-amber-500/40 transition-colors shadow-sm"
+                                                            status={app.availabilityStatus || 'available'}
+                                                            size="md"
+                                                            shape="circle"
                                                             onClick={() => navigate(`/profile/${app.applicantId}`)}
+                                                            className="cursor-pointer hover:scale-105 transition-transform"
+                                                            title="Click to view candidate profile"
                                                         />
                                                     </div>
                                                     <div>
-                                                        <h3
-                                                            className="font-bold text-zinc-900 dark:text-white text-base cursor-pointer hover:text-amber-600 dark:hover:text-amber-400 transition-colors flex items-center gap-1.5"
-                                                            onClick={() => navigate(`/profile/${app.applicantId}`)}
-                                                        >
-                                                            {app.name}
-                                                            <span className="material-symbols-outlined text-amber-500 dark:text-amber-400 text-sm">verified</span>
-                                                        </h3>
+                                                        <div className="flex items-center gap-2 flex-wrap">
+                                                            <h3
+                                                                className="font-bold text-zinc-900 dark:text-white text-base cursor-pointer hover:text-amber-600 dark:hover:text-amber-400 transition-colors flex items-center gap-1.5"
+                                                                onClick={() => navigate(`/profile/${app.applicantId}`)}
+                                                            >
+                                                                {app.name}
+                                                                <span className="material-symbols-outlined text-amber-500 dark:text-amber-400 text-sm">verified</span>
+                                                            </h3>
+                                                            {(() => {
+                                                                const avail = getAvailabilityConfig(app.availabilityStatus);
+                                                                return (
+                                                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border flex items-center gap-1 ${avail.badgeBg} ${avail.badgeText} ${avail.badgeBorder}`}>
+                                                                        <span className={`size-1.5 rounded-full ${avail.dotColor} ${avail.code === 'available' ? 'animate-pulse' : ''}`} />
+                                                                        <span>{avail.label}</span>
+                                                                    </span>
+                                                                );
+                                                            })()}
+                                                        </div>
                                                         <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">
                                                             {app.role || 'Film Industry Professional'}
                                                         </p>

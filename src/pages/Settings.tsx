@@ -241,7 +241,7 @@ export default function Settings() {
                                 className={`flex flex-col items-center text-center p-4 rounded-2xl border transition-all duration-200 relative group cursor-pointer ${
                                     !isDarkMode
                                         ? 'bg-white border-amber-500 shadow-md shadow-amber-500/10 ring-2 ring-amber-500/30'
-                                        : 'bg-white dark:bg-[#121316] border-zinc-200 dark:border-white/[0.08] hover:border-zinc-300 dark:hover:border-white/[0.15] opacity-75 hover:opacity-100'
+                                        : 'bg-white dark:bg-[#1e1f24] border-zinc-200 dark:border-white/[0.08] hover:border-zinc-300 dark:hover:border-white/[0.15] opacity-75 hover:opacity-100'
                                 }`}
                             >
                                 <div className={`size-12 rounded-2xl flex items-center justify-center mb-2.5 transition-transform group-hover:scale-105 ${
@@ -273,27 +273,27 @@ export default function Settings() {
                                 onClick={() => !isDarkMode && toggleDarkMode()}
                                 className={`flex flex-col items-center text-center p-4 rounded-2xl border transition-all duration-200 relative group cursor-pointer ${
                                     isDarkMode
-                                        ? 'bg-[#0E2452] border-blue-500 shadow-md shadow-blue-500/20 ring-2 ring-blue-500/40'
-                                        : 'bg-white dark:bg-[#0E2452] border-zinc-200 dark:border-blue-400/20 hover:border-zinc-300 dark:hover:border-blue-400/40 opacity-75 hover:opacity-100'
+                                        ? 'bg-[#1e1f24] border-amber-500 shadow-md shadow-amber-500/10 ring-2 ring-amber-500/40'
+                                        : 'bg-white dark:bg-[#1e1f24] border-zinc-200 dark:border-white/10 hover:border-zinc-300 dark:hover:border-white/20 opacity-75 hover:opacity-100'
                                 }`}
                             >
                                 <div className={`size-12 rounded-2xl flex items-center justify-center mb-2.5 transition-transform group-hover:scale-105 ${
                                     isDarkMode
-                                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
-                                        : 'bg-zinc-100 dark:bg-blue-900/40 text-blue-400'
+                                        ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/30'
+                                        : 'bg-zinc-100 dark:bg-white/10 text-zinc-400'
                                 }`}>
-                                    <span className="material-symbols-outlined text-2xl">dark_mode</span>
+                                    <span className="material-symbols-outlined text-2xl font-bold">dark_mode</span>
                                 </div>
                                 <span className="text-xs font-bold text-zinc-900 dark:text-white uppercase tracking-wider font-display">
                                     Night Theme
                                 </span>
-                                <span className="text-[11px] text-zinc-500 dark:text-blue-300 mt-0.5">
-                                    Midnight Sapphire
+                                <span className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
+                                    Antigravity Gray
                                 </span>
 
                                 {isDarkMode && (
                                     <div className="absolute top-2.5 right-2.5">
-                                        <span className="material-symbols-outlined text-blue-400 text-base filled">
+                                        <span className="material-symbols-outlined text-amber-500 text-base filled">
                                             check_circle
                                         </span>
                                     </div>
@@ -307,7 +307,7 @@ export default function Settings() {
                         <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest px-1">
                             Privacy & Inquiries
                         </span>
-                        <div className="rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.08] shadow-sm overflow-hidden divide-y divide-zinc-200 dark:divide-white/[0.06]">
+                        <div className="rounded-2xl bg-white dark:bg-[#1e1f24] border border-zinc-200 dark:border-white/[0.08] shadow-sm overflow-hidden divide-y divide-zinc-200 dark:divide-white/[0.06]">
                             {/* Direct Calls */}
                             <div className="flex items-center justify-between px-4 py-3.5">
                                 <div className="flex items-center gap-3.5">

@@ -10,6 +10,7 @@ import { useAuth } from '../context/AuthContext';
 import { useAuthModal } from '../context/AuthModalContext';
 import PostMedia from '../components/PostMedia';
 import SEO from '../components/SEO';
+import { useToast } from '../context/ToastContext';
 
 const formatTimeAgo = (timestamp: any) => {
     if (!timestamp) return 'Just now';
@@ -34,12 +35,20 @@ export default function BlogsEvents() {
     const navigate = useNavigate();
     const { currentUser } = useAuth();
     const { openAuthModal } = useAuthModal();
+    const toast = useToast();
 
     // Comment states
     const [comments, setComments] = useState<any[]>([]);
     const [commentText, setCommentText] = useState('');
     const [loadingComments, setLoadingComments] = useState(false);
     const [submittingComment, setSubmittingComment] = useState(false);
+
+    // Inline Comment & Quote Share States
+    const [activeInlineCommentId, setActiveInlineCommentId] = useState<string | null>(null);
+    const [inlineCommentText, setInlineCommentText] = useState('');
+    const [submittingInlineComment, setSubmittingInlineComment] = useState(false);
+    const [selectedQuoteText, setSelectedQuoteText] = useState('');
+    const [selectedQuotePosition, setSelectedQuotePosition] = useState<{ top: number; left: number } | null>(null);
 
     // Fetch comments when activePost changes
     useEffect(() => {
@@ -82,6 +91,81 @@ export default function BlogsEvents() {
             console.error('Error submitting comment:', error);
         }
         setSubmittingComment(false);
+    };
+
+    // Submit Inline Comment on specific paragraph or quote
+    const handlePostInlineComment = async (blockId: string, quoteSnippet: string, inlineIndex?: number) => {
+        if (!inlineCommentText.trim() || !currentUser || !activePost?.id) return;
+
+        setSubmittingInlineComment(true);
+        try {
+            await addCommentToPost({
+                postId: activePost.id,
+                author: currentUser.displayName || 'Anonymous',
+                authorId: currentUser.uid,
+                authorImage: currentUser.photoURL || '',
+                text: inlineCommentText.trim(),
+                quotedText: quoteSnippet,
+                blockId: blockId,
+                inlineIndex: inlineIndex,
+                createdAt: Timestamp.now(),
+                likes: 0,
+                type: 'blog'
+            });
+
+            // Refresh comments
+            const fetchedComments = await getCommentsForPost(activePost.id);
+            setComments(fetchedComments);
+            setInlineCommentText('');
+            setActiveInlineCommentId(null);
+            toast.success('Inline comment posted!');
+        } catch (error) {
+            console.error('Error submitting inline comment:', error);
+            toast.error('Failed to post comment.');
+        } finally {
+            setSubmittingInlineComment(false);
+        }
+    };
+
+    // Quote Sharing Handlers ("like share thing also")
+    const shareQuoteWhatsApp = (quote: string) => {
+        const url = window.location.href;
+        const text = `"${quote}"\n\nRead more on iFilmDirectory: ${url}`;
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+    };
+
+    const shareQuoteTwitter = (quote: string) => {
+        const url = window.location.href;
+        const text = `"${quote.length > 200 ? quote.substring(0, 197) + '...' : quote}" via @iFilmDirectory`;
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+    };
+
+    const copyQuoteToClipboard = (quote: string) => {
+        const url = window.location.href;
+        const text = `"${quote}" — Read on iFilmDirectory: ${url}`;
+        navigator.clipboard.writeText(text);
+        toast.success('Quote & link copied to clipboard!');
+    };
+
+    // Text Selection Event Listener for Medium-style popup
+    const handleTextSelection = () => {
+        const selection = window.getSelection();
+        if (!selection || selection.isCollapsed) {
+            setSelectedQuotePosition(null);
+            return;
+        }
+        const text = selection.toString().trim();
+        if (text.length > 5) {
+            const range = selection.getRangeAt(0);
+            const rect = range.getBoundingClientRect();
+            setSelectedQuoteText(text);
+            setSelectedQuotePosition({
+                top: Math.max(10, rect.top - 50),
+                left: Math.max(80, Math.min(window.innerWidth - 80, rect.left + rect.width / 2))
+            });
+        } else {
+            setSelectedQuotePosition(null);
+        }
     };
 
     useEffect(() => {
@@ -382,29 +466,166 @@ export default function BlogsEvents() {
                             >
                                 <span className="material-symbols-outlined">close</span>
                             </button>
+                            {(activePost.coverImageCourtesy || activePost.coverImageCaption) && (
+                                <div className="absolute bottom-2 right-3 max-w-[90%] bg-black/70 backdrop-blur-sm px-2.5 py-1 rounded-lg text-[10px] text-zinc-300 italic tracking-wide">
+                                    {activePost.coverImageCaption && <span>{activePost.coverImageCaption} • </span>}
+                                    <span>{activePost.coverImageCourtesy}</span>
+                                </div>
+                            )}
                         </div>
                         <div className="p-6">
-                            <div className="flex items-center gap-2 mb-4">
-                                <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 text-xs font-semibold border border-amber-500/20">
-                                    {activePost.category}
-                                </span>
-                                <span className="text-xs text-zinc-400">
-                                    {formatTimeAgo(activePost.date)}
-                                </span>
+                            {/* Floating Selection Tooltip (Medium style) */}
+                            {selectedQuotePosition && (
+                                <div
+                                    style={{ top: selectedQuotePosition.top, left: selectedQuotePosition.left }}
+                                    className="fixed -translate-x-1/2 z-[110] flex items-center gap-1.5 bg-zinc-950 text-white backdrop-blur-md px-3 py-1.5 rounded-full shadow-2xl border border-white/20 animate-in zoom-in-95 text-xs font-bold"
+                                >
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            if (!currentUser) return openAuthModal('Sign in to leave an inline comment');
+                                            setActiveInlineCommentId('selection');
+                                            setSelectedQuotePosition(null);
+                                        }}
+                                        className="flex items-center gap-1 hover:text-amber-400 transition-colors cursor-pointer"
+                                    >
+                                        <span className="material-symbols-outlined text-sm">chat_bubble</span>
+                                        <span>Comment</span>
+                                    </button>
+                                    <span className="w-px h-3.5 bg-white/20" />
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            shareQuoteWhatsApp(selectedQuoteText);
+                                            setSelectedQuotePosition(null);
+                                        }}
+                                        className="hover:text-emerald-400 transition-colors px-1 cursor-pointer"
+                                        title="Share to WhatsApp"
+                                    >
+                                        📱
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            shareQuoteTwitter(selectedQuoteText);
+                                            setSelectedQuotePosition(null);
+                                        }}
+                                        className="hover:text-sky-400 transition-colors px-1 cursor-pointer"
+                                        title="Share to X"
+                                    >
+                                        𝕏
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            copyQuoteToClipboard(selectedQuoteText);
+                                            setSelectedQuotePosition(null);
+                                        }}
+                                        className="hover:text-amber-400 transition-colors px-1 cursor-pointer"
+                                        title="Copy Quote"
+                                    >
+                                        <span className="material-symbols-outlined text-sm">content_copy</span>
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* Header Row: Category, Date, & Article Social Sharing */}
+                            <div className="flex items-center justify-between gap-2 mb-4">
+                                <div className="flex items-center gap-2">
+                                    <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 text-xs font-semibold border border-amber-500/20">
+                                        {activePost.category}
+                                    </span>
+                                    <span className="text-xs text-zinc-400">
+                                        {formatTimeAgo(activePost.date)}
+                                    </span>
+                                </div>
+
+                                {/* Article Social Share Bar ("like share thing also") */}
+                                <div className="flex items-center gap-1">
+                                    <button
+                                        type="button"
+                                        onClick={() => shareQuoteWhatsApp(activePost.title)}
+                                        className="size-8 rounded-lg bg-black/5 dark:bg-white/5 hover:bg-emerald-500/15 text-zinc-600 dark:text-zinc-300 hover:text-emerald-500 flex items-center justify-center transition-colors text-xs font-bold cursor-pointer"
+                                        title="Share story on WhatsApp"
+                                    >
+                                        📱
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => shareQuoteTwitter(activePost.title)}
+                                        className="size-8 rounded-lg bg-black/5 dark:bg-white/5 hover:bg-sky-500/15 text-zinc-600 dark:text-zinc-300 hover:text-sky-500 flex items-center justify-center transition-colors text-xs font-bold cursor-pointer"
+                                        title="Share story on X"
+                                    >
+                                        𝕏
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => copyQuoteToClipboard(activePost.title)}
+                                        className="size-8 rounded-lg bg-black/5 dark:bg-white/5 hover:bg-amber-500/15 text-zinc-600 dark:text-zinc-300 hover:text-amber-500 flex items-center justify-center transition-colors cursor-pointer"
+                                        title="Copy story link"
+                                    >
+                                        <span className="material-symbols-outlined text-sm">link</span>
+                                    </button>
+                                </div>
                             </div>
+
                             <h2 className="text-xl font-bold mb-4 text-zinc-900 dark:text-white">{activePost.title}</h2>
                             <div className="flex items-center gap-2 mb-6 pb-6 border-b border-black/[0.04] dark:border-white/[0.06]">
                                 <span className="material-symbols-outlined text-zinc-500 dark:text-zinc-400">person</span>
                                 <span className="font-medium text-sm text-zinc-900 dark:text-white">{activePost.author}</span>
                             </div>
-                            <div className="prose dark:prose-invert max-w-none">
+
+                            {/* Active Quote Selection Comment Banner */}
+                            {activeInlineCommentId === 'selection' && (
+                                <div className="mb-6 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-3 animate-in fade-in">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                                            <span className="material-symbols-outlined text-sm">format_quote</span>
+                                            Commenting on selected quote:
+                                        </span>
+                                        <button
+                                            type="button"
+                                            onClick={() => setActiveInlineCommentId(null)}
+                                            className="text-zinc-400 hover:text-zinc-600 text-xs"
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                    <blockquote className="text-xs italic text-zinc-700 dark:text-zinc-300 pl-3 border-l-2 border-amber-500">
+                                        "{selectedQuoteText}"
+                                    </blockquote>
+                                    <div className="flex gap-2">
+                                        <textarea
+                                            value={inlineCommentText}
+                                            onChange={(e) => setInlineCommentText(e.target.value)}
+                                            placeholder="Write your thoughts on this quote..."
+                                            className="flex-1 p-2.5 rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-[#18191d] text-xs resize-none focus:ring-2 focus:ring-amber-500 text-zinc-900 dark:text-white"
+                                            rows={2}
+                                        />
+                                        <button
+                                            type="button"
+                                            disabled={!inlineCommentText.trim() || submittingInlineComment}
+                                            onClick={() => handlePostInlineComment('selected_quote', selectedQuoteText)}
+                                            className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-white font-bold text-xs rounded-xl disabled:opacity-50 transition-all self-end cursor-pointer"
+                                        >
+                                            {submittingInlineComment ? 'Posting...' : 'Post'}
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="prose dark:prose-invert max-w-none" onMouseUp={handleTextSelection} onTouchEnd={handleTextSelection}>
                                 {activePost.contentBlocks && activePost.contentBlocks.length > 0 ? (
                                     // Render structured content blocks
-                                    <div className="space-y-4">
-                                        {activePost.contentBlocks.map((block: any, idx: number) => (
-                                            block.type === 'image' ? (
+                                    <div className="space-y-5">
+                                        {activePost.contentBlocks.map((block: any, idx: number) => {
+                                            const blockId = block.id || `block_${idx}`;
+                                            const rawQuote = (block.content || '').replace(/<[^>]*>/g, '').trim();
+                                            const blockComments = comments.filter((c: any) => c.blockId === blockId || c.inlineIndex === idx);
+
+                                            return block.type === 'image' ? (
                                                 <div
-                                                    key={idx}
+                                                    key={blockId}
                                                     className={`${block.imageAlign === 'left' ? 'float-left mr-4 mb-4' :
                                                         block.imageAlign === 'right' ? 'float-right ml-4 mb-4' :
                                                             'mx-auto clear-both'
@@ -416,31 +637,269 @@ export default function BlogsEvents() {
                                                 >
                                                     <PostMedia
                                                         src={block.content}
-                                                        alt="Blog content"
+                                                        alt={block.caption || "Blog content"}
                                                         className="w-full h-auto rounded-xl shadow-lg"
                                                         fallbackType="FILM_SET"
                                                     />
+                                                    {(block.caption || block.courtesy) && (
+                                                        <div className="text-center mt-1.5 space-y-0.5">
+                                                            {block.caption && (
+                                                                <p className="text-xs text-zinc-600 dark:text-zinc-300 italic">
+                                                                    {block.caption}
+                                                                </p>
+                                                            )}
+                                                            {block.courtesy && (
+                                                                <p className="text-[10px] text-zinc-400 dark:text-zinc-500 italic tracking-wide">
+                                                                    {block.courtesy}
+                                                                </p>
+                                                            )}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             ) : (
-                                                <div
-                                                    key={idx}
-                                                    className="text-sm leading-relaxed text-zinc-700 dark:text-zinc-300"
-                                                    dangerouslySetInnerHTML={{ __html: block.content }}
-                                                />
-                                            )
-                                        ))}
+                                                <div key={blockId} className="group/para relative space-y-2">
+                                                    <div
+                                                        className="text-sm leading-relaxed text-zinc-700 dark:text-zinc-300"
+                                                        dangerouslySetInnerHTML={{ __html: block.content }}
+                                                    />
+
+                                                    {/* Inline Comment & Share Action Pill on Each Block */}
+                                                    <div className="flex items-center gap-2 pt-1 opacity-90 sm:opacity-0 group-hover/para:opacity-100 transition-opacity">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                if (!currentUser) return openAuthModal('Sign in to comment inline');
+                                                                setActiveInlineCommentId(activeInlineCommentId === blockId ? null : blockId);
+                                                            }}
+                                                            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
+                                                                blockComments.length > 0
+                                                                    ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30'
+                                                                    : 'bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-zinc-600 dark:text-zinc-400'
+                                                            }`}
+                                                        >
+                                                            <span className="material-symbols-outlined text-xs">chat_bubble</span>
+                                                            <span>
+                                                                {blockComments.length > 0
+                                                                    ? `${blockComments.length} ${blockComments.length === 1 ? 'Comment' : 'Comments'}`
+                                                                    : 'Inline Comment'}
+                                                            </span>
+                                                        </button>
+
+                                                        {/* Share Quote Options */}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => shareQuoteWhatsApp(rawQuote)}
+                                                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-black/5 dark:bg-white/5 hover:bg-emerald-500/15 text-zinc-600 dark:text-zinc-400 hover:text-emerald-500 transition-all cursor-pointer"
+                                                            title="Share quote to WhatsApp"
+                                                        >
+                                                            📱 WhatsApp
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => shareQuoteTwitter(rawQuote)}
+                                                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-black/5 dark:bg-white/5 hover:bg-sky-500/15 text-zinc-600 dark:text-zinc-400 hover:text-sky-500 transition-all cursor-pointer"
+                                                            title="Share quote to X"
+                                                        >
+                                                            𝕏
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => copyQuoteToClipboard(rawQuote)}
+                                                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-black/5 dark:bg-white/5 hover:bg-amber-500/15 text-zinc-600 dark:text-zinc-400 hover:text-amber-500 transition-all cursor-pointer"
+                                                            title="Copy quote"
+                                                        >
+                                                            <span className="material-symbols-outlined text-xs">content_copy</span>
+                                                        </button>
+                                                    </div>
+
+                                                    {/* Inline Comment Drawer for this specific block */}
+                                                    {activeInlineCommentId === blockId && (
+                                                        <div className="p-3.5 rounded-2xl bg-black/[0.03] dark:bg-[#18191d] border border-black/[0.06] dark:border-white/10 space-y-3 animate-in fade-in">
+                                                            <div className="flex items-center justify-between">
+                                                                <span className="text-[10px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                                                                    <span className="material-symbols-outlined text-xs">chat_bubble</span>
+                                                                    Comments on this paragraph
+                                                                </span>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => setActiveInlineCommentId(null)}
+                                                                    className="text-zinc-400 hover:text-zinc-600 text-xs"
+                                                                >
+                                                                    ✕
+                                                                </button>
+                                                            </div>
+
+                                                            {/* Comments on this block */}
+                                                            {blockComments.length > 0 && (
+                                                                <div className="space-y-2">
+                                                                    {blockComments.map((c: any) => (
+                                                                        <div key={c.id} className="p-2.5 rounded-xl bg-white dark:bg-[#121316] border border-black/[0.04] dark:border-white/5 text-xs">
+                                                                            <div className="flex items-center justify-between font-bold text-zinc-900 dark:text-white">
+                                                                                <span>{c.author}</span>
+                                                                                <span className="text-[10px] text-zinc-400 font-normal">{formatTimeAgo(c.createdAt)}</span>
+                                                                            </div>
+                                                                            <p className="text-zinc-700 dark:text-zinc-300 mt-1">{c.text}</p>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            )}
+
+                                                            {/* Inline Comment Input */}
+                                                            <div className="flex gap-2">
+                                                                <input
+                                                                    type="text"
+                                                                    value={inlineCommentText}
+                                                                    onChange={(e) => setInlineCommentText(e.target.value)}
+                                                                    placeholder="Leave a comment on this quote..."
+                                                                    className="flex-1 px-3 py-1.5 rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-[#121316] text-xs text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                                                                    onKeyDown={(e) => {
+                                                                        if (e.key === 'Enter' && inlineCommentText.trim()) {
+                                                                            handlePostInlineComment(blockId, rawQuote, idx);
+                                                                        }
+                                                                    }}
+                                                                />
+                                                                <button
+                                                                    type="button"
+                                                                    disabled={!inlineCommentText.trim() || submittingInlineComment}
+                                                                    onClick={() => handlePostInlineComment(blockId, rawQuote, idx)}
+                                                                    className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-white font-bold text-xs rounded-xl transition-all disabled:opacity-50 cursor-pointer"
+                                                                >
+                                                                    {submittingInlineComment ? 'Posting...' : 'Post'}
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
                                         <div className="clear-both" />
                                     </div>
                                 ) : (
-                                    // Fallback to legacy content
-                                    <>
-                                        <p className="text-sm leading-relaxed text-zinc-500 dark:text-zinc-400 mb-4">
-                                            {activePost.excerpt}
-                                        </p>
-                                        <div className="text-sm leading-relaxed text-zinc-500 dark:text-zinc-400 whitespace-pre-wrap">
-                                            {activePost.content}
-                                        </div>
-                                    </>
+                                    // Fallback to legacy content split into paragraphs with inline comments
+                                    <div className="space-y-4">
+                                        {activePost.excerpt && (
+                                            <p className="text-sm font-medium leading-relaxed text-zinc-500 dark:text-zinc-400 italic mb-2">
+                                                {activePost.excerpt}
+                                            </p>
+                                        )}
+                                        {(activePost.content || '').split('\n\n').filter(Boolean).map((para: string, idx: number) => {
+                                            const paraId = `para_${idx}`;
+                                            const rawQuote = para.trim();
+                                            const paraComments = comments.filter((c: any) => c.blockId === paraId || c.inlineIndex === idx);
+
+                                            return (
+                                                <div key={paraId} className="group/para relative space-y-2">
+                                                    <div className="text-sm leading-relaxed text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap">
+                                                        {para}
+                                                    </div>
+
+                                                    {/* Inline Comment & Share Action Pill on Each Legacy Paragraph */}
+                                                    <div className="flex items-center gap-2 pt-1 opacity-90 sm:opacity-0 group-hover/para:opacity-100 transition-opacity">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                if (!currentUser) return openAuthModal('Sign in to comment inline');
+                                                                setActiveInlineCommentId(activeInlineCommentId === paraId ? null : paraId);
+                                                            }}
+                                                            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
+                                                                paraComments.length > 0
+                                                                    ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30'
+                                                                    : 'bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-zinc-600 dark:text-zinc-400'
+                                                            }`}
+                                                        >
+                                                            <span className="material-symbols-outlined text-xs">chat_bubble</span>
+                                                            <span>
+                                                                {paraComments.length > 0
+                                                                    ? `${paraComments.length} ${paraComments.length === 1 ? 'Comment' : 'Comments'}`
+                                                                    : 'Inline Comment'}
+                                                            </span>
+                                                        </button>
+
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => shareQuoteWhatsApp(rawQuote)}
+                                                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-black/5 dark:bg-white/5 hover:bg-emerald-500/15 text-zinc-600 dark:text-zinc-400 hover:text-emerald-500 transition-all cursor-pointer"
+                                                            title="Share quote to WhatsApp"
+                                                        >
+                                                            📱 WhatsApp
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => shareQuoteTwitter(rawQuote)}
+                                                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-black/5 dark:bg-white/5 hover:bg-sky-500/15 text-zinc-600 dark:text-zinc-400 hover:text-sky-500 transition-all cursor-pointer"
+                                                            title="Share quote to X"
+                                                        >
+                                                            𝕏
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => copyQuoteToClipboard(rawQuote)}
+                                                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-black/5 dark:bg-white/5 hover:bg-amber-500/15 text-zinc-600 dark:text-zinc-400 hover:text-amber-500 transition-all cursor-pointer"
+                                                            title="Copy quote"
+                                                        >
+                                                            <span className="material-symbols-outlined text-xs">content_copy</span>
+                                                        </button>
+                                                    </div>
+
+                                                    {/* Inline Comment Drawer for this specific paragraph */}
+                                                    {activeInlineCommentId === paraId && (
+                                                        <div className="p-3.5 rounded-2xl bg-black/[0.03] dark:bg-[#18191d] border border-black/[0.06] dark:border-white/10 space-y-3 animate-in fade-in">
+                                                            <div className="flex items-center justify-between">
+                                                                <span className="text-[10px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                                                                    <span className="material-symbols-outlined text-xs">chat_bubble</span>
+                                                                    Comments on this paragraph
+                                                                </span>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => setActiveInlineCommentId(null)}
+                                                                    className="text-zinc-400 hover:text-zinc-600 text-xs"
+                                                                >
+                                                                    ✕
+                                                                </button>
+                                                            </div>
+
+                                                            {paraComments.length > 0 && (
+                                                                <div className="space-y-2">
+                                                                    {paraComments.map((c: any) => (
+                                                                        <div key={c.id} className="p-2.5 rounded-xl bg-white dark:bg-[#121316] border border-black/[0.04] dark:border-white/5 text-xs">
+                                                                            <div className="flex items-center justify-between font-bold text-zinc-900 dark:text-white">
+                                                                                <span>{c.author}</span>
+                                                                                <span className="text-[10px] text-zinc-400 font-normal">{formatTimeAgo(c.createdAt)}</span>
+                                                                            </div>
+                                                                            <p className="text-zinc-700 dark:text-zinc-300 mt-1">{c.text}</p>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            )}
+
+                                                            <div className="flex gap-2">
+                                                                <input
+                                                                    type="text"
+                                                                    value={inlineCommentText}
+                                                                    onChange={(e) => setInlineCommentText(e.target.value)}
+                                                                    placeholder="Leave a comment on this quote..."
+                                                                    className="flex-1 px-3 py-1.5 rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-[#121316] text-xs text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                                                                    onKeyDown={(e) => {
+                                                                        if (e.key === 'Enter' && inlineCommentText.trim()) {
+                                                                            handlePostInlineComment(paraId, rawQuote, idx);
+                                                                        }
+                                                                    }}
+                                                                />
+                                                                <button
+                                                                    type="button"
+                                                                    disabled={!inlineCommentText.trim() || submittingInlineComment}
+                                                                    onClick={() => handlePostInlineComment(paraId, rawQuote, idx)}
+                                                                    className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-white font-bold text-xs rounded-xl transition-all disabled:opacity-50 cursor-pointer"
+                                                                >
+                                                                    {submittingInlineComment ? 'Posting...' : 'Post'}
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
                                 )}
                             </div>
 
@@ -523,6 +982,11 @@ export default function BlogsEvents() {
                                                             {formatTimeAgo(comment.createdAt)}
                                                         </span>
                                                     </div>
+                                                    {comment.quotedText && (
+                                                        <div className="my-1.5 pl-2.5 py-1 border-l-2 border-amber-500 bg-amber-500/5 rounded-r-lg text-xs italic text-zinc-600 dark:text-zinc-400">
+                                                            “{comment.quotedText.length > 130 ? comment.quotedText.substring(0, 130) + '...' : comment.quotedText}”
+                                                        </div>
+                                                    )}
                                                     <p className="text-sm text-zinc-700 dark:text-zinc-300 mt-1">{comment.text}</p>
                                                 </div>
                                             </div>

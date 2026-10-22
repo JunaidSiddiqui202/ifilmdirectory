@@ -5,6 +5,8 @@ import { jobService, type Job } from '../services/jobService';
 import { useAuth } from '../context/AuthContext';
 import { useAuthModal } from '../context/AuthModalContext';
 import PostMedia from '../components/PostMedia';
+import AvailabilityAvatar from '../components/AvailabilityAvatar';
+import { getUserProfile } from '../services/userService';
 import { useToast } from '../context/ToastContext';
 import SEO, { JobStructuredData, BreadcrumbStructuredData } from '../components/SEO';
 
@@ -18,9 +20,19 @@ export default function JobDetails() {
     const [job, setJob] = useState<Job | null>(null);
     const [loading, setLoading] = useState(true);
     const [hasApplied, setHasApplied] = useState(false);
+    const [myAvailabilityStatus, setMyAvailabilityStatus] = useState('available');
     const [showDisclaimerModal, setShowDisclaimerModal] = useState(false);
     const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
     const [disclaimerConfirmed, setDisclaimerConfirmed] = useState(true);
+
+    useEffect(() => {
+        if (!currentUser?.uid) return;
+        getUserProfile(currentUser.uid).then((prof) => {
+            if (prof?.availabilityStatus) {
+                setMyAvailabilityStatus(prof.availabilityStatus);
+            }
+        }).catch(console.error);
+    }, [currentUser?.uid]);
 
     const executeWithDisclaimer = (action: () => void) => {
         const isAccepted = typeof localStorage !== 'undefined' && localStorage.getItem('ifilm_job_disclaimer_accepted') === 'true';
@@ -175,8 +187,15 @@ export default function JobDetails() {
                         <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
                         <div className="flex flex-col sm:flex-row sm:items-center gap-5 relative z-10">
-                            <div className="size-20 shrink-0 rounded-2xl border-2 border-zinc-200 dark:border-white/10 shadow-2xl bg-zinc-100 dark:bg-black overflow-hidden">
-                                <PostMedia src={job.logo || ''} fallbackType="COMPANY_LOGO" className="w-full h-full object-cover" />
+                            <div className="relative shrink-0">
+                                <AvailabilityAvatar
+                                    src={job.logo || ''}
+                                    alt={job.company}
+                                    status={job.type === 'Audition' ? 'casting' : 'available'}
+                                    size="lg"
+                                    shape="circle"
+                                    fallbackType="COMPANY_LOGO"
+                                />
                             </div>
                             <div className="flex-1 min-w-0">
                                 <button
@@ -208,12 +227,17 @@ export default function JobDetails() {
                                     <span>{job.fraternityRole}</span>
                                 </div>
                             )}
-                            {job.isRss && (
-                                <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-500/20 text-xs font-bold">
-                                    <span className="material-symbols-outlined text-sm">verified</span>
-                                    <span>Verified Portal</span>
+                            {job.isRss ? (
+                                <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-zinc-100 dark:bg-white/[0.06] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/10 text-xs font-bold">
+                                    <span className="material-symbols-outlined text-sm" aria-hidden="true">dynamic_feed</span>
+                                    <span>Public Aggregated Opportunity</span>
                                 </div>
-                            )}
+                            ) : ((job as any).verified || job.user_details?.verification_tier) ? (
+                                <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-500/20 text-xs font-bold">
+                                    <span className="material-symbols-outlined text-sm" aria-hidden="true">verified</span>
+                                    <span>Verified Production</span>
+                                </div>
+                            ) : null}
                             {job.salary && (
                                 <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-xs font-bold">
                                     <span className="material-symbols-outlined text-sm">payments</span>
@@ -346,38 +370,11 @@ export default function JobDetails() {
                         </div>
                     </section>
 
-                    {/* CASTING & RECRUITMENT SAFETY DISCLAIMER */}
-                    <section className="rounded-3xl bg-amber-50/90 dark:bg-[#1a1714] border border-amber-300/80 dark:border-amber-500/30 p-5 sm:p-6 space-y-3.5 shadow-xs">
-                        <div className="flex items-center gap-2.5">
-                            <span className="material-symbols-outlined text-amber-800 dark:text-amber-400 text-xl">verified_user</span>
-                            <h3 className="text-sm font-extrabold text-amber-950 dark:text-white">
-                                iFilmDirectory Casting & Opportunity Safety Notice
-                            </h3>
-                        </div>
-                        <p className="text-xs text-zinc-800 dark:text-zinc-200 leading-relaxed font-normal">
-                            iFilmDirectory is an open directory for film fraternity opportunities. <strong>Never pay money for auditions, registration, security deposits, or artist cards.</strong> Legitimate productions and casting directors never charge talent. Always verify production banners independently before attending private auditions or sharing sensitive personal data.
-                        </p>
-                        <div className="p-3.5 rounded-2xl bg-amber-100/70 dark:bg-black/50 border border-amber-300/70 dark:border-amber-500/20 text-xs text-zinc-900 dark:text-zinc-200 space-y-1.5 leading-relaxed">
-                            <div className="flex items-center gap-1.5 font-bold text-amber-900 dark:text-amber-400 text-xs">
-                                <span className="material-symbols-outlined text-base">info</span>
-                                <span>Platform Disclaimer: Automated Feed & Transactions</span>
-                            </div>
-                            <p className="text-[11px] text-zinc-800 dark:text-zinc-300">
-                                • <strong>Financial Transactions:</strong> iFilmDirectory is <strong>not responsible for any money transactions</strong> between users, applicants, recruiters, or production banners.
-                            </p>
-                            <p className="text-[11px] text-zinc-800 dark:text-zinc-300">
-                                • <strong>Automated Feed:</strong> Please note this is an <strong>automated feed</strong> and directory aggregation; iFilmDirectory is <strong>not responsible for external apply links workings, availability, or third-party website redirects</strong>.
-                            </p>
-                        </div>
-                        <div className="pt-2 border-t border-amber-300/50 dark:border-amber-500/20 flex flex-wrap items-center justify-end gap-3 text-xs">
-                            <a
-                                href="mailto:support@ifilmdirectory.com"
-                                className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 hover:text-amber-600 transition-colors"
-                            >
-                                Help & Support Desk
-                            </a>
-                        </div>
-                    </section>
+                    {/* CASTING & RECRUITMENT SAFETY DISCLAIMER - Compact 1-line */}
+                    <div className="py-2 px-3.5 rounded-xl bg-amber-50/60 dark:bg-amber-500/[0.04] border border-amber-200/60 dark:border-amber-500/15 flex items-center justify-center gap-1.5 text-[11px] text-zinc-600 dark:text-zinc-400 text-center">
+                        <span className="material-symbols-outlined text-sm text-amber-500 shrink-0">verified_user</span>
+                        <span><strong>Safety Notice:</strong> Never pay money for auditions or registration • Automated directory feed</span>
+                    </div>
                 </main>
 
                 {/* Fixed Bottom Action Drawer */}
@@ -397,7 +394,28 @@ export default function JobDetails() {
                                 <span>Application Submitted</span>
                             </div>
                         ) : (
-                            <div className="flex items-center gap-3 w-full">
+                            <div className="w-full space-y-2.5">
+                                {currentUser && (
+                                    <div className="w-full flex items-center justify-between text-xs py-1 px-1 border-b border-zinc-200/50 dark:border-white/5 pb-2">
+                                        <div className="flex items-center gap-2 min-w-0">
+                                            <AvailabilityAvatar
+                                                src={currentUser?.photoURL || ''}
+                                                alt={currentUser?.displayName || 'You'}
+                                                status={myAvailabilityStatus}
+                                                size="xs"
+                                                shape="circle"
+                                            />
+                                            <span className="text-zinc-600 dark:text-zinc-400 font-medium truncate text-xs">
+                                                Applying as <strong className="text-zinc-900 dark:text-white font-bold">{currentUser?.displayName || 'Filmmaker'}</strong>
+                                            </span>
+                                        </div>
+                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center gap-1 shrink-0">
+                                            <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                            <span>Available for Projects</span>
+                                        </span>
+                                    </div>
+                                )}
+                                <div className="flex items-center gap-3 w-full">
                                 {job.sourceUrl && (
                                     <button
                                         type="button"
@@ -441,6 +459,7 @@ export default function JobDetails() {
                                         <span className="!text-white font-black" style={{ color: '#ffffff' }}>Contact via Support</span>
                                     </button>
                                 )}
+                                </div>
                             </div>
                         )}
                     </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import PostMedia from '../components/PostMedia';
+import AvailabilityAvatar from '../components/AvailabilityAvatar';
 import BottomNav from '../components/BottomNav';
 import Logo from '../components/Logo';
 import MediaUploadModal from '../components/MediaUploadModal';
@@ -21,7 +22,8 @@ import {
     getFollowersCount,
     getFollowingCount,
     getUserByUsername,
-    hasAdminPrivileges
+    hasAdminPrivileges,
+    getAvailabilityConfig
 } from '../services/userService';
 
 import PrivacySettingsModal from '../components/PrivacySettingsModal';
@@ -517,19 +519,21 @@ export default function UserProfile() {
 
             {/* Profile Info Section: Vertical on mobile, Instagram-Desktop horizontal layout on md: */}
             <div className="flex flex-col md:flex-row md:items-start md:gap-10 lg:gap-14 px-6 pt-3 md:pt-10 pb-6 md:pb-8">
-                {/* Profile Image (Centered on mobile, left column on desktop) */}
+                {/* Profile Image with LinkedIn-Style Cinema Availability Ribbon */}
                 <div className="relative mb-4 md:mb-0 shrink-0 self-center md:self-start">
-                    <div className="size-32 sm:size-36 md:size-40 lg:size-44 rounded-full overflow-hidden border-4 border-white/10 shadow-2xl bg-black">
-                        <PostMedia
-                            src={profile?.photoURL || ''}
-                            fallbackType={profile?.role === 'actor' ? 'ACTOR' : 'GENERAL'}
-                            className="w-full h-full object-cover"
-                        />
-                    </div>
+                    <AvailabilityAvatar
+                        src={profile?.photoURL || ''}
+                        alt={profile?.displayName || 'User'}
+                        status={profile?.availabilityStatus}
+                        size="2xl"
+                        shape="circle"
+                        fallbackType={profile?.role === 'actor' ? 'ACTOR' : 'GENERAL'}
+                        className="shadow-2xl"
+                    />
                     {isMe && (
                         <button
                             onClick={() => setIsUploadModalOpen(true)}
-                            className="absolute bottom-1 right-1 size-9 md:size-10 rounded-full bg-amber-500 border-2 border-[#090A0C] text-black shadow-lg flex items-center justify-center hover:scale-110 transition-transform active:scale-95"
+                            className="absolute bottom-1 right-1 size-9 md:size-10 rounded-full bg-amber-500 border-2 border-[#090A0C] text-black shadow-lg flex items-center justify-center hover:scale-110 transition-transform active:scale-95 z-20"
                             title="Edit photo"
                         >
                             <span className="material-symbols-outlined text-lg md:text-xl font-bold">edit</span>
@@ -684,6 +688,21 @@ export default function UserProfile() {
                                     {profile.location}
                                 </span>
                             )}
+                            {profile && (() => {
+                                const avail = getAvailabilityConfig(profile.availabilityStatus);
+                                return (
+                                    <button
+                                        type="button"
+                                        onClick={() => isMe && setIsEditProfileModalOpen(true)}
+                                        className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1.5 border shadow-2xs transition-all ${avail.badgeBg} ${avail.badgeText} ${avail.badgeBorder} ${isMe ? 'cursor-pointer hover:scale-105' : ''}`}
+                                        title={isMe ? `Click to edit status: ${avail.statusText}` : `Status: ${avail.statusText}`}
+                                    >
+                                        <span className={`size-1.5 rounded-full ${avail.dotColor} ${avail.code === 'available' ? 'animate-pulse' : ''}`} />
+                                        <span>{avail.label}</span>
+                                        {isMe && <span className="material-symbols-outlined text-xs opacity-70">edit</span>}
+                                    </button>
+                                );
+                            })()}
                         </div>
                         {profile?.bio && (
                             <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1">
@@ -1105,31 +1124,81 @@ export default function UserProfile() {
                     <div className="p-6 pb-8 flex flex-col gap-6">
                         <section>
                             <h2 className="text-xl font-bold mb-4">Work Availability</h2>
-                            <div className={`p-6 rounded-2xl border flex flex-col gap-4 shadow-sm ${profile?.availabilityStatus === 'available'
-                                ? 'bg-green-500/5 border-green-500/20'
-                                : profile?.availabilityStatus === 'busy'
-                                    ? 'bg-red-500/5 border-red-500/20'
-                                    : 'bg-primary/5 border-primary/20'
-                                }`}>
-                                <div className="flex items-center gap-3">
-                                    <span className={`material-symbols-outlined text-3xl ${profile?.availabilityStatus === 'available' ? 'text-green-500' : 'text-primary'
-                                        }`}>
-                                        {profile?.availabilityStatus === 'available' ? 'event_available' : 'schedule'}
-                                    </span>
-                                    <div>
-                                        <p className="font-black text-xl capitalize">
-                                            {profile?.availabilityStatus?.replace('_', ' ') || 'Available'}
-                                        </p>
-                                        <p className="text-sm font-medium opacity-60">Status updated recently</p>
-                                    </div>
-                                </div>
+                            {(() => {
+                                const avail = getAvailabilityConfig(profile?.availabilityStatus);
+                                return (
+                                    <div className={`p-6 rounded-2xl border flex flex-col gap-4 shadow-sm ${
+                                        avail.code === 'available'
+                                            ? 'bg-emerald-500/5 border-emerald-500/20'
+                                            : avail.code === 'working'
+                                            ? 'bg-amber-500/5 border-amber-500/20'
+                                            : 'bg-zinc-500/5 border-zinc-500/20'
+                                    }`}>
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className={`size-12 rounded-2xl flex items-center justify-center shrink-0 ${
+                                                    avail.code === 'available'
+                                                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                                                        : avail.code === 'working'
+                                                        ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                                                        : 'bg-zinc-500/10 text-zinc-600 dark:text-zinc-400'
+                                                }`}>
+                                                    <span className="material-symbols-outlined text-2xl">
+                                                        {avail.icon}
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <div className="flex items-center gap-2 flex-wrap">
+                                                        <h3 className="font-black text-xl text-zinc-900 dark:text-white flex items-center gap-1.5">
+                                                            <span>{avail.dotEmoji}</span>
+                                                            <span>{avail.label}</span>
+                                                        </h3>
+                                                    </div>
+                                                    <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 mt-0.5">
+                                                        Status: <span className="text-zinc-800 dark:text-zinc-200">{avail.statusText}</span>
+                                                    </p>
+                                                </div>
+                                            </div>
 
-                                {profile?.statusMessage && (
-                                    <div className="bg-white/50 dark:bg-black/20 p-4 rounded-xl italic text-lg text-center border border-black/5 dark:border-white/5">
-                                        "{profile.statusMessage}"
+                                            {isMe ? (
+                                                <button
+                                                    onClick={() => setIsEditProfileModalOpen(true)}
+                                                    className="px-4 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/10 dark:hover:bg-white/20 text-zinc-900 dark:text-white font-bold text-xs transition-all border border-zinc-200 dark:border-white/10 shrink-0 self-start sm:self-center"
+                                                >
+                                                    Update Status
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    onClick={() => {
+                                                        if (!currentUser) {
+                                                            openAuthModal(`Sign in to contact ${profile?.displayName || 'this creator'}`);
+                                                            return;
+                                                        }
+                                                        navigate(`/chat/${profile?.uid}`);
+                                                    }}
+                                                    className={`px-4 py-2 rounded-xl font-bold text-xs transition-all shrink-0 self-start sm:self-center ${
+                                                        avail.code === 'unavailable'
+                                                            ? 'bg-zinc-100 dark:bg-white/5 text-zinc-500 border border-zinc-200 dark:border-white/10 cursor-not-allowed'
+                                                            : 'bg-amber-500 hover:bg-amber-400 text-black shadow-xs'
+                                                    }`}
+                                                >
+                                                    {avail.code === 'available'
+                                                        ? 'Book for Projects'
+                                                        : avail.code === 'working'
+                                                        ? 'Send Project Enquiry'
+                                                        : 'Currently Unavailable'}
+                                                </button>
+                                            )}
+                                        </div>
+
+                                        {profile?.statusMessage && (
+                                            <div className="bg-white/70 dark:bg-black/30 p-4 rounded-xl italic text-sm text-zinc-700 dark:text-zinc-300 border border-black/5 dark:border-white/5">
+                                                "{profile.statusMessage}"
+                                            </div>
+                                        )}
                                     </div>
-                                )}
-                            </div>
+                                );
+                            })()}
                         </section>
                     </div>
                 )}

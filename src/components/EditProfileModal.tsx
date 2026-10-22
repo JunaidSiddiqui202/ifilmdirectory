@@ -435,18 +435,28 @@ export default function EditProfileModal({ isOpen, onClose, profile, onSave }: E
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Availability Status</label>
+                                <div className="flex items-center justify-between">
+                                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Availability Status</label>
+                                    <span className="text-[11px] font-bold text-amber-500 dark:text-amber-400">Directory Badge</span>
+                                </div>
                                 <select
-                                    value={formData.availabilityStatus || 'available'}
+                                    value={
+                                        formData.availabilityStatus === 'busy' || formData.availabilityStatus === 'out_of_office'
+                                            ? 'unavailable'
+                                            : formData.availabilityStatus === 'on_set'
+                                            ? 'working'
+                                            : (formData.availabilityStatus || 'available')
+                                    }
                                     onChange={(e) => handleChange('availabilityStatus', e.target.value)}
-                                    className="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-black/40 border border-zinc-200 dark:border-zinc-700 focus:ring-2 focus:ring-primary/50 outline-none text-zinc-900 dark:text-white"
+                                    className="w-full px-3 py-2.5 rounded-lg bg-zinc-50 dark:bg-black/40 border border-zinc-200 dark:border-zinc-700 focus:ring-2 focus:ring-primary/50 outline-none text-zinc-900 dark:text-white text-sm"
                                 >
-                                    <option value="available">Available ✅</option>
-                                    <option value="busy">Busy (No Calls) 🚫</option>
-                                    <option value="working">Currently Working 💼</option>
-                                    <option value="on_set">On Set 🎬</option>
-                                    <option value="out_of_office">Out of Office 🏖️</option>
+                                    <option value="available">🟢 Available for Projects — (Ready to accept projects)</option>
+                                    <option value="working">🟡 Open to Upcoming Projects — (Currently working but accepting enquiries)</option>
+                                    <option value="unavailable">⚫ Currently Unavailable — (Not accepting work)</option>
                                 </select>
+                                <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                                    This status badge is displayed on your profile and directory search cards for directors and casting teams.
+                                </p>
                             </div>
                         </div>
                     </section>

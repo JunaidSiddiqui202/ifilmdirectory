@@ -130,9 +130,9 @@ export default function Showcase() {
 
     // Comment Input State
     const [commentText, setCommentText] = useState('');
+    const [replyingTo, setReplyingTo] = useState<{ id: string | number; author: string } | null>(null);
     const [userProfile, setUserProfile] = useState<any>(null);
-    const [replyingTo, setReplyingTo] = useState<{ id: string | number, author: string } | null>(null);
-    const [feedFilter, setFeedFilter] = useState<'All' | 'Trailers' | 'Teasers' | 'Lyrical' | 'Openings' | 'BTS' | 'Cinematography' | 'Opportunities'>('All');
+    const [feedFilter, setFeedFilter] = useState<'All' | 'BTS' | 'Cinematography' | 'Opportunities'>('All');
     
     // Feed Mode: News & Reviews vs Creators Feed
     const [mainFeedTab, setMainFeedTab] = useState<'news' | 'creators'>(
@@ -502,18 +502,6 @@ export default function Showcase() {
         if (feedFilter === 'Opportunities') return !!post.jobId;
         const text = (post.content || '').toLowerCase();
         const role = (post.role || '').toLowerCase();
-        if (feedFilter === 'Trailers') {
-            return post.videoType === 'trailer' || text.includes('trailer');
-        }
-        if (feedFilter === 'Teasers') {
-            return post.videoType === 'teaser' || text.includes('teaser');
-        }
-        if (feedFilter === 'Lyrical') {
-            return post.videoType === 'lyrical' || text.includes('lyrical') || text.includes('song') || text.includes('track');
-        }
-        if (feedFilter === 'Openings') {
-            return post.videoType === 'opening' || text.includes('opening') || text.includes('pooja') || text.includes('muhurtham');
-        }
         if (feedFilter === 'BTS') {
             return text.includes('bts') || text.includes('behind') || text.includes('set') || text.includes('shoot') || text.includes('production');
         }
@@ -526,13 +514,15 @@ export default function Showcase() {
     const formatNewsTimeAgo = (timestamp: number) => {
         if (!timestamp) return '';
         const diffMs = Date.now() - timestamp;
+        if (diffMs < 0) return 'Recent';
         const mins = Math.floor(diffMs / (60 * 1000));
         if (mins < 1) return 'Just now';
         if (mins < 60) return `${mins}m ago`;
         const hours = Math.floor(mins / 60);
         if (hours < 24) return `${hours}h ago`;
         const days = Math.floor(hours / 24);
-        return `${days}d ago`;
+        if (days < 7) return `${days}d ago`;
+        return new Date(timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     };
 
     const getNewsIndustryBadge = (industry: NewsItem['industry']) => {
@@ -656,25 +646,7 @@ export default function Showcase() {
                                 {post.role}
                             </span>
                         )}
-                        {post.videoType && (
-                            <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 border shrink-0 ${
-                                post.videoType === 'trailer'
-                                    ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30'
-                                    : post.videoType === 'teaser'
-                                    ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30'
-                                    : post.videoType === 'lyrical'
-                                    ? 'bg-pink-500/10 text-pink-600 dark:text-pink-400 border-pink-500/30'
-                                    : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
-                            }`}>
-                                <span className="material-symbols-outlined text-xs">
-                                    {post.videoType === 'trailer' ? 'play_circle' : post.videoType === 'teaser' ? 'bolt' : post.videoType === 'lyrical' ? 'music_note' : 'movie'}
-                                </span>
-                                <span>
-                                    {post.videoType === 'trailer' ? 'Trailer' : post.videoType === 'teaser' ? 'Teaser' : post.videoType === 'lyrical' ? 'Lyrical' : 'Opening'}
-                                </span>
-                            </span>
-                        )}
-                        {mainFeedTab === 'news' && !post.videoType && (
+                        {mainFeedTab === 'news' && (
                             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
                                 Filmmaker
                             </span>
@@ -727,21 +699,6 @@ export default function Showcase() {
                     )}
                 </div>
             </div>
-
-            {/* Movie Title & Release Date Tag if present */}
-            {(post.movieTitle || post.releaseDate) && (
-                <div className="px-3.5 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-between text-xs">
-                    <span className="font-bold text-zinc-900 dark:text-white flex items-center gap-1.5">
-                        <span className="material-symbols-outlined text-sm text-amber-500">movie</span>
-                        <span>{post.movieTitle}</span>
-                    </span>
-                    {post.releaseDate && (
-                        <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
-                            Release: {post.releaseDate}
-                        </span>
-                    )}
-                </div>
-            )}
 
             {/* Content Text */}
             <div className="text-zinc-800 dark:text-zinc-200 text-sm sm:text-[15px] leading-relaxed">
@@ -819,7 +776,11 @@ export default function Showcase() {
                     <div id={`carousel-${post.id}`} className={`flex gap-2 overflow-x-auto pb-0 snap-x scrollbar-hide scroll-smooth ${post.images.length === 1 ? 'justify-center' : ''}`}>
                         {post.images.map((img, idx) => (
                             <div key={idx} className="relative shrink-0 snap-start overflow-hidden w-full aspect-video bg-black flex items-center justify-center">
-                                <PostMedia src={img} alt="Post attachment" className="w-full h-full object-cover" />
+                                <PostMedia
+                                    src={img}
+                                    alt={post.content ? `${post.author || 'Filmmaker'}: ${post.content.slice(0, 50)}` : `${post.author || 'Filmmaker'} creative portfolio media`}
+                                    className="w-full h-full object-cover"
+                                />
                             </div>
                         ))}
                     </div>
@@ -1283,7 +1244,7 @@ export default function Showcase() {
                     </div>
                 ) : (
                     <div className="flex gap-1.5 overflow-x-auto no-scrollbar py-0.5 -mx-1 px-1">
-                        {(['All', 'Trailers', 'Teasers', 'Lyrical', 'Openings', 'BTS', 'Cinematography', 'Opportunities'] as const).map((cat) => (
+                        {(['All', 'BTS', 'Cinematography', 'Opportunities'] as const).map((cat) => (
                             <button
                                 key={cat}
                                 onClick={() => setFeedFilter(cat)}
@@ -1293,7 +1254,7 @@ export default function Showcase() {
                                         : 'bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-transparent dark:border-white/5'
                                 }`}
                             >
-                                {cat === 'BTS' ? 'BTS & Stills' : cat === 'Trailers' ? '🎬 Trailers' : cat === 'Teasers' ? '⚡ Teasers' : cat === 'Lyrical' ? '🎵 Lyrical' : cat === 'Openings' ? '🍿 Openings' : cat}
+                                {cat === 'BTS' ? 'BTS & Stills' : cat}
                             </button>
                         ))}
                     </div>

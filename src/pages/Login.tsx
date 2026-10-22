@@ -347,7 +347,7 @@ export default function Login() {
                             type="button"
                             onClick={toggleDarkMode}
                             className="size-9 sm:size-auto sm:px-3 sm:py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.08] dark:hover:bg-white/[0.15] text-zinc-700 dark:text-amber-400 border border-zinc-200 dark:border-white/10 transition-all active:scale-95 cursor-pointer shadow-sm select-none flex items-center justify-center gap-1.5"
-                            title={isDarkMode ? "Switch to Day Theme (Studio Light)" : "Switch to Night Theme (Cinematic Dark)"}
+                            title={isDarkMode ? "Switch to Day Theme (Studio Light)" : "Switch to Night Theme (Antigravity Gray)"}
                             aria-label="Toggle theme"
                         >
                             <span className="material-symbols-outlined text-lg sm:text-xl">

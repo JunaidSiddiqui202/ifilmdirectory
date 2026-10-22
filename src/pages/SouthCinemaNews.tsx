@@ -242,14 +242,17 @@ export default function SouthCinemaNews() {
     const openingsCount = news.filter(n => n.category === 'opening').length;
 
     const formatTimeAgo = (timestamp: number) => {
+        if (!timestamp) return '';
         const diffMs = Date.now() - timestamp;
+        if (diffMs < 0) return 'Recent Notice';
         const mins = Math.floor(diffMs / (60 * 1000));
         if (mins < 1) return 'Just now';
         if (mins < 60) return `${mins}m ago`;
         const hours = Math.floor(mins / 60);
         if (hours < 24) return `${hours}h ago`;
         const days = Math.floor(hours / 24);
-        return `${days}d ago`;
+        if (days < 7) return `${days}d ago`;
+        return new Date(timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     };
 
     const getIndustryBadge = (industry: NewsItem['industry']) => {
@@ -878,17 +881,6 @@ export default function SouthCinemaNews() {
                                 </div>
                             )}
 
-                            {selectedArticle.trailerUrl && (
-                                <div className="w-full aspect-video rounded-2xl overflow-hidden bg-black border border-zinc-200 dark:border-white/10 shadow-md">
-                                    <iframe
-                                        src={`https://www.youtube-nocookie.com/embed/${selectedArticle.trailerUrl.split('/').pop()?.split('?')[0]}?rel=0`}
-                                        className="w-full h-full"
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                        allowFullScreen
-                                        title="Official Video Trailer / Teaser"
-                                    />
-                                </div>
-                            )}
 
                             <div className="flex items-start justify-between gap-3">
                                 <h2 className="text-base sm:text-xl font-bold text-zinc-900 dark:text-white leading-snug">
@@ -928,32 +920,10 @@ export default function SouthCinemaNews() {
                                         .map((para, i) => (
                                             <p key={i} className="leading-relaxed">{para.trim()}</p>
                                         ))}
-                                    {/* Modal Editorial Attribution & Contact Disclaimer */}
-                                    <div className="mt-5 p-3.5 rounded-xl bg-amber-50/90 dark:bg-[#1a1714] border border-amber-300/80 dark:border-amber-500/30 text-xs space-y-2">
-                                        <div className="flex items-center gap-2 text-amber-900 dark:text-amber-400 font-extrabold text-[11px] uppercase tracking-wider">
-                                            <span className="material-symbols-outlined text-sm">verified_user</span>
-                                            <span>Editorial & Review Attribution</span>
-                                        </div>
-                                        <p className="text-[11px] text-zinc-800 dark:text-zinc-200 leading-relaxed font-normal">
-                                            Aggregated under fair use and public RSS syndication for cinema industry discovery. All trademarks, excerpts, headlines, and copyright belong exclusively to the source publisher ({selectedArticle.source}). Movie reviews reflect independent opinions of respective film critics.
-                                        </p>
-                                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-1 text-[11px] border-t border-amber-300/50 dark:border-amber-500/20">
-                                            <span className="text-zinc-700 dark:text-zinc-300 font-medium">Corrections & Grievances:</span>
-                                            <a
-                                                href={`mailto:editorial@ifilmdirectory.com?subject=Editorial Inquiry: ${encodeURIComponent(selectedArticle.title)}`}
-                                                className="text-amber-800 dark:text-amber-400 font-extrabold hover:underline inline-flex items-center gap-1"
-                                            >
-                                                <span className="material-symbols-outlined text-xs">mail</span>
-                                                editorial@ifilmdirectory.com
-                                            </a>
-                                            <span className="text-zinc-400 dark:text-zinc-500">•</span>
-                                            <a
-                                                href="mailto:contact@ifilmdirectory.com"
-                                                className="text-zinc-700 dark:text-zinc-300 hover:text-amber-600 font-medium inline-flex items-center gap-1"
-                                            >
-                                                contact@ifilmdirectory.com
-                                            </a>
-                                        </div>
+                                    {/* Modal Editorial Attribution - Compact 1-line */}
+                                    <div className="mt-4 py-1.5 px-3 rounded-xl bg-amber-50/60 dark:bg-amber-500/[0.04] border border-amber-200/60 dark:border-amber-500/15 flex items-center justify-center gap-1.5 text-[10px] text-zinc-500 dark:text-zinc-400 text-center">
+                                        <span className="material-symbols-outlined text-xs text-amber-500 shrink-0">verified_user</span>
+                                        <span className="truncate">Aggregated under fair use • Excerpts & copyright belong exclusively to {selectedArticle.source}</span>
                                     </div>
                                 </div>
                             )}

@@ -121,7 +121,8 @@ function ExternalLinkModal({ isOpen, url, onClose, onConfirm }: ExternalLinkModa
     );
 }
 
-export default function PostImage({ src, alt = "Post attachment", className = "" }: PostImageProps) {
+export default function PostImage({ src, alt, className = "" }: PostImageProps) {
+    const computedAlt = alt && alt !== "Post attachment" ? alt : "Filmmaker portfolio work";
     const [hasError, setHasError] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [showLinkModal, setShowLinkModal] = useState(false);
@@ -178,7 +179,7 @@ export default function PostImage({ src, alt = "Post attachment", className = ""
             )}
             <img
                 src={src}
-                alt={alt}
+                alt={computedAlt}
                 className={`w-full h-full object-cover transition-opacity ${isLoading ? 'opacity-0' : 'opacity-100'}`}
                 loading="lazy"
                 onLoad={() => setIsLoading(false)}

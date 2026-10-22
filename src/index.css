@@ -7,16 +7,16 @@
     --color-primary: #CC0000;
     /* CNN Editorial Newsroom Theme */
     --color-background: #f8fafc;
-    --color-background-dark: #050f26; /* AccountsMan Deep Midnight Sapphire */
+    --color-background-dark: #141416; /* Antigravity Matte Dark Gray Canvas */
     --color-surface: #ffffff;
-    --color-surface-dark: #0a1c3e; /* Deep Sapphire Surface */
-    --color-surface-dark-elevated: #0f2758;
+    --color-surface-dark: #1e1f24; /* Antigravity Panel & Card Surface Gray */
+    --color-surface-dark-elevated: #26272e;
     --color-text: #0f172a;
-    --color-text-dark: #ffffff;
+    --color-text-dark: #f4f4f6;
     --color-text-secondary: #64748b;
-    --color-text-secondary-dark: #93c5fd; /* AccountsMan Ice Blue */
+    --color-text-secondary-dark: #9ca3af; /* Antigravity Muted Text Gray */
     --color-border: #e2e8f0;
-    --color-border-dark: rgba(96, 165, 250, 0.16);
+    --color-border-dark: rgba(255, 255, 255, 0.09);
   }
 
   .theme-blue {
@@ -104,7 +104,7 @@
     display: flex;
     width: max-content;
     will-change: transform;
-    animation: marquee-scroll 160s linear infinite;
+    animation: marquee-scroll 130s linear infinite;
   }
 
   .animate-marquee-scroll:hover,
@@ -115,16 +115,29 @@
   @keyframes ticker-slide-in {
     from {
       opacity: 0;
-      transform: translateY(4px);
+      transform: translateX(18px);
     }
     to {
       opacity: 1;
-      transform: translateY(0);
+      transform: translateX(0);
     }
   }
 
   .animate-ticker-slide {
-    animation: ticker-slide-in 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: ticker-slide-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes ticker-progress {
+    from {
+      width: 0%;
+    }
+    to {
+      width: 100%;
+    }
+  }
+
+  .animate-ticker-progress {
+    animation: ticker-progress 7.5s linear forwards;
   }
 }
 
@@ -404,21 +417,28 @@ html:not(.dark) [data-reel-page] .material-symbols-outlined {
 }
 
 /* ========================================================
-   ACCOUNTSMAN NIGHT THEME ENGINE (Deep Midnight Sapphire)
-   Transforms the app into the exact luminous sapphire &
-   nocturnal navy blue aesthetic from accountsman.in when
-   the 'dark' class is present on <html>
+/* ========================================================
+   ANTIGRAVITY MATTE DARK GRAY THEME ENGINE
+   Sleek Antigravity developer environment dark gray aesthetic:
+   - Canvas / Body: #141416
+   - Sticky App Bars / Sidebar / Nav: rgba(24, 25, 28, 0.96)
+   - Cards / Containers / Modals: #1e1f24
+   - Card Hover / Elevated States: #26272e
+   - Input Fields: #18191d
+   - Hairline Borders: rgba(255, 255, 255, 0.09)
+   - Primary Text: #f4f4f6
+   - Secondary / Muted Text: #9ca3af / #6b7280
+   when the 'dark' class is present on <html>
    ======================================================== */
 html.dark {
   color-scheme: dark;
-  background-color: #050f26;
+  background-color: #141416;
 }
 
 html.dark body {
-  background-color: #050f26 !important;
-  background-image: radial-gradient(130% 90% at 50% 0%, #0c2152 0%, #050f26 50%, #020713 100%) !important;
-  background-attachment: fixed !important;
-  color: #ffffff !important;
+  background-color: #141416 !important;
+  background-image: none !important;
+  color: #f4f4f6 !important;
 }
 
 /* Page canvas roots */
@@ -428,6 +448,7 @@ html.dark [class*="min-h-screen"][class*="bg-[#0B0C0E]"],
 html.dark [class*="min-h-screen"][class*="bg-[#08090B]"],
 html.dark [class*="min-h-screen"][class*="bg-[#000000]"],
 html.dark [class*="min-h-screen"][class*="bg-zinc-950"],
+html.dark [class*="min-h-screen"][class*="bg-[#141416]"],
 html.dark [class*="min-h-screen"][class*="bg-background-dark"],
 html.dark [class*="min-h-[100dvh]"][class*="bg-[#090A0C]"],
 html.dark [class*="min-h-[100dvh]"][class*="bg-[#090a0c]"],
@@ -435,11 +456,12 @@ html.dark [class*="min-h-[100dvh]"][class*="bg-[#0B0C0E]"],
 html.dark [class*="min-h-[100dvh]"][class*="bg-[#08090B]"],
 html.dark [class*="min-h-[100dvh]"][class*="bg-[#000000]"],
 html.dark [class*="min-h-[100dvh]"][class*="bg-zinc-950"],
-html.dark [class*="min-h-[100dvh]"][class*="bg-background-dark"] {
-  background-color: #050f26 !important;
-  background-image: radial-gradient(130% 90% at 50% 0%, #0c2152 0%, #050f26 50%, #020713 100%) !important;
-  background-attachment: fixed !important;
-  color: #ffffff !important;
+html.dark [class*="min-h-[100dvh]"][class*="bg-[#141416]"],
+html.dark [class*="min-h-[100dvh]"][class*="bg-background-dark"],
+html.dark [class*="bg-[#050f26]"] {
+  background-color: #141416 !important;
+  background-image: none !important;
+  color: #f4f4f6 !important;
 }
 
 /* Sticky App Bars, Top Headers, Navbars, Desktop Sidebar, Bottom Nav */
@@ -453,13 +475,16 @@ html.dark aside[class*="dark:bg-[#090A0C]"],
 html.dark header[class*="dark:bg-[#090a0c]"],
 html.dark nav[class*="dark:bg-[#090a0c]"],
 html.dark aside[class*="dark:bg-[#090a0c]"],
+html.dark header[class*="dark:bg-[#141416]"],
+html.dark nav[class*="dark:bg-[#141416]"],
+html.dark aside[class*="dark:bg-[#141416]"],
 html.dark header.dark\:bg-background-dark,
 html.dark nav.dark\:bg-background-dark,
 html.dark aside.dark\:bg-background-dark {
-  background-color: rgba(6, 17, 42, 0.94) !important;
+  background-color: rgba(24, 25, 28, 0.96) !important;
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
-  border-color: rgba(96, 165, 250, 0.16) !important;
+  border-color: rgba(255, 255, 255, 0.09) !important;
 }
 
 /* Cards, List Rows, Search Bars, Modals, Dropdowns, Sheets, Pill Filters */
@@ -471,6 +496,7 @@ html.dark [class*="bg-[#16171b]"],
 html.dark [class*="bg-[#17191e]"],
 html.dark [class*="bg-[#18191D]"],
 html.dark [class*="bg-[#18191d]"],
+html.dark [class*="bg-[#1e1f24]"],
 html.dark [class*="bg-[#1a1108]"],
 html.dark [class*="bg-[#1a1a1a]"],
 html.dark [class*="bg-[#1a1b1e]"],
@@ -491,26 +517,33 @@ html.dark [class*="bg-[#0d0d0d]"],
 html.dark [class*="dark:bg-[#121316]"],
 html.dark [class*="dark:bg-[#14161a]"],
 html.dark [class*="dark:bg-[#18191D]"],
+html.dark [class*="dark:bg-[#1e1f24]"],
+html.dark [class*="dark:bg-[#0a1c3e]"],
+html.dark [class*="dark:bg-[#06132b]"],
+html.dark [class*="dark:bg-[#0E2452]"],
 html.dark [class*="bg-surface-dark"],
 html.dark [class*="bg-zinc-900"]:not([class*="aspect-"] *):not([class*="fixed inset-0"] *),
 html.dark [class*="bg-[#090A0C]"]:not([class*="min-h-"]):not([class*="fixed inset-0"]):not(header):not(nav):not(aside),
 html.dark [class*="bg-[#090a0c]"]:not([class*="min-h-"]):not([class*="fixed inset-0"]):not(header):not(nav):not(aside) {
-  background-color: #0a1c3e !important;
-  border-color: rgba(96, 165, 250, 0.16) !important;
-  box-shadow: 0 4px 20px -2px rgba(1, 4, 15, 0.55) !important;
-  color: #ffffff;
+  background-color: #1e1f24 !important;
+  border-color: rgba(255, 255, 255, 0.09) !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.45) !important;
+  color: #f4f4f6;
 }
 
 /* Interactive card hover */
 html.dark [class*="hover:bg-[#18191D]"]:hover,
 html.dark [class*="hover:bg-[#1a1c22]"]:hover,
 html.dark [class*="hover:bg-[#1c1d22]"]:hover,
+html.dark [class*="hover:bg-[#26272e]"]:hover,
 html.dark [class*="hover:bg-zinc-800"]:hover,
 html.dark [class*="dark:hover:bg-white/[0.05]"]:hover,
 html.dark [class*="dark:hover:bg-white/[0.08]"]:hover,
-html.dark [class*="dark:hover:bg-[#18191D]"]:hover {
-  background-color: #0f2758 !important;
-  border-color: rgba(96, 165, 250, 0.3) !important;
+html.dark [class*="dark:hover:bg-[#18191D]"]:hover,
+html.dark [class*="dark:hover:bg-[#26272e]"]:hover,
+html.dark [class*="dark:hover:bg-[#0a1c3e]"]:hover {
+  background-color: #26272e !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
 }
 
 /* Inner containers and subtle item fills */
@@ -521,11 +554,11 @@ html.dark [class*="bg-white/[0.05]"],
 html.dark [class*="bg-white/5"],
 html.dark [class*="bg-white/10"]:not([class*="aspect-"] [class*="absolute"]):not([class*="fixed inset-0"] *),
 html.dark [class*="bg-zinc-800"]:not([class*="aspect-"] *):not([class*="fixed inset-0"] *) {
-  background-color: rgba(10, 28, 62, 0.65) !important;
-  border-color: rgba(96, 165, 250, 0.16) !important;
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(255, 255, 255, 0.09) !important;
 }
 
-/* Dark borders to sapphire borders */
+/* Dark borders to clean Antigravity gray hairline borders */
 html.dark [class*="border-zinc-800"]:not([class*="aspect-"] [class*="absolute"]):not([class*="fixed inset-0"] *),
 html.dark [class*="border-zinc-700"]:not([class*="aspect-"] [class*="absolute"]):not([class*="fixed inset-0"] *),
 html.dark [class*="border-white/10"]:not([class*="aspect-"] [class*="absolute"]):not([class*="fixed inset-0"] *),
@@ -534,38 +567,45 @@ html.dark [class*="border-white/[0.08]"]:not([class*="aspect-"] [class*="absolut
 html.dark [class*="dark:border-white/10"]:not([class*="aspect-"] [class*="absolute"]):not([class*="fixed inset-0"] *),
 html.dark [class*="dark:border-white/5"]:not([class*="aspect-"] [class*="absolute"]):not([class*="fixed inset-0"] *),
 html.dark [class*="dark:border-white/[0.08]"]:not([class*="aspect-"] [class*="absolute"]):not([class*="fixed inset-0"] *),
+html.dark [class*="dark:border-blue-500/20"],
+html.dark [class*="dark:border-blue-400/20"],
+html.dark [class*="dark:border-blue-400/30"],
+html.dark [class*="dark:border-blue-500/30"],
 html.dark [class*="divide-zinc-800"] > *,
 html.dark [class*="divide-white/10"] > *,
-html.dark [class*="divide-white/5"] > * {
-  border-color: rgba(96, 165, 250, 0.16) !important;
+html.dark [class*="divide-white/5"] > *,
+html.dark [class*="dark:divide-blue-500/10"] > * {
+  border-color: rgba(255, 255, 255, 0.09) !important;
 }
 
-/* Form inputs & textareas in night theme */
+/* Form inputs & textareas in night theme (Antigravity graphite fill #18191d) */
 html.dark input[class*="bg-[#"],
 html.dark textarea[class*="bg-[#"],
 html.dark select[class*="bg-[#"],
 html.dark input.bg-surface-dark,
 html.dark textarea.bg-surface-dark,
 html.dark [class*="dark:bg-[#121316]"] input,
-html.dark [class*="dark:bg-[#121316]"] textarea {
-  background-color: #06132b !important;
-  color: #ffffff !important;
-  border-color: rgba(96, 165, 250, 0.22) !important;
+html.dark [class*="dark:bg-[#121316]"] textarea,
+html.dark [class*="dark:bg-[#1e1f24]"] input,
+html.dark [class*="dark:bg-[#1e1f24]"] textarea {
+  background-color: #18191d !important;
+  color: #f4f4f6 !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
 html.dark input::placeholder,
 html.dark textarea::placeholder {
-  color: #64748b !important;
+  color: #6b7280 !important;
 }
 
-/* Subtext & muted text in night theme (Ice Blue from AccountsMan) */
+/* Subtext & muted text in night theme (Antigravity Muted Gray) */
 html.dark .text-zinc-400:not([class*="aspect-"] [class*="absolute"] *):not(button *):not([class*="btn-primary"] *):not(a *),
 html.dark .text-subtle-dark:not([class*="aspect-"] [class*="absolute"] *):not(button *):not(a *) {
-  color: #93c5fd !important;
+  color: #9ca3af !important;
 }
 
 html.dark .text-zinc-500:not([class*="aspect-"] [class*="absolute"] *):not(button *):not(a *) {
-  color: #60a5fa !important;
+  color: #6b7280 !important;
 }
 
 /* Headings in night theme */
@@ -575,38 +615,11 @@ html.dark h3:not([class*="aspect-"] [class*="absolute"] *),
 html.dark h4:not([class*="aspect-"] [class*="absolute"] *),
 html.dark h5:not([class*="aspect-"] [class*="absolute"] *),
 html.dark h6:not([class*="aspect-"] [class*="absolute"] *) {
-  color: #ffffff !important;
-}
-
-/* Electric Royal Blue CTAs in Night Theme (AccountsMan style) */
-html.dark .btn-primary,
-html.dark button[class~="bg-primary"],
-html.dark a[class~="bg-primary"] {
-  background-color: #2563eb !important;
-  background-image: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
-  color: #ffffff !important;
-  border: 1px solid rgba(147, 197, 253, 0.3) !important;
-  box-shadow: 0 8px 24px -4px rgba(37, 99, 235, 0.45) !important;
-}
-
-html.dark .btn-primary:hover,
-html.dark button[class~="bg-primary"]:hover,
-html.dark a[class~="bg-primary"]:hover {
-  background-color: #1d4ed8 !important;
-  background-image: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
-  box-shadow: 0 10px 28px -4px rgba(37, 99, 235, 0.6) !important;
-}
-
-/* Active filter pills in night mode */
-html.dark [class*="bg-amber-500/10"],
-html.dark [class*="bg-amber-500/20"] {
-  background-color: rgba(37, 99, 235, 0.18) !important;
-  border-color: rgba(96, 165, 250, 0.3) !important;
-  color: #93c5fd !important;
+  color: #f4f4f6 !important;
 }
 
 /* Dark mode toggle styles */
 html.dark .theme-toggle-night {
-  background-color: #2563eb !important;
-  border-color: rgba(147, 197, 253, 0.4) !important;
+  background-color: #26272e !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
 }
