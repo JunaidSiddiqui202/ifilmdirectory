@@ -1716,7 +1716,10 @@ export default function Search() {
                                                                     </p>
                                                                 </div>
                                                                 <div className="flex items-center justify-between pt-1 border-t border-zinc-100 dark:border-white/10 text-xs">
-                                                                    <span className="font-black text-amber-500">{loc.price}</span>
+                                                                    <span className="font-semibold text-emerald-600 dark:text-emerald-400 text-[11px] flex items-center gap-1">
+                                                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                                                        Production Ready
+                                                                    </span>
                                                                     <span className="text-zinc-400 text-[11px] flex items-center gap-0.5">
                                                                         <span className="material-symbols-outlined text-[12px] text-amber-500">star</span>
                                                                         {loc.rating} ({loc.reviews})
@@ -1845,7 +1848,10 @@ export default function Search() {
                                                         {facility.location}
                                                     </p>
                                                     <div className="flex items-center justify-between text-xs font-semibold mt-2 pt-1 border-t border-zinc-100 dark:border-white/10">
-                                                        <span className="text-amber-500">{facility.price}</span>
+                                                        <span className="font-semibold text-emerald-600 dark:text-emerald-400 text-[11px] flex items-center gap-1">
+                                                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                                            Verified Stage
+                                                        </span>
                                                         <span className="text-zinc-400 flex items-center gap-0.5 text-[11px]">
                                                             <span className="material-symbols-outlined text-[12px] text-amber-500">star</span>
                                                             {facility.rating} ({facility.reviews})

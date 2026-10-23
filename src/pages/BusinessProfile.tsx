@@ -14,8 +14,9 @@ interface Service {
     id: string;
     name: string;
     description: string;
-    price: string;
-    duration: string;
+    specs?: string[];
+    price?: string;
+    duration?: string;
     image?: string;
 }
 
@@ -162,35 +163,31 @@ export default function BusinessProfile() {
         services: [
             {
                 id: '1',
-                name: 'Indoor Shooting Floor',
-                description: '10,000 sq ft air-conditioned shooting floor with 40ft height, professional lighting grid, and green screen setup.',
-                price: '₹50,000',
-                duration: 'per day',
-                image: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=400&h=300&fit=crop'
+                name: 'Indoor Acoustic Shooting Floor (Floor 1 & 2)',
+                description: '15,000 sq ft climate-controlled sound stage with 42ft clear height, 200kW motorized lighting grid, elephant door unit access, and calibrated green screen cyc wall.',
+                specs: ['15,000 Sq.Ft Clear Floor', '42ft Clear Height', 'Motorized Lighting Grid', 'Sound Transmission Class STC 65+'],
+                image: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&h=600&fit=crop'
             },
             {
                 id: '2',
-                name: 'Outdoor Set',
-                description: 'Versatile outdoor sets including village, urban street, and period architecture. Customizable for your needs.',
-                price: '₹35,000',
-                duration: 'per day',
-                image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=400&h=300&fit=crop'
+                name: 'Heritage Standing Sets & Backlot',
+                description: 'Permanent exterior backlot featuring South Indian courtyard streets, police stations, courtrooms, and modular mansion facades with generator points.',
+                specs: ['4-Acre Standing Exterior Sets', 'Authentic Teak Corridors', 'Pre-rigged Unit Parking', '24/7 Security Clearance'],
+                image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&h=600&fit=crop'
             },
             {
                 id: '3',
-                name: 'Post-Production Suite',
-                description: 'Complete DI, color grading, VFX, and sound mixing facilities with latest software and hardware.',
-                price: '₹25,000',
-                duration: 'per day',
-                image: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&h=300&fit=crop'
+                name: 'Dolby Atmos Premier Post Suite & DI Theatre',
+                description: 'Certified 64-speaker Dolby Atmos mix stage, Christie 4K laser projection, Baselight color grading suite, and multi-track ADR recording booth.',
+                specs: ['Dolby Atmos Theatrical Mixing', 'Christie 4K DCI Projection', 'Baselight 4K HDR DI Suite', 'ADR Voice-over Booth'],
+                image: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800&h=600&fit=crop'
             },
             {
                 id: '4',
-                name: 'Equipment Rental',
-                description: 'ARRI, RED, and Sony cameras, lighting packages, grip equipment, and more.',
-                price: 'Custom',
-                duration: 'pricing',
-                image: 'https://images.unsplash.com/photo-1492619375914-88005aa9e8fb?w=400&h=300&fit=crop'
+                name: 'Cine Camera & Technocrane Grip Package',
+                description: 'Full cinema camera packages including ARRI ALEXA 35, Mini LF, RED V-Raptor XL, Master Anamorphic prime glass, 50ft Technocrane, and cine lighting trucks.',
+                specs: ['ARRI ALEXA 35 & Mini LF', 'Cooke / ARRI Master Anamorphics', 'Technocrane 50ft & Ronin 4D', 'SkyPanel / Aputure Cine Lighting'],
+                image: 'https://images.unsplash.com/photo-1492619375914-88005aa9e8fb?w=800&h=600&fit=crop'
             }
         ],
         reviews: [
@@ -260,15 +257,23 @@ export default function BusinessProfile() {
                         phone: '+91 000 000 0000',
                         email: 'contact@ifilmdirectory.com',
                         gallery: [facilityData.image],
-                        services: [
-                            {
-                                id: '1',
-                                name: facilityData.type,
-                                description: facilityData.description || 'Full access to facility',
-                                price: facilityData.price,
-                                duration: 'per day'
-                            }
-                        ],
+                        services: (facilityData.amenities && facilityData.amenities.length > 0)
+                            ? facilityData.amenities.map((amenity, idx) => ({
+                                id: String(idx + 1),
+                                name: amenity,
+                                description: `Certified studio capability for feature films, web series, and cinema shoots.`,
+                                specs: [amenity, 'Film Unit Ready', 'Acoustic / Power Certified'],
+                                image: facilityData.image
+                            }))
+                            : [
+                                {
+                                    id: '1',
+                                    name: `${facilityData.type} Floor & Facilities`,
+                                    description: facilityData.description || 'Full production access to shooting stage, power backup, and crew amenities.',
+                                    specs: ['Cine Certified', 'Production Unit Parking', 'Direct Studio Liaison'],
+                                    image: facilityData.image
+                                }
+                            ],
                         reviews: [],
                         team: [],
                         projectsCompleted: 100,
@@ -667,10 +672,10 @@ export default function BusinessProfile() {
                         {business.services.map((service) => (
                             <div
                                 key={service.id}
-                                className="rounded-2xl bg-white dark:bg-zinc-900 overflow-hidden border border-zinc-100 dark:border-zinc-800 hover:shadow-lg transition-shadow"
+                                className="rounded-2xl bg-white dark:bg-zinc-900 overflow-hidden border border-zinc-200 dark:border-white/[0.08] hover:shadow-lg transition-all"
                             >
                                 {service.image && (
-                                    <div className="aspect-video w-full overflow-hidden">
+                                    <div className="aspect-video w-full overflow-hidden max-h-64 bg-black">
                                         <PostMedia
                                             src={service.image}
                                             className="h-full w-full object-cover"
@@ -683,9 +688,35 @@ export default function BusinessProfile() {
                                     <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
                                         {service.description}
                                     </p>
-                                    <div className="mt-4">
-                                        <button className="w-full rounded-xl bg-primary py-3 text-sm font-bold text-white hover:bg-primary/90 transition-colors">
-                                            Inquire Now
+
+                                    {/* Cinema Technical Specs Pills */}
+                                    {service.specs && service.specs.length > 0 && (
+                                        <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-zinc-100 dark:border-white/[0.06]">
+                                            {service.specs.map((spec, sIdx) => (
+                                                <span
+                                                    key={sIdx}
+                                                    className="px-2.5 py-1 rounded-lg bg-zinc-100 dark:bg-white/[0.05] text-zinc-700 dark:text-zinc-300 text-xs font-semibold flex items-center gap-1.5 border border-zinc-200/60 dark:border-white/5"
+                                                >
+                                                    <span className="material-symbols-outlined text-xs text-amber-500">check_circle</span>
+                                                    {spec}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    <div className="mt-5">
+                                        <button
+                                            onClick={() => {
+                                                if (!currentUser) {
+                                                    openAuthModal('Sign in to inquire about studio facilities');
+                                                    return;
+                                                }
+                                                setShowContactModal(true);
+                                            }}
+                                            className="w-full rounded-xl bg-amber-500 hover:bg-amber-400 py-3 text-sm font-bold text-white shadow-md shadow-amber-500/20 transition-all active:scale-[0.99] flex items-center justify-center gap-2"
+                                        >
+                                            <span className="material-symbols-outlined text-base">calendar_month</span>
+                                            <span>Inquire Availability for this Stage</span>
                                         </button>
                                     </div>
                                 </div>

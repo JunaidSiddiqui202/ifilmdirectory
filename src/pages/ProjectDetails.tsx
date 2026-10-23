@@ -67,7 +67,7 @@ export default function ProjectDetails() {
             await projectService.addToShortlist(id, {
                 userId: talent.uid,
                 userName: talent.displayName || 'Cinema Talent',
-                userPhoto: talent.photoURL,
+                userPhoto: talent.photoURL || undefined,
                 role: talent.role || 'Industry Professional',
                 status: 'shortlisted'
             });

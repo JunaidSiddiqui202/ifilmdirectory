@@ -209,12 +209,11 @@ export default function BookingFacilities() {
                                                 <span className="text-white font-bold">{facility.rating || 4.9}</span>
                                             </div>
 
-                                            {/* Price Tag */}
-                                            {facility.price && (
-                                                <span className="absolute bottom-2.5 right-2.5 px-3 py-1 rounded-lg bg-amber-500 text-white text-xs font-black shadow-lg">
-                                                    {facility.price}
-                                                </span>
-                                            )}
+                                            {/* Status Badge */}
+                                            <span className="absolute bottom-2.5 right-2.5 px-2.5 py-1 rounded-lg bg-black/75 backdrop-blur-md text-emerald-400 border border-emerald-500/30 text-[11px] font-bold flex items-center gap-1 shadow-md">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                                Available for Production
+                                            </span>
                                         </div>
 
                                         <h3 className="text-base font-bold text-zinc-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors truncate">
@@ -225,22 +224,35 @@ export default function BookingFacilities() {
                                             {facility.location || 'Pan-India Production Hub'}
                                         </p>
 
-                                        {/* Specs tags if available */}
-                                        <div className="flex items-center gap-2 mt-3 flex-wrap">
-                                            <span className="text-[10px] px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-white/[0.04] text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-white/[0.06] flex items-center gap-1">
-                                                <span className="material-symbols-outlined text-[11px] text-amber-500 dark:text-amber-400">verified</span>
-                                                Cine Certified
-                                            </span>
-                                            <span className="text-[10px] px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-white/[0.04] text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-white/[0.06]">
-                                                Direct Inquiries
-                                            </span>
+                                        {/* Brief Overview */}
+                                        {facility.description && (
+                                            <p className="text-xs text-zinc-600 dark:text-zinc-400 line-clamp-2 mt-2 leading-relaxed">
+                                                {facility.description}
+                                            </p>
+                                        )}
+
+                                        {/* Cinema Specs & Amenities Pills */}
+                                        <div className="flex items-center gap-1.5 mt-3 flex-wrap">
+                                            {(facility.amenities && facility.amenities.length > 0
+                                                ? facility.amenities.slice(0, 3)
+                                                : ['Cine Certified Floor', 'Direct Studio Desk', 'Acoustic Treated']
+                                            ).map((amenity, i) => (
+                                                <span
+                                                    key={i}
+                                                    className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-white/[0.04] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/[0.06] flex items-center gap-1"
+                                                >
+                                                    <span className="material-symbols-outlined text-[10px] text-amber-500 dark:text-amber-400">check_circle</span>
+                                                    {amenity}
+                                                </span>
+                                            ))}
                                         </div>
                                     </div>
 
                                     <div className="pt-3 border-t border-zinc-200 dark:border-white/[0.06] mt-4 flex items-center justify-between gap-2">
-                                        <span className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">
-                                            5MC Verified Facility
-                                        </span>
+                                        <div className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 font-medium">
+                                            <span className="material-symbols-outlined text-sm text-blue-500 filled" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+                                            <span>Studio Certified</span>
+                                        </div>
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
@@ -248,7 +260,7 @@ export default function BookingFacilities() {
                                             }}
                                             className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-white text-xs font-bold transition-all active:scale-95 flex items-center gap-1.5 shadow-md shadow-amber-500/20"
                                         >
-                                            <span className="text-white">View Details</span>
+                                            <span className="text-white">Studio Specs & Inquire</span>
                                             <span className="material-symbols-outlined text-sm text-white">arrow_forward</span>
                                         </button>
                                     </div>

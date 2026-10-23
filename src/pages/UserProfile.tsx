@@ -34,7 +34,7 @@ import SEO, { PersonStructuredData, BreadcrumbStructuredData } from '../componen
 import { findCuratedTalent } from '../constants/curatedTalent';
 
 // Mock Profiles for fallback
-const mockProfiles: Record<string, Partial<UserProfileType>> = {
+const mockProfiles: Record<string, any> = {
     // Map Firestore IDs (1, 2) to Studios
     '1': {
         uid: '1',
@@ -51,7 +51,7 @@ const mockProfiles: Record<string, Partial<UserProfileType>> = {
             equipment: ['ARRI Alexa', 'RED Camera', 'Dolby Atmos Theater', '4K DI Suite', 'Green Screen Studio', 'Outdoor Sets']
         },
         createdAt: new Date().toISOString(),
-        verification: { isVerified: true, status: 'verified' }
+        verification: { isVerified: true, status: 'verified', isMobileVerified: true, isEmailVerified: true }
     },
     '2': {
         uid: '2',
@@ -68,13 +68,13 @@ const mockProfiles: Record<string, Partial<UserProfileType>> = {
             equipment: ['Sony Venice', 'Panavision Cameras', '7.1 Surround Sound', 'Editing Suites', 'DI Theater', 'Recording Studios']
         },
         createdAt: new Date().toISOString(),
-        verification: { isVerified: true, status: 'verified' }
+        verification: { isVerified: true, status: 'verified', isMobileVerified: true, isEmailVerified: true }
     },
     // Move previous mock users to avoid conflict
     'u1': {
         uid: 'u1',
         displayName: 'Aarav Sharma',
-        role: 'Actor',
+        role: 'actor',
         photoURL: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop',
         email: 'aarav@example.com',
         createdAt: new Date().toISOString()
@@ -82,7 +82,7 @@ const mockProfiles: Record<string, Partial<UserProfileType>> = {
     'u2': {
         uid: 'u2',
         displayName: 'Priya Patel',
-        role: 'Director',
+        role: 'director',
         photoURL: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=300&fit=crop',
         email: 'priya@example.com',
         createdAt: new Date().toISOString()
@@ -90,7 +90,7 @@ const mockProfiles: Record<string, Partial<UserProfileType>> = {
     '3': {
         uid: '3',
         displayName: 'Rohan Das',
-        role: 'Sound Designer',
+        role: 'sound_designer',
         photoURL: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&h=300&fit=crop',
         email: 'rohan@example.com',
         createdAt: new Date().toISOString()
@@ -98,7 +98,7 @@ const mockProfiles: Record<string, Partial<UserProfileType>> = {
     '4': {
         uid: '4',
         displayName: 'Ananya Reddy',
-        role: 'Cinematographer',
+        role: 'cinematographer',
         photoURL: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&h=300&fit=crop',
         email: 'ananya@example.com',
         createdAt: new Date().toISOString()
@@ -106,7 +106,7 @@ const mockProfiles: Record<string, Partial<UserProfileType>> = {
     '5': {
         uid: '5',
         displayName: 'Sameer Khan',
-        role: 'Editor',
+        role: 'editor',
         photoURL: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&h=300&fit=crop',
         email: 'sameer@example.com',
         createdAt: new Date().toISOString()
@@ -114,7 +114,7 @@ const mockProfiles: Record<string, Partial<UserProfileType>> = {
     '6': {
         uid: '6',
         displayName: 'Isha Gupta',
-        role: 'Writer',
+        role: 'writer',
         photoURL: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=300&fit=crop',
         email: 'isha@example.com',
         createdAt: new Date().toISOString()
@@ -122,7 +122,7 @@ const mockProfiles: Record<string, Partial<UserProfileType>> = {
     '7': {
         uid: '7',
         displayName: 'Karan Johar',
-        role: 'Producer',
+        role: 'producer',
         photoURL: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop',
         email: 'karan@example.com',
         createdAt: new Date().toISOString()
@@ -143,7 +143,7 @@ const mockProfiles: Record<string, Partial<UserProfileType>> = {
             equipment: ['ARRI Alexa', 'RED Camera', 'Dolby Atmos Theater', '4K DI Suite', 'Green Screen Studio', 'Outdoor Sets']
         },
         createdAt: new Date().toISOString(),
-        verification: { isVerified: true, status: 'verified' }
+        verification: { isVerified: true, status: 'verified', isMobileVerified: true, isEmailVerified: true }
     },
     'suresh-productions': {
         uid: 'suresh-productions',
@@ -160,7 +160,7 @@ const mockProfiles: Record<string, Partial<UserProfileType>> = {
             equipment: ['Sony Venice', 'Panavision Cameras', '7.1 Surround Sound', 'Editing Suites', 'DI Theater', 'Recording Studios']
         },
         createdAt: new Date().toISOString(),
-        verification: { isVerified: true, status: 'verified' }
+        verification: { isVerified: true, status: 'verified', isMobileVerified: true, isEmailVerified: true }
     }
 };
 
@@ -316,15 +316,16 @@ export default function UserProfile() {
             return;
         }
         try {
-            const updatedProfile = {
+            const updatedProfile: any = {
                 ...profile,
                 displayName: profile.displayName, // Keep original name
-                role: enhancedData.headline,
+                role: (enhancedData.headline?.toLowerCase() || profile.role),
+                customRole: enhancedData.headline,
                 bio: enhancedData.bio.standard, // Use standard bio version
             };
 
             await updateUserProfile(currentUser.uid, updatedProfile);
-            setProfile(updatedProfile);
+            setProfile(updatedProfile as UserProfileType);
             toast.success('Profile enhanced with AI successfully!');
         } catch (error) {
             console.error("Error updating profile:", error);

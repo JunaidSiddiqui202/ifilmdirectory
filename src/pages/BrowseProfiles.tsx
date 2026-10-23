@@ -1017,11 +1017,10 @@ export default function BrowseProfiles() {
                                                 {facility.type}
                                             </span>
 
-                                            {facility.price && (
-                                                <span className="absolute bottom-2.5 right-2.5 px-2.5 py-1 rounded-lg bg-amber-500 text-white text-xs font-black shadow-md">
-                                                    {facility.price}
-                                                </span>
-                                            )}
+                                            <span className="absolute bottom-2.5 right-2.5 px-2.5 py-1 rounded-lg bg-black/75 backdrop-blur-md text-emerald-400 border border-emerald-500/30 text-[10px] font-bold flex items-center gap-1 shadow-md">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                                Available
+                                            </span>
                                         </div>
 
                                         <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-white truncate group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors">
