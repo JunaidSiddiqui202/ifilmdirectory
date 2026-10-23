@@ -102,7 +102,7 @@ function RouteTransitionWrapper({ children }: { children: React.ReactNode }) {
   }, [location.pathname]);
 
   return (
-    <div key={location.pathname} className="page-transition-wrapper min-h-screen">
+    <div className="min-h-screen">
       {children}
     </div>
   );

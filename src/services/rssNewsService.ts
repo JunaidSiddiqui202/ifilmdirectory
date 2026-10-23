@@ -1035,14 +1035,24 @@ class RSSNewsService {
      */
     public formatImageUrl(url: string): string {
         if (!url) return '';
-        // If already on photon CDN or external Unsplash image, keep as-is
-        if (url.includes('.wp.com/') || url.includes('images.unsplash.com')) {
+        // If already on photon CDN, Oracle Cloud object storage, or Unsplash, keep as-is
+        if (
+            url.includes('.wp.com/') ||
+            url.includes('images.unsplash.com') ||
+            url.includes('objectstorage') ||
+            url.includes('oraclecloud.com') ||
+            url.includes('sortdcdn.net') ||
+            url.includes('cloudinary.com')
+        ) {
             return url;
         }
-        // If WordPress upload, proxy via i0.wp.com
+        // Only proxy classic standard domain WordPress uploads
         if (url.includes('/wp-content/uploads/')) {
             const clean = url.replace(/^https?:\/\//i, '');
-            return `https://i0.wp.com/${clean}`;
+            // Only use photon if it's a standard web domain, not cloud bucket
+            if (!clean.includes('.oraclecloud.') && !clean.includes('amazonaws.') && !clean.includes('sortdcdn.')) {
+                return `https://i0.wp.com/${clean}`;
+            }
         }
         return url;
     }
