@@ -46,10 +46,13 @@
   </Files>
 </IfModule>
 
-# 4. Single Page Application (SPA) Routing
+# 4. Single Page Application (SPA) Routing & API Proxies
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
+
+  # Allow clean URL for RSS proxy
+  RewriteRule ^api/rss-proxy/?$ api/rss-proxy.php [L,QSA]
 
   # Do not rewrite actual files or directories
   RewriteCond %{REQUEST_FILENAME} -f [OR]
@@ -59,3 +62,4 @@
   # Route everything else through index.html
   RewriteRule ^ index.html [L]
 </IfModule>
+

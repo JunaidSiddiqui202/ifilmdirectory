@@ -53,26 +53,42 @@ export interface RSSFeedSource {
 export const EXCLUDED_NEWS_REGEX = /\b(trailer|teaser|lyrical|glimpse|promo song|promo video|re-?release|re-?releasing|rerelease|4k re-?release|remastered|anniversary re-?release)\b/i;
 
 const STORAGE_KEYS = {
-    CACHE: 'ifilm_rss_news_cache_v_current_live_v3',
-    LAST_SYNC: 'ifilm_rss_last_sync_timestamp_v3',
-    FEEDS: 'ifilm_rss_sources_config_v5',
+    CACHE: 'ifilm_rss_news_cache_v_current_live_v4',
+    LAST_SYNC: 'ifilm_rss_last_sync_timestamp_v4',
+    FEEDS: 'ifilm_rss_sources_config_v6',
     AUTO_REFRESH_MINS: 'ifilm_rss_auto_refresh_minutes_v90'
 };
 
-// Immediate cleanup of legacy dirty/outdated caches containing 2024 articles
+// Immediate cleanup of any legacy dirty/outdated caches containing 2024 or TrackTollywood articles
 try {
     if (typeof localStorage !== 'undefined') {
         localStorage.removeItem('ifilm_rss_news_cache_v_clean_articles');
         localStorage.removeItem('ifilm_rss_last_sync_timestamp');
+        localStorage.removeItem('ifilm_rss_last_sync_timestamp_v2');
+        localStorage.removeItem('ifilm_rss_last_sync_timestamp_v3');
         localStorage.removeItem('ifilm_rss_sources_config_v4');
+        localStorage.removeItem('ifilm_rss_sources_config_v5');
         localStorage.removeItem('ifilm_rss_news_cache_v_current_live_v2');
+        localStorage.removeItem('ifilm_rss_news_cache_v_current_live_v3');
         localStorage.removeItem('ifilm_rss_news_cache_v1');
         localStorage.removeItem('ifilm_rss_news_cache_v2');
         localStorage.removeItem('ifilm_rss_news_cache_v3');
+
+        // Clean any storage keys mentioning tracktollywood or 2024
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && (key.includes('tracktollywood') || key.includes('news_cache'))) {
+                const val = localStorage.getItem(key);
+                if (val && (val.toLowerCase().includes('tracktollywood') || val.includes('2024'))) {
+                    localStorage.removeItem(key);
+                }
+            }
+        }
     }
 } catch {
     // Ignore in SSR
 }
+
 
 export const DEFAULT_FEEDS: RSSFeedSource[] = [
     {
@@ -568,8 +584,14 @@ class RSSNewsService {
                 if (Array.isArray(items) && items.length > 0) {
                     // Freshness filter: keep only from today onwards or latest from yesterday (48 hours)
                     // Upcoming releases and openings are kept regardless
+                    // Strictly purge any tracktollywood items or old 2024 articles
                     const YESTERDAY_CUTOFF = Date.now() - 48 * 60 * 60 * 1000;
                     const freshItems = items.filter(it => {
+                        const titleLower = (it.title || '').toLowerCase();
+                        const sourceLower = (it.source || '').toLowerCase();
+                        const linkLower = (it.link || '').toLowerCase();
+                        if (titleLower.includes('tracktollywood') || sourceLower.includes('tracktollywood') || linkLower.includes('tracktollywood')) return false;
+                        if (it.pubDate && it.pubDate.includes('2024')) return false;
                         if (EXCLUDED_NEWS_REGEX.test(it.title)) return false;
                         if (it.category === 'release' || it.category === 'opening' || it.releaseDate) return true;
                         return (it.timestamp || 0) >= YESTERDAY_CUTOFF;
@@ -660,8 +682,14 @@ class RSSNewsService {
         }
 
         // Enforce freshness: keep content from today onwards or latest from yesterday (48-hour cutoff)
+        // Strictly purge any tracktollywood items or old 2024 articles
         const YESTERDAY_CUTOFF = Date.now() - 48 * 60 * 60 * 1000;
         const freshItems = deduplicated.filter(item => {
+            const titleLower = (item.title || '').toLowerCase();
+            const sourceLower = (item.source || '').toLowerCase();
+            const linkLower = (item.link || '').toLowerCase();
+            if (titleLower.includes('tracktollywood') || sourceLower.includes('tracktollywood') || linkLower.includes('tracktollywood')) return false;
+            if (item.pubDate && item.pubDate.includes('2024')) return false;
             if (EXCLUDED_NEWS_REGEX.test(item.title)) return false;
             if (item.category === 'release' || item.category === 'opening' || item.releaseDate) return true;
             return item.timestamp >= YESTERDAY_CUTOFF;
@@ -701,18 +729,25 @@ class RSSNewsService {
      * Fetch a single RSS feed via local proxy or rss2json fallback
      */
     private async fetchSingleFeed(feed: RSSFeedSource): Promise<NewsItem[]> {
-        try {
-            // Strategy 1: Local Vite proxy (works with raw XML, fast & zero CORS issues)
-            const proxyUrl = `/api/rss-proxy?url=${encodeURIComponent(feed.url)}`;
-            const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(9000) });
+        // Strategy 1: Local / Hostinger proxy (/api/rss-proxy or /api/rss-proxy.php)
+        const proxyEndpoints = [
+            `/api/rss-proxy?url=${encodeURIComponent(feed.url)}`,
+            `/api/rss-proxy.php?url=${encodeURIComponent(feed.url)}`
+        ];
 
-            if (res.ok) {
-                const xmlText = await res.text();
-                const parsed = this.parseXmlFeed(xmlText, feed);
-                if (parsed.length > 0) return parsed;
+        for (const proxyUrl of proxyEndpoints) {
+            try {
+                const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(9000) });
+                if (res.ok) {
+                    const xmlText = await res.text();
+                    if (xmlText && (xmlText.includes('<rss') || xmlText.includes('<feed') || xmlText.includes('<item'))) {
+                        const parsed = this.parseXmlFeed(xmlText, feed);
+                        if (parsed.length > 0) return parsed;
+                    }
+                }
+            } catch {
+                // Try next endpoint
             }
-        } catch {
-            // Proxy failed or unavailable, proceed to Strategy 2
         }
 
         try {

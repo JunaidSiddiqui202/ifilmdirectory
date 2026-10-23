@@ -623,3 +623,37 @@ html.dark .theme-toggle-night {
   background-color: #26272e !important;
   border-color: rgba(255, 255, 255, 0.18) !important;
 }
+
+/* ==============================================================================
+   Page Transitions & Scroll Animation Enhancements
+   ============================================================================== */
+html {
+  scroll-behavior: smooth;
+}
+
+@keyframes pageFadeSlide {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-transition-wrapper {
+  animation: pageFadeSlide 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: opacity, transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .page-transition-wrapper {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
