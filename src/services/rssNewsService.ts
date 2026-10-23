@@ -53,15 +53,18 @@ export interface RSSFeedSource {
 export const EXCLUDED_NEWS_REGEX = /\b(trailer|teaser|lyrical|glimpse|promo song|promo video|re-?release|re-?releasing|rerelease|4k re-?release|remastered|anniversary re-?release)\b/i;
 
 const STORAGE_KEYS = {
-    CACHE: 'ifilm_rss_news_cache_v_current_live_v4',
-    LAST_SYNC: 'ifilm_rss_last_sync_timestamp_v4',
-    FEEDS: 'ifilm_rss_sources_config_v6',
+    CACHE: 'ifilm_rss_news_cache_v_current_live_v5',
+    LAST_SYNC: 'ifilm_rss_last_sync_timestamp_v5',
+    FEEDS: 'ifilm_rss_sources_config_v7',
     AUTO_REFRESH_MINS: 'ifilm_rss_auto_refresh_minutes_v90'
 };
 
 // Immediate cleanup of any legacy dirty/outdated caches containing 2024 or TrackTollywood articles
 try {
     if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem('ifilm_rss_news_cache_v_current_live_v4');
+        localStorage.removeItem('ifilm_rss_last_sync_timestamp_v4');
+        localStorage.removeItem('ifilm_rss_sources_config_v6');
         localStorage.removeItem('ifilm_rss_news_cache_v_clean_articles');
         localStorage.removeItem('ifilm_rss_last_sync_timestamp');
         localStorage.removeItem('ifilm_rss_last_sync_timestamp_v2');
@@ -91,6 +94,34 @@ try {
 
 
 export const DEFAULT_FEEDS: RSSFeedSource[] = [
+    {
+        id: '123telugu_latest',
+        name: '123Telugu',
+        url: 'https://www.123telugu.com/feed',
+        industry: 'telugu',
+        enabled: true
+    },
+    {
+        id: '123telugu_reviews',
+        name: '123Telugu Reviews',
+        url: 'https://www.123telugu.com/category/reviews/feed',
+        industry: 'telugu',
+        enabled: true
+    },
+    {
+        id: 'idlebrain_wire',
+        name: 'Idlebrain.com',
+        url: 'https://news.google.com/rss/search?q=when:7d+site:idlebrain.com&hl=en-IN&gl=IN&ceid=IN:en',
+        industry: 'telugu',
+        enabled: true
+    },
+    {
+        id: 'idlebrain_reviews',
+        name: 'Idlebrain Reviews & Telugu Cinema',
+        url: 'https://news.google.com/rss/search?q=site:idlebrain.com+review+OR+news&hl=en-IN&gl=IN&ceid=IN:en',
+        industry: 'telugu',
+        enabled: true
+    },
     {
         id: 'greatandhra_movies',
         name: 'GreatAndhra Movies',
@@ -825,7 +856,20 @@ class RSSNewsService {
                         thumbnail = this.getFallbackImage(feed.industry, title);
                     }
 
-                    const source = el.querySelector('source')?.textContent || feed.name;
+                    let source = el.querySelector('source')?.textContent || feed.name;
+                    if (source.includes('Google News') || source.length > 28 || source.includes(' OR ') || source.includes('"')) {
+                        const titleParts = title.split(' - ');
+                        if (titleParts.length > 1 && titleParts[titleParts.length - 1].length < 25) {
+                            source = titleParts[titleParts.length - 1].trim();
+                        } else {
+                            source = feed.name;
+                        }
+                    }
+                    if (feed.id.startsWith('idlebrain')) {
+                        source = 'Idlebrain.com';
+                    } else if (feed.id.startsWith('123telugu')) {
+                        source = '123Telugu';
+                    }
                     const { category, rating, releaseDate, openingType, detectedIndustry } = this.classifyItem(title, content || description, feed.industry);
 
                     items.push({
@@ -930,6 +974,11 @@ class RSSNewsService {
                 } else {
                     source = feed.name;
                 }
+            }
+            if (feed.id.startsWith('idlebrain')) {
+                source = 'Idlebrain.com';
+            } else if (feed.id.startsWith('123telugu')) {
+                source = '123Telugu';
             }
 
             return {
