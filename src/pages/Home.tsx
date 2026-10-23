@@ -846,11 +846,38 @@ export default function Home() {
             />
             <div className="w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-6xl 2xl:max-w-7xl mx-auto flex flex-col flex-1 px-4 sm:px-6">
                 
-                {/* 1. CINEMA TOP HEADER: Official Logo + Quick Search + Comms (Mobile Only; on desktop the left sidebar provides full nav and branding) */}
-                <header className="md:hidden sticky top-0 z-30 flex items-center justify-between py-3.5 bg-white/95 dark:bg-[#090A0C]/95 backdrop-blur-md border-b border-zinc-200 dark:border-white/5">
-                    <div className="flex items-center gap-2.5 min-w-0">
+                {/* 1. CINEMA TOP HEADER: Official Logo + Quick Shortcuts + Comms */}
+                <header className="sticky top-0 z-30 flex items-center justify-between py-3 sm:py-3.5 bg-white/95 dark:bg-[#090A0C]/95 backdrop-blur-md border-b border-zinc-200 dark:border-white/5 transition-colors">
+                    <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
                         <HamburgerMenu />
                         <Logo size="sm" showText={true} />
+                        <div className="hidden lg:flex items-center gap-1.5 ml-2">
+                            <button
+                                onClick={() => navigate('/browse-profiles')}
+                                className="px-3 py-1 rounded-full text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                            >
+                                Talent
+                            </button>
+                            <button
+                                onClick={() => navigate('/jobs')}
+                                className="px-3 py-1 rounded-full text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                            >
+                                Auditions & Jobs
+                            </button>
+                            <button
+                                onClick={() => navigate('/showcase')}
+                                className="px-3 py-1 rounded-full text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                            >
+                                Community Feed
+                            </button>
+                            <button
+                                onClick={() => navigate('/south-cinema')}
+                                className="px-3 py-1 rounded-full text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 hover:bg-amber-500/20 transition-all flex items-center gap-1"
+                            >
+                                <span className="material-symbols-outlined text-xs">theaters</span>
+                                <span>South Cinema Wire</span>
+                            </button>
+                        </div>
                     </div>
 
                     <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
@@ -859,7 +886,7 @@ export default function Home() {
                             onClick={toggleDarkMode}
                             type="button"
                             className="p-1.5 sm:p-2 rounded-xl bg-zinc-100 dark:bg-[#1e1f24] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-amber-400 hover:text-zinc-900 dark:hover:text-white hover:border-amber-500/30 transition-all active:scale-95 flex items-center justify-center shrink-0 cursor-pointer"
-                            title={isDarkMode ? "Switch to Day Theme" : "Switch to Night Theme (Antigravity Gray)"}
+                            title={isDarkMode ? "Switch to Day Theme" : "Switch to Night Theme"}
                             aria-label="Toggle Theme"
                         >
                             <span className="material-symbols-outlined text-lg sm:text-xl">
@@ -911,7 +938,14 @@ export default function Home() {
                                 className="cursor-pointer ml-0.5 hover:scale-105 transition-transform"
                                 title="My Profile"
                             />
-                        ) : null}
+                        ) : (
+                            <button
+                                onClick={() => openAuthModal('Sign in to access your profile')}
+                                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 text-black font-extrabold text-xs hover:bg-amber-400 transition-all shadow-sm"
+                            >
+                                <span>Sign In</span>
+                            </button>
+                        )}
                     </div>
                 </header>
 
