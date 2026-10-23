@@ -185,6 +185,28 @@ export default function Home() {
             }
         };
         loadHomeData();
+
+        // 90-minute online auto-update interval check for live news, reviews and jobs
+        const updateInterval = setInterval(async () => {
+            try {
+                if (rssNewsService.isCacheStale()) {
+                    const freshNews = await rssNewsService.getNews(true);
+                    if (freshNews && freshNews.items && freshNews.items.length > 0) {
+                        setCinemaNews(freshNews.items);
+                    }
+                }
+                const freshJobs = await jobService.getJobs();
+                if (freshJobs && freshJobs.length > 0) {
+                    setJobs(freshJobs.slice(0, 6));
+                }
+            } catch (intervalErr) {
+                console.warn('Background 90-minute content update check error:', intervalErr);
+            }
+        }, 60 * 1000); // Check every minute if 90-minute stale threshold reached
+
+        return () => {
+            clearInterval(updateInterval);
+        };
     }, []);
 
     /**
@@ -1012,7 +1034,7 @@ export default function Home() {
                         </div>
 
                         {/* Primary Discovery Hub (Find Talent, Find Work, Search) */}
-                        <PrimaryDiscoveryHub />
+                        {PrimaryDiscoveryHub()}
 
                         {/* Live South Cinema Breaking RSS Ticker with Jobs Arrivals & Instant Readers */}
                         <BreakingTicker
