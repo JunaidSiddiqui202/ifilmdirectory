@@ -29,6 +29,10 @@ export interface ProductionProject {
     description: string;
     producerId: string;
     status: 'active' | 'completed' | 'archived';
+    format?: 'Feature Film' | 'Web Series' | 'Short Film' | 'Documentary' | 'Music Video' | 'Commercial';
+    genre?: string;
+    productionPhase?: 'Development' | 'Pre-Production' | 'Principal Photography' | 'Post-Production' | 'Distribution';
+    budgetTier?: 'Indie Micro' | 'Medium Budget' | 'Tentpole / Large Scale';
     createdAt: Timestamp;
     startDate?: string;
     location?: string;
@@ -114,51 +118,88 @@ export const projectService = {
     seedProjects: async (userId: string) => {
         const dummyProjects = [
             {
-                name: "Midnight in Mumbai",
-                description: "A neo-noir thriller set in the underbelly of Mumbai. We are currently scouting for locations and technical crew. Focusing on high-contrast visuals and immersive soundscapes.",
-                location: "Mumbai, India",
+                name: "Varanasi: City of Shadows",
+                description: "An investigative neo-noir psychological thriller set against the ghats of Varanasi and Lucknow. Exploring deep anamorphic visuals, night river sequences, and sync sound design.",
+                location: "Varanasi & Lucknow",
+                format: "Feature Film" as const,
+                genre: "Crime / Noir / Thriller",
+                productionPhase: "Pre-Production" as const,
+                budgetTier: "Medium Budget" as const,
                 producerId: userId,
                 status: 'active' as const,
                 shortlist: [
                     {
-                        userId: 'talent-1',
-                        userName: 'Arjun Mehra',
-                        role: 'Cinematographer',
+                        userId: 'cin-santosh-sivan',
+                        userName: 'Santosh Sivan, ISC',
+                        role: 'Director of Photography',
                         status: 'shortlisted' as const,
-                        userPhoto: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&h=200&fit=crop',
+                        userPhoto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=500&fit=crop',
                         addedAt: Timestamp.now()
                     },
                     {
-                        userId: 'talent-2',
-                        userName: 'Sarah Khan',
-                        role: 'Production Designer',
+                        userId: 'snd-rasool-pookutty',
+                        userName: 'Resul Pookutty, CAS',
+                        role: 'Sound Designer',
                         status: 'contacted' as const,
-                        userPhoto: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop',
+                        userPhoto: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=500&h=500&fit=crop',
+                        addedAt: Timestamp.now()
+                    },
+                    {
+                        userId: 'art-sabha-cyril',
+                        userName: 'Sabu Cyril',
+                        role: 'Production Designer',
+                        status: 'shortlisted' as const,
+                        userPhoto: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=500&h=500&fit=crop',
                         addedAt: Timestamp.now()
                     }
                 ]
             },
             {
-                name: "The Last Script",
-                description: "Experimental short film about a writer's block that manifests physically. Heavy use of CGI and practical effects. Post-production intensive.",
-                location: "London, UK",
-                producerId: userId,
-                status: 'active' as const,
-                shortlist: []
-            },
-            {
-                name: "Desert Echoes",
-                description: "Documentary exploring the folk music of Rajasthan. Focus on authentic storytelling and capturing the vastness of the Thar desert.",
-                location: "Jaisalmer, India",
+                name: "The Western Ghats Expedition",
+                description: "Natural history and indigenous culture documentary series exploring the biodiversity corridor of Kerala and Karnataka. Minimal footprint practical documentary unit.",
+                location: "Wayanad, Kerala & Coorg, Karnataka",
+                format: "Web Series" as const,
+                genre: "Documentary / Nature",
+                productionPhase: "Development" as const,
+                budgetTier: "Indie Micro" as const,
                 producerId: userId,
                 status: 'active' as const,
                 shortlist: [
                     {
-                        userId: 'talent-3',
-                        userName: 'Vikram Singh',
-                        role: 'Sound Mixer',
+                        userId: 'edit-deepu-joseph',
+                        userName: 'Deepu Joseph',
+                        role: 'Film Editor & Colorist',
                         status: 'hired' as const,
-                        userPhoto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop',
+                        userPhoto: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=500&h=500&fit=crop',
+                        addedAt: Timestamp.now()
+                    }
+                ]
+            },
+            {
+                name: "Salaam Hyderabad: 1983",
+                description: "Period political drama chronicling cultural shifts and street cinema halls of 1980s Old City Hyderabad. Extensive vintage set recreations and practical special effects.",
+                location: "Ramoji Film City & Hyderabad Studios",
+                format: "Feature Film" as const,
+                genre: "Period Drama / Action",
+                productionPhase: "Principal Photography" as const,
+                budgetTier: "Tentpole / Large Scale" as const,
+                producerId: userId,
+                status: 'active' as const,
+                shortlist: [
+                    {
+                        userId: 'dp-k-k-senthil-kumar',
+                        userName: 'K. K. Senthil Kumar, ISC',
+                        role: 'Director of Photography',
+                        status: 'hired' as const,
+                        userPhoto: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500&h=500&fit=crop',
+                        addedAt: Timestamp.now()
+                    },
+                    {
+                        userId: 'wri-juhi-chaturvedi',
+                        userName: 'Juhi Chaturvedi',
+                        role: 'Screenwriter & Dialogues',
+                        status: 'contacted' as const,
+                        userPhoto: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=500&h=500&fit=crop',
                         addedAt: Timestamp.now()
                     }
                 ]
