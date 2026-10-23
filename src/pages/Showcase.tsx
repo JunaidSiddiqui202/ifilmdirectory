@@ -157,8 +157,23 @@ export default function Showcase() {
             if (mounted) setNewsLoading(false);
         });
 
+        // 90-minute auto update check
+        const newsInterval = setInterval(async () => {
+            if (rssNewsService.isCacheStale()) {
+                try {
+                    const fresh = await rssNewsService.getNews(true);
+                    if (mounted && fresh.items.length > 0) {
+                        setNews(fresh.items);
+                    }
+                } catch (e) {
+                    console.warn("Background news refresh error in Showcase:", e);
+                }
+            }
+        }, 60 * 1000);
+
         return () => {
             mounted = false;
+            clearInterval(newsInterval);
         };
     }, []);
 

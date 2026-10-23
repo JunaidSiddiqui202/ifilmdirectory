@@ -53,17 +53,32 @@ export interface RSSFeedSource {
 export const EXCLUDED_NEWS_REGEX = /\b(trailer|teaser|lyrical|glimpse|promo song|promo video|re-?release|re-?releasing|rerelease|4k re-?release|remastered|anniversary re-?release)\b/i;
 
 const STORAGE_KEYS = {
-    CACHE: 'ifilm_rss_news_cache_v_clean_articles',
-    LAST_SYNC: 'ifilm_rss_last_sync_timestamp',
-    FEEDS: 'ifilm_rss_sources_config_v3',
+    CACHE: 'ifilm_rss_news_cache_v_current_live_v3',
+    LAST_SYNC: 'ifilm_rss_last_sync_timestamp_v3',
+    FEEDS: 'ifilm_rss_sources_config_v5',
     AUTO_REFRESH_MINS: 'ifilm_rss_auto_refresh_minutes_v90'
 };
 
+// Immediate cleanup of legacy dirty/outdated caches containing 2024 articles
+try {
+    if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem('ifilm_rss_news_cache_v_clean_articles');
+        localStorage.removeItem('ifilm_rss_last_sync_timestamp');
+        localStorage.removeItem('ifilm_rss_sources_config_v4');
+        localStorage.removeItem('ifilm_rss_news_cache_v_current_live_v2');
+        localStorage.removeItem('ifilm_rss_news_cache_v1');
+        localStorage.removeItem('ifilm_rss_news_cache_v2');
+        localStorage.removeItem('ifilm_rss_news_cache_v3');
+    }
+} catch {
+    // Ignore in SSR
+}
+
 export const DEFAULT_FEEDS: RSSFeedSource[] = [
     {
-        id: 'tracktollywood',
-        name: 'TrackTollywood',
-        url: 'https://tracktollywood.com/feed/',
+        id: 'greatandhra_movies',
+        name: 'GreatAndhra Movies',
+        url: 'https://www.greatandhra.com/movies/feed/',
         industry: 'telugu',
         enabled: true
     },
@@ -247,15 +262,22 @@ export const UPCOMING_MOVIE_RELEASES: UpcomingMovieRelease[] = [
     }
 ];
 
+// Reference dynamic timestamps for fallback cinema items (always from today / past few hours onwards)
+const NEWS_NOW = Date.now();
+const nh = (hours: number) => ({
+    pubDate: new Date(NEWS_NOW - hours * 3600000).toISOString(),
+    timestamp: NEWS_NOW - hours * 3600000
+});
+
 // Fallback high quality cinema items for offline resilience (Latest release dates & openings at the top!)
 const SEED_BACKUP_ITEMS: NewsItem[] = [
     {
         id: 'seed-rel-0',
         title: 'Pushpa 2: The Rule Worldwide Theatrical Release Date Locked for December 5: Wildfire Advance Bookings Open',
-        link: 'https://tracktollywood.com/',
-        pubDate: '2024-10-21T09:30:00.000Z',
-        timestamp: 1729503000000,
-        source: 'TrackTollywood',
+        link: 'https://www.greatandhra.com/movies/',
+        pubDate: nh(1).pubDate,
+        timestamp: nh(1).timestamp,
+        source: 'GreatAndhra',
         description: 'Icon Star Allu Arjun and Sukumar’s action juggernaut Pushpa 2: The Rule locked for December 5 worldwide across 11,000+ screens.',
         content: `The countdown begins for Indian cinema's most anticipated sequel! Mythri Movie Makers have locked December 5, 2026 for the colossal worldwide release of 'Pushpa 2: The Rule'.\n\nStarring Icon Star Allu Arjun alongside Rashmika Mandanna and Fahadh Faasil, the mass extravaganza has smashed historical pre-release business records across Telugu, Hindi, Tamil, Kannada, and Malayalam.\n\nAdvance bookings are being rolled out across global markets with phenomenal opening response. Director Sukumar has delivered an electrifying final cut with music by Devi Sri Prasad.`,
         thumbnail: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&h=450&fit=crop',
@@ -268,8 +290,8 @@ const SEED_BACKUP_ITEMS: NewsItem[] = [
         id: 'seed-open-1',
         title: 'Thalapathy 69 Grand Opening: Thalapathy Vijay & H. Vinoth Film Launched with Spectacular Pooja Ceremony',
         link: 'https://www.onlykollywood.com/',
-        pubDate: '2024-10-20T14:15:00.000Z',
-        timestamp: 1729433700000,
+        pubDate: nh(2).pubDate,
+        timestamp: nh(2).timestamp,
         source: 'Only Kollywood',
         description: 'Thalapathy Vijay’s final mass commercial spectacle has officially commenced with an auspicious pooja in Chennai, attended by director H. Vinoth, Pooja Hegde, and Bobby Deol.',
         content: `The biggest cinematic opening event in South cinema took place today in Chennai as Thalapathy 69 was launched with a star-studded traditional Pooja Ceremony.\n\nProduced on a monumental scale by KVN Productions, the high-octane political action drama marks Thalapathy Vijay's final film prior to his full-time political journey. Acclaimed director H. Vinoth held the clapperboard for the first muhurtham shot.\n\nWith Anirudh Ravichander composing the soundtrack and Sathyan Sooryan handling cinematography, regular shooting is progressing at top speed toward a Diwali 2026 worldwide theatrical opening.`,
@@ -282,10 +304,10 @@ const SEED_BACKUP_ITEMS: NewsItem[] = [
     {
         id: 'seed-rel-1',
         title: 'The Raja Saab Sankranthi Release Confirmed: Rebel Star Prabhas Romantic Horror Spectacle Set for Jan 14, 2027',
-        link: 'https://tracktollywood.com/',
-        pubDate: '2024-10-19T11:00:00.000Z',
-        timestamp: 1729335600000,
-        source: 'TrackTollywood',
+        link: 'https://www.greatandhra.com/movies/',
+        pubDate: nh(4).pubDate,
+        timestamp: nh(4).timestamp,
+        source: 'GreatAndhra',
         description: 'Director Maruthi and producer TG Vishwa Prasad lock January 14, 2027 (Sankranthi) worldwide for The Raja Saab. High expectations surround Prabhas’s vintage mass avatar.',
         content: `The makers of 'The Raja Saab' have officially reaffirmed January 14, 2027 for a colossal Sankranthi worldwide theatrical release across Telugu, Tamil, Malayalam, Kannada, and Hindi.\n\nDirected by Maruthi and backed by People Media Factory, the romantic horror comedy features Rebel Star Prabhas in a dashing, vintage look alongside Malavika Mohanan, Nidhhi Agerwal, and Riddhi Kumar.\n\nComposer Thaman S is finishing the remaining mass dance numbers and theatrical opening themes. The grand theatrical release is planned across more than 4,500 screens worldwide with advance bookings expected to shatter Day 1 records.`,
         thumbnail: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800&h=450&fit=crop',
@@ -298,8 +320,8 @@ const SEED_BACKUP_ITEMS: NewsItem[] = [
         id: 'seed-open-2',
         title: 'SSMB29 Grand Launch: SS Rajamouli & Mahesh Babu Begin Global Jungle Odyssey with Landmark Muhurtham',
         link: 'https://filmyfocus.com/',
-        pubDate: '2024-10-18T16:30:00.000Z',
-        timestamp: 1729269000000,
+        pubDate: nh(6).pubDate,
+        timestamp: nh(6).timestamp,
         source: 'Filmy Focus',
         description: 'The globe-trotting jungle adventure directed by SS Rajamouli starring Superstar Mahesh Babu has commenced initial production tests following a private pooja ceremony.',
         content: `Mahesh Babu and SS Rajamouli's highly awaited cinematic masterpiece, tentatively titled SSMB29, has completed its inaugural opening ceremony and camera tests.\n\nConceived as an international globetrotting action-adventure inspired by Indiana Jones and Wilbur Smith novels, the film features groundbreaking visual techniques and an international ensemble cast.\n\nMM Keeravaani has begun composing the musical suite. Production across African rainforests and European studios is slated to start in upcoming months, promising a new benchmark for Indian cinema on the world stage.`,
@@ -312,10 +334,10 @@ const SEED_BACKUP_ITEMS: NewsItem[] = [
     {
         id: 'seed-rel-2',
         title: 'Game Changer Massive Release: Shankar & Ram Charan Spectacle Ready for December 25 Worldwide Debut',
-        link: 'https://tracktollywood.com/',
-        pubDate: '2024-10-17T10:00:00.000Z',
-        timestamp: 1729159200000,
-        source: 'TrackTollywood',
+        link: 'https://www.greatandhra.com/movies/',
+        pubDate: nh(8).pubDate,
+        timestamp: nh(8).timestamp,
+        source: 'GreatAndhra',
         description: 'Mega Powerstar Ram Charan and visionary director Shankar’s political action epic Game Changer locked for festive worldwide theatrical release.',
         content: `Producer Dil Raju has officially reaffirmed that 'Game Changer' will arrive in theatres worldwide for Christmas & Sankranti.\n\nRam Charan plays a dual role as an unyielding election officer alongside Kiara Advani and SJ Suryah. The music by Thaman S has already created record-breaking social media records.\n\nThe global theatrical distribution rights have been finalized across North America, UK, Europe, and the Middle East, setting the stage for one of the grandest box office openings in Indian cinema history.`,
         thumbnail: 'https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=800&h=450&fit=crop',
@@ -328,8 +350,8 @@ const SEED_BACKUP_ITEMS: NewsItem[] = [
         id: 'seed-rel-3',
         title: 'Toxic Worldwide Theatrical Release Date Locked: Yash & Geetu Mohandas Spectacle Set for April 9, 2027',
         link: 'https://www.onlykollywood.com/',
-        pubDate: '2024-10-16T12:00:00.000Z',
-        timestamp: 1729080000000,
+        pubDate: nh(12).pubDate,
+        timestamp: nh(12).timestamp,
         source: 'Only Kollywood',
         description: 'Rocking Star Yash’s much-anticipated next outing Toxic: A Fairy Tale for Grown-ups locks April 9, 2027 for a massive global theatrical rollout.',
         content: `KVN Productions and Monster Mind Creations have officially confirmed April 9, 2027 as the theatrical release date for 'Toxic: A Fairy Tale for Grown-ups'.\n\nDirected by critically acclaimed auteur Geetu Mohandas, the multi-lingual action spectacle presents Yash in a gritty, enigmatic persona. The film features an international technical crew and music by Jeremy Stack.\n\nShooting schedules in London and Mumbai are nearing completion with grand IMAX master prints slated for international festival premiers ahead of the worldwide theatrical opening.`,
@@ -342,10 +364,10 @@ const SEED_BACKUP_ITEMS: NewsItem[] = [
     {
         id: 'seed-1',
         title: 'Nani Teams Up With 96 Director Prem Kumar for an Emotional Love Story',
-        link: 'https://tracktollywood.com/',
-        pubDate: '2024-10-15T08:00:00.000Z',
-        timestamp: 1728979200000,
-        source: 'TrackTollywood',
+        link: 'https://www.greatandhra.com/movies/',
+        pubDate: nh(14).pubDate,
+        timestamp: nh(14).timestamp,
+        source: 'GreatAndhra',
         description: 'Natural Star Nani has officially signed an evocative romance drama helmed by C. Prem Kumar. Production kicks off next quarter with grand musical compositions.',
         content: `Natural Star Nani has officially signed an evocative romance drama helmed by C. Prem Kumar (acclaimed director of '96'). The project has sent waves of excitement across Tollywood as fans have long awaited a pure, soulful love story from the versatile actor.\n\nPre-production is underway in Hyderabad with musical compositions being finalized. The team is aiming for a picturesque monsoon shoot across coastal Andhra Pradesh and Tamil Nadu.\n\nIndustry insiders reveal that the emotional core of the film balances nostalgic romance with contemporary drama, promising to be one of Nani's most poignant cinematic outings to date.`,
         thumbnail: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&h=450&fit=crop',
@@ -356,8 +378,8 @@ const SEED_BACKUP_ITEMS: NewsItem[] = [
         id: 'seed-2',
         title: 'Dhanush’s D56: 20-Day Action Schedule Begins with High-Octane Sequences',
         link: 'https://www.onlykollywood.com/',
-        pubDate: '2024-10-14T15:20:00.000Z',
-        timestamp: 1728919200000,
+        pubDate: nh(16).pubDate,
+        timestamp: nh(16).timestamp,
         source: 'Only Kollywood',
         description: 'Dhanush commenced shooting for his massive action entertainer in Chennai. International stunt choreographers have designed custom set pieces for this schedule.',
         content: `Dhanush has commenced shooting for his landmark high-octane action thriller, tentatively titled D56, in Chennai under stringent secrecy. A massive custom industrial set was erected on the city outskirts for an intensive 20-day stunt schedule.\n\nAcclaimed stunt directors from abroad are collaborating with local technicians to choreograph practical action sequences with zero computer-generated stunt doubles. The film features Dhanush in an intense, gritty transformation.\n\nThe music is composed by G.V. Prakash Kumar, who has already recorded two adrenaline-pumping tracks for the project. The film is eyeing a worldwide theatrical release later this year across Tamil, Telugu, and Hindi.`,
@@ -368,10 +390,10 @@ const SEED_BACKUP_ITEMS: NewsItem[] = [
     {
         id: 'seed-3',
         title: 'Devara Movie Review: Jr NTR Powers Koratala Siva’s Coastal Action Saga',
-        link: 'https://tracktollywood.com/',
-        pubDate: '2024-10-12T18:45:00.000Z',
-        timestamp: 1728758700000,
-        source: 'TrackTollywood',
+        link: 'https://www.greatandhra.com/movies/',
+        pubDate: nh(18).pubDate,
+        timestamp: nh(18).timestamp,
+        source: 'GreatAndhra',
         description: 'Jr NTR delivers a commanding dual performance backed by Anirudh’s thumping background score in this maritime revenge drama.',
         content: `Verdict: Jr NTR delivers a ferociously intense performance that anchors the maritime action drama through its highs.\n\nPlot & Highlights: Set across rugged coastal settlements, Devara follows the turbulent reign of maritime clans locked in betrayal and bloodshed. Jr NTR's screen presence in the sea combat sequences is breathtaking, demonstrating raw power and emotive depth.\n\nMusic & Direction: Anirudh Ravichander's background score elevates the adrenaline in every clash, while Rathnavelu's cinematography renders the dark seas with stunning scale. Saif Ali Khan provides an imposing antagonist counterweight.\n\nFinal Take: A grand, mass-appealing cinematic experience with monumental interval and climax sequences that will delight action cinema lovers across the country.`,
         thumbnail: 'https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=800&h=450&fit=crop',
@@ -383,8 +405,8 @@ const SEED_BACKUP_ITEMS: NewsItem[] = [
         id: 'seed-4',
         title: 'Lokesh Kanagaraj Confirms Next Chapter of LCU with Kamal Haasan & Suriya',
         link: 'https://www.onlykollywood.com/',
-        pubDate: '2024-10-10T13:30:00.000Z',
-        timestamp: 1728567000000,
+        pubDate: nh(20).pubDate,
+        timestamp: nh(20).timestamp,
         source: 'Only Kollywood',
         description: 'Director Lokesh Kanagaraj shared exciting details regarding the upcoming interconnected universe projects featuring Rolex and Agent Vikram.',
         content: `In a recent film festival interaction, director Lokesh Kanagaraj provided definitive confirmation that the LCU (Lokesh Cinematic Universe) will expand into its most ambitious phase yet.\n\nThe upcoming standalone Rolex film starring Suriya is currently in deep script development, setting up an explosive face-off against Kamal Haasan's Agent Vikram and Karthi's Dilli.\n\nLokesh highlighted that the interconnected lore will span two upcoming theatrical spectacles, uniting the biggest stars in South Indian cinema under one unified storyline. Fans across social media celebrated the revelation as production timelines were hinted for early next year.`,
@@ -396,8 +418,8 @@ const SEED_BACKUP_ITEMS: NewsItem[] = [
         id: 'seed-5',
         title: 'Aavesham Movie Review: Fahadh Faasil Unleashes Peak Entertainment in Bengaluru',
         link: 'https://news.google.com/',
-        pubDate: '2024-10-08T17:00:00.000Z',
-        timestamp: 1728406800000,
+        pubDate: nh(22).pubDate,
+        timestamp: nh(22).timestamp,
         source: 'The Hindu Cinema',
         description: 'Fahadh Faasil’s eccentric gangster Ranga lights up the screen with uninhibited hilarity, backed by Sushin Shyam’s infectious energy.',
         content: `Verdict: Fahadh Faasil delivers an electrifying comedic tour de force in Jithu Madhavan's uproarious action comedy.\n\nThe Story: When three college students in Bengaluru seek local gang backing to settle scores with campus bullies, they cross paths with Ranga (Fahadh Faasil), a flamboyant Malayali gangster dressed in crisp white attire who craves friendship as much as dominance.\n\nPerformance: Fahadh completely lets loose, combining wild eccentricities with genuine warmth. Sushin Shyam's infectious score drives the film with relentless energy, turning simple comedic beats into theatrical frenzy.\n\nFinal Take: A wildly entertaining riot that reaffirms Malayalam cinema's supreme flair for blending genre thrills with authentic characters.`,
@@ -410,8 +432,8 @@ const SEED_BACKUP_ITEMS: NewsItem[] = [
         id: 'seed-6',
         title: 'Kantara: A Legend Chapter 1 Wraps Crucial Forest Climax Schedule',
         link: 'https://filmyfocus.com/',
-        pubDate: '2024-10-05T09:15:00.000Z',
-        timestamp: 1728119700000,
+        pubDate: nh(24).pubDate,
+        timestamp: nh(24).timestamp,
         source: 'Filmy Focus',
         description: 'Rishab Shetty has completed an intensive 40-day forest warfare sequence for the mythological prequel produced by Hombale Films.',
         content: `Actor-director Rishab Shetty has wrapped a demanding 40-day continuous schedule in the dense forests of Kundapura for the mythological magnum opus 'Kantara: A Legend Chapter 1'.\n\nProduced on a massive scale by Hombale Films, the prequel delves into the origins of the tribal deity and the folklore surrounding the sacred groves. Rishab underwent rigorous physical training in ancient Kalarippayattu and traditional martial arts for the sequences.\n\nThe production has utilized practical rain machines, custom tribal villages, and authentic indigenous tools to preserve historical realism. The film is being made for a worldwide multi-language theatrical release with cutting-edge visual effects.`,
