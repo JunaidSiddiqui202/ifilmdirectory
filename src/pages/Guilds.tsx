@@ -10,6 +10,7 @@ import PostMedia from '../components/PostMedia';
 import SEO from '../components/SEO';
 
 export default function Guilds() {
+    const navigate = useNavigate();
     const { currentUser } = useAuth();
     const [guilds, setGuilds] = useState<Guild[]>([]);
     const [selectedGuild, setSelectedGuild] = useState<Guild | null>(null);
@@ -274,16 +275,25 @@ export default function Guilds() {
             )}
 
             {/* Left Sidebar: Guild List */}
-            <aside className={`fixed inset-y-0 left-0 z-40 w-72 md:w-80 border-r border-black/[0.02] dark:border-white/[0.02] flex flex-col bg-white/70 dark:bg-zinc-900/70 backdrop-blur-3xl transform transition-transform duration-300 md:relative md:translate-x-0 ${showMobileSidebar ? 'translate-x-0' : '-translate-x-full'}`}>
-                <div className="p-6 border-b border-black/[0.02] dark:border-white/[0.02] flex justify-between items-center">
-                    <div>
-                        <h2 className="text-xl font-black tracking-tight flex items-center gap-2 uppercase">
-                            <span className="material-symbols-outlined text-primary text-3xl">groups</span>
-                            Skill Guilds
-                        </h2>
-                        <p className="text-[10px] text-text-subtle-light dark:text-text-subtle-dark mt-0.5 font-medium italic">Professional Departments</p>
+            <aside className={`fixed inset-y-0 left-0 z-40 w-72 md:w-80 border-r border-zinc-200 dark:border-white/[0.08] flex flex-col bg-white/90 dark:bg-zinc-950/90 backdrop-blur-3xl transform transition-transform duration-300 md:relative md:translate-x-0 ${showMobileSidebar ? 'translate-x-0' : '-translate-x-full'}`}>
+                <div className="p-5 border-b border-zinc-200 dark:border-white/[0.08] flex justify-between items-center bg-white/50 dark:bg-zinc-900/40">
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => navigate('/groups-forums')}
+                            className="p-1.5 rounded-xl text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] border border-zinc-200 dark:border-white/[0.08] transition-all"
+                            title="Back to Forums"
+                        >
+                            <span className="material-symbols-outlined text-lg">arrow_back</span>
+                        </button>
+                        <div>
+                            <h2 className="text-base font-bold tracking-tight text-zinc-900 dark:text-white flex items-center gap-1.5">
+                                <span className="material-symbols-outlined text-amber-500 text-xl">groups</span>
+                                <span>Skill Guilds</span>
+                            </h2>
+                            <p className="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium">Trade Craft Departments</p>
+                        </div>
                     </div>
-                    <button onClick={() => setShowMobileSidebar(false)} className="md:hidden material-symbols-outlined text-text-subtle-light">close</button>
+                    <button onClick={() => setShowMobileSidebar(false)} className="md:hidden p-1.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-white material-symbols-outlined text-lg">close</button>
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-4 space-y-2 pb-24">
@@ -323,68 +333,80 @@ export default function Guilds() {
                 {selectedGuild && (
                     <>
                         {/* Feed Header */}
-                        <header className="bg-white/80 dark:bg-zinc-950/80 px-5 pt-4 pb-3 border-b border-black/[0.03] dark:border-white/[0.05] flex justify-between items-center backdrop-blur-xl sticky top-0 z-20">
+                        <header className="bg-white/95 dark:bg-[#090A0C]/95 px-5 md:px-8 py-3.5 border-b border-zinc-200 dark:border-white/[0.08] flex justify-between items-center backdrop-blur-xl sticky top-0 z-20 shadow-sm">
                             <div className="flex items-center gap-3 md:gap-4 overflow-hidden">
                                 <button
                                     onClick={() => setShowMobileSidebar(true)}
-                                    className="md:hidden material-symbols-outlined text-primary p-2 hover:bg-primary/10 rounded-lg"
+                                    className="md:hidden p-2 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/[0.08] rounded-xl transition-all"
                                 >
-                                    menu
+                                    <span className="material-symbols-outlined text-xl">menu</span>
                                 </button>
-                                <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-primary/10 flex items-center justify-center shadow-inner shrink-0 ring-1 ring-primary/10">
-                                    <span className="material-symbols-outlined text-xl md:text-3xl text-primary">{getGuildIcon(selectedGuild)}</span>
+                                <div className="w-11 h-11 md:w-13 md:h-13 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0 text-amber-500 shadow-sm">
+                                    <span className="material-symbols-outlined text-2xl md:text-3xl">{getGuildIcon(selectedGuild)}</span>
                                 </div>
                                 <div className="min-w-0">
-                                    <h3 className="text-base md:text-2xl font-black tracking-tight truncate uppercase">{selectedGuild.name}</h3>
-                                    <p className="text-[10px] md:text-sm text-zinc-500 font-black truncate uppercase tracking-widest opacity-80">
-                                        {selectedGuild.memberCount} Professionals
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <h3 className="text-base md:text-xl font-bold tracking-tight text-zinc-900 dark:text-white truncate">
+                                            {selectedGuild.name}
+                                        </h3>
+                                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-bold uppercase tracking-wider">
+                                            {selectedGuild.category}
+                                        </span>
+                                    </div>
+                                    <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium truncate mt-0.5">
+                                        {selectedGuild.memberCount.toLocaleString()} Industry Members • Official Guild
                                     </p>
                                 </div>
                             </div>
                             <button
                                 onClick={() => setShowCreatePost(true)}
-                                className="flex items-center gap-2 px-4 py-2 bg-primary text-white font-black rounded-lg md:rounded-xl hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 active:scale-95 shrink-0 text-xs uppercase tracking-widest"
+                                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white font-bold rounded-xl transition-all shadow-md shadow-amber-500/20 active:scale-95 shrink-0 text-xs"
                             >
-                                <span className="material-symbols-outlined text-sm">edit_note</span>
-                                <span className="hidden sm:inline">New Post</span>
+                                <span className="material-symbols-outlined text-base">edit_note</span>
+                                <span className="hidden sm:inline">Post in Guild</span>
                                 <span className="sm:hidden">Post</span>
                             </button>
                         </header>
 
                         {/* Feed Content */}
-                        <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6 pb-32">
+                        <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-5 pb-32">
                             {/* Observation Notice */}
-                            <div className="bg-white/50 dark:bg-zinc-900/50 backdrop-blur-md p-4 rounded-xl border border-black/[0.03] dark:border-white/[0.05] flex items-center gap-4 shadow-sm ring-1 ring-black/[0.01] dark:ring-white/[0.01]">
-                                <span className="material-symbols-outlined text-primary text-xl shrink-0">visibility</span>
-                                <div className="text-[10px] md:text-[11px] font-black uppercase tracking-widest text-zinc-500 leading-tight">
-                                    <span className="text-primary mr-1">Professional Notice:</span>
-                                    Technical space. Verified Professionals observe for talent discovery.
+                            <div className="bg-white dark:bg-[#121316] p-4 rounded-2xl border border-zinc-200 dark:border-white/[0.08] flex items-center gap-3.5 shadow-sm">
+                                <div className="size-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 shrink-0">
+                                    <span className="material-symbols-outlined text-lg">verified_user</span>
+                                </div>
+                                <div className="text-xs text-zinc-600 dark:text-zinc-300 leading-snug">
+                                    <span className="font-bold text-zinc-900 dark:text-white mr-1.5">Trade Verification Notice:</span>
+                                    This is a monitored professional space. Accredited producers, showrunners, and department heads actively scout discussion contributors for film slates.
                                 </div>
                             </div>
 
                             {/* Guidelines Card */}
-                            <div className="bg-white/50 dark:bg-zinc-900/50 backdrop-blur-md border border-black/[0.03] dark:border-white/[0.05] p-5 rounded-2xl shadow-sm ring-1 ring-black/[0.01] dark:ring-white/[0.01]">
-                                <h4 className="flex items-center gap-2 text-xs md:text-sm font-black uppercase tracking-widest text-primary mb-4">
-                                    <span className="material-symbols-outlined text-lg">gavel</span>
-                                    Guild Guidelines
+                            <div className="bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.08] p-5 rounded-2xl shadow-sm">
+                                <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-3">
+                                    <span className="material-symbols-outlined text-base">policy</span>
+                                    <span>Guild Charter & Discussion Standards</span>
                                 </h4>
-                                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
+                                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5">
                                     {selectedGuild.guidelines.map((g: string, i: number) => (
-                                        <li key={i} className="text-[10px] text-zinc-500 flex items-center gap-2 font-black uppercase tracking-widest opacity-80">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-primary/40 shrink-0"></div>
-                                            {g}
+                                        <li key={i} className="text-xs text-zinc-600 dark:text-zinc-400 flex items-start gap-2">
+                                            <span className="size-1.5 rounded-full bg-amber-500 mt-1.5 shrink-0" />
+                                            <span>{g}</span>
                                         </li>
                                     ))}
                                 </ul>
                             </div>
 
                             {/* Trending Topics Section */}
-                            <div className="bg-white/50 dark:bg-zinc-900/50 backdrop-blur-md border border-black/[0.03] dark:border-white/[0.05] p-5 rounded-2xl shadow-sm ring-1 ring-black/[0.01] dark:ring-white/[0.01]">
-                                <h4 className="flex items-center gap-2 text-xs md:text-sm font-black uppercase tracking-widest text-primary mb-4">
-                                    <span className="material-symbols-outlined text-lg">trending_up</span>
-                                    Trending Topics Across Guilds
-                                </h4>
-                                <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
+                            <div className="bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.08] p-5 rounded-2xl shadow-sm">
+                                <div className="flex items-center justify-between mb-3.5">
+                                    <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+                                        <span className="material-symbols-outlined text-base">trending_up</span>
+                                        <span>Trending Technical Topics Across Guilds</span>
+                                    </h4>
+                                    <span className="text-[11px] text-zinc-500 font-medium">Updated live</span>
+                                </div>
+                                <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none snap-x snap-mandatory">
                                     {trendingPosts.length > 0 ? trendingPosts.slice(0, 5).map((post) => (
                                         <div
                                             key={post.id}
@@ -393,44 +415,43 @@ export default function Guilds() {
                                                 const postGuild = guilds.find(g => g.id === post.guildId);
                                                 if (postGuild) {
                                                     setSelectedGuild(postGuild);
-                                                    // Scroll to top to see the post
                                                     window.scrollTo({ top: 0, behavior: 'smooth' });
                                                 }
                                             }}
-                                            className="min-w-[280px] snap-start bg-white dark:bg-zinc-800 rounded-xl p-4 border border-border-light dark:border-border-dark hover:border-primary hover:shadow-md transition-all cursor-pointer group"
+                                            className="min-w-[280px] max-w-[300px] snap-start bg-zinc-50 dark:bg-white/[0.02] rounded-2xl p-4 border border-zinc-200 dark:border-white/[0.06] hover:border-amber-500/40 hover:shadow-md transition-all cursor-pointer group"
                                         >
-                                            <div className="flex items-start gap-3 mb-2">
+                                            <div className="flex items-start gap-2.5 mb-2.5">
                                                 <div
-                                                    className="w-8 h-8 rounded-full bg-cover bg-center shrink-0"
+                                                    className="w-8 h-8 rounded-xl bg-cover bg-center shrink-0 border border-zinc-200 dark:border-white/10"
                                                     style={{ backgroundImage: `url(${post.userPhoto || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(post.userName)})` }}
                                                 />
                                                 <div className="flex-1 min-w-0">
-                                                    <p className="font-bold text-sm truncate">{post.userName}</p>
-                                                    <p className="text-[10px] text-text-subtle-light dark:text-text-subtle-dark">
+                                                    <p className="font-bold text-xs text-zinc-900 dark:text-white truncate">{post.userName}</p>
+                                                    <p className="text-[10px] text-zinc-500 dark:text-zinc-400 truncate">
                                                         {guilds.find(g => g.id === post.guildId)?.name || 'Guild'}
                                                     </p>
                                                 </div>
                                             </div>
-                                            <h5 className="font-bold text-sm mb-1 line-clamp-2 group-hover:text-primary transition-colors">
+                                            <h5 className="font-bold text-xs text-zinc-900 dark:text-white mb-1 line-clamp-2 group-hover:text-amber-500 transition-colors leading-snug">
                                                 {post.title}
                                             </h5>
-                                            <p className="text-xs text-text-subtle-light dark:text-text-subtle-dark line-clamp-2">
+                                            <p className="text-[11px] text-zinc-600 dark:text-zinc-400 line-clamp-2 leading-relaxed">
                                                 {post.content}
                                             </p>
-                                            <div className="flex items-center gap-3 mt-3 text-[10px] text-text-subtle-light dark:text-text-subtle-dark">
+                                            <div className="flex items-center gap-3 mt-3 text-[11px] text-zinc-500 dark:text-zinc-400 pt-2 border-t border-zinc-200/60 dark:border-white/5">
                                                 <span className="flex items-center gap-1">
-                                                    <span className="material-symbols-outlined text-xs">favorite</span>
-                                                    {post.likes}
+                                                    <span className="material-symbols-outlined text-xs text-amber-500">thumb_up</span>
+                                                    <span>{post.likes}</span>
                                                 </span>
                                                 <span className="flex items-center gap-1">
-                                                    <span className="material-symbols-outlined text-xs">comment</span>
-                                                    {post.commentCount}
+                                                    <span className="material-symbols-outlined text-xs">chat_bubble</span>
+                                                    <span>{post.commentCount}</span>
                                                 </span>
                                             </div>
                                         </div>
                                     )) : (
-                                        <div className="w-full py-8 text-center text-text-subtle-light dark:text-text-subtle-dark text-sm">
-                                            No trending topics yet. Be the first to post!
+                                        <div className="w-full py-8 text-center text-zinc-400 text-xs">
+                                            No trending topics yet. Be the first to start a conversation!
                                         </div>
                                     )}
                                 </div>
@@ -997,10 +1018,10 @@ function GuildPostCard({ post }: { post: GuildPost }) {
 
     return (
         <>
-            <article className={`bg-white/90 dark:bg-zinc-900/90 backdrop-blur-3xl border border-white dark:border-white/5 rounded-[40px] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.08)] dark:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.3)] ring-1 ring-black/[0.01] dark:ring-white/[0.01] transition-all group overflow-hidden ${post.type === 'ama' ? 'border-purple-500/20' : ''}`}>
+            <article className={`bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.08] hover:border-amber-500/30 rounded-3xl shadow-sm hover:shadow-md transition-all group overflow-hidden ${post.type === 'ama' ? 'border-purple-500/30' : ''}`}>
                 {/* Post Header */}
-                <div className="p-5 flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-zinc-200 dark:bg-zinc-800 overflow-hidden shrink-0 border border-border-light dark:border-border-dark shadow-sm">
+                <div className="p-5 flex items-start gap-3.5">
+                    <div className="w-10 h-10 rounded-2xl bg-zinc-100 dark:bg-black overflow-hidden shrink-0 border border-zinc-200 dark:border-white/10 shadow-sm">
                         {post.userPhoto && (
                             <PostMedia
                                 src={post.userPhoto}
