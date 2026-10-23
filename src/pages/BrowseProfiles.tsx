@@ -14,6 +14,7 @@ import MapDiscovery from '../components/MapDiscovery';
 import PostMedia from '../components/PostMedia';
 import AvailabilityAvatar from '../components/AvailabilityAvatar';
 import { useToast } from '../context/ToastContext';
+import { useTheme } from '../context/ThemeContext';
 import SEO from '../components/SEO';
 
 import { CURATED_CINEMA_TALENT } from '../constants/curatedTalent';
@@ -22,6 +23,7 @@ export default function BrowseProfiles() {
     const navigate = useNavigate();
     const { currentUser } = useAuth();
     const { openAuthModal } = useAuthModal();
+    const { isDarkMode, toggleDarkMode } = useTheme();
     const toast = useToast();
 
     // Primary Pillar: 'talent' | 'guilds' | 'studios'
@@ -351,6 +353,15 @@ export default function BrowseProfiles() {
                     </div>
 
                     <div className="flex items-center gap-1.5">
+                        <button
+                            onClick={toggleDarkMode}
+                            className="size-9 rounded-xl flex items-center justify-center bg-white dark:bg-[#121316] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/10 active:scale-95 transition-all"
+                            title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                        >
+                            <span className="material-symbols-outlined text-lg">
+                                {isDarkMode ? 'light_mode' : 'dark_mode'}
+                            </span>
+                        </button>
                         {pillar === 'talent' && (
                             <button
                                 onClick={() => setViewMode(prev => prev === 'grid' ? 'directory' : 'grid')}
@@ -412,6 +423,16 @@ export default function BrowseProfiles() {
 
                         {/* Top Right Desktop Controls */}
                         <div className="flex items-center gap-2.5">
+                            <button
+                                onClick={toggleDarkMode}
+                                className="size-9 rounded-xl flex items-center justify-center bg-white dark:bg-[#121316] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/10 active:scale-95 transition-all"
+                                title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                            >
+                                <span className="material-symbols-outlined text-lg">
+                                    {isDarkMode ? 'light_mode' : 'dark_mode'}
+                                </span>
+                            </button>
+
                             {pillar === 'talent' && (
                                 <div className="flex items-center bg-white dark:bg-[#121316] p-1 rounded-xl border border-zinc-200 dark:border-white/10 shadow-sm">
                                     <button

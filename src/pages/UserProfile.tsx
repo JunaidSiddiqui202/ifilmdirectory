@@ -4,6 +4,7 @@ import PostMedia from '../components/PostMedia';
 import AvailabilityAvatar from '../components/AvailabilityAvatar';
 import BottomNav from '../components/BottomNav';
 import Logo from '../components/Logo';
+import HamburgerMenu from '../components/HamburgerMenu';
 import MediaUploadModal from '../components/MediaUploadModal';
 import ProfileEnhancementModal from '../components/ProfileEnhancementModal';
 import EditProfileModal from '../components/EditProfileModal';
@@ -12,6 +13,7 @@ import { type EnhancedProfile } from '../services/aiService';
 import VerificationModal from '../components/VerificationModal';
 import { useAuth } from '../context/AuthContext';
 import { useAuthModal } from '../context/AuthModalContext';
+import { useTheme } from '../context/ThemeContext';
 import {
     getUserProfile,
     updateUserProfile,
@@ -169,6 +171,7 @@ export default function UserProfile() {
     const { id } = useParams();
     const { currentUser } = useAuth();
     const { openAuthModal } = useAuthModal();
+    const { isDarkMode, toggleDarkMode } = useTheme();
     const toast = useToast();
     const [profile, setProfile] = useState<UserProfileType | null>(null);
     const [loading, setLoading] = useState(true);
@@ -532,8 +535,8 @@ export default function UserProfile() {
             )}
             <div className="w-full max-w-md md:max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto flex flex-col flex-1 px-0 sm:px-4">
             {/* Top Navigation Bar: Mobile only */}
-            <div className="md:hidden flex items-center justify-between p-4 bg-white/95 dark:bg-[#090A0C]/90 backdrop-blur-md sticky top-0 z-50 border-b border-zinc-200 dark:border-white/5">
-                <div className="flex items-center gap-3">
+            <div className="md:hidden flex items-center justify-between p-3.5 bg-white/95 dark:bg-[#090A0C]/90 backdrop-blur-md sticky top-0 z-50 border-b border-zinc-200 dark:border-white/5">
+                <div className="flex items-center gap-2.5">
                     <button 
                         onClick={() => {
                             if (window.history.length > 1) {
@@ -542,22 +545,35 @@ export default function UserProfile() {
                                 navigate('/browse-profiles');
                             }
                         }} 
-                        className="p-2 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 hover:border-amber-500/30 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors flex items-center justify-center"
+                        className="size-9 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors flex items-center justify-center active:scale-95"
                         title="Go back"
                     >
-                        <span className="material-symbols-outlined text-xl">arrow_back</span>
+                        <span className="material-symbols-outlined text-lg">arrow_back</span>
                     </button>
                     <div className="flex items-center gap-2 cursor-pointer select-none" onClick={() => navigate('/home')}>
                         <Logo size="sm" showText={true} />
                     </div>
                 </div>
-                <button
-                    onClick={handleShareProfile}
-                    className="p-2 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 hover:border-amber-500/30 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors"
-                    title="Share Profile"
-                >
-                    <span className="material-symbols-outlined text-xl">share</span>
-                </button>
+
+                <div className="flex items-center gap-1.5">
+                    <button
+                        onClick={toggleDarkMode}
+                        className="size-9 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 transition-colors flex items-center justify-center active:scale-95"
+                        title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                    >
+                        <span className="material-symbols-outlined text-lg">
+                            {isDarkMode ? 'light_mode' : 'dark_mode'}
+                        </span>
+                    </button>
+                    <button
+                        onClick={handleShareProfile}
+                        className="size-9 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors flex items-center justify-center active:scale-95"
+                        title="Share Profile"
+                    >
+                        <span className="material-symbols-outlined text-lg">share</span>
+                    </button>
+                    <HamburgerMenu />
+                </div>
             </div>
 
             {/* Cinematic Hero Header Card */}
@@ -577,7 +593,16 @@ export default function UserProfile() {
                     <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-[#111317] via-transparent to-black/40" />
                     
                     {/* Top right quick actions on desktop */}
-                    <div className="absolute top-4 right-4 hidden md:flex items-center gap-2.5 z-10">
+                    <div className="absolute top-4 right-4 hidden md:flex items-center gap-2 z-10">
+                        <button
+                            onClick={toggleDarkMode}
+                            className="p-2.5 rounded-xl bg-black/60 hover:bg-black/80 backdrop-blur-md border border-white/15 text-white transition-all hover:scale-105 active:scale-95 shadow-lg"
+                            title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                        >
+                            <span className="material-symbols-outlined text-lg">
+                                {isDarkMode ? 'light_mode' : 'dark_mode'}
+                            </span>
+                        </button>
                         <button
                             onClick={handleShareProfile}
                             className="p-2.5 rounded-xl bg-black/60 hover:bg-black/80 backdrop-blur-md border border-white/15 text-white transition-all hover:scale-105 active:scale-95 shadow-lg"
