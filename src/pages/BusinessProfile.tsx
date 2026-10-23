@@ -454,6 +454,30 @@ export default function BusinessProfile() {
                                     <p className="mt-3 text-sm font-medium text-zinc-500 dark:text-zinc-400 max-w-xs mx-auto line-clamp-2">
                                         {business.tagline}
                                     </p>
+
+                                    {/* Action CTA Bar */}
+                                    <div className="mt-5 flex items-center justify-center gap-3">
+                                        <button
+                                            onClick={() => {
+                                                if (!currentUser) {
+                                                    openAuthModal('Sign in to contact facility & inquire booking');
+                                                    return;
+                                                }
+                                                setShowContactModal(true);
+                                            }}
+                                            className="px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-white font-bold text-sm shadow-md shadow-amber-500/20 transition-all active:scale-95 flex items-center gap-2"
+                                        >
+                                            <span className="material-symbols-outlined text-lg">calendar_month</span>
+                                            <span>Contact & Inquire Booking</span>
+                                        </button>
+                                        <button
+                                            onClick={handleShare}
+                                            className="px-4 py-3 rounded-xl bg-zinc-100 dark:bg-white/[0.06] hover:bg-zinc-200 dark:hover:bg-white/[0.1] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/[0.08] transition-colors flex items-center gap-1.5 text-sm font-bold"
+                                        >
+                                            <span className="material-symbols-outlined text-lg">share</span>
+                                            <span className="hidden sm:inline">Share</span>
+                                        </button>
+                                    </div>
                                 </>
                             )}
                         </div>
@@ -807,11 +831,11 @@ export default function BusinessProfile() {
                     </div>
                 )}
             </div>
-            {/* Fixed Bottom CTA */}
-            <div className="fixed bottom-24 left-0 right-0 z-20 px-4 pointer-events-none">
+            {/* Mobile Fixed Bottom CTA (hidden on desktop) */}
+            <div className="md:hidden fixed bottom-20 left-0 right-0 z-20 px-4 pointer-events-none">
                 <div className="mx-auto max-w-md pointer-events-auto">
-                    <div className="rounded-2xl bg-white/95 dark:bg-[#121316]/95 backdrop-blur-xl p-3 shadow-2xl border border-zinc-200 dark:border-white/[0.1]">
-                        <div className="flex items-center gap-2.5">
+                    <div className="rounded-2xl bg-white/95 dark:bg-[#121316]/95 backdrop-blur-xl p-2.5 shadow-2xl border border-zinc-200 dark:border-white/[0.1]">
+                        <div className="flex items-center gap-2">
                             <button
                                 onClick={() => {
                                     if (!currentUser) {
@@ -820,17 +844,17 @@ export default function BusinessProfile() {
                                     }
                                     setShowContactModal(true);
                                 }}
-                                className="flex-1 min-w-0 rounded-xl bg-amber-500 hover:bg-amber-400 py-3.5 font-black text-white shadow-lg shadow-amber-500/20 transition-all active:scale-95 flex items-center justify-center gap-2"
+                                className="flex-1 min-w-0 rounded-xl bg-amber-500 hover:bg-amber-400 py-3 font-bold text-white shadow-lg shadow-amber-500/20 transition-all active:scale-95 flex items-center justify-center gap-2 text-xs"
                             >
-                                <span className="material-symbols-outlined text-xl">calendar_month</span>
-                                <span className="text-sm font-bold">Contact & Inquire Booking</span>
+                                <span className="material-symbols-outlined text-lg">calendar_month</span>
+                                <span>Contact & Inquire</span>
                             </button>
                             <button 
                                 onClick={handleShare}
-                                className="w-12 h-12 shrink-0 rounded-xl bg-zinc-100 dark:bg-white/[0.05] hover:bg-zinc-200 dark:hover:bg-white/[0.1] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/[0.08] transition-colors flex items-center justify-center"
+                                className="w-10 h-10 shrink-0 rounded-xl bg-zinc-100 dark:bg-white/[0.05] hover:bg-zinc-200 dark:hover:bg-white/[0.1] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/[0.08] transition-colors flex items-center justify-center"
                                 title="Share"
                             >
-                                <span className="material-symbols-outlined text-xl">share</span>
+                                <span className="material-symbols-outlined text-lg">share</span>
                             </button>
                         </div>
                     </div>
