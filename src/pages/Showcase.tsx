@@ -1175,7 +1175,7 @@ export default function Showcase() {
                     <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                         <button
                             onClick={toggleDarkMode}
-                            className="size-8 sm:size-9 rounded-lg sm:rounded-xl flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 border border-transparent dark:border-white/5 transition-all active:scale-95"
+                            className="flex md:hidden size-8 sm:size-9 rounded-lg sm:rounded-xl items-center justify-center text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 border border-transparent dark:border-white/5 transition-all active:scale-95"
                             title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
                             aria-label="Toggle theme"
                         >

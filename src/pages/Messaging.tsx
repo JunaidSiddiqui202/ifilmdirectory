@@ -480,10 +480,10 @@ export default function Messaging() {
                                 <span className="material-symbols-outlined text-lg">call</span>
                             </button>
 
-                            {/* Theme Toggle */}
+                            {/* Theme Toggle (Mobile only, sidebar has it on desktop) */}
                             <button
                                 onClick={toggleDarkMode}
-                                className="flex size-9 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] border border-zinc-200 dark:border-white/[0.08] text-zinc-600 dark:text-zinc-300 transition-colors"
+                                className="flex md:hidden size-9 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] border border-zinc-200 dark:border-white/[0.08] text-zinc-600 dark:text-zinc-300 transition-colors"
                                 title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
                             >
                                 <span className="material-symbols-outlined text-lg">

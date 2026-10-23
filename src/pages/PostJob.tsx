@@ -219,7 +219,7 @@ export default function PostJob() {
                     </div>
                     <button
                         onClick={toggleDarkMode}
-                        className="flex size-10 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] border border-zinc-200 dark:border-white/[0.08] text-zinc-700 dark:text-zinc-200 transition-all active:scale-95"
+                        className="flex md:hidden size-10 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] border border-zinc-200 dark:border-white/[0.08] text-zinc-700 dark:text-zinc-200 transition-all active:scale-95"
                         title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
                         aria-label="Toggle theme"
                     >
@@ -573,7 +573,7 @@ export default function PostJob() {
                 <div className="flex items-center gap-2">
                     <button
                         onClick={toggleDarkMode}
-                        className="flex size-10 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] border border-zinc-200 dark:border-white/[0.08] text-zinc-700 dark:text-zinc-200 transition-all active:scale-95"
+                        className="flex md:hidden size-10 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] border border-zinc-200 dark:border-white/[0.08] text-zinc-700 dark:text-zinc-200 transition-all active:scale-95"
                         title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
                         aria-label="Toggle theme"
                     >

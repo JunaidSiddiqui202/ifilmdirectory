@@ -177,7 +177,7 @@ export default function JobApplications() {
                 <div className="flex items-center gap-2">
                     <button
                         onClick={toggleDarkMode}
-                        className="flex size-10 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.04] dark:hover:bg-white/10 text-zinc-700 dark:text-zinc-300 transition-all active:scale-95"
+                        className="flex md:hidden size-10 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.04] dark:hover:bg-white/10 text-zinc-700 dark:text-zinc-300 transition-all active:scale-95"
                         title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
                         aria-label="Toggle theme"
                     >

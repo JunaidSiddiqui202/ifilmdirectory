@@ -106,10 +106,10 @@ export default function ShowreelView2() {
                             <span>Cinema Player</span>
                         </button>
 
-                        {/* Theme Toggle Button */}
+                        {/* Theme Toggle Button (Mobile only) */}
                         <button
                             onClick={toggleDarkMode}
-                            className="flex size-9 items-center justify-center rounded-xl bg-black/5 dark:bg-white/5 text-zinc-700 dark:text-zinc-300 hover:bg-black/10 dark:hover:bg-white/10 active:scale-95 transition-all"
+                            className="flex md:hidden size-9 items-center justify-center rounded-xl bg-black/5 dark:bg-white/5 text-zinc-700 dark:text-zinc-300 hover:bg-black/10 dark:hover:bg-white/10 active:scale-95 transition-all"
                             title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
                         >
                             <span className="material-symbols-outlined text-lg">

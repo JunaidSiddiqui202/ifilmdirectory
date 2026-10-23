@@ -881,11 +881,11 @@ export default function Home() {
                     </div>
 
                     <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                        {/* Day/Night Theme Toggle Icon */}
+                        {/* Day/Night Theme Toggle Icon (Mobile only, sidebar has it on desktop) */}
                         <button
                             onClick={toggleDarkMode}
                             type="button"
-                            className="p-1.5 sm:p-2 rounded-xl bg-zinc-100 dark:bg-[#1e1f24] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-amber-400 hover:text-zinc-900 dark:hover:text-white hover:border-amber-500/30 transition-all active:scale-95 flex items-center justify-center shrink-0 cursor-pointer"
+                            className="md:hidden p-1.5 sm:p-2 rounded-xl bg-zinc-100 dark:bg-[#1e1f24] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-amber-400 hover:text-zinc-900 dark:hover:text-white hover:border-amber-500/30 transition-all active:scale-95 flex items-center justify-center shrink-0 cursor-pointer"
                             title={isDarkMode ? "Switch to Day Theme" : "Switch to Night Theme"}
                             aria-label="Toggle Theme"
                         >

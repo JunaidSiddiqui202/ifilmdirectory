@@ -558,7 +558,7 @@ export default function UserProfile() {
                 <div className="flex items-center gap-1.5">
                     <button
                         onClick={toggleDarkMode}
-                        className="size-9 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 transition-colors flex items-center justify-center active:scale-95"
+                        className="flex md:hidden size-9 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 transition-colors items-center justify-center active:scale-95"
                         title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
                     >
                         <span className="material-symbols-outlined text-lg">
@@ -594,15 +594,6 @@ export default function UserProfile() {
                     
                     {/* Top right quick actions on desktop */}
                     <div className="absolute top-4 right-4 hidden md:flex items-center gap-2 z-10">
-                        <button
-                            onClick={toggleDarkMode}
-                            className="p-2.5 rounded-xl bg-black/60 hover:bg-black/80 backdrop-blur-md border border-white/15 text-white transition-all hover:scale-105 active:scale-95 shadow-lg"
-                            title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-                        >
-                            <span className="material-symbols-outlined text-lg">
-                                {isDarkMode ? 'light_mode' : 'dark_mode'}
-                            </span>
-                        </button>
                         <button
                             onClick={handleShareProfile}
                             className="p-2.5 rounded-xl bg-black/60 hover:bg-black/80 backdrop-blur-md border border-white/15 text-white transition-all hover:scale-105 active:scale-95 shadow-lg"

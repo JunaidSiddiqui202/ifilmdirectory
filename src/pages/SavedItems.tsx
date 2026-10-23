@@ -257,7 +257,7 @@ export default function SavedItems() {
                         <Logo size="sm" showText={true} />
                     </div>
 
-                    <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                    <div className="flex md:hidden items-center gap-1.5 sm:gap-2 shrink-0">
                         <button
                             onClick={toggleDarkMode}
                             type="button"
