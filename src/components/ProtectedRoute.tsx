@@ -41,7 +41,7 @@ export default function ProtectedRoute({ children, allowGuest = false }: Protect
     }
 
     const isShowreelViewer = location.pathname.startsWith('/showreel/view');
-    const isStudioPage = ['/create-blog', '/edit-blog', '/create-event', '/post-job'].some(p => location.pathname.startsWith(p));
+    const isStudioPage = ['/create-blog', '/edit-blog', '/create-event', '/post-job', '/showreel/upload'].some(p => location.pathname.startsWith(p));
     const isStandalone = location.pathname.startsWith('/-admin') || isShowreelViewer || isStudioPage;
 
     return (

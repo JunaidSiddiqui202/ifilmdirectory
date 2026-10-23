@@ -163,7 +163,7 @@ export default function UploadShowreel() {
         <div className="relative flex min-h-screen w-full flex-col bg-slate-50 dark:bg-[#090A0C] text-zinc-900 dark:text-white transition-colors pb-32">
             {/* Unified Responsive Cinema Header */}
             <header className="sticky top-0 z-40 bg-white/85 dark:bg-[#090A0C]/85 backdrop-blur-xl border-b border-black/[0.06] dark:border-white/[0.08] px-4 sm:px-6 py-3 transition-colors">
-                <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
+                <div className="max-w-2xl lg:max-w-3xl mx-auto flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => navigate(-1)}
