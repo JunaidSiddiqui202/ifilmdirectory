@@ -385,10 +385,10 @@ export default function MessagesList() {
                                 <button 
                                     onClick={() => navigate('/browse-profiles')}
                                     className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white font-bold text-xs transition-all shadow-md shadow-amber-500/25 active:scale-95"
-                                    title="Start a new message thread"
+                                    title="Start a new message"
                                 >
                                     <span className="material-symbols-outlined text-base">edit_square</span>
-                                    <span className="hidden sm:inline">New Thread</span>
+                                    <span className="hidden sm:inline">New Message</span>
                                 </button>
                             ) : (
                                 localUnreadNotifCount > 0 && (
