@@ -13,6 +13,7 @@ import { Timestamp, collection, query, where, getDocs } from 'firebase/firestore
 import { db } from '../firebaseConfig';
 import { useToast } from '../context/ToastContext';
 import { useUnread } from '../context/UnreadContext';
+import { useTheme } from '../context/ThemeContext';
 import { rssNewsService, type NewsItem } from '../services/rssNewsService';
 import SEO from '../components/SEO';
 
@@ -110,6 +111,7 @@ export default function Showcase() {
     const { openAuthModal } = useAuthModal();
     const toast = useToast();
     const { hasUnreadMessages, hasUnreadNotifications } = useUnread();
+    const { isDarkMode, toggleDarkMode } = useTheme();
     const [posts, setPosts] = useState<Post[]>([]);
 
     useEffect(() => {
@@ -1133,17 +1135,55 @@ export default function Showcase() {
 
             {/* Cinema Header - Compact on mobile */}
             <header className="sticky top-0 z-40 bg-white/80 dark:bg-[#090A0C]/85 px-3 sm:px-6 pt-2.5 sm:pt-4 pb-1.5 sm:pb-3 backdrop-blur-2xl border-b border-black/[0.04] dark:border-white/[0.06] flex flex-col gap-1.5 sm:gap-2.5">
-                <div className="flex md:hidden justify-between items-center gap-2">
-                    <div className="flex items-center gap-2 min-w-0">
+                <div className="flex justify-between items-center gap-3">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                        <button
+                            onClick={() => navigate('/home')}
+                            className="p-1.5 rounded-xl bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/10 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors"
+                            title="Back to Home"
+                        >
+                            <span className="material-symbols-outlined text-xl">arrow_back</span>
+                        </button>
                         <HamburgerMenu />
-                        <div className="flex items-center gap-1.5 cursor-pointer select-none" onClick={() => navigate('/home')}>
+                        <div className="flex items-center gap-2 cursor-pointer select-none" onClick={() => navigate('/home')}>
                             <Logo size="sm" showText={true} />
-                            <span className="hidden sm:inline-block text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                            <span className="hidden sm:inline-flex text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/25">
                                 Feed
                             </span>
                         </div>
                     </div>
-                    <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+
+                    {/* Quick navigation to Showreel Views */}
+                    <div className="hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-xl bg-zinc-100 dark:bg-white/[0.04] border border-zinc-200 dark:border-white/[0.06] text-xs">
+                        <span className="text-zinc-400 font-semibold text-[11px]">Showreels:</span>
+                        <button
+                            onClick={() => navigate('/showreel/view1')}
+                            className="px-2 py-0.5 rounded-md hover:bg-amber-500/15 hover:text-amber-500 text-zinc-600 dark:text-zinc-300 font-bold text-[11px] transition-colors"
+                        >
+                            Cinema View
+                        </button>
+                        <span className="text-zinc-300 dark:text-zinc-700">•</span>
+                        <button
+                            onClick={() => navigate('/showreel/upload')}
+                            className="px-2 py-0.5 rounded-md text-amber-600 dark:text-amber-400 hover:bg-amber-500/15 font-bold text-[11px] transition-colors flex items-center gap-1"
+                        >
+                            <span className="material-symbols-outlined text-[13px]">upload</span>
+                            <span>Upload Reel</span>
+                        </button>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                        <button
+                            onClick={toggleDarkMode}
+                            className="size-8 sm:size-9 rounded-lg sm:rounded-xl flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 border border-transparent dark:border-white/5 transition-all active:scale-95"
+                            title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                            aria-label="Toggle theme"
+                        >
+                            <span className="material-symbols-outlined text-[18px]">
+                                {isDarkMode ? 'light_mode' : 'dark_mode'}
+                            </span>
+                        </button>
+
                         <button
                             onClick={() => navigate('/search')}
                             className="size-8 sm:size-9 rounded-lg sm:rounded-xl flex items-center justify-center text-zinc-600 dark:text-zinc-400 hover:text-amber-500 hover:bg-black/5 dark:hover:bg-white/5 transition-all"
@@ -1151,6 +1191,7 @@ export default function Showcase() {
                         >
                             <span className="material-symbols-outlined text-[18px] sm:text-[20px]">search</span>
                         </button>
+
                         <button
                             onClick={() => {
                                 if (!currentUser) return openAuthModal('Sign in to view notifications');
@@ -1164,6 +1205,7 @@ export default function Showcase() {
                                 <span className="absolute top-1.5 right-1.5 size-2 bg-amber-500 rounded-full animate-pulse shadow-sm shadow-amber-500/50" />
                             )}
                         </button>
+
                         <button
                             onClick={() => {
                                 if (!currentUser) return openAuthModal('Sign in to view messages');
@@ -1177,6 +1219,7 @@ export default function Showcase() {
                                 <span className="absolute top-1 right-1 size-2.5 bg-red-500 rounded-full ring-2 ring-white dark:ring-[#090A0C] animate-pulse shadow-sm shadow-red-500/60" />
                             )}
                         </button>
+
                         {currentUser ? (
                             <div
                                 onClick={() => navigate('/profile')}

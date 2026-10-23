@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import HamburgerMenu from '../components/HamburgerMenu';
+import Logo from '../components/Logo';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { getUserProfile, getLatestUsers, type UserProfile } from '../services/userService';
 import PostMedia from '../components/PostMedia';
 import { jobService, type Job } from '../services/jobService';
@@ -24,6 +26,7 @@ const formatViews = (views: number) => {
 export default function ShowreelView3() {
     const navigate = useNavigate();
     const { currentUser } = useAuth();
+    const { isDarkMode, toggleDarkMode } = useTheme();
     const [userProfile, setUserProfile] = useState<any>(null);
     const [recentJobs, setRecentJobs] = useState<Job[]>([]);
     const [recentAuditions, setRecentAuditions] = useState<Job[]>([]);
@@ -171,39 +174,61 @@ export default function ShowreelView3() {
     };
 
     return (
-        <div className="relative mx-auto flex h-full min-h-screen w-full max-w-md md:max-w-xl lg:max-w-2xl flex-col bg-background-light dark:bg-background-dark">
-            {/* Header */}
-            <header className="sticky top-0 z-40 bg-white/70 dark:bg-zinc-950/70 px-6 pt-5 pb-4 backdrop-blur-3xl border-b border-black/[0.02] dark:border-white/[0.02]">
-                <div className="flex items-center justify-between">
+        <div className="relative mx-auto flex h-full min-h-screen w-full max-w-4xl flex-col bg-slate-50 dark:bg-[#090A0C] text-zinc-900 dark:text-white transition-colors pb-24">
+            {/* Unified Responsive Cinema Header */}
+            <header className="sticky top-0 z-40 bg-white/85 dark:bg-[#090A0C]/85 px-4 sm:px-6 py-3 backdrop-blur-xl border-b border-black/[0.06] dark:border-white/[0.08] transition-colors">
+                <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => navigate(-1)}
+                            className="flex size-9 items-center justify-center rounded-xl bg-black/5 dark:bg-white/5 text-zinc-700 dark:text-zinc-300 hover:bg-black/10 dark:hover:bg-white/10 active:scale-95 transition-all"
+                            title="Go Back"
+                        >
+                            <span className="material-symbols-outlined text-xl">arrow_back</span>
+                        </button>
                         <HamburgerMenu />
-                        <div
-                            className="h-11 w-11 shrink-0 rounded-[14px] overflow-hidden ring-2 ring-primary/10 shadow-lg cursor-pointer transition-transform active:scale-90"
-                            onClick={() => navigate('/profile')}
+                        <Logo />
+                        <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-bold tracking-wide">
+                            <span className="material-symbols-outlined text-xs">auto_awesome</span>
+                            Trending Reels
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        {/* Theme Toggle Button */}
+                        <button
+                            onClick={toggleDarkMode}
+                            className="flex size-9 items-center justify-center rounded-xl bg-black/5 dark:bg-white/5 text-zinc-700 dark:text-zinc-300 hover:bg-black/10 dark:hover:bg-white/10 active:scale-95 transition-all"
+                            title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+                        >
+                            <span className="material-symbols-outlined text-lg">
+                                {isDarkMode ? 'light_mode' : 'dark_mode'}
+                            </span>
+                        </button>
+
+                        <button
+                            onClick={() => setShowSearch(!showSearch)}
+                            className={`flex size-9 items-center justify-center rounded-xl transition-all ${showSearch ? 'bg-amber-500 text-white shadow-sm' : 'bg-black/5 dark:bg-white/5 text-zinc-700 dark:text-zinc-300 hover:bg-black/10 dark:hover:bg-white/10'}`}
+                            title="Search"
+                        >
+                            <span className="material-symbols-outlined text-lg">search</span>
+                        </button>
+                        <button
+                            onClick={() => navigate('/messaging')}
+                            className="flex size-9 items-center justify-center rounded-xl bg-black/5 dark:bg-white/5 text-zinc-700 dark:text-zinc-300 hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+                            title="Messages"
+                        >
+                            <span className="material-symbols-outlined text-lg">chat</span>
+                        </button>
+                        <button
+                            onClick={() => navigate(currentUser ? `/profile/${currentUser.uid}` : '/login')}
+                            className="size-9 rounded-full overflow-hidden ring-1 ring-black/10 dark:ring-white/15 cursor-pointer hover:ring-amber-500 transition-all shrink-0"
+                            title={displayName}
                         >
                             <PostMedia
                                 src={photoURL}
                                 fallbackType="USER_MALE"
-                                className="w-full h-full"
+                                className="w-full h-full object-cover"
                             />
-                        </div>
-                        <div className="cursor-pointer" onClick={() => navigate('/profile')}>
-                            <p className="text-[9px] font-black text-zinc-400 uppercase tracking-[0.1em] leading-none mb-1.5">Portfolio</p>
-                            <h1 className="text-base font-black tracking-tight text-zinc-900 dark:text-white leading-none">{displayName}</h1>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <button
-                            onClick={() => setShowSearch(!showSearch)}
-                            className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all ${showSearch ? 'bg-primary text-white shadow-primary/30' : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800'}`}
-                        >
-                            <span className="material-symbols-outlined font-bold">search</span>
-                        </button>
-                        <button
-                            onClick={() => navigate('/messaging')}
-                            className="flex h-10 w-10 items-center justify-center rounded-xl text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-                        >
-                            <span className="material-symbols-outlined font-bold">chat_bubble_outline</span>
                         </button>
                     </div>
                 </div>
