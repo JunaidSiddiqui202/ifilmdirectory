@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { projectService, type ProductionProject, type ShortlistedTalent } from '../services/projectService';
+import { type UserProfile as UserProfileType } from '../services/userService';
 import BottomNav from '../components/BottomNav';
 import PostMedia from '../components/PostMedia';
 import SEO from '../components/SEO';
@@ -13,6 +14,11 @@ export default function ProjectDetails() {
     const [project, setProject] = useState<ProductionProject | null>(null);
     const [loading, setLoading] = useState(true);
     const [activeFilter, setActiveFilter] = useState<'all' | 'shortlisted' | 'contacted' | 'hired' | 'rejected'>('all');
+    const [isAddCrewModalOpen, setIsAddCrewModalOpen] = useState(false);
+    const [directoryProfiles, setDirectoryProfiles] = useState<UserProfileType[]>([]);
+    const [directoryLoading, setDirectoryLoading] = useState(false);
+    const [searchDirectoryQuery, setSearchDirectoryQuery] = useState('');
+    const [addingTalentId, setAddingTalentId] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchProject = async () => {
@@ -28,6 +34,57 @@ export default function ProjectDetails() {
         };
         fetchProject();
     }, [id]);
+
+    const openAddCrewModal = async () => {
+        setIsAddCrewModalOpen(true);
+        if (directoryProfiles.length === 0) {
+            setDirectoryLoading(true);
+            try {
+                const { getAllUsers } = await import('../services/userService');
+                const { CURATED_CINEMA_TALENT } = await import('../constants/curatedTalent');
+                const liveUsers = await getAllUsers();
+                const liveUids = new Set(liveUsers.map(u => u.uid));
+                const supplemental = (CURATED_CINEMA_TALENT as unknown as UserProfileType[]).filter(p => !liveUids.has(p.uid as string));
+                setDirectoryProfiles([...liveUsers, ...supplemental]);
+            } catch (err) {
+                console.error("Failed to load talent directory:", err);
+            } finally {
+                setDirectoryLoading(false);
+            }
+        }
+    };
+
+    const handleAddTalentToCurrentProject = async (talent: UserProfileType) => {
+        if (!id || !project) return;
+        const alreadyInShortlist = (project.shortlist || []).some(t => t.userId === talent.uid);
+        if (alreadyInShortlist) {
+            toast.info(`${talent.displayName || 'Creator'} is already in this project's shortlist.`);
+            return;
+        }
+
+        setAddingTalentId(talent.uid);
+        try {
+            await projectService.addToShortlist(id, {
+                userId: talent.uid,
+                userName: talent.displayName || 'Cinema Talent',
+                userPhoto: talent.photoURL,
+                role: talent.role || 'Industry Professional',
+                status: 'shortlisted'
+            });
+
+            // Refresh project state
+            const refreshed = await projectService.getProjectById(id);
+            if (refreshed) {
+                setProject(refreshed);
+            }
+            toast.success(`Added ${talent.displayName} to shortlist!`);
+        } catch (err) {
+            console.error("Error shortlisting talent:", err);
+            toast.error("Failed to add talent to project");
+        } finally {
+            setAddingTalentId(null);
+        }
+    };
 
     const handleUpdateStatus = async (userId: string, status: ShortlistedTalent['status']) => {
         if (!id) return;
@@ -154,7 +211,7 @@ export default function ProjectDetails() {
 
                 <div className="flex items-center gap-2">
                     <button
-                        onClick={() => navigate('/browse-profiles')}
+                        onClick={openAddCrewModal}
                         className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold transition-all shadow-md shadow-amber-500/10 shrink-0"
                     >
                         <span className="material-symbols-outlined text-base">person_add</span>
@@ -242,11 +299,11 @@ export default function ProjectDetails() {
                     </div>
 
                     <button
-                        onClick={() => navigate('/browse-profiles')}
+                        onClick={openAddCrewModal}
                         className="text-xs font-bold text-amber-500 hover:text-amber-600 dark:hover:text-amber-400 flex items-center gap-1 transition-colors"
                     >
+                        <span className="material-symbols-outlined text-sm">person_add</span>
                         <span>Find More Filmmakers</span>
-                        <span className="material-symbols-outlined text-sm">arrow_forward</span>
                     </button>
                 </div>
 
@@ -305,7 +362,7 @@ export default function ProjectDetails() {
                                                 <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">Status:</span>
                                                 <select
                                                     value={talent.status}
-                                                    onChange={(e) => handleUpdateStatus(talent.userId, e.target.value as any)}
+                                                    onChange={(e) => handleUpdateStatus(talent.userId, e.target.value as ShortlistedTalent['status'])}
                                                     className={`text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg border outline-none cursor-pointer transition-all ${statusClass}`}
                                                 >
                                                     <option value="shortlisted" className="bg-white dark:bg-[#17191e] text-zinc-900 dark:text-white">Shortlisted</option>
@@ -344,19 +401,181 @@ export default function ProjectDetails() {
                             <h3 className="text-base font-bold text-zinc-900 dark:text-white mb-1">
                                 No Talent in this Category
                             </h3>
-                            <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto mb-4">
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto mb-5">
                                 Browse certified cinematographers, directors, actors, and editors to add them to this production.
                             </p>
-                            <button
-                                onClick={() => navigate('/browse-profiles')}
-                                className="px-4 py-2 rounded-xl bg-amber-500 text-black text-xs font-bold hover:bg-amber-400 transition-all shadow-md shadow-amber-500/20"
-                            >
-                                Browse Talent Directory
-                            </button>
+                            <div className="flex items-center gap-3 flex-wrap justify-center">
+                                <button
+                                    onClick={openAddCrewModal}
+                                    className="px-4 py-2.5 rounded-xl bg-amber-500 text-black text-xs font-bold hover:bg-amber-400 transition-all shadow-md shadow-amber-500/20 flex items-center gap-1.5"
+                                >
+                                    <span className="material-symbols-outlined text-base">person_add</span>
+                                    <span>Add Crew to this Project</span>
+                                </button>
+                                <button
+                                    onClick={() => navigate('/browse-profiles')}
+                                    className="px-4 py-2.5 rounded-xl bg-zinc-100 dark:bg-white/10 hover:bg-zinc-200 dark:hover:bg-white/15 text-zinc-800 dark:text-white text-xs font-bold transition-all border border-zinc-200 dark:border-white/10"
+                                >
+                                    Browse Full Directory
+                                </button>
+                            </div>
                         </div>
                     )}
                 </section>
             </div>
+
+            {/* Quick Add Crew From Directory Modal */}
+            {isAddCrewModalOpen && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in"
+                    onClick={() => setIsAddCrewModalOpen(false)}
+                >
+                    <div
+                        className="bg-white dark:bg-[#121316] rounded-3xl w-full max-w-xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl border border-zinc-200 dark:border-white/10"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Modal Header */}
+                        <div className="p-5 border-b border-zinc-200 dark:border-white/10 flex items-center justify-between gap-3">
+                            <div>
+                                <h3 className="text-lg font-black text-zinc-900 dark:text-white flex items-center gap-2">
+                                    <span className="material-symbols-outlined text-amber-500">person_add</span>
+                                    <span>Add Crew to {project.name}</span>
+                                </h3>
+                                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                                    Select certified filmmakers, cinematographers, actors & technicians
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => setIsAddCrewModalOpen(false)}
+                                className="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-white/10 text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
+                            >
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+
+                        {/* Search Input */}
+                        <div className="p-4 border-b border-zinc-100 dark:border-white/5 bg-zinc-50 dark:bg-black/20">
+                            <div className="relative">
+                                <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 text-lg">
+                                    search
+                                </span>
+                                <input
+                                    type="text"
+                                    value={searchDirectoryQuery}
+                                    onChange={(e) => setSearchDirectoryQuery(e.target.value)}
+                                    placeholder="Search by name, role (e.g. Cinematographer, Director), or city..."
+                                    className="w-full pl-10 pr-4 py-2.5 text-xs bg-white dark:bg-[#090A0C] border border-zinc-200 dark:border-white/10 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:border-amber-500"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Talent List */}
+                        <div className="flex-1 overflow-y-auto p-4 space-y-2.5">
+                            {directoryLoading ? (
+                                <div className="flex flex-col items-center justify-center py-12">
+                                    <div className="size-8 border-3 border-amber-500 border-t-transparent rounded-full animate-spin mb-2" />
+                                    <span className="text-xs text-zinc-400">Loading industry filmmakers...</span>
+                                </div>
+                            ) : (
+                                (() => {
+                                    const filteredTalent = directoryProfiles.filter(p => {
+                                        if (!searchDirectoryQuery.trim()) return true;
+                                        const q = searchDirectoryQuery.toLowerCase();
+                                        return (
+                                            (p.displayName || '').toLowerCase().includes(q) ||
+                                            (p.role || '').toLowerCase().includes(q) ||
+                                            (p.location || '').toLowerCase().includes(q) ||
+                                            (p.skills || []).some((s: string) => s.toLowerCase().includes(q))
+                                        );
+                                    });
+
+                                    if (filteredTalent.length === 0) {
+                                        return (
+                                            <div className="text-center py-12 text-zinc-400 text-xs">
+                                                No filmmakers found matching "{searchDirectoryQuery}".
+                                            </div>
+                                        );
+                                    }
+
+                                    return filteredTalent.map((talent) => {
+                                        const isAlreadyIn = (project.shortlist || []).some(t => t.userId === talent.uid);
+                                        const isAddingThis = addingTalentId === talent.uid;
+
+                                        return (
+                                            <div
+                                                key={talent.uid}
+                                                className="flex items-center justify-between gap-3 p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-200/80 dark:border-white/5 hover:border-amber-500/30 transition-all"
+                                            >
+                                                <div
+                                                    className="flex items-center gap-3 min-w-0 cursor-pointer flex-1"
+                                                    onClick={() => navigate(`/profile/${talent.uid}`)}
+                                                >
+                                                    <div className="size-11 rounded-xl overflow-hidden shrink-0 bg-zinc-200 dark:bg-zinc-800">
+                                                        <PostMedia
+                                                            src={talent.photoURL || ''}
+                                                            fallbackType="USER_MALE"
+                                                            className="size-full object-cover"
+                                                        />
+                                                    </div>
+                                                    <div className="min-w-0 flex-1">
+                                                        <h5 className="font-bold text-xs sm:text-sm text-zinc-900 dark:text-white truncate hover:text-amber-500 transition-colors">
+                                                            {talent.displayName || 'Cinema Creator'}
+                                                        </h5>
+                                                        <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate flex items-center gap-1.5">
+                                                            <span className="font-semibold text-amber-600 dark:text-amber-400">{talent.role || 'Professional'}</span>
+                                                            {talent.location && (
+                                                                <>
+                                                                    <span>•</span>
+                                                                    <span className="truncate">{talent.location}</span>
+                                                                </>
+                                                            )}
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex items-center gap-2 shrink-0">
+                                                    {isAlreadyIn ? (
+                                                        <span className="px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-xs font-bold flex items-center gap-1">
+                                                            <span className="material-symbols-outlined text-sm">check</span>
+                                                            <span>Shortlisted</span>
+                                                        </span>
+                                                    ) : (
+                                                        <button
+                                                            onClick={() => handleAddTalentToCurrentProject(talent)}
+                                                            disabled={isAddingThis}
+                                                            className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold transition-all shadow-sm active:scale-95 disabled:opacity-50 flex items-center gap-1"
+                                                        >
+                                                            <span className="material-symbols-outlined text-sm">add</span>
+                                                            <span>{isAddingThis ? 'Adding...' : 'Add Crew'}</span>
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        );
+                                    });
+                                })()
+                            )}
+                        </div>
+
+                        {/* Modal Footer */}
+                        <div className="p-4 border-t border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-black/30 flex items-center justify-between text-xs">
+                            <span className="text-zinc-500 dark:text-zinc-400">
+                                Looking for studios & gear?
+                            </span>
+                            <button
+                                onClick={() => {
+                                    setIsAddCrewModalOpen(false);
+                                    navigate('/browse-profiles');
+                                }}
+                                className="font-bold text-amber-500 hover:underline flex items-center gap-1"
+                            >
+                                <span>Open Full Talent Directory</span>
+                                <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <BottomNav />
         </div>

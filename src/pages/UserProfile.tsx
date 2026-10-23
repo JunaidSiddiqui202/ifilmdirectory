@@ -28,12 +28,13 @@ import {
 
 import PrivacySettingsModal from '../components/PrivacySettingsModal';
 import FollowListModal from '../components/FollowListModal';
+import AddToProjectModal from '../components/AddToProjectModal';
 import { useToast } from '../context/ToastContext';
 import SEO, { PersonStructuredData, BreadcrumbStructuredData } from '../components/SEO';
 import { findCuratedTalent } from '../constants/curatedTalent';
 
 // Mock Profiles for fallback
-const mockProfiles: Record<string, any> = {
+const mockProfiles: Record<string, Partial<UserProfileType>> = {
     // Map Firestore IDs (1, 2) to Studios
     '1': {
         uid: '1',
@@ -186,6 +187,7 @@ export default function UserProfile() {
     const [activeTab, setActiveTab] = useState('Portfolio');
     const [isFollowListModalOpen, setIsFollowListModalOpen] = useState(false);
     const [followListType, setFollowListType] = useState<'followers' | 'following'>('followers');
+    const [isAddToProjectOpen, setIsAddToProjectOpen] = useState(false);
 
     const isMe = !id || (currentUser && (id === currentUser.uid || profile?.uid === currentUser.uid));
 
@@ -280,9 +282,10 @@ export default function UserProfile() {
                 setFollowersCount(prev => prev + 1);
                 toast.success(`Following ${profile.displayName || 'user'}`);
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Error toggling follow:", error);
-            toast.error(error?.message?.includes('network') 
+            const err = error as { message?: string };
+            toast.error(err?.message?.includes('network') 
                 ? "Network error. Please try again." 
                 : "Failed to update follow status.");
         } finally {
@@ -316,7 +319,7 @@ export default function UserProfile() {
             const updatedProfile = {
                 ...profile,
                 displayName: profile.displayName, // Keep original name
-                role: enhancedData.headline as any,
+                role: enhancedData.headline,
                 bio: enhancedData.bio.standard, // Use standard bio version
             };
 
@@ -348,9 +351,10 @@ export default function UserProfile() {
                 setProfile(updatedProfile);
                 toast.success('Profile updated successfully!');
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Error updating profile:", error);
-            toast.error(`Failed to update profile: ${error.message || 'Unknown error'}`);
+            const err = error as { message?: string };
+            toast.error(`Failed to update profile: ${err.message || 'Unknown error'}`);
         }
     };
 
@@ -529,7 +533,17 @@ export default function UserProfile() {
             {/* Top Navigation Bar: Mobile only (Desktop uses sidebar + direct profile header) */}
             <div className="md:hidden flex items-center justify-between p-4 bg-white/95 dark:bg-[#090A0C]/90 backdrop-blur-md sticky top-0 z-50 border-b border-zinc-200 dark:border-white/5">
                 <div className="flex items-center gap-3">
-                    <button onClick={() => navigate(-1)} className="p-2 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 hover:border-amber-500/30 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors">
+                    <button 
+                        onClick={() => {
+                            if (window.history.length > 1) {
+                                navigate(-1);
+                            } else {
+                                navigate('/browse-profiles');
+                            }
+                        }} 
+                        className="p-2 rounded-xl bg-zinc-100 dark:bg-[#121316] border border-zinc-200 dark:border-white/10 hover:border-amber-500/30 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors flex items-center justify-center"
+                        title="Go back"
+                    >
                         <span className="material-symbols-outlined text-xl">arrow_back</span>
                     </button>
                     <div className="flex items-center gap-2 cursor-pointer select-none" onClick={() => navigate('/home')}>
@@ -574,15 +588,19 @@ export default function UserProfile() {
                     {/* Top Row: Name, Verification Badge & Desktop Action Buttons */}
                     <div className="flex flex-col md:flex-row md:items-center md:gap-4 mb-3.5 w-full">
                         <div className="flex items-center gap-2 justify-center md:justify-start min-w-0">
-                            {!isMe && (
-                                <button
-                                    onClick={() => navigate(-1)}
-                                    className="hidden md:flex p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-zinc-300 hover:text-white transition-colors mr-1 shrink-0"
-                                    title="Back"
-                                >
-                                    <span className="material-symbols-outlined text-lg">arrow_back</span>
-                                </button>
-                            )}
+                            <button
+                                onClick={() => {
+                                    if (window.history.length > 1) {
+                                        navigate(-1);
+                                    } else {
+                                        navigate('/browse-profiles');
+                                    }
+                                }}
+                                className="hidden md:flex p-2 rounded-xl bg-zinc-100 dark:bg-white/10 hover:bg-zinc-200 dark:hover:bg-white/20 text-zinc-700 dark:text-zinc-200 hover:text-zinc-900 dark:hover:text-white transition-colors mr-1 shrink-0 border border-zinc-200 dark:border-white/10"
+                                title="Back to Previous Page"
+                            >
+                                <span className="material-symbols-outlined text-lg">arrow_back</span>
+                            </button>
                             <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2 min-w-0 flex-wrap justify-center md:justify-start">
                                 <span className="break-words">{profile?.displayName || 'Anonymous User'}</span>
                                 {(profile?.verification_tier === 'gold' || profile?.verification_tier === 'blue' || profile?.verification?.isVerified) && (
@@ -674,6 +692,20 @@ export default function UserProfile() {
                                     >
                                         <span className="material-symbols-outlined text-[16px]">mail</span>
                                         <span>Message</span>
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            if (!currentUser) {
+                                                openAuthModal(`Sign in to add ${profile.displayName || 'this creator'} to your project`);
+                                                return;
+                                            }
+                                            setIsAddToProjectOpen(true);
+                                        }}
+                                        className="px-4 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 font-bold text-xs flex items-center gap-1.5 transition-all border border-amber-500/30"
+                                        title="Add to Production Project"
+                                    >
+                                        <span className="material-symbols-outlined text-[16px]">playlist_add</span>
+                                        <span>Shortlist to Project</span>
                                     </button>
                                 </>
                             )}
@@ -816,6 +848,19 @@ export default function UserProfile() {
                                 >
                                     <span className="material-symbols-outlined">mail</span>
                                     Message
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        if (!currentUser) {
+                                            openAuthModal(`Sign in to add ${profile.displayName || 'this creator'} to your project`);
+                                            return;
+                                        }
+                                        setIsAddToProjectOpen(true);
+                                    }}
+                                    className="w-full h-11 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 font-bold text-sm flex items-center justify-center gap-2 border border-amber-500/30"
+                                >
+                                    <span className="material-symbols-outlined">playlist_add</span>
+                                    Shortlist to Production Project
                                 </button>
                             </>
                         )}
@@ -1335,6 +1380,19 @@ export default function UserProfile() {
             <ExperienceModal isOpen={isExperienceModalOpen} onClose={() => setIsExperienceModalOpen(false)} onSave={handleSaveExperience} onDelete={handleDeleteExperience} itemToEdit={editingExperience} />
             <PrivacySettingsModal isOpen={isPrivacyModalOpen} onClose={() => setIsPrivacyModalOpen(false)} privacySettings={profile.privacySettings} onSave={handleSavePrivacySettings} />
             {profile && <FollowListModal isOpen={isFollowListModalOpen} onClose={() => setIsFollowListModalOpen(false)} userId={profile.uid} type={followListType} />}
+            {isAddToProjectOpen && profile && (
+                <AddToProjectModal
+                    userId={profile.uid}
+                    userName={profile.displayName || 'Cinema Talent'}
+                    userPhoto={profile.photoURL || undefined}
+                    userRole={profile.role || 'Film Professional'}
+                    onClose={() => setIsAddToProjectOpen(false)}
+                    onSuccess={() => {
+                        toast.success(`Shortlisted ${profile.displayName} to project!`);
+                        setIsAddToProjectOpen(false);
+                    }}
+                />
+            )}
         </div>
     );
 }
