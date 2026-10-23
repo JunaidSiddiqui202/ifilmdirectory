@@ -360,20 +360,12 @@ export default function MessagesList() {
                             </div>
                         </div>
 
-                        {/* Center: Desktop Title Tag */}
-                        <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 dark:bg-white/[0.04] border border-zinc-200 dark:border-white/[0.06]">
-                            <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-                            <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 tracking-wide uppercase">
-                                Production Communications Hub
-                            </span>
-                        </div>
-
                         {/* Right: Actions */}
                         <div className="flex items-center gap-2">
-                            {/* Theme Toggle */}
+                            {/* Theme Toggle (Mobile only since desktop sidebar already has theme toggle) */}
                             <button
                                 onClick={toggleDarkMode}
-                                className="flex size-9 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] border border-zinc-200 dark:border-white/[0.08] text-zinc-600 dark:text-zinc-300 transition-colors"
+                                className="flex md:hidden size-9 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] border border-zinc-200 dark:border-white/[0.08] text-zinc-600 dark:text-zinc-300 transition-colors"
                                 title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
                             >
                                 <span className="material-symbols-outlined text-lg">
