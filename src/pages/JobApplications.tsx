@@ -6,6 +6,7 @@ import { getUserProfile, getAvailabilityConfig } from '../services/userService';
 import AvailabilityAvatar from '../components/AvailabilityAvatar';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { useTheme } from '../context/ThemeContext';
 
 interface Application {
     id: string;
@@ -24,6 +25,7 @@ export default function JobApplications() {
     const navigate = useNavigate();
     const { id } = useParams();
     const { currentUser } = useAuth();
+    const { isDarkMode, toggleDarkMode } = useTheme();
     const toast = useToast();
     const [job, setJob] = useState<Job | null>(null);
     const [applications, setApplications] = useState<Application[]>([]);
@@ -172,13 +174,26 @@ export default function JobApplications() {
                     </div>
                 </div>
 
-                <button
-                    onClick={() => navigate(`/job/${id}`)}
-                    className="hidden sm:flex items-center gap-2 text-xs font-semibold px-3.5 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/[0.08] transition-all"
-                >
-                    <span className="material-symbols-outlined text-sm">visibility</span>
-                    View Job Listing
-                </button>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={toggleDarkMode}
+                        className="flex size-10 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.04] dark:hover:bg-white/10 text-zinc-700 dark:text-zinc-300 transition-all active:scale-95"
+                        title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                        aria-label="Toggle theme"
+                    >
+                        <span className="material-symbols-outlined text-[18px]">
+                            {isDarkMode ? 'light_mode' : 'dark_mode'}
+                        </span>
+                    </button>
+
+                    <button
+                        onClick={() => navigate(`/job/${id}`)}
+                        className="hidden sm:flex items-center gap-2 text-xs font-semibold px-3.5 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/[0.08] transition-all"
+                    >
+                        <span className="material-symbols-outlined text-sm">visibility</span>
+                        View Job Listing
+                    </button>
+                </div>
             </header>
 
             <div className="w-full max-w-6xl mx-auto flex flex-col flex-1 px-4 md:px-8 py-6 pb-28">

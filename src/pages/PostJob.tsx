@@ -9,12 +9,14 @@ import { createPost } from '../services/postService';
 import { useAuth } from '../context/AuthContext';
 import { Timestamp } from 'firebase/firestore';
 import { getUserProfile } from '../services/userService';
+import { useTheme } from '../context/ThemeContext';
 
 import { uploadFile } from '../services/storageService';
 
 export default function PostJob() {
     const navigate = useNavigate();
     const { currentUser } = useAuth();
+    const { isDarkMode, toggleDarkMode } = useTheme();
 
     // Modes: 'select' | 'job' | 'post'
     const [creationMode, setCreationMode] = useState<'select' | 'job' | 'post'>('select');
@@ -197,80 +199,145 @@ export default function PostJob() {
     // 1. Selection Screen
     if (creationMode === 'select') {
         return (
-            <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark pb-24">
+            <div className="relative flex min-h-[100dvh] w-full flex-col bg-slate-50 dark:bg-[#090A0C] text-zinc-900 dark:text-white pb-24 transition-colors font-display">
                 {/* Header */}
-                <header className="sticky top-0 z-10 flex items-center justify-between bg-background-light/80 p-4 backdrop-blur-sm dark:bg-background-dark/80 border-b border-zinc-200 dark:border-zinc-800">
+                <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-zinc-200 dark:border-white/[0.08] bg-white/95 dark:bg-[#090A0C]/90 px-4 md:px-8 backdrop-blur-md">
                     <button
                         onClick={() => navigate('/home')}
-                        className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors"
+                        className="flex size-10 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] border border-zinc-200 dark:border-white/[0.08] text-zinc-700 dark:text-zinc-200 transition-all"
+                        title="Back to Home"
                     >
-                        <span className="material-symbols-outlined">arrow_back</span>
+                        <span className="material-symbols-outlined text-xl">arrow_back</span>
                     </button>
-                    <h1 className="text-xl font-bold text-zinc-900 dark:text-white">Create</h1>
-                    <div className="w-10" /> {/* Spacer for centering */}
+                    <div className="text-center">
+                        <h1 className="text-base font-black text-zinc-900 dark:text-white tracking-tight uppercase">
+                            Create & Publish
+                        </h1>
+                        <p className="text-[10px] text-zinc-500 dark:text-zinc-400 font-semibold">
+                            Choose what to broadcast across the industry
+                        </p>
+                    </div>
+                    <button
+                        onClick={toggleDarkMode}
+                        className="flex size-10 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] border border-zinc-200 dark:border-white/[0.08] text-zinc-700 dark:text-zinc-200 transition-all active:scale-95"
+                        title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                        aria-label="Toggle theme"
+                    >
+                        <span className="material-symbols-outlined text-[18px]">
+                            {isDarkMode ? 'light_mode' : 'dark_mode'}
+                        </span>
+                    </button>
                 </header>
 
-                <main
-                    className="flex-1 p-4 flex flex-col gap-4 relative"
-                    onClick={() => navigate(-1)}
-                >
-                    <div className="absolute inset-0" onClick={() => navigate(-1)} />
-                    <div className="relative z-10 flex flex-col gap-4" onClick={(e) => e.stopPropagation()}>
-                        <p className="text-zinc-500 dark:text-zinc-400 font-medium">What would you like to share?</p>
+                <main className="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 md:p-8 flex flex-col justify-center">
+                    <div className="text-center max-w-lg mx-auto mb-8 space-y-1.5">
+                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 inline-flex items-center gap-1.5">
+                            <span className="material-symbols-outlined text-sm">hub</span>
+                            <span>Creator & Industry Studio Hub</span>
+                        </span>
+                        <h2 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white tracking-tight">
+                            What would you like to share?
+                        </h2>
+                        <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
+                            Broadcast to over thousands of verified filmmakers, cast, and technicians.
+                        </p>
+                    </div>
 
-                        {/* Option 1: Share Update */}
-                        <button
-                            onClick={() => setCreationMode('post')}
-                            className="flex flex-col items-center justify-center gap-3 p-8 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition-shadow group"
-                        >
-                            <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <span className="material-symbols-outlined text-3xl text-blue-600 dark:text-blue-400">edit_note</span>
-                            </div>
-                            <div className="text-center">
-                                <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Share Update</h3>
-                                <p className="text-sm text-zinc-500 dark:text-zinc-400">Post thoughts, images, or news to the Showcase feed.</p>
-                            </div>
-                        </button>
-
-                        {/* Option 2: Upload Work */}
-                        <button
-                            onClick={() => navigate('/showreel/upload')}
-                            className="flex flex-col items-center justify-center gap-3 p-8 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition-shadow group"
-                        >
-                            <div className="w-16 h-16 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <span className="material-symbols-outlined text-3xl text-purple-600 dark:text-purple-400">video_library</span>
-                            </div>
-                            <div className="text-center">
-                                <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Upload Work</h3>
-                                <p className="text-sm text-zinc-500 dark:text-zinc-400">Showcase your skills & portfolio to get more work opportunities.</p>
-                            </div>
-                        </button>
-
-                        {/* Option 3: Post Job */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {/* Option 1: Post Job / Audition Call */}
                         <button
                             onClick={() => setCreationMode('job')}
-                            className="flex flex-col items-center justify-center gap-3 p-8 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition-shadow group"
+                            className="flex flex-col text-left p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#121316] border border-amber-500/30 hover:border-amber-500 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-200 group relative overflow-hidden"
                         >
-                            <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <span className="material-symbols-outlined text-3xl text-green-600 dark:text-green-400">work</span>
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl group-hover:bg-amber-500/20 transition-all" />
+                            <div className="size-14 rounded-2xl bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                <span className="material-symbols-outlined text-3xl">work</span>
                             </div>
-                            <div className="text-center">
-                                <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Post Job / Audition</h3>
-                                <p className="text-sm text-zinc-500 dark:text-zinc-400">Recruit talent or find crew for your project.</p>
+                            <span className="text-[10px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-1 flex items-center gap-1">
+                                <span className="size-1.5 rounded-full bg-amber-500 animate-pulse" />
+                                <span>Recruiter & Casting Call</span>
+                            </span>
+                            <h3 className="text-lg font-black text-zinc-900 dark:text-white mb-1.5">
+                                Post Job / Audition Call
+                            </h3>
+                            <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed mb-4">
+                                Recruit verified cast, technicians, directors, DOPs, editors, and production crew for your next film.
+                            </p>
+                            <div className="mt-auto flex items-center gap-1 text-xs font-black text-amber-600 dark:text-amber-400 group-hover:translate-x-1 transition-transform">
+                                <span>Start Casting Wizard</span>
+                                <span className="material-symbols-outlined text-base">arrow_forward</span>
                             </div>
                         </button>
 
-                        {/* Option 4: Create Blog */}
+                        {/* Option 2: Share Update */}
+                        <button
+                            onClick={() => setCreationMode('post')}
+                            className="flex flex-col text-left p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.08] hover:border-sky-500/40 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-200 group relative overflow-hidden"
+                        >
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-sky-500/5 rounded-full blur-2xl group-hover:bg-sky-500/15 transition-all" />
+                            <div className="size-14 rounded-2xl bg-sky-500/15 text-sky-600 dark:text-sky-400 border border-sky-500/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                <span className="material-symbols-outlined text-3xl">edit_note</span>
+                            </div>
+                            <span className="text-[10px] font-black uppercase tracking-wider text-sky-600 dark:text-sky-400 mb-1">
+                                Community Broadcast
+                            </span>
+                            <h3 className="text-lg font-black text-zinc-900 dark:text-white mb-1.5">
+                                Share Showcase Update
+                            </h3>
+                            <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed mb-4">
+                                Post behind-the-scenes thoughts, stills, production updates, or milestones to the Showcase feed.
+                            </p>
+                            <div className="mt-auto flex items-center gap-1 text-xs font-black text-sky-600 dark:text-sky-400 group-hover:translate-x-1 transition-transform">
+                                <span>Create Post</span>
+                                <span className="material-symbols-outlined text-base">arrow_forward</span>
+                            </div>
+                        </button>
+
+                        {/* Option 3: Upload Showreel / Work */}
+                        <button
+                            onClick={() => navigate('/showreel/upload')}
+                            className="flex flex-col text-left p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.08] hover:border-purple-500/40 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-200 group relative overflow-hidden"
+                        >
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl group-hover:bg-purple-500/15 transition-all" />
+                            <div className="size-14 rounded-2xl bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-500/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                <span className="material-symbols-outlined text-3xl">video_library</span>
+                            </div>
+                            <span className="text-[10px] font-black uppercase tracking-wider text-purple-600 dark:text-purple-400 mb-1">
+                                Portfolio & Media
+                            </span>
+                            <h3 className="text-lg font-black text-zinc-900 dark:text-white mb-1.5">
+                                Upload Showreel / Portfolio
+                            </h3>
+                            <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed mb-4">
+                                Upload acting clips, DOP showreels, VFX breakdowns, or music tracks to gain direct bookings.
+                            </p>
+                            <div className="mt-auto flex items-center gap-1 text-xs font-black text-purple-600 dark:text-purple-400 group-hover:translate-x-1 transition-transform">
+                                <span>Upload Media</span>
+                                <span className="material-symbols-outlined text-base">arrow_forward</span>
+                            </div>
+                        </button>
+
+                        {/* Option 4: Write Article / Blog */}
                         <button
                             onClick={() => navigate('/create-blog')}
-                            className="flex flex-col items-center justify-center gap-3 p-8 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition-shadow group"
+                            className="flex flex-col text-left p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.08] hover:border-fuchsia-500/40 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-200 group relative overflow-hidden"
                         >
-                            <div className="w-16 h-16 rounded-full bg-fuchsia-100 dark:bg-fuchsia-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <span className="material-symbols-outlined text-3xl text-fuchsia-600 dark:text-fuchsia-400">article</span>
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-fuchsia-500/5 rounded-full blur-2xl group-hover:bg-fuchsia-500/15 transition-all" />
+                            <div className="size-14 rounded-2xl bg-fuchsia-500/15 text-fuchsia-600 dark:text-fuchsia-400 border border-fuchsia-500/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                <span className="material-symbols-outlined text-3xl">article</span>
                             </div>
-                            <div className="text-center">
-                                <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Write Blog</h3>
-                                <p className="text-sm text-zinc-500 dark:text-zinc-400">Share articles, insights, or stories with AI assistance.</p>
+                            <span className="text-[10px] font-black uppercase tracking-wider text-fuchsia-600 dark:text-fuchsia-400 mb-1">
+                                Editorial & Insights
+                            </span>
+                            <h3 className="text-lg font-black text-zinc-900 dark:text-white mb-1.5">
+                                Write Film Article / Blog
+                            </h3>
+                            <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed mb-4">
+                                Share cinema reviews, filmmaking breakdown techniques, and industry perspectives.
+                            </p>
+                            <div className="mt-auto flex items-center gap-1 text-xs font-black text-fuchsia-600 dark:text-fuchsia-400 group-hover:translate-x-1 transition-transform">
+                                <span>Write Article</span>
+                                <span className="material-symbols-outlined text-base">arrow_forward</span>
                             </div>
                         </button>
                     </div>
@@ -485,70 +552,76 @@ export default function PostJob() {
 
     // 3. Job Creation Mode (Original UI)
     return (
-        <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden">
+        <div className="relative flex min-h-[100dvh] w-full flex-col bg-slate-50 dark:bg-[#090A0C] text-zinc-900 dark:text-white pb-28 overflow-x-hidden font-display transition-colors">
             {/* Header */}
-            <header className="sticky top-0 z-10 flex items-center bg-background-light/80 dark:bg-background-dark/80 p-4 pb-2 justify-between backdrop-blur-sm border-b border-white/5 dark:border-white/5">
-                <div className="flex size-12 shrink-0 items-center justify-start">
+            <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-zinc-200 dark:border-white/[0.08] bg-white/95 dark:bg-[#090A0C]/90 px-4 md:px-8 backdrop-blur-md">
+                <button
+                    onClick={() => setCreationMode('select')}
+                    className="flex size-10 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] border border-zinc-200 dark:border-white/[0.08] text-zinc-700 dark:text-zinc-200 transition-all"
+                    title="Back to Selection"
+                >
+                    <span className="material-symbols-outlined text-xl">arrow_back</span>
+                </button>
+                <div className="text-center px-2">
+                    <h1 className="text-base font-black text-zinc-900 dark:text-white tracking-tight uppercase">
+                        Post Job / Audition Call
+                    </h1>
+                    <p className="text-[10px] text-zinc-500 dark:text-zinc-400 font-semibold hidden sm:block">
+                        Broadcast casting or crew requirements to verified filmmakers
+                    </p>
+                </div>
+                <div className="flex items-center gap-2">
                     <button
-                        onClick={() => setCreationMode('select')}
-                        className="hover:opacity-70 transition-opacity"
+                        onClick={toggleDarkMode}
+                        className="flex size-10 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] border border-zinc-200 dark:border-white/[0.08] text-zinc-700 dark:text-zinc-200 transition-all active:scale-95"
+                        title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                        aria-label="Toggle theme"
                     >
-                        <span className="material-symbols-outlined text-black dark:text-white">
-                            arrow_back_ios_new
+                        <span className="material-symbols-outlined text-[18px]">
+                            {isDarkMode ? 'light_mode' : 'dark_mode'}
                         </span>
                     </button>
-                </div>
-                <h1 className="text-black dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">
-                    Post a Job / Audition
-                </h1>
-                <div className="flex w-12 items-center justify-end">
+
                     <button
                         type="button"
                         onClick={() => handleJobSubmit()}
                         disabled={loading}
-                        className="text-primary text-base font-bold leading-normal tracking-[0.015em] shrink-0 hover:opacity-80 transition-opacity disabled:opacity-50"
+                        className="rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 px-4 py-2 text-xs font-black text-white shadow-lg shadow-amber-500/20 transition-all active:scale-95 disabled:opacity-50 flex items-center gap-1.5"
                     >
-                        {loading ? '...' : 'Post'}
+                        <span className="material-symbols-outlined text-base">send</span>
+                        <span>{loading ? 'Posting...' : 'Publish'}</span>
                     </button>
                 </div>
             </header>
 
-            <main className="flex-grow pb-24 w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto">
-                <div className="p-4">
+            <main className="flex-grow pb-24 w-full max-w-3xl mx-auto px-4 sm:px-6 pt-6">
+                <div className="mb-6">
                     {/* Segmented Control */}
-                    <div className="flex h-10 w-full items-center justify-center rounded-lg bg-gray-200 dark:bg-[#493222] p-1">
-                        <label
-                            className={`flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-lg px-2 transition-colors duration-200 ${postType === 'Job'
-                                ? 'bg-white dark:bg-[#231810] shadow-sm text-black dark:text-white'
-                                : 'text-gray-500 dark:text-[#cba990]'
-                                }`}
+                    <div className="flex h-12 w-full items-center justify-center rounded-2xl bg-zinc-100 dark:bg-white/[0.04] p-1.5 border border-zinc-200 dark:border-white/[0.06]">
+                        <button
+                            type="button"
+                            onClick={() => setPostType('Job')}
+                            className={`flex flex-1 items-center justify-center gap-2 h-full rounded-xl text-xs font-black transition-all ${
+                                postType === 'Job'
+                                    ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20'
+                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                            }`}
                         >
-                            <span className="truncate text-sm font-medium leading-normal">Job</span>
-                            <input
-                                className="invisible w-0"
-                                name="post-type"
-                                type="radio"
-                                value="Job"
-                                checked={postType === 'Job'}
-                                onChange={() => setPostType('Job')}
-                            />
-                        </label>
-                        <label
-                            className={`flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-lg px-2 transition-colors duration-200 ${postType === 'Audition'
-                                ? 'bg-white dark:bg-[#231810] shadow-sm text-black dark:text-white'
-                                : 'text-gray-500 dark:text-[#cba990]'
-                                }`}
+                            <span className="material-symbols-outlined text-base">work</span>
+                            <span>Crew & Technician Job</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setPostType('Audition')}
+                            className={`flex flex-1 items-center justify-center gap-2 h-full rounded-xl text-xs font-black transition-all ${
+                                postType === 'Audition'
+                                    ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20'
+                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                            }`}
                         >
-                            <span className="truncate text-sm font-medium leading-normal">Audition</span>
-                            <input
-                                className="invisible w-0"
-                                name="post-type"
-                                type="radio"
-                                value="Audition"
-                                checked={postType === 'Audition'}
-                                onChange={() => setPostType('Audition')}
-                            />
-                        </label>
+                            <span className="material-symbols-outlined text-base">theater_comedy</span>
+                            <span>Casting & Actor Audition</span>
+                        </button>
                     </div>
 
                     {/* AI Find Actors Button (only for Auditions) */}
@@ -573,59 +646,62 @@ export default function PostJob() {
                     )}
                 </div>
 
-                <div className="space-y-4 px-4">
+                <div className="space-y-6">
                     {/* Basic Information */}
-                    <section>
-                        <h2 className="text-black dark:text-white text-lg font-bold mb-3">Basic Information</h2>
+                    <section className="p-6 rounded-3xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.08] shadow-sm space-y-4">
+                        <h2 className="text-sm font-black text-zinc-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                            <span className="material-symbols-outlined text-amber-500 text-base">info</span>
+                            <span>Basic Information</span>
+                        </h2>
                         <div className="space-y-4">
                             <label className="flex flex-col">
-                                <p className="text-black dark:text-white text-base font-medium leading-normal pb-2">
-                                    {postType === 'Audition' ? 'Role Name / Character' : 'Title'}
-                                </p>
+                                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 pb-1.5">
+                                    {postType === 'Audition' ? 'Role Name / Character' : 'Title'} *
+                                </span>
                                 <input
                                     name="title"
                                     value={jobFormData.title}
                                     onChange={handleJobInputChange}
-                                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-black dark:text-white focus:outline-0 focus:ring-0 border border-gray-300 dark:border-[#684831] bg-white dark:bg-[#342418] focus:border-primary dark:focus:border-primary h-14 placeholder:text-gray-500 dark:placeholder:text-[#cba990] p-[15px] text-base font-normal leading-normal"
+                                    className="w-full rounded-xl bg-zinc-50 dark:bg-black/30 border border-zinc-200 dark:border-white/10 px-4 py-3 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-amber-500 transition-colors"
                                     placeholder={postType === 'Audition' ? "e.g., Lead Actor - 'Rahul'" : "e.g., Cinematographer"}
                                 />
                             </label>
                             <label className="flex flex-col">
-                                <p className="text-black dark:text-white text-base font-medium leading-normal pb-2">
-                                    {postType === 'Audition' ? 'Project Name / Production' : 'Company / Production House'}
-                                </p>
+                                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 pb-1.5">
+                                    {postType === 'Audition' ? 'Project Name / Production' : 'Company / Production House'} *
+                                </span>
                                 <input
                                     name="company"
                                     value={jobFormData.company}
                                     onChange={handleJobInputChange}
-                                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-black dark:text-white focus:outline-0 focus:ring-0 border border-gray-300 dark:border-[#684831] bg-white dark:bg-[#342418] focus:border-primary dark:focus:border-primary h-14 placeholder:text-gray-500 dark:placeholder:text-[#cba990] p-[15px] text-base font-normal leading-normal"
-                                    placeholder="Enter name"
+                                    className="w-full rounded-xl bg-zinc-50 dark:bg-black/30 border border-zinc-200 dark:border-white/10 px-4 py-3 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-amber-500 transition-colors"
+                                    placeholder="Enter banner or production house name"
                                 />
                             </label>
 
                             {/* External Links */}
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <label className="flex flex-col">
-                                    <p className="text-black dark:text-white text-base font-medium leading-normal pb-2">
+                                    <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 pb-1.5">
                                         IMDb Link (Optional)
-                                    </p>
+                                    </span>
                                     <input
                                         name="imdb"
                                         value={jobFormData.imdb}
                                         onChange={handleJobInputChange}
-                                        className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-black dark:text-white focus:outline-0 focus:ring-0 border border-gray-300 dark:border-[#684831] bg-white dark:bg-[#342418] focus:border-primary dark:focus:border-primary h-14 placeholder:text-gray-500 dark:placeholder:text-[#cba990] p-[15px] text-base font-normal leading-normal"
+                                        className="w-full rounded-xl bg-zinc-50 dark:bg-black/30 border border-zinc-200 dark:border-white/10 px-4 py-3 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-amber-500 transition-colors"
                                         placeholder="https://imdb.com/..."
                                     />
                                 </label>
                                 <label className="flex flex-col">
-                                    <p className="text-black dark:text-white text-base font-medium leading-normal pb-2">
+                                    <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 pb-1.5">
                                         Wiki Link (Optional)
-                                    </p>
+                                    </span>
                                     <input
                                         name="wiki"
                                         value={jobFormData.wiki}
                                         onChange={handleJobInputChange}
-                                        className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-black dark:text-white focus:outline-0 focus:ring-0 border border-gray-300 dark:border-[#684831] bg-white dark:bg-[#342418] focus:border-primary dark:focus:border-primary h-14 placeholder:text-gray-500 dark:placeholder:text-[#cba990] p-[15px] text-base font-normal leading-normal"
+                                        className="w-full rounded-xl bg-zinc-50 dark:bg-black/30 border border-zinc-200 dark:border-white/10 px-4 py-3 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-amber-500 transition-colors"
                                         placeholder="https://wikipedia.org/..."
                                     />
                                 </label>
@@ -633,36 +709,36 @@ export default function PostJob() {
 
                             {/* Audition Specifics */}
                             {postType === 'Audition' && (
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <label className="flex flex-col">
-                                        <p className="text-black dark:text-white text-base font-medium leading-normal pb-2">
+                                        <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 pb-1.5">
                                             Gender
-                                        </p>
+                                        </span>
                                         <div className="relative">
                                             <select
                                                 name="gender"
                                                 value={jobFormData.gender}
                                                 // @ts-ignore
                                                 onChange={handleJobInputChange}
-                                                className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-black dark:text-white focus:outline-0 focus:ring-0 border border-gray-300 dark:border-[#684831] bg-white dark:bg-[#342418] focus:border-primary dark:focus:border-primary h-14 p-[15px] text-base font-normal leading-normal appearance-none"
+                                                className="w-full rounded-xl bg-zinc-50 dark:bg-black/30 border border-zinc-200 dark:border-white/10 px-4 py-3 text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-amber-500 transition-colors appearance-none"
                                             >
                                                 <option value="Any">Any</option>
                                                 <option value="Male">Male</option>
                                                 <option value="Female">Female</option>
                                                 <option value="Other">Other</option>
                                             </select>
-                                            <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">expand_more</span>
+                                            <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none">expand_more</span>
                                         </div>
                                     </label>
                                     <label className="flex flex-col">
-                                        <p className="text-black dark:text-white text-base font-medium leading-normal pb-2">
+                                        <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 pb-1.5">
                                             Age Range
-                                        </p>
+                                        </span>
                                         <input
                                             name="ageRange"
                                             value={jobFormData.ageRange}
                                             onChange={handleJobInputChange}
-                                            className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-black dark:text-white focus:outline-0 focus:ring-0 border border-gray-300 dark:border-[#684831] bg-white dark:bg-[#342418] focus:border-primary dark:focus:border-primary h-14 placeholder:text-gray-500 dark:placeholder:text-[#cba990] p-[15px] text-base font-normal leading-normal"
+                                            className="w-full rounded-xl bg-zinc-50 dark:bg-black/30 border border-zinc-200 dark:border-white/10 px-4 py-3 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-amber-500 transition-colors"
                                             placeholder="e.g. 20-30"
                                         />
                                     </label>
@@ -672,8 +748,11 @@ export default function PostJob() {
                     </section>
 
                     {/* The Details */}
-                    <section>
-                        <h2 className="text-black dark:text-white text-lg font-bold mb-3">The Details</h2>
+                    <section className="p-6 rounded-3xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.08] shadow-sm space-y-4">
+                        <h2 className="text-sm font-black text-zinc-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                            <span className="material-symbols-outlined text-amber-500 text-base">description</span>
+                            <span>Opportunity Description & Specs</span>
+                        </h2>
                         <div className="space-y-4">
                             <AIEnhancedTextarea
                                 label={postType === 'Audition' ? "Character Bio / Description" : "Job Description"}
@@ -695,51 +774,52 @@ export default function PostJob() {
                     </section>
 
                     {/* Logistical Information */}
-                    <section>
-                        <h2 className="text-black dark:text-white text-lg font-bold mb-3">
-                            Logistical Information
+                    <section className="p-6 rounded-3xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.08] shadow-sm space-y-4">
+                        <h2 className="text-sm font-black text-zinc-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                            <span className="material-symbols-outlined text-amber-500 text-base">pin_drop</span>
+                            <span>Logistical Details & Timeline</span>
                         </h2>
                         <div className="space-y-4">
                             <label className="flex flex-col">
-                                <p className="text-black dark:text-white text-base font-medium leading-normal pb-2">
-                                    Location
-                                </p>
+                                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 pb-1.5">
+                                    Location *
+                                </span>
                                 <div className="relative flex items-center">
-                                    <span className="material-symbols-outlined absolute left-3 text-gray-500 dark:text-[#cba990]">
+                                    <span className="material-symbols-outlined absolute left-3.5 text-zinc-400 text-lg pointer-events-none">
                                         location_on
                                     </span>
                                     <input
                                         name="location"
                                         value={jobFormData.location}
                                         onChange={handleJobInputChange}
-                                        className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-black dark:text-white focus:outline-0 focus:ring-0 border border-gray-300 dark:border-[#684831] bg-white dark:bg-[#342418] focus:border-primary dark:focus:border-primary h-14 placeholder:text-gray-500 dark:placeholder:text-[#cba990] pl-11 pr-4 py-[15px] text-base font-normal leading-normal"
-                                        placeholder="e.g., Mumbai, Maharashtra"
+                                        className="w-full rounded-xl bg-zinc-50 dark:bg-black/30 border border-zinc-200 dark:border-white/10 pl-11 pr-4 py-3 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-amber-500 transition-colors"
+                                        placeholder="e.g., Hyderabad, Mumbai, Bangalore, Chennai"
                                     />
                                 </div>
                             </label>
                             <label className="flex flex-col">
-                                <p className="text-black dark:text-white text-base font-medium leading-normal pb-2">
+                                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 pb-1.5">
                                     Salary / Compensation
-                                </p>
+                                </span>
                                 <div className="relative flex items-center">
-                                    <span className="material-symbols-outlined absolute left-3 text-gray-500 dark:text-[#cba990]">
-                                        currency_rupee
+                                    <span className="material-symbols-outlined absolute left-3.5 text-zinc-400 text-lg pointer-events-none">
+                                        payments
                                     </span>
                                     <input
                                         name="salary"
                                         value={jobFormData.salary}
                                         onChange={handleJobInputChange}
-                                        className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-black dark:text-white focus:outline-0 focus:ring-0 border border-gray-300 dark:border-[#684831] bg-white dark:bg-[#342418] focus:border-primary dark:focus:border-primary h-14 placeholder:text-gray-500 dark:placeholder:text-[#cba990] pl-11 pr-4 py-[15px] text-base font-normal leading-normal"
-                                        placeholder="As per industry standards"
+                                        className="w-full rounded-xl bg-zinc-50 dark:bg-black/30 border border-zinc-200 dark:border-white/10 pl-11 pr-4 py-3 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-amber-500 transition-colors"
+                                        placeholder="e.g. As per industry standards, ₹50k - ₹1L"
                                     />
                                 </div>
                             </label>
                             <label className="flex flex-col">
-                                <p className="text-black dark:text-white text-base font-medium leading-normal pb-2">
-                                    Application Deadline
-                                </p>
+                                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 pb-1.5">
+                                    Application Deadline *
+                                </span>
                                 <div className="relative flex items-center">
-                                    <span className="material-symbols-outlined absolute left-3 text-gray-500 dark:text-[#cba990]">
+                                    <span className="material-symbols-outlined absolute left-3.5 text-zinc-400 text-lg pointer-events-none">
                                         calendar_today
                                     </span>
                                     <input
@@ -747,20 +827,20 @@ export default function PostJob() {
                                         type="date"
                                         value={jobFormData.deadline}
                                         onChange={handleJobInputChange}
-                                        className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-black dark:text-white focus:outline-0 focus:ring-0 border border-gray-300 dark:border-[#684831] bg-white dark:bg-[#342418] focus:border-primary dark:focus:border-primary h-14 placeholder:text-gray-500 dark:placeholder:text-[#cba990] pl-11 pr-4 py-[15px] text-base font-normal leading-normal"
+                                        className="w-full rounded-xl bg-zinc-50 dark:bg-black/30 border border-zinc-200 dark:border-white/10 pl-11 pr-4 py-3 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-amber-500 transition-colors"
                                     />
                                 </div>
                             </label>
 
                             {/* Shoot Date & Days Required for Audition */}
                             {postType === 'Audition' && (
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <label className="flex flex-col">
-                                        <p className="text-black dark:text-white text-base font-medium leading-normal pb-2">
+                                        <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 pb-1.5">
                                             Tentative Shoot Date
-                                        </p>
+                                        </span>
                                         <div className="relative flex items-center">
-                                            <span className="material-symbols-outlined absolute left-3 text-gray-500 dark:text-[#cba990]">
+                                            <span className="material-symbols-outlined absolute left-3.5 text-zinc-400 text-lg pointer-events-none">
                                                 movie_filter
                                             </span>
                                             <input
@@ -768,19 +848,19 @@ export default function PostJob() {
                                                 type="date"
                                                 value={jobFormData.shootDate}
                                                 onChange={handleJobInputChange}
-                                                className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-black dark:text-white focus:outline-0 focus:ring-0 border border-gray-300 dark:border-[#684831] bg-white dark:bg-[#342418] focus:border-primary dark:focus:border-primary h-14 placeholder:text-gray-500 dark:placeholder:text-[#cba990] pl-11 pr-4 py-[15px] text-base font-normal leading-normal"
+                                                className="w-full rounded-xl bg-zinc-50 dark:bg-black/30 border border-zinc-200 dark:border-white/10 pl-11 pr-4 py-3 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-amber-500 transition-colors"
                                             />
                                         </div>
                                     </label>
                                     <label className="flex flex-col">
-                                        <p className="text-black dark:text-white text-base font-medium leading-normal pb-2">
+                                        <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 pb-1.5">
                                             Days Required
-                                        </p>
+                                        </span>
                                         <input
                                             name="daysRequired"
                                             value={jobFormData.daysRequired}
                                             onChange={handleJobInputChange}
-                                            className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-black dark:text-white focus:outline-0 focus:ring-0 border border-gray-300 dark:border-[#684831] bg-white dark:bg-[#342418] focus:border-primary dark:focus:border-primary h-14 placeholder:text-gray-500 dark:placeholder:text-[#cba990] p-[15px] text-base font-normal leading-normal"
+                                            className="w-full rounded-xl bg-zinc-50 dark:bg-black/30 border border-zinc-200 dark:border-white/10 px-4 py-3 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-amber-500 transition-colors"
                                             placeholder="e.g. 5 days"
                                         />
                                     </label>
@@ -790,21 +870,24 @@ export default function PostJob() {
                     </section>
 
                     {/* Media */}
-                    <section>
-                        <h2 className="text-black dark:text-white text-lg font-bold mb-3">Reference Media</h2>
+                    <section className="p-6 rounded-3xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.08] shadow-sm space-y-4">
+                        <h2 className="text-sm font-black text-zinc-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                            <span className="material-symbols-outlined text-amber-500 text-base">video_library</span>
+                            <span>Reference Media & Audition Reels</span>
+                        </h2>
                         <div className="space-y-4">
                             <div>
-                                <p className="text-black dark:text-white text-base font-medium leading-normal pb-2">
-                                    Reference Video / Audition Script
-                                </p>
+                                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 pb-1.5 block">
+                                    Reference Video / Audition Script (Optional)
+                                </span>
                                 <button
                                     type="button"
                                     onClick={() => videoInputRef.current?.click()}
                                     disabled={isUploadingVideo}
-                                    className="flex items-center justify-center w-full h-14 px-4 py-2 border-2 border-dashed border-gray-300 dark:border-[#684831] rounded-lg text-gray-500 dark:text-[#cba990] hover:bg-black/5 dark:hover:bg-white/5 transition-colors disabled:opacity-50"
+                                    className="flex items-center justify-center w-full h-14 px-4 py-2 border border-dashed border-zinc-300 dark:border-white/20 rounded-2xl bg-zinc-50 dark:bg-black/20 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors disabled:opacity-50"
                                 >
-                                    <span className="material-symbols-outlined mr-2">{isUploadingVideo ? 'hourglass_empty' : 'video_call'}</span>
-                                    <span className="text-base font-medium">
+                                    <span className="material-symbols-outlined mr-2 text-amber-500">{isUploadingVideo ? 'hourglass_empty' : 'video_call'}</span>
+                                    <span className="text-xs sm:text-sm font-bold">
                                         {isUploadingVideo ? 'Uploading Video...' : (jobFormData.videoUrl ? 'Change Video' : 'Upload Reference Video')}
                                     </span>
                                 </button>
@@ -835,9 +918,9 @@ export default function PostJob() {
                                     }}
                                 />
                                 {jobFormData.videoUrl && (
-                                    <div className="mt-2 text-sm text-green-600 dark:text-green-400 flex items-center gap-1">
+                                    <div className="mt-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
                                         <span className="material-symbols-outlined text-sm">check_circle</span>
-                                        Video uploaded successfully
+                                        <span>Video uploaded successfully</span>
                                     </div>
                                 )}
                             </div>
@@ -845,15 +928,18 @@ export default function PostJob() {
                     </section>
 
                     {/* How to Apply */}
-                    <section>
-                        <h2 className="text-black dark:text-white text-lg font-bold mb-3">How to Apply</h2>
+                    <section className="p-6 rounded-3xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.08] shadow-sm space-y-4">
+                        <h2 className="text-sm font-black text-zinc-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                            <span className="material-symbols-outlined text-amber-500 text-base">outgoing_mail</span>
+                            <span>Contact & Application Methods</span>
+                        </h2>
                         <div className="space-y-4">
                             <label className="flex flex-col">
-                                <p className="text-black dark:text-white text-base font-medium leading-normal pb-2">
-                                    Contact Email
-                                </p>
+                                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 pb-1.5">
+                                    Direct Contact Email (Optional)
+                                </span>
                                 <div className="relative flex items-center">
-                                    <span className="material-symbols-outlined absolute left-3 text-gray-500 dark:text-[#cba990]">
+                                    <span className="material-symbols-outlined absolute left-3.5 text-zinc-400 text-lg pointer-events-none">
                                         mail
                                     </span>
                                     <input
@@ -861,23 +947,23 @@ export default function PostJob() {
                                         type="email"
                                         value={jobFormData.email}
                                         onChange={handleJobInputChange}
-                                        className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-black dark:text-white focus:outline-0 focus:ring-0 border border-gray-300 dark:border-[#684831] bg-white dark:bg-[#342418] focus:border-primary dark:focus:border-primary h-14 placeholder:text-gray-500 dark:placeholder:text-[#cba990] pl-11 pr-4 py-[15px] text-base font-normal leading-normal"
+                                        className="w-full rounded-xl bg-zinc-50 dark:bg-black/30 border border-zinc-200 dark:border-white/10 pl-11 pr-4 py-3 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-amber-500 transition-colors"
                                         placeholder="casting@productionhouse.com"
                                     />
                                 </div>
                             </label>
                             <div>
-                                <p className="text-black dark:text-white text-base font-medium leading-normal pb-2">
-                                    Attachments
-                                </p>
+                                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 pb-1.5 block">
+                                    Attachments (Audition Script / Breakdown PDF)
+                                </span>
                                 <button
                                     type="button"
                                     onClick={() => attachmentInputRef.current?.click()}
                                     disabled={isUploadingAttachment}
-                                    className="flex items-center justify-center w-full h-14 px-4 py-2 border-2 border-dashed border-gray-300 dark:border-[#684831] rounded-lg text-gray-500 dark:text-[#cba990] hover:bg-black/5 dark:hover:bg-white/5 transition-colors disabled:opacity-50"
+                                    className="flex items-center justify-center w-full h-14 px-4 py-2 border border-dashed border-zinc-300 dark:border-white/20 rounded-2xl bg-zinc-50 dark:bg-black/20 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors disabled:opacity-50"
                                 >
-                                    <span className="material-symbols-outlined mr-2">{isUploadingAttachment ? 'hourglass_empty' : 'upload_file'}</span>
-                                    <span className="text-base font-medium">
+                                    <span className="material-symbols-outlined mr-2 text-amber-500">{isUploadingAttachment ? 'hourglass_empty' : 'upload_file'}</span>
+                                    <span className="text-xs sm:text-sm font-bold">
                                         {isUploadingAttachment ? 'Uploading...' : 'Attach Script or JD (PDF, DOC)'}
                                     </span>
                                 </button>
@@ -919,17 +1005,17 @@ export default function PostJob() {
                                 {jobAttachments.length > 0 && (
                                     <div className="mt-3 space-y-2">
                                         {jobAttachments.map((attachment, idx) => (
-                                            <div key={idx} className="flex items-center justify-between p-3 bg-zinc-100 dark:bg-zinc-800 rounded-lg">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="material-symbols-outlined text-primary">description</span>
-                                                    <span className="text-sm text-zinc-700 dark:text-zinc-300 truncate max-w-[200px]">{attachment.name}</span>
+                                            <div key={idx} className="flex items-center justify-between p-3 bg-zinc-100 dark:bg-white/[0.04] border border-zinc-200 dark:border-white/10 rounded-xl">
+                                                <div className="flex items-center gap-2 min-w-0">
+                                                    <span className="material-symbols-outlined text-amber-500">description</span>
+                                                    <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 truncate max-w-[220px]">{attachment.name}</span>
                                                 </div>
                                                 <button
                                                     type="button"
                                                     onClick={() => setJobAttachments(prev => prev.filter((_, i) => i !== idx))}
                                                     className="text-red-500 hover:text-red-600 p-1"
                                                 >
-                                                    <span className="material-symbols-outlined text-lg">close</span>
+                                                    <span className="material-symbols-outlined text-base">close</span>
                                                 </button>
                                             </div>
                                         ))}
@@ -941,27 +1027,27 @@ export default function PostJob() {
                 </div>
 
                 {/* Bottom Post Button */}
-                <div className="mx-4 mt-6 mb-8">
+                <div className="mt-8 mb-8">
                     <button
                         type="button"
                         onClick={() => handleJobSubmit()}
                         disabled={loading}
-                        className="w-full bg-primary text-white font-bold text-lg py-4 rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-70 disabled:hover:scale-100 flex items-center justify-center gap-2"
+                        className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white font-black text-base py-4 rounded-2xl shadow-xl shadow-amber-500/20 hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                         {loading ? (
                             <>
                                 <span className="material-symbols-outlined animate-spin">refresh</span>
-                                Posting...
+                                <span>Publishing Call...</span>
                             </>
                         ) : (
                             <>
                                 <span className="material-symbols-outlined">send</span>
-                                Post {postType}
+                                <span>Broadcast {postType} Call</span>
                             </>
                         )}
                     </button>
                     <p className="text-center text-xs text-zinc-500 dark:text-zinc-400 mt-3">
-                        By posting, you agree to our Terms of Service and Community Guidelines.
+                        By posting, you agree to iFilmDirectory Terms & Community Casting Safety Notice.
                     </p>
                 </div>
             </main>
@@ -973,45 +1059,41 @@ export default function PostJob() {
                 onSelectActors={(actorIds) => {
                     setInvitedActors(actorIds);
                     console.log('Invited actors:', actorIds);
-                    // TODO: Send invitations to selected actors
                 }}
             />
 
             {/* Success Modal */}
             {showSuccessModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in" onClick={() => !loading && setShowSuccessModal(false)}>
-                    <div className="bg-white dark:bg-[#231810] rounded-2xl p-6 mx-4 max-w-sm w-full shadow-2xl animate-in zoom-in-95" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex flex-col items-center text-center">
-                            <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 ${successMessage.includes('successfully')
-                                ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
-                                : 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400'
-                                }`}>
-                                <span className="material-symbols-outlined text-3xl">
-                                    {successMessage.includes('successfully') ? 'check_circle' : 'error'}
-                                </span>
-                            </div>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-fade-in" onClick={() => !loading && setShowSuccessModal(false)}>
+                    <div className="bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/10 rounded-3xl p-6 sm:p-7 max-w-sm w-full shadow-2xl text-center space-y-4 animate-scale-in" onClick={(e) => e.stopPropagation()}>
+                        <div className={`size-16 rounded-2xl mx-auto flex items-center justify-center ${successMessage.includes('successfully')
+                            ? 'bg-emerald-500/15 text-emerald-500 border border-emerald-500/30'
+                            : 'bg-amber-500/15 text-amber-500 border border-amber-500/30'
+                            }`}>
+                            <span className="material-symbols-outlined text-3xl">
+                                {successMessage.includes('successfully') ? 'check_circle' : 'info'}
+                            </span>
+                        </div>
 
-                            <h3 className="text-xl font-bold text-black dark:text-white mb-2">
-                                {successMessage.includes('successfully') ? 'Success!' : 'Notice'}
+                        <div>
+                            <h3 className="text-lg font-black text-zinc-900 dark:text-white mb-1.5">
+                                {successMessage.includes('successfully') ? 'Opportunity Published!' : 'Notice'}
                             </h3>
-
-                            <p className="text-gray-600 dark:text-[#cba990] mb-6">
+                            <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
                                 {successMessage}
                             </p>
-
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    setShowSuccessModal(false);
-                                    if (successMessage.includes('successfully')) {
-                                        navigate('/jobs');
-                                    }
-                                }}
-                                className="w-full bg-primary text-white font-bold py-3 rounded-xl hover:opacity-90 transition-opacity"
-                            >
-                                {successMessage.includes('successfully') ? 'Done' : 'Okay'}
-                            </button>
                         </div>
+
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setShowSuccessModal(false);
+                                if (successMessage.includes('successfully')) navigate('/jobs');
+                            }}
+                            className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-white font-black text-xs uppercase tracking-wider transition-all"
+                        >
+                            {successMessage.includes('successfully') ? 'View Jobs Board' : 'Dismiss'}
+                        </button>
                     </div>
                 </div>
             )}

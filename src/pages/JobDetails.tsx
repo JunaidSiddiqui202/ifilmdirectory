@@ -8,6 +8,7 @@ import PostMedia from '../components/PostMedia';
 import AvailabilityAvatar from '../components/AvailabilityAvatar';
 import { getUserProfile } from '../services/userService';
 import { useToast } from '../context/ToastContext';
+import { useTheme } from '../context/ThemeContext';
 import SEO, { JobStructuredData, BreadcrumbStructuredData } from '../components/SEO';
 
 export default function JobDetails() {
@@ -15,6 +16,7 @@ export default function JobDetails() {
     const { id } = useParams();
     const { currentUser } = useAuth();
     const { openAuthModal } = useAuthModal();
+    const { isDarkMode, toggleDarkMode } = useTheme();
     const toast = useToast();
     const [isBookmarked, setIsBookmarked] = useState(false);
     const [job, setJob] = useState<Job | null>(null);
@@ -160,10 +162,46 @@ export default function JobDetails() {
                     >
                         <span className="material-symbols-outlined text-xl">arrow_back</span>
                     </button>
-                    <h1 className="flex-1 text-center text-sm sm:text-base font-black tracking-tight text-zinc-900 dark:text-white uppercase truncate px-3">
-                        Call Details
-                    </h1>
-                    <div className="flex items-center gap-2">
+                    <div className="flex-1 text-center px-3 min-w-0">
+                        <h1 className="text-sm sm:text-base font-black tracking-tight text-zinc-900 dark:text-white uppercase truncate">
+                            Call Details
+                        </h1>
+                        <p className="text-[10px] text-zinc-500 dark:text-zinc-400 font-semibold truncate hidden sm:block">
+                            {job?.company || 'Film Opportunity'}
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-1.5 sm:gap-2">
+                        <button
+                            onClick={toggleDarkMode}
+                            className="flex size-10 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.04] dark:hover:bg-white/10 text-zinc-700 dark:text-zinc-300 transition-all active:scale-95"
+                            title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                            aria-label="Toggle theme"
+                        >
+                            <span className="material-symbols-outlined text-[18px]">
+                                {isDarkMode ? 'light_mode' : 'dark_mode'}
+                            </span>
+                        </button>
+
+                        <button
+                            onClick={() => {
+                                const shareUrl = window.location.href;
+                                if (navigator.share) {
+                                    navigator.share({
+                                        title: `${job?.title} at ${job?.company}`,
+                                        text: `Casting & Opportunity on iFilmDirectory: ${job?.title} by ${job?.company}`,
+                                        url: shareUrl
+                                    }).catch(() => {});
+                                } else {
+                                    navigator.clipboard.writeText(shareUrl);
+                                    toast.success('Opportunity link copied to clipboard!');
+                                }
+                            }}
+                            className="flex size-10 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.04] dark:hover:bg-white/10 text-zinc-700 dark:text-zinc-300 transition-all active:scale-95"
+                            title="Share Opportunity"
+                        >
+                            <span className="material-symbols-outlined text-[19px]">share</span>
+                        </button>
+
                         <button
                             onClick={handleBookmark}
                             className={`flex size-10 items-center justify-center rounded-xl border transition-all ${

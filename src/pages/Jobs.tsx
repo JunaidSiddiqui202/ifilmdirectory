@@ -10,6 +10,7 @@ import AvailabilityAvatar from '../components/AvailabilityAvatar';
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
 import { useAuthModal } from '../context/AuthModalContext';
+import { useTheme } from '../context/ThemeContext';
 import SEO from '../components/SEO';
 
 const formatTimeAgo = (timestamp: any) => {
@@ -29,6 +30,7 @@ export default function Jobs() {
     const toast = useToast();
     const { currentUser } = useAuth();
     const { openAuthModal } = useAuthModal();
+    const { isDarkMode, toggleDarkMode } = useTheme();
     const [filter, setFilter] = useState<'All' | 'Audition' | 'Crew' | 'Post-Production'>('All');
     const [searchQuery, setSearchQuery] = useState('');
     const [subFilter, setSubFilter] = useState<string>('All');
@@ -257,8 +259,19 @@ export default function Jobs() {
                             </div>
                         </div>
 
-                        {/* Top Actions: Post & Manual Sync */}
+                        {/* Top Actions: Theme toggle, Manual Sync & Post */}
                         <div className="flex items-center gap-2 shrink-0">
+                            <button
+                                onClick={toggleDarkMode}
+                                className="flex size-9 sm:size-10 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] border border-zinc-200 dark:border-white/[0.08] text-zinc-700 dark:text-zinc-200 transition-all active:scale-95"
+                                title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                                aria-label="Toggle theme"
+                            >
+                                <span className="material-symbols-outlined text-[18px]">
+                                    {isDarkMode ? 'light_mode' : 'dark_mode'}
+                                </span>
+                            </button>
+
                             <button
                                 onClick={() => loadJobs(true)}
                                 disabled={isSyncing}
@@ -268,7 +281,7 @@ export default function Jobs() {
                                 <span className={`material-symbols-outlined text-base ${isSyncing ? 'animate-spin text-amber-500' : ''}`}>
                                     sync
                                 </span>
-                                <span className="hidden sm:inline">{isSyncing ? 'Syncing...' : 'Sync Now'}</span>
+                                <span className="hidden sm:inline">{isSyncing ? 'Syncing...' : 'Sync'}</span>
                             </button>
 
                             <button
@@ -276,10 +289,11 @@ export default function Jobs() {
                                     if (!currentUser) return openAuthModal('Sign in to post a casting call or crew opening');
                                     navigate('/post-job');
                                 }}
-                                className="rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 px-4 py-2 text-xs font-black text-white shadow-lg shadow-amber-500/20 transition-all active:scale-95 flex items-center gap-1.5"
+                                className="rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 px-3.5 sm:px-4 py-2 text-xs font-black text-white shadow-lg shadow-amber-500/20 transition-all active:scale-95 flex items-center gap-1.5"
                             >
                                 <span className="material-symbols-outlined text-base">add_circle</span>
-                                <span>Post Call</span>
+                                <span className="hidden xs:inline">Post Call</span>
+                                <span className="xs:hidden">Post</span>
                             </button>
                         </div>
                     </div>
