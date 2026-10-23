@@ -95,14 +95,22 @@ export default function ExperienceModal({ isOpen, onClose, onSave, onDelete, ite
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-            <div className="bg-white dark:bg-zinc-900 rounded-xl w-full max-w-md shadow-2xl overflow-hidden">
-                <div className="p-4 border-b border-zinc-200 dark:border-zinc-800 flex justify-between items-center">
-                    <h3 className="text-lg font-bold text-zinc-900 dark:text-white">
-                        {itemToEdit ? 'Edit Experience' : 'Add Experience'}
-                    </h3>
-                    <button onClick={onClose} disabled={loading} className="text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 disabled:opacity-50">
-                        <span className="material-symbols-outlined">close</span>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-fade-in">
+            <div className="bg-white dark:bg-[#111317] rounded-3xl w-full max-w-md shadow-2xl border border-zinc-200 dark:border-white/10 overflow-hidden">
+                <div className="p-5 border-b border-zinc-200 dark:border-white/10 flex justify-between items-center bg-white/95 dark:bg-[#111317]/95 backdrop-blur-md">
+                    <div className="flex items-center gap-2.5">
+                        <div className="size-9 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center border border-amber-500/20">
+                            <span className="material-symbols-outlined text-xl">theaters</span>
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-black text-zinc-900 dark:text-white tracking-tight">
+                                {itemToEdit ? 'Edit Filmography Credit' : 'Add Filmography Credit'}
+                            </h3>
+                            <p className="text-xs text-zinc-500 font-medium">Record feature, series, or commercial</p>
+                        </div>
+                    </div>
+                    <button onClick={onClose} disabled={loading} className="p-2 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors disabled:opacity-50">
+                        <span className="material-symbols-outlined text-xl">close</span>
                     </button>
                 </div>
 
@@ -170,7 +178,7 @@ export default function ExperienceModal({ isOpen, onClose, onSave, onDelete, ite
                         />
                     </div>
 
-                    <div className="flex gap-3 pt-4">
+                    <div className="flex gap-2.5 pt-4">
                         {itemToEdit && (
                             <button
                                 type="button"
@@ -180,25 +188,25 @@ export default function ExperienceModal({ isOpen, onClose, onSave, onDelete, ite
                                         onClose();
                                     }
                                 }}
-                                className="px-4 py-2 rounded-lg font-bold text-red-500 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+                                className="px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-red-500 bg-red-500/10 hover:bg-red-500/20 transition-colors border border-red-500/20"
                             >
                                 Delete
                             </button>
                         )}
-                        <div className="flex-1 flex gap-3 justify-end">
+                        <div className="flex-1 flex gap-2.5 justify-end">
                             <button
                                 type="button"
                                 onClick={onClose}
-                                className="px-4 py-2 rounded-lg font-bold text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                                className="px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/10 transition-colors border border-zinc-200 dark:border-white/5"
                             >
                                 Cancel
                             </button>
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="px-6 py-2 rounded-lg font-bold text-white bg-primary hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                className="px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider text-black bg-amber-500 hover:bg-amber-400 transition-all shadow-md shadow-amber-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
                             >
-                                {loading ? 'Saving...' : 'Save'}
+                                {loading ? 'Saving...' : 'Save Credit'}
                             </button>
                         </div>
                     </div>

@@ -123,19 +123,24 @@ export default function VerificationModal({ isOpen, onClose, profile, onSave }: 
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
-            <div className="bg-white dark:bg-zinc-900 rounded-xl w-full max-w-lg my-8 flex flex-col shadow-2xl max-h-[90vh]">
-                <div className="p-4 border-b border-zinc-200 dark:border-zinc-800 flex justify-between items-center bg-white dark:bg-zinc-900 z-10 rounded-t-xl shrink-0">
-                    <h3 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2">
-                        <span className="material-symbols-outlined text-blue-500">verified</span>
-                        Get Verified
-                    </h3>
-                    <button onClick={onClose} className="text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300">
-                        <span className="material-symbols-outlined">close</span>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 overflow-y-auto animate-fade-in">
+            <div className="bg-white dark:bg-[#111317] rounded-3xl w-full max-w-lg my-8 flex flex-col shadow-2xl border border-zinc-200 dark:border-white/10 max-h-[90vh] overflow-hidden">
+                <div className="p-5 sm:p-6 border-b border-zinc-200 dark:border-white/10 flex justify-between items-center bg-white/95 dark:bg-[#111317]/95 backdrop-blur-md z-10 shrink-0">
+                    <div className="flex items-center gap-2.5">
+                        <div className="size-9 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center border border-amber-500/20">
+                            <span className="material-symbols-outlined text-xl">verified</span>
+                        </div>
+                        <div>
+                            <h3 className="text-xl font-black text-zinc-900 dark:text-white tracking-tight">Verified Professional</h3>
+                            <p className="text-xs text-zinc-500 font-medium">Official film industry credential verification</p>
+                        </div>
+                    </div>
+                    <button onClick={onClose} className="p-2 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors">
+                        <span className="material-symbols-outlined text-xl">close</span>
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-6 space-y-6 overflow-y-auto flex-1">
+                <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-6 overflow-y-auto flex-1">
 
                     {/* Status Info */}
                     <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-100 dark:border-blue-800">

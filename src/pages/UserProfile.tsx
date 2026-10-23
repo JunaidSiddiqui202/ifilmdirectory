@@ -530,8 +530,8 @@ export default function UserProfile() {
                     />
                 </>
             )}
-            <div className="w-full max-w-md md:max-w-2xl lg:max-w-4xl xl:max-w-5xl mx-auto flex flex-col flex-1">
-            {/* Top Navigation Bar: Mobile only (Desktop uses sidebar + direct profile header) */}
+            <div className="w-full max-w-md md:max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto flex flex-col flex-1 px-0 sm:px-4">
+            {/* Top Navigation Bar: Mobile only */}
             <div className="md:hidden flex items-center justify-between p-4 bg-white/95 dark:bg-[#090A0C]/90 backdrop-blur-md sticky top-0 z-50 border-b border-zinc-200 dark:border-white/5">
                 <div className="flex items-center gap-3">
                     <button 
@@ -560,105 +560,171 @@ export default function UserProfile() {
                 </button>
             </div>
 
-            {/* Profile Info Section: Vertical on mobile, Instagram-Desktop horizontal layout on md: */}
-            <div className="flex flex-col md:flex-row md:items-start md:gap-10 lg:gap-14 px-6 pt-3 md:pt-10 pb-6 md:pb-8">
-                {/* Profile Image with LinkedIn-Style Cinema Availability Ribbon */}
-                <div className="relative mb-4 md:mb-0 shrink-0 self-center md:self-start">
-                    <AvailabilityAvatar
-                        src={profile?.photoURL || ''}
-                        alt={profile?.displayName || 'User'}
-                        status={profile?.availabilityStatus}
-                        size="2xl"
-                        shape="circle"
-                        fallbackType={profile?.role === 'actor' ? 'ACTOR' : 'GENERAL'}
-                        className="shadow-2xl"
-                    />
-                    {isMe && (
-                        <button
-                            onClick={() => setIsUploadModalOpen(true)}
-                            className="absolute bottom-1 right-1 size-9 md:size-10 rounded-full bg-amber-500 border-2 border-[#090A0C] text-black shadow-lg flex items-center justify-center hover:scale-110 transition-transform active:scale-95 z-20"
-                            title="Edit photo"
-                        >
-                            <span className="material-symbols-outlined text-lg md:text-xl font-bold">edit</span>
-                        </button>
+            {/* Cinematic Hero Header Card */}
+            <div className="relative w-full rounded-none sm:rounded-3xl overflow-hidden bg-white dark:bg-[#111317] border-0 sm:border border-zinc-200 dark:border-white/10 shadow-xl mb-6">
+                {/* Cinematic Backdrop / Film Banner */}
+                <div className="relative h-36 sm:h-48 md:h-56 w-full overflow-hidden bg-gradient-to-r from-zinc-900 via-amber-950/40 to-zinc-950">
+                    {profile?.gallery && profile.gallery.length > 0 ? (
+                        <img 
+                            src={profile.gallery[0]} 
+                            alt="Cover backdrop" 
+                            className="w-full h-full object-cover opacity-25 filter blur-xs scale-105"
+                        />
+                    ) : (
+                        <div className="w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-500/20 via-zinc-900 to-black" />
                     )}
+                    {/* Film grain / filmstrip overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-[#111317] via-transparent to-black/40" />
+                    
+                    {/* Top right quick actions on desktop */}
+                    <div className="absolute top-4 right-4 hidden md:flex items-center gap-2.5 z-10">
+                        <button
+                            onClick={handleShareProfile}
+                            className="p-2.5 rounded-xl bg-black/60 hover:bg-black/80 backdrop-blur-md border border-white/15 text-white transition-all hover:scale-105 active:scale-95 shadow-lg"
+                            title="Share Profile"
+                        >
+                            <span className="material-symbols-outlined text-lg">share</span>
+                        </button>
+                        <button
+                            onClick={() => {
+                                const text = encodeURIComponent(`Check out ${profile?.displayName || 'this filmmaker'}'s portfolio on iFilmDirectory: ${window.location.href}`);
+                                window.open(`https://wa.me/?text=${text}`, '_blank');
+                            }}
+                            className="p-2.5 rounded-xl bg-[#22c55e]/90 hover:bg-[#22c55e] backdrop-blur-md text-white transition-all hover:scale-105 active:scale-95 shadow-lg"
+                            title="Share on WhatsApp"
+                        >
+                            <span className="material-symbols-outlined text-lg">chat</span>
+                        </button>
+                    </div>
+
+                    {/* Back button on desktop within banner */}
+                    <div className="absolute top-4 left-4 hidden md:flex items-center z-10">
+                        <button
+                            onClick={() => {
+                                if (window.history.length > 1) {
+                                    navigate(-1);
+                                } else {
+                                    navigate('/browse-profiles');
+                                }
+                            }}
+                            className="px-3.5 py-2 rounded-xl bg-black/60 hover:bg-black/80 backdrop-blur-md text-white font-semibold text-xs transition-all border border-white/15 flex items-center gap-1.5 shadow-lg active:scale-95"
+                            title="Back to Previous Page"
+                        >
+                            <span className="material-symbols-outlined text-sm">arrow_back</span>
+                            <span>Back</span>
+                        </button>
+                    </div>
                 </div>
 
-                {/* Profile Details Column */}
-                <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left min-w-0">
-                    {/* Top Row: Name, Verification Badge & Desktop Action Buttons */}
-                    <div className="flex flex-col md:flex-row md:items-center md:gap-4 mb-3.5 w-full">
-                        <div className="flex items-center gap-2 justify-center md:justify-start min-w-0">
-                            <button
-                                onClick={() => {
-                                    if (window.history.length > 1) {
-                                        navigate(-1);
-                                    } else {
-                                        navigate('/browse-profiles');
-                                    }
-                                }}
-                                className="hidden md:flex p-2 rounded-xl bg-zinc-100 dark:bg-white/10 hover:bg-zinc-200 dark:hover:bg-white/20 text-zinc-700 dark:text-zinc-200 hover:text-zinc-900 dark:hover:text-white transition-colors mr-1 shrink-0 border border-zinc-200 dark:border-white/10"
-                                title="Back to Previous Page"
-                            >
-                                <span className="material-symbols-outlined text-lg">arrow_back</span>
-                            </button>
-                            <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2 min-w-0 flex-wrap justify-center md:justify-start">
-                                <span className="break-words">{profile?.displayName || 'Anonymous User'}</span>
-                                {(profile?.verification_tier === 'gold' || profile?.verification_tier === 'blue' || profile?.verification?.isVerified) && (
+                {/* Profile Avatar & Details Section */}
+                <div className="px-5 sm:px-8 pb-6 -mt-16 sm:-mt-20 md:-mt-24 relative z-20">
+                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-5">
+                        {/* Avatar & Main Identity */}
+                        <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 sm:gap-6 text-center sm:text-left">
+                            {/* Profile Image with LinkedIn-Style Cinema Availability Ribbon */}
+                            <div className="relative shrink-0">
+                                <div className="p-1 rounded-full bg-white dark:bg-[#111317] shadow-2xl ring-4 ring-black/5 dark:ring-white/10">
+                                    <AvailabilityAvatar
+                                        src={profile?.photoURL || ''}
+                                        alt={profile?.displayName || 'User'}
+                                        status={profile?.availabilityStatus}
+                                        size="2xl"
+                                        shape="circle"
+                                        fallbackType={profile?.role === 'actor' ? 'ACTOR' : 'GENERAL'}
+                                        className="shadow-2xl"
+                                    />
+                                </div>
+                                {isMe && (
                                     <button
-                                        onClick={() => isMe && setIsVerificationModalOpen(true)}
-                                        className={`inline-flex items-center ${isMe ? 'cursor-pointer hover:scale-110 transition-transform' : 'cursor-default'}`}
-                                        title={isMe ? "Click to view verification details" : "Verified Professional"}
+                                        onClick={() => setIsUploadModalOpen(true)}
+                                        className="absolute bottom-2 right-2 size-9 md:size-10 rounded-full bg-amber-500 border-2 border-white dark:border-[#111317] text-black shadow-xl flex items-center justify-center hover:scale-110 transition-transform active:scale-95 z-20"
+                                        title="Edit photo"
                                     >
-                                        <span className="material-symbols-outlined text-amber-500 text-2xl filled shrink-0">verified</span>
+                                        <span className="material-symbols-outlined text-lg md:text-xl font-bold">photo_camera</span>
                                     </button>
                                 )}
-                            </h1>
+                            </div>
+
+                            {/* Name, Verified Badge & Roles */}
+                            <div className="space-y-1.5 pb-1">
+                                <div className="flex items-center gap-2 justify-center sm:justify-start flex-wrap">
+                                    <h1 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
+                                        <span>{profile?.displayName || 'Anonymous User'}</span>
+                                        {(profile?.verification_tier === 'gold' || profile?.verification_tier === 'blue' || profile?.verification?.isVerified) && (
+                                            <button
+                                                onClick={() => isMe && setIsVerificationModalOpen(true)}
+                                                className={`inline-flex items-center ${isMe ? 'cursor-pointer hover:scale-110 transition-transform' : 'cursor-default'}`}
+                                                title={isMe ? "Click to view verification details" : "Verified Film Professional"}
+                                            >
+                                                <span className="material-symbols-outlined text-amber-500 text-2xl filled shrink-0 drop-shadow-sm">verified</span>
+                                            </button>
+                                        )}
+                                    </h1>
+                                </div>
+
+                                <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap pt-0.5">
+                                    <span className="text-xs font-black uppercase tracking-wider px-3 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/25">
+                                        {profile?.role || 'Film Professional'}
+                                    </span>
+                                    {profile?.location && (
+                                        <span className="text-xs text-zinc-600 dark:text-zinc-400 font-semibold flex items-center gap-1 bg-zinc-100 dark:bg-white/5 px-2.5 py-1 rounded-full border border-zinc-200 dark:border-white/5">
+                                            <span className="material-symbols-outlined text-sm text-amber-500">location_on</span>
+                                            {profile.location}
+                                        </span>
+                                    )}
+                                    {profile && (() => {
+                                        const avail = getAvailabilityConfig(profile.availabilityStatus);
+                                        return (
+                                            <button
+                                                type="button"
+                                                onClick={() => isMe && setIsEditProfileModalOpen(true)}
+                                                className={`text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5 border shadow-2xs transition-all ${avail.badgeBg} ${avail.badgeText} ${avail.badgeBorder} ${isMe ? 'cursor-pointer hover:scale-105' : ''}`}
+                                                title={isMe ? `Click to edit status: ${avail.statusText}` : `Status: ${avail.statusText}`}
+                                            >
+                                                <span className={`size-1.5 rounded-full ${avail.dotColor} ${avail.code === 'available' ? 'animate-pulse' : ''}`} />
+                                                <span>{avail.label}</span>
+                                                {isMe && <span className="material-symbols-outlined text-xs opacity-70">edit</span>}
+                                            </button>
+                                        );
+                                    })()}
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Desktop Only: Inline Action Buttons (matching Instagram Desktop header) */}
-                        <div className="hidden md:flex items-center gap-2.5 mt-2 md:mt-0 flex-wrap">
+                        {/* Desktop Action Buttons */}
+                        <div className="hidden md:flex items-center gap-2.5 pb-1 flex-wrap justify-end">
                             {isMe ? (
                                 <>
                                     <button
                                         onClick={() => setIsEditProfileModalOpen(true)}
-                                        className="px-4 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/10 dark:hover:bg-white/20 text-zinc-900 dark:text-white font-bold text-xs transition-all border border-zinc-200 dark:border-white/10 active:scale-95"
+                                        className="px-4 py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/10 dark:hover:bg-white/15 text-zinc-900 dark:text-white font-bold text-xs transition-all border border-zinc-200 dark:border-white/10 active:scale-95 flex items-center gap-1.5 shadow-sm"
                                     >
+                                        <span className="material-symbols-outlined text-base">edit</span>
                                         Edit Profile
                                     </button>
                                     <button
                                         onClick={() => setIsEnhanceModalOpen(true)}
-                                        className="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold text-xs flex items-center gap-1.5 hover:brightness-110 transition-all shadow-md shadow-purple-500/20 active:scale-95"
+                                        className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold text-xs flex items-center gap-1.5 hover:brightness-110 transition-all shadow-md shadow-purple-500/20 active:scale-95"
                                     >
-                                        <span className="material-symbols-outlined text-[16px]">auto_awesome</span>
+                                        <span className="material-symbols-outlined text-base">auto_awesome</span>
                                         AI Enhance
                                     </button>
                                     {!profile?.verification?.isVerified && (
                                         <button
                                             onClick={() => setIsVerificationModalOpen(true)}
-                                            className="px-4 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 font-bold text-xs flex items-center gap-1.5 transition-all border border-amber-500/30 active:scale-95"
+                                            className="px-4 py-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 font-bold text-xs flex items-center gap-1.5 transition-all border border-amber-500/30 active:scale-95 shadow-sm"
                                             title="Apply for Verified Badge"
                                         >
-                                            <span className="material-symbols-outlined text-[16px]">verified</span>
+                                            <span className="material-symbols-outlined text-base">verified</span>
                                             {profile?.verification?.status === 'pending' ? 'Pending' : 'Get Verified'}
                                         </button>
                                     )}
-                                    <button
-                                        onClick={() => {
-                                            const text = encodeURIComponent(`Check out my professional profile on iFilmDirectory: ${window.location.href}`);
-                                            window.open(`https://wa.me/?text=${text}`, '_blank');
-                                        }}
-                                        className="p-2 rounded-xl bg-[#22c55e] hover:bg-[#1eb054] text-white transition-all shadow-sm active:scale-95"
-                                        title="Share on WhatsApp"
-                                    >
-                                        <span className="material-symbols-outlined text-lg">share</span>
-                                    </button>
                                     {isAdminUser && (
                                         <button
                                             onClick={() => navigate('/-admin')}
-                                            className="px-3 py-2 rounded-xl bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-300 font-bold text-xs flex items-center gap-1.5 transition-all border border-zinc-300 dark:border-white/10"
+                                            className="px-3.5 py-2.5 rounded-xl bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-300 font-bold text-xs flex items-center gap-1.5 transition-all border border-zinc-300 dark:border-white/10"
                                         >
-                                            <span className="material-symbols-outlined text-[16px]">admin_panel_settings</span>
+                                            <span className="material-symbols-outlined text-base">admin_panel_settings</span>
                                             Admin
                                         </button>
                                     )}
@@ -668,15 +734,15 @@ export default function UserProfile() {
                                     <button
                                         onClick={handleToggleFollow}
                                         disabled={isFollowLoading}
-                                        className={`px-5 py-2 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all ${
+                                        className={`px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm ${
                                             isFollowLoading
                                                 ? 'opacity-60 cursor-not-allowed bg-zinc-200 dark:bg-zinc-800 text-zinc-500'
                                                 : followed
                                                     ? 'bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-300 dark:bg-zinc-800 dark:text-white dark:border-white/10 dark:hover:bg-zinc-700 active:scale-95'
-                                                    : 'bg-amber-500 text-white hover:bg-amber-400 shadow-sm shadow-amber-500/25 active:scale-95'
+                                                    : 'bg-amber-500 text-black hover:bg-amber-400 shadow-amber-500/25 active:scale-95'
                                         }`}
                                     >
-                                        <span className={`material-symbols-outlined text-[16px] ${isFollowLoading ? 'animate-spin' : ''}`}>
+                                        <span className={`material-symbols-outlined text-base ${isFollowLoading ? 'animate-spin' : ''}`}>
                                             {isFollowLoading ? 'sync' : (followed ? 'person_check' : 'person_add')}
                                         </span>
                                         <span>{isFollowLoading ? 'Updating...' : (followed ? 'Following' : 'Follow')}</span>
@@ -689,9 +755,9 @@ export default function UserProfile() {
                                             }
                                             navigate(`/chat/${profile.uid}`);
                                         }}
-                                        className="px-4 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/10 dark:hover:bg-white/20 text-zinc-900 dark:text-white font-bold text-xs flex items-center gap-1.5 transition-all border border-zinc-200 dark:border-white/10"
+                                        className="px-4 py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/10 dark:hover:bg-white/15 text-zinc-900 dark:text-white font-bold text-xs flex items-center gap-1.5 transition-all border border-zinc-200 dark:border-white/10 shadow-sm"
                                     >
-                                        <span className="material-symbols-outlined text-[16px]">mail</span>
+                                        <span className="material-symbols-outlined text-base">mail</span>
                                         <span>Message</span>
                                     </button>
                                     <button
@@ -702,10 +768,10 @@ export default function UserProfile() {
                                             }
                                             setIsAddToProjectOpen(true);
                                         }}
-                                        className="px-4 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 font-bold text-xs flex items-center gap-1.5 transition-all border border-amber-500/30"
+                                        className="px-4 py-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 font-bold text-xs flex items-center gap-1.5 transition-all border border-amber-500/30 shadow-sm"
                                         title="Add to Production Project"
                                     >
-                                        <span className="material-symbols-outlined text-[16px]">playlist_add</span>
+                                        <span className="material-symbols-outlined text-base">playlist_add</span>
                                         <span>Shortlist to Project</span>
                                     </button>
                                 </>
@@ -713,86 +779,67 @@ export default function UserProfile() {
                         </div>
                     </div>
 
-                    {/* Stats Row (Credits/Media, Followers, Following) */}
-                    <div className="flex justify-center md:justify-start gap-8 md:gap-10 w-full mb-4">
-                        <div className="text-center md:text-left">
-                            <span className="font-extrabold text-base md:text-lg text-zinc-900 dark:text-white">
-                                {(profile?.gallery?.length || 0) + (profile?.experience?.length || 0)}
-                            </span>
-                            <span className="text-xs text-zinc-500 dark:text-zinc-400 font-medium ml-1.5">Credits</span>
-                        </div>
-                        <div
-                            className="text-center md:text-left cursor-pointer hover:opacity-80 transition-opacity"
-                            onClick={() => { setFollowListType('followers'); setIsFollowListModalOpen(true); }}
-                        >
-                            <span className="font-extrabold text-base md:text-lg text-zinc-900 dark:text-white">{followersCount}</span>
-                            <span className="text-xs text-zinc-500 dark:text-zinc-400 font-medium ml-1.5">Followers</span>
-                        </div>
-                        <div
-                            className="text-center md:text-left cursor-pointer hover:opacity-80 transition-opacity"
-                            onClick={() => { setFollowListType('following'); setIsFollowListModalOpen(true); }}
-                        >
-                            <span className="font-extrabold text-base md:text-lg text-zinc-900 dark:text-white">{followingCount}</span>
-                            <span className="text-xs text-zinc-500 dark:text-zinc-400 font-medium ml-1.5">Following</span>
-                        </div>
-                    </div>
-
-                    {/* Role & Location & Bio */}
-                    <div className="space-y-1.5 mb-5 md:mb-0 max-w-xl">
-                        <div className="flex items-center justify-center md:justify-start gap-2 flex-wrap">
-                            <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                                {profile?.role || 'Film Professional'}
-                            </span>
-                            {profile?.location && (
-                                <span className="text-xs text-zinc-500 dark:text-zinc-400 flex items-center gap-1">
-                                    <span className="material-symbols-outlined text-sm text-amber-500">location_on</span>
-                                    {profile.location}
-                                </span>
-                            )}
-                            {profile && (() => {
-                                const avail = getAvailabilityConfig(profile.availabilityStatus);
-                                return (
-                                    <button
-                                        type="button"
-                                        onClick={() => isMe && setIsEditProfileModalOpen(true)}
-                                        className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1.5 border shadow-2xs transition-all ${avail.badgeBg} ${avail.badgeText} ${avail.badgeBorder} ${isMe ? 'cursor-pointer hover:scale-105' : ''}`}
-                                        title={isMe ? `Click to edit status: ${avail.statusText}` : `Status: ${avail.statusText}`}
-                                    >
-                                        <span className={`size-1.5 rounded-full ${avail.dotColor} ${avail.code === 'available' ? 'animate-pulse' : ''}`} />
-                                        <span>{avail.label}</span>
-                                        {isMe && <span className="material-symbols-outlined text-xs opacity-70">edit</span>}
-                                    </button>
-                                );
-                            })()}
-                        </div>
-                        {profile?.bio && (
-                            <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1">
-                                {profile.bio}
+                    {/* Stats & Bio Card Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 pt-5 border-t border-zinc-200 dark:border-white/10">
+                        {/* Bio snippet */}
+                        <div className="md:col-span-2">
+                            <h4 className="text-[11px] font-black uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-1.5">About Filmmaker</h4>
+                            <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed line-clamp-3">
+                                {profile?.bio || "Cinema professional on iFilmDirectory. Available for film productions, casting, and collaborations."}
                             </p>
-                        )}
+                        </div>
+
+                        {/* Stats Pills */}
+                        <div className="flex items-center justify-around md:justify-end gap-3 bg-zinc-50 dark:bg-black/30 p-3 rounded-2xl border border-zinc-200 dark:border-white/5">
+                            <div className="text-center px-2">
+                                <span className="block font-black text-lg sm:text-xl text-zinc-900 dark:text-white">
+                                    {(profile?.gallery?.length || 0) + (profile?.experience?.length || 0)}
+                                </span>
+                                <span className="text-[11px] text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-wider">Credits</span>
+                            </div>
+                            <div className="h-8 w-px bg-zinc-200 dark:bg-white/10" />
+                            <div
+                                className="text-center px-2 cursor-pointer hover:opacity-80 transition-opacity"
+                                onClick={() => { setFollowListType('followers'); setIsFollowListModalOpen(true); }}
+                            >
+                                <span className="block font-black text-lg sm:text-xl text-zinc-900 dark:text-white">{followersCount}</span>
+                                <span className="text-[11px] text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-wider">Followers</span>
+                            </div>
+                            <div className="h-8 w-px bg-zinc-200 dark:bg-white/10" />
+                            <div
+                                className="text-center px-2 cursor-pointer hover:opacity-80 transition-opacity"
+                                onClick={() => { setFollowListType('following'); setIsFollowListModalOpen(true); }}
+                            >
+                                <span className="block font-black text-lg sm:text-xl text-zinc-900 dark:text-white">{followingCount}</span>
+                                <span className="text-[11px] text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-wider">Following</span>
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Mobile Only: Vertical Action Buttons Stack (Untouched on mobile!) */}
-                    <div className="flex md:hidden flex-col gap-2.5 w-full max-w-sm mt-3">
+                    {/* Mobile Only: Action Buttons */}
+                    <div className="flex md:hidden flex-col gap-2.5 w-full mt-5 pt-4 border-t border-zinc-200 dark:border-white/10">
                         {isMe ? (
                             <>
-                                <button
-                                    onClick={() => setIsEditProfileModalOpen(true)}
-                                    className="w-full h-11 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/10 text-zinc-900 dark:text-white font-bold text-sm flex items-center justify-center dark:hover:bg-white/15 transition-all border border-zinc-200 dark:border-white/10"
-                                >
-                                    Edit Profile
-                                </button>
-                                <button
-                                    onClick={() => setIsEnhanceModalOpen(true)}
-                                    className="w-full h-11 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold text-sm flex items-center justify-center gap-2 hover:brightness-110 transition-all shadow-md shadow-purple-500/20"
-                                >
-                                    <span className="material-symbols-outlined text-lg">auto_awesome</span>
-                                    AI Enhance Profile
-                                </button>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <button
+                                        onClick={() => setIsEditProfileModalOpen(true)}
+                                        className="h-11 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/10 text-zinc-900 dark:text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all border border-zinc-200 dark:border-white/10"
+                                    >
+                                        <span className="material-symbols-outlined text-base">edit</span>
+                                        Edit Profile
+                                    </button>
+                                    <button
+                                        onClick={() => setIsEnhanceModalOpen(true)}
+                                        className="h-11 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 hover:brightness-110 transition-all shadow-md shadow-purple-500/20"
+                                    >
+                                        <span className="material-symbols-outlined text-base">auto_awesome</span>
+                                        AI Enhance
+                                    </button>
+                                </div>
                                 {!profile?.verification?.isVerified && (
                                     <button
                                         onClick={() => setIsVerificationModalOpen(true)}
-                                        className="w-full h-11 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 font-bold text-sm flex items-center justify-center gap-2 border border-amber-500/30 transition-all"
+                                        className="w-full h-11 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 font-bold text-xs flex items-center justify-center gap-2 border border-amber-500/30 transition-all"
                                     >
                                         <span className="material-symbols-outlined text-lg">verified</span>
                                         {profile?.verification?.status === 'pending' ? 'Verification Pending Review' : 'Get Verified Badge'}
@@ -803,18 +850,17 @@ export default function UserProfile() {
                                         const text = encodeURIComponent(`Check out my professional profile on iFilmDirectory: ${window.location.href}`);
                                         window.open(`https://wa.me/?text=${text}`, '_blank');
                                     }}
-                                    className="w-full h-11 rounded-xl bg-[#22c55e] text-white font-bold text-sm flex items-center justify-center gap-2 hover:brightness-105 transition-all"
+                                    className="w-full h-11 rounded-xl bg-[#22c55e] text-white font-bold text-xs flex items-center justify-center gap-2 hover:brightness-105 transition-all shadow-sm"
                                 >
                                     <span className="material-symbols-outlined text-lg">share</span>
-                                    Invite Friends via WhatsApp
+                                    Share on WhatsApp
                                 </button>
-
                                 {isAdminUser && (
                                     <button
                                         onClick={() => navigate('/-admin')}
-                                        className="w-full h-11 rounded-xl bg-zinc-200 hover:bg-zinc-300 dark:bg-[#111827] text-zinc-800 dark:text-white font-bold text-sm flex items-center justify-center gap-2 dark:hover:bg-black transition-all border border-zinc-300 dark:border-white/10"
+                                        className="w-full h-11 rounded-xl bg-zinc-200 hover:bg-zinc-300 dark:bg-[#111827] text-zinc-800 dark:text-white font-bold text-xs flex items-center justify-center gap-2 transition-all border border-zinc-300 dark:border-white/10"
                                     >
-                                        <span className="material-symbols-outlined text-lg">admin_panel_settings</span>
+                                        <span className="material-symbols-outlined text-base">admin_panel_settings</span>
                                         Admin Management
                                     </button>
                                 )}
@@ -829,7 +875,7 @@ export default function UserProfile() {
                                             ? 'opacity-60 cursor-not-allowed bg-zinc-200 dark:bg-zinc-800 text-zinc-500'
                                             : followed
                                                 ? 'bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-300 dark:bg-zinc-800 dark:text-white dark:border-white/10 active:scale-95'
-                                                : 'bg-amber-500 text-white hover:bg-amber-400 active:scale-95'
+                                                : 'bg-amber-500 text-black hover:bg-amber-400 active:scale-95'
                                     }`}
                                 >
                                     <span className={`material-symbols-outlined ${isFollowLoading ? 'animate-spin' : ''}`}>
@@ -837,307 +883,376 @@ export default function UserProfile() {
                                     </span>
                                     <span>{isFollowLoading ? 'Updating...' : (followed ? 'Following' : 'Follow')}</span>
                                 </button>
-                                <button
-                                    onClick={() => {
-                                        if (!currentUser) {
-                                            openAuthModal(`Sign in to message ${profile.displayName || 'this creator'}`);
-                                            return;
-                                        }
-                                        navigate(`/chat/${profile.uid}`);
-                                    }}
-                                    className="w-full h-11 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-900 border border-zinc-200 dark:bg-white/10 dark:text-white font-bold text-sm flex items-center justify-center gap-2 dark:border-white/10"
-                                >
-                                    <span className="material-symbols-outlined">mail</span>
-                                    Message
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        if (!currentUser) {
-                                            openAuthModal(`Sign in to add ${profile.displayName || 'this creator'} to your project`);
-                                            return;
-                                        }
-                                        setIsAddToProjectOpen(true);
-                                    }}
-                                    className="w-full h-11 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 font-bold text-sm flex items-center justify-center gap-2 border border-amber-500/30"
-                                >
-                                    <span className="material-symbols-outlined">playlist_add</span>
-                                    Shortlist to Production Project
-                                </button>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <button
+                                        onClick={() => {
+                                            if (!currentUser) {
+                                                openAuthModal(`Sign in to message ${profile.displayName || 'this creator'}`);
+                                                return;
+                                            }
+                                            navigate(`/chat/${profile.uid}`);
+                                        }}
+                                        className="h-11 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-900 border border-zinc-200 dark:bg-white/10 dark:text-white font-bold text-xs flex items-center justify-center gap-1.5 dark:border-white/10"
+                                    >
+                                        <span className="material-symbols-outlined text-base">mail</span>
+                                        Message
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            if (!currentUser) {
+                                                openAuthModal(`Sign in to add ${profile.displayName || 'this creator'} to your project`);
+                                                return;
+                                            }
+                                            setIsAddToProjectOpen(true);
+                                        }}
+                                        className="h-11 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 font-bold text-xs flex items-center justify-center gap-1.5 border border-amber-500/30"
+                                    >
+                                        <span className="material-symbols-outlined text-base">playlist_add</span>
+                                        Shortlist
+                                    </button>
+                                </div>
                             </>
                         )}
                     </div>
                 </div>
-            </div>
 
-            {/* Tab Navigation: Centered on desktop with icons, matching Instagram desktop */}
-            <div className="border-t border-zinc-200 dark:border-white/10 mt-4 md:mt-6 overflow-x-auto no-scrollbar">
-                <div className="flex w-full md:justify-center min-w-max px-4 gap-2 md:gap-8">
-                    {[
-                        { id: 'Portfolio', label: 'Portfolio', icon: 'grid_on' },
-                        { id: 'Availability', label: 'Availability', icon: 'event_available' },
-                        { id: 'About', label: 'About', icon: 'person' },
-                        { id: 'Contact', label: 'Contact', icon: 'alternate_email' }
-                    ].map((tab) => (
-                        <button
-                            key={tab.id}
-                            onClick={() => setActiveTab(tab.id)}
-                            className={`flex items-center gap-2 px-5 md:px-6 py-4 text-xs md:text-sm font-bold uppercase tracking-wider transition-all relative ${
-                                activeTab === tab.id
-                                    ? 'text-zinc-900 dark:text-white border-t-2 border-amber-500 -mt-[1px]'
-                                    : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300'
-                            }`}
-                        >
-                            <span className="material-symbols-outlined text-lg">{tab.icon}</span>
-                            <span>{tab.label}</span>
-                        </button>
-                    ))}
+                {/* Tab Navigation: Centered with cinematic pills */}
+                <div className="border-t border-zinc-200 dark:border-white/10 bg-zinc-50/50 dark:bg-black/20 overflow-x-auto no-scrollbar">
+                    <div className="flex w-full md:justify-center min-w-max px-4 gap-2 sm:gap-4 py-2">
+                        {[
+                            { id: 'Portfolio', label: 'Portfolio', icon: 'grid_on' },
+                            { id: 'Availability', label: 'Availability', icon: 'event_available' },
+                            { id: 'About', label: 'Filmography & About', icon: 'person' },
+                            { id: 'Contact', label: 'Contact', icon: 'alternate_email' }
+                        ].map((tab) => (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id)}
+                                className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider transition-all ${
+                                    activeTab === tab.id
+                                        ? 'bg-amber-500 text-black shadow-md shadow-amber-500/20 scale-102'
+                                        : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200/60 dark:hover:bg-white/5'
+                                }`}
+                            >
+                                <span className="material-symbols-outlined text-base sm:text-lg">{tab.icon}</span>
+                                <span>{tab.label}</span>
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </div>
 
             {/* Content Section */}
-            <div className="flex-1 bg-slate-50 dark:bg-[#090A0C] min-h-[400px]">
+            <div className="flex-1 min-h-[400px]">
                 {activeTab === 'Portfolio' && (
-                    <div className="p-6 pb-8 flex flex-col gap-10">
+                    <div className="flex flex-col gap-8 pb-10">
                         {/* Showreels Section */}
-                        <section>
+                        <section className="bg-white dark:bg-[#111317] p-5 sm:p-7 rounded-3xl border border-zinc-200 dark:border-white/10 shadow-sm">
                             <div className="flex items-center justify-between mb-5">
-                                <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Showreels</h2>
+                                <div className="flex items-center gap-2.5">
+                                    <div className="size-9 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center border border-amber-500/20">
+                                        <span className="material-symbols-outlined text-xl">movie</span>
+                                    </div>
+                                    <div>
+                                        <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white tracking-tight">Featured Showreels</h2>
+                                        <p className="text-xs text-zinc-500 font-medium">Showcase reels, teasers, and performance clips</p>
+                                    </div>
+                                </div>
                                 {isMe ? (
                                     <button
                                         onClick={() => setIsPrivacyModalOpen(true)}
-                                        className="flex items-center gap-1.5 text-amber-500 hover:text-amber-600 dark:hover:text-amber-400 text-sm font-bold cursor-pointer transition-colors"
+                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/5 dark:hover:bg-white/10 text-amber-600 dark:text-amber-400 text-xs font-bold cursor-pointer transition-colors border border-amber-500/20"
                                         title="Manage portfolio privacy"
                                     >
-                                        Privacy
-                                        <span className="material-symbols-outlined text-[20px]">lock</span>
+                                        <span className="material-symbols-outlined text-base">lock</span>
+                                        <span>Privacy</span>
                                     </button>
                                 ) : (
-                                    <div className="flex items-center gap-1.5 text-zinc-400 text-sm font-medium">
-                                        <span className="material-symbols-outlined text-[18px]">public</span>
+                                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 dark:bg-white/5 text-zinc-500 text-xs font-semibold">
+                                        <span className="material-symbols-outlined text-sm">public</span>
                                         Public
                                     </div>
                                 )}
                             </div>
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                                 {(profile?.gallery || []).slice(0, 4).map((url, idx) => (
-                                    <div key={idx} className="flex flex-col gap-3">
+                                    <div key={idx} className="flex flex-col gap-2.5 group">
                                         <div
                                             onClick={() => navigate('/showreels')}
-                                            className="aspect-[4/3] bg-zinc-100 dark:bg-zinc-900 rounded-2xl overflow-hidden relative group cursor-pointer shadow-sm border border-zinc-200 dark:border-white/5"
+                                            className="aspect-video bg-zinc-950 rounded-2xl overflow-hidden relative cursor-pointer shadow-md border border-zinc-200 dark:border-white/10 group-hover:border-amber-500/50 transition-all"
                                             title="Watch Showreel"
                                         >
-                                            <PostMedia src={url} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                                            <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
-                                                <div className="size-12 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center border border-white/20">
-                                                    <span className="material-symbols-outlined text-white text-2xl filled">play_arrow</span>
+                                            <PostMedia src={url} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-108 opacity-90 group-hover:opacity-100" />
+                                            <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/10 transition-all">
+                                                <div className="size-11 rounded-full bg-black/70 backdrop-blur-md flex items-center justify-center border border-white/25 text-white group-hover:bg-amber-500 group-hover:text-black group-hover:scale-110 transition-all shadow-xl">
+                                                    <span className="material-symbols-outlined text-2xl filled">play_arrow</span>
                                                 </div>
                                             </div>
+                                            <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded-md bg-black/80 backdrop-blur-sm text-[10px] font-bold text-white uppercase tracking-wider">
+                                                HD Reel
+                                            </span>
                                         </div>
                                         <div className="px-1">
-                                            <h3 className="font-bold text-base md:text-lg text-zinc-900 dark:text-white truncate">{idx === 0 ? 'Drama Reel 2023' : idx === 1 ? 'Action Sequence' : 'Showreel Feature'}</h3>
-                                            <p className="text-zinc-500 dark:text-zinc-400 text-xs md:text-sm font-medium">{idx === 0 ? 'My Showreel' : 'Compilation'}</p>
+                                            <h3 className="font-bold text-sm sm:text-base text-zinc-900 dark:text-white truncate group-hover:text-amber-500 transition-colors">
+                                                {idx === 0 ? 'Director Reel 2024' : idx === 1 ? 'Dramatic Scene Cut' : 'Cinematography Highlight'}
+                                            </h3>
+                                            <p className="text-zinc-500 dark:text-zinc-400 text-xs font-medium">Showreel Compilation</p>
                                         </div>
                                     </div>
                                 ))}
                                 {(profile?.gallery || []).length === 0 && (
-                                    <div className="col-span-full py-12 bg-zinc-100/80 dark:bg-zinc-900/50 rounded-2xl flex flex-col items-center justify-center border-2 border-dashed border-zinc-300 dark:border-zinc-800 gap-2">
+                                    <div className="col-span-full py-12 bg-zinc-50 dark:bg-black/20 rounded-2xl flex flex-col items-center justify-center border-2 border-dashed border-zinc-200 dark:border-white/10 gap-2">
                                         <span className="material-symbols-outlined text-zinc-400 text-4xl">movie</span>
-                                        <p className="text-zinc-500 dark:text-zinc-400 font-bold italic">No showreels added yet</p>
+                                        <p className="text-zinc-500 dark:text-zinc-400 font-bold text-sm">No showreels added yet</p>
+                                        {isMe && (
+                                            <button 
+                                                onClick={() => setIsGalleryModalOpen(true)}
+                                                className="mt-2 px-4 py-2 rounded-xl bg-amber-500 text-black font-bold text-xs hover:bg-amber-400 transition-all shadow-sm"
+                                            >
+                                                Upload Reel
+                                            </button>
+                                        )}
                                     </div>
                                 )}
                             </div>
                         </section>
 
                         {/* Photos Section */}
-                        <section>
+                        <section className="bg-white dark:bg-[#111317] p-5 sm:p-7 rounded-3xl border border-zinc-200 dark:border-white/10 shadow-sm">
                             <div className="flex items-center justify-between mb-5">
-                                <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Photos</h2>
-                                <button
-                                    onClick={() => setIsGalleryModalOpen(true)}
-                                    className="flex items-center gap-1.5 text-amber-500 text-sm font-bold hover:brightness-90 transition-all"
-                                >
-                                    Add Photos
-                                    <span className="material-symbols-outlined text-[18px]">add_photo_alternate</span>
-                                </button>
+                                <div className="flex items-center gap-2.5">
+                                    <div className="size-9 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center border border-amber-500/20">
+                                        <span className="material-symbols-outlined text-xl">photo_library</span>
+                                    </div>
+                                    <div>
+                                        <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white tracking-tight">Production Gallery</h2>
+                                        <p className="text-xs text-zinc-500 font-medium">Headshots, set photos, and production stills</p>
+                                    </div>
+                                </div>
+                                {isMe && (
+                                    <button
+                                        onClick={() => setIsGalleryModalOpen(true)}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-bold transition-all border border-amber-500/30"
+                                    >
+                                        <span className="material-symbols-outlined text-base">add_photo_alternate</span>
+                                        <span>Add Photo</span>
+                                    </button>
+                                )}
                             </div>
-                            <div className="flex md:grid md:grid-cols-4 md:gap-4 overflow-x-auto md:overflow-visible no-scrollbar -mx-6 px-6 md:mx-0 md:px-0">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
                                 {(profile?.gallery || []).length > 0 ? (
                                     profile.gallery?.map((url, idx) => (
-                                        <div key={idx} className="w-[140px] md:w-full aspect-square shrink-0 rounded-2xl overflow-hidden bg-zinc-100 dark:bg-zinc-900 shadow-sm border border-zinc-200 dark:border-white/10 group">
-                                            <PostMedia src={url} className="w-full h-full object-cover grayscale active:grayscale-0 md:grayscale-0 md:group-hover:scale-105 transition-all duration-300" />
+                                        <div key={idx} className="aspect-square rounded-2xl overflow-hidden bg-zinc-100 dark:bg-zinc-900 shadow-sm border border-zinc-200 dark:border-white/10 group relative">
+                                            <PostMedia src={url} className="w-full h-full object-cover group-hover:scale-108 transition-all duration-500" />
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2">
+                                                <span className="text-[10px] font-bold text-white uppercase tracking-wider">Still #{idx + 1}</span>
+                                            </div>
                                         </div>
                                     ))
                                 ) : (
-                                    <div className="w-full md:col-span-4 py-10 bg-zinc-100/80 dark:bg-zinc-900/50 rounded-2xl flex items-center justify-center border-2 border-dashed border-zinc-300 dark:border-zinc-800">
-                                        <p className="text-zinc-500 dark:text-zinc-400 font-bold italic">No photos added</p>
+                                    <div className="col-span-full py-10 bg-zinc-50 dark:bg-black/20 rounded-2xl flex flex-col items-center justify-center border-2 border-dashed border-zinc-200 dark:border-white/10 gap-2">
+                                        <span className="material-symbols-outlined text-zinc-400 text-3xl">photo_camera</span>
+                                        <p className="text-zinc-500 dark:text-zinc-400 font-bold text-sm">No photos added yet</p>
                                     </div>
                                 )}
                             </div>
                         </section>
 
                         {/* Skills Section */}
-                        <section>
+                        <section className="bg-white dark:bg-[#111317] p-5 sm:p-7 rounded-3xl border border-zinc-200 dark:border-white/10 shadow-sm">
                             <div className="flex items-center justify-between mb-5">
-                                <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Skills</h2>
-                                <button
-                                    onClick={() => setIsEditProfileModalOpen(true)}
-                                    className="flex items-center gap-1.5 text-amber-500 text-sm font-bold hover:brightness-90 transition-all"
-                                >
-                                    Edit
-                                    <span className="material-symbols-outlined text-[18px]">edit</span>
-                                </button>
+                                <div className="flex items-center gap-2.5">
+                                    <div className="size-9 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center border border-amber-500/20">
+                                        <span className="material-symbols-outlined text-xl">stars</span>
+                                    </div>
+                                    <div>
+                                        <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white tracking-tight">Core Competencies & Skills</h2>
+                                        <p className="text-xs text-zinc-500 font-medium">Verified skill proficiencies & crafts</p>
+                                    </div>
+                                </div>
+                                {isMe && (
+                                    <button
+                                        onClick={() => setIsEditProfileModalOpen(true)}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/5 dark:hover:bg-white/10 text-zinc-800 dark:text-zinc-200 text-xs font-bold transition-all border border-zinc-200 dark:border-white/10"
+                                    >
+                                        <span className="material-symbols-outlined text-base">edit</span>
+                                        <span>Edit</span>
+                                    </button>
+                                )}
                             </div>
                             <div className="flex flex-wrap gap-2.5">
-                                {(profile?.skills || ['MONOLOGUE', 'STUNT WORK', 'IMPROVISATION', 'CLASSICAL DANCE', 'VOICE ACTING']).map((skill, idx) => {
-                                    const colors = [
-                                        { bg: 'bg-[#ebf0ff]/10', text: 'text-indigo-400', border: 'border-indigo-500/20' },
-                                        { bg: 'bg-[#fdf2f8]/10', text: 'text-pink-400', border: 'border-pink-500/20' },
-                                        { bg: 'bg-[#ecfdf5]/10', text: 'text-emerald-400', border: 'border-emerald-500/20' },
-                                        { bg: 'bg-[#f0f9ff]/10', text: 'text-sky-400', border: 'border-sky-500/20' },
-                                        { bg: 'bg-[#f5f3ff]/10', text: 'text-purple-400', border: 'border-purple-500/20' },
-                                    ];
-                                    const color = colors[idx % colors.length];
-                                    return (
-                                        <span
-                                            key={skill}
-                                            className={`px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-widest border shadow-sm ${color.bg} ${color.text} ${color.border}`}
-                                        >
-                                            {skill}
-                                        </span>
-                                    );
-                                })}
+                                {(profile?.skills || ['MONOLOGUE', 'STUNT WORK', 'IMPROVISATION', 'CLASSICAL DANCE', 'VOICE ACTING']).map((skill) => (
+                                    <span
+                                        key={skill}
+                                        className="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-zinc-100 dark:bg-white/5 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-white/10 hover:border-amber-500/50 hover:text-amber-500 transition-all shadow-xs"
+                                    >
+                                        {skill}
+                                    </span>
+                                ))}
                             </div>
                         </section>
 
-                        {/* Experience Section */}
-                        <section>
+                        {/* Recent Experience Section */}
+                        <section className="bg-white dark:bg-[#111317] p-5 sm:p-7 rounded-3xl border border-zinc-200 dark:border-white/10 shadow-sm">
                             <div className="flex items-center justify-between mb-5">
-                                <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Recent Projects</h2>
-                                <button
-                                    onClick={() => setIsExperienceModalOpen(true)}
-                                    className="flex items-center gap-1.5 text-amber-500 text-sm font-bold hover:brightness-90 transition-all"
-                                >
-                                    Add New
-                                    <span className="material-symbols-outlined text-[18px]">add_circle</span>
-                                </button>
+                                <div className="flex items-center gap-2.5">
+                                    <div className="size-9 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center border border-amber-500/20">
+                                        <span className="material-symbols-outlined text-xl">theaters</span>
+                                    </div>
+                                    <div>
+                                        <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white tracking-tight">Filmography & Credits</h2>
+                                        <p className="text-xs text-zinc-500 font-medium">Feature films, web series, and commercials</p>
+                                    </div>
+                                </div>
+                                {isMe && (
+                                    <button
+                                        onClick={() => setIsExperienceModalOpen(true)}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-bold transition-all border border-amber-500/30"
+                                    >
+                                        <span className="material-symbols-outlined text-base">add_circle</span>
+                                        <span>Add Credit</span>
+                                    </button>
+                                )}
                             </div>
-                            <div className="flex flex-col gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {(profile?.experience || []).length > 0 ? (
                                     profile.experience?.map((exp) => (
                                         <div
                                             key={exp.id}
                                             onClick={() => isMe && (setEditingExperience(exp), setIsExperienceModalOpen(true))}
-                                            className="flex gap-5 p-4 rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/10 items-center cursor-pointer group hover:border-amber-500/40 transition-all shadow-sm"
+                                            className="flex gap-4 p-4 rounded-2xl bg-zinc-50 dark:bg-black/30 border border-zinc-200 dark:border-white/10 items-center cursor-pointer group hover:border-amber-500/40 transition-all shadow-xs"
                                         >
-                                            <div className="w-14 h-18 bg-zinc-100 dark:bg-zinc-800 rounded-xl shrink-0 overflow-hidden flex items-center justify-center border border-zinc-200 dark:border-white/10">
-                                                <span className="material-symbols-outlined text-zinc-400 text-3xl">
+                                            <div className="size-14 bg-amber-500/10 rounded-2xl shrink-0 flex items-center justify-center border border-amber-500/20 text-amber-500 group-hover:scale-105 transition-transform">
+                                                <span className="material-symbols-outlined text-3xl">
                                                     {exp.type === 'movie' ? 'movie' : exp.type === 'tv' ? 'tv' : 'theaters'}
                                                 </span>
                                             </div>
                                             <div className="flex flex-col flex-1 min-w-0">
-                                                <div className="flex justify-between items-center mb-1">
-                                                    <h3 className="text-lg font-bold truncate group-hover:text-amber-600 dark:group-hover:text-amber-500 transition-colors text-zinc-900 dark:text-white">{exp.title}</h3>
-                                                    <span className="text-sm font-bold text-zinc-500 dark:text-zinc-400">{exp.year}</span>
+                                                <div className="flex justify-between items-center mb-0.5">
+                                                    <h3 className="text-base font-bold truncate group-hover:text-amber-500 transition-colors text-zinc-900 dark:text-white">{exp.title}</h3>
+                                                    <span className="text-xs font-black text-amber-500 px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 ml-2 shrink-0">{exp.year}</span>
                                                 </div>
-                                                <p className="text-amber-500 font-bold uppercase tracking-wider text-xs">{exp.role}</p>
+                                                <p className="text-zinc-600 dark:text-zinc-400 font-bold uppercase tracking-wider text-xs">{exp.role}</p>
+                                                {exp.description && (
+                                                    <p className="text-zinc-500 text-xs line-clamp-1 mt-1">{exp.description}</p>
+                                                )}
                                             </div>
                                         </div>
                                     ))
                                 ) : (
-                                    <div className="py-12 bg-zinc-100/80 dark:bg-zinc-900/50 rounded-2xl flex items-center justify-center border-2 border-dashed border-zinc-300 dark:border-zinc-800">
-                                        <p className="text-zinc-500 dark:text-zinc-400 font-bold italic">No projects listed</p>
+                                    <div className="col-span-full py-10 bg-zinc-50 dark:bg-black/20 rounded-2xl flex flex-col items-center justify-center border-2 border-dashed border-zinc-200 dark:border-white/10 gap-2">
+                                        <span className="material-symbols-outlined text-zinc-400 text-3xl">theaters</span>
+                                        <p className="text-zinc-500 dark:text-zinc-400 font-bold text-sm">No filmography credits listed yet</p>
                                     </div>
                                 )}
                             </div>
                         </section>
 
                         {/* Under Production Section */}
-                        <section>
+                        <section className="bg-white dark:bg-[#111317] p-5 sm:p-7 rounded-3xl border border-zinc-200 dark:border-white/10 shadow-sm">
                             <div className="flex items-center justify-between mb-5">
-                                <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Under Production</h2>
+                                <div className="flex items-center gap-2.5">
+                                    <div className="size-9 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center border border-purple-500/20">
+                                        <span className="material-symbols-outlined text-xl">schedule</span>
+                                    </div>
+                                    <div>
+                                        <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white tracking-tight">Under Production</h2>
+                                        <p className="text-xs text-zinc-500 font-medium">Active upcoming film and OTT projects</p>
+                                    </div>
+                                </div>
                                 {isMe && (
                                     <button
                                         onClick={() => setIsEditProfileModalOpen(true)}
-                                        className="flex items-center gap-1.5 text-amber-500 text-sm font-bold hover:brightness-90 transition-all"
+                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/5 dark:hover:bg-white/10 text-zinc-800 dark:text-zinc-200 text-xs font-bold transition-all border border-zinc-200 dark:border-white/10"
                                     >
-                                        Manage
-                                        <span className="material-symbols-outlined text-[18px]">edit</span>
+                                        <span className="material-symbols-outlined text-base">edit</span>
+                                        <span>Manage</span>
                                     </button>
                                 )}
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {(profile?.underProductionProjects || []).length > 0 ? (
                                     profile.underProductionProjects?.map((project) => (
-                                        <div key={project.id} className="p-5 rounded-2xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/20 shadow-sm">
+                                        <div key={project.id} className="p-5 rounded-2xl bg-gradient-to-br from-purple-500/5 via-transparent to-blue-500/5 border border-purple-500/20 shadow-xs">
                                             <div className="flex justify-between items-start mb-2">
-                                                <h3 className="text-xl font-bold text-zinc-900 dark:text-white line-clamp-1">{project.title}</h3>
-                                                <span className="px-2.5 py-1 rounded-full bg-purple-500/20 text-purple-400 text-[10px] font-black uppercase tracking-widest border border-purple-500/30 shrink-0">
+                                                <h3 className="text-lg font-black text-zinc-900 dark:text-white line-clamp-1">{project.title}</h3>
+                                                <span className="px-2.5 py-1 rounded-full bg-purple-500/15 text-purple-400 text-[10px] font-black uppercase tracking-widest border border-purple-500/30 shrink-0">
                                                     {project.status}
                                                 </span>
                                             </div>
-                                            <p className="text-sm font-bold text-amber-500 uppercase tracking-wider mb-2">{project.role}</p>
+                                            <p className="text-xs font-bold text-amber-500 uppercase tracking-wider mb-2">{project.role}</p>
                                             {project.description && (
-                                                <p className="text-sm text-zinc-600 dark:text-zinc-400 line-clamp-2 italic">"{project.description}"</p>
+                                                <p className="text-xs text-zinc-600 dark:text-zinc-400 line-clamp-2 italic">"{project.description}"</p>
                                             )}
                                             {project.expectedRelease && (
-                                                <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-zinc-500 dark:text-zinc-400">
-                                                    <span className="material-symbols-outlined text-sm">event</span>
-                                                    Expected: {project.expectedRelease}
+                                                <div className="mt-3 flex items-center gap-1.5 text-xs font-bold text-zinc-500 dark:text-zinc-400">
+                                                    <span className="material-symbols-outlined text-sm text-purple-400">event</span>
+                                                    Target Release: {project.expectedRelease}
                                                 </div>
                                             )}
                                         </div>
                                     ))
                                 ) : (
-                                    <div className="col-span-full py-12 bg-zinc-100/80 dark:bg-zinc-900/50 rounded-2xl flex items-center justify-center border-2 border-dashed border-zinc-300 dark:border-zinc-800">
-                                        <p className="text-zinc-500 dark:text-zinc-400 font-bold italic">No under-production works listed</p>
+                                    <div className="col-span-full py-10 bg-zinc-50 dark:bg-black/20 rounded-2xl flex flex-col items-center justify-center border-2 border-dashed border-zinc-200 dark:border-white/10 gap-2">
+                                        <span className="material-symbols-outlined text-zinc-400 text-3xl">pending_actions</span>
+                                        <p className="text-zinc-500 dark:text-zinc-400 font-bold text-sm">No under-production works listed</p>
                                     </div>
                                 )}
                             </div>
                         </section>
 
                         {/* Past Works Section */}
-                        <section>
+                        <section className="bg-white dark:bg-[#111317] p-5 sm:p-7 rounded-3xl border border-zinc-200 dark:border-white/10 shadow-sm">
                             <div className="flex items-center justify-between mb-5">
-                                <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Past Works</h2>
+                                <div className="flex items-center gap-2.5">
+                                    <div className="size-9 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center border border-amber-500/20">
+                                        <span className="material-symbols-outlined text-xl">history_edu</span>
+                                    </div>
+                                    <div>
+                                        <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white tracking-tight">Key Career Milestones</h2>
+                                        <p className="text-xs text-zinc-500 font-medium">Notable releases and collaborations</p>
+                                    </div>
+                                </div>
                                 {isMe && (
                                     <button
                                         onClick={() => setIsEditProfileModalOpen(true)}
-                                        className="flex items-center gap-1.5 text-amber-500 text-sm font-bold hover:brightness-90 transition-all"
+                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/5 dark:hover:bg-white/10 text-zinc-800 dark:text-zinc-200 text-xs font-bold transition-all border border-zinc-200 dark:border-white/10"
                                     >
-                                        Manage
-                                        <span className="material-symbols-outlined text-[18px]">edit</span>
+                                        <span className="material-symbols-outlined text-base">edit</span>
+                                        <span>Manage</span>
                                     </button>
                                 )}
                             </div>
-                            <div className="flex flex-col gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {(profile?.pastProjects || []).length > 0 ? (
                                     profile.pastProjects?.map((project) => (
-                                        <div key={project.id} className="flex gap-5 p-5 rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/10 items-center shadow-sm">
-                                            <div className="w-14 h-14 bg-zinc-100 dark:bg-zinc-800 rounded-full shrink-0 flex items-center justify-center border border-zinc-200 dark:border-white/10">
-                                                <span className="material-symbols-outlined text-zinc-400 text-3xl">history</span>
+                                        <div key={project.id} className="flex gap-4 p-4 rounded-2xl bg-zinc-50 dark:bg-black/30 border border-zinc-200 dark:border-white/10 items-start shadow-xs">
+                                            <div className="size-11 bg-zinc-200 dark:bg-white/5 rounded-xl shrink-0 flex items-center justify-center text-zinc-500 mt-0.5">
+                                                <span className="material-symbols-outlined text-xl">history</span>
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex justify-between items-center mb-1">
-                                                    <h3 className="text-lg font-bold truncate text-zinc-900 dark:text-white">{project.title}</h3>
-                                                    <span className="text-sm font-bold text-zinc-500 dark:text-zinc-400">{project.year}</span>
+                                                    <h3 className="text-base font-bold truncate text-zinc-900 dark:text-white">{project.title}</h3>
+                                                    <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 ml-2">{project.year}</span>
                                                 </div>
                                                 <div className="flex items-center gap-3">
-                                                    <p className="text-sm font-bold text-amber-500 uppercase tracking-widest">{project.role}</p>
+                                                    <p className="text-xs font-black text-amber-500 uppercase tracking-wider">{project.role}</p>
                                                     {project.link && (
-                                                        <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-xs text-sky-500 dark:text-sky-400 hover:underline flex items-center gap-0.5">
+                                                        <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-xs text-sky-500 hover:underline flex items-center gap-0.5">
                                                             View <span className="material-symbols-outlined text-xs">open_in_new</span>
                                                         </a>
                                                     )}
                                                 </div>
                                                 {project.description && (
-                                                    <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-2 line-clamp-1">{project.description}</p>
+                                                    <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1.5 line-clamp-2">{project.description}</p>
                                                 )}
                                             </div>
                                         </div>
                                     ))
                                 ) : (
-                                    <div className="py-12 bg-zinc-100/80 dark:bg-zinc-900/50 rounded-2xl flex items-center justify-center border-2 border-dashed border-zinc-300 dark:border-zinc-800">
-                                        <p className="text-zinc-500 dark:text-zinc-400 font-bold italic">No past works listed</p>
+                                    <div className="col-span-full py-10 bg-zinc-50 dark:bg-black/20 rounded-2xl flex flex-col items-center justify-center border-2 border-dashed border-zinc-200 dark:border-white/10 gap-2">
+                                        <span className="material-symbols-outlined text-zinc-400 text-3xl">history</span>
+                                        <p className="text-zinc-500 dark:text-zinc-400 font-bold text-sm">No past milestones listed</p>
                                     </div>
                                 )}
                             </div>
@@ -1146,62 +1261,104 @@ export default function UserProfile() {
                 )}
 
                 {activeTab === 'About' && (
-                    <div className="p-6 pb-8 flex flex-col gap-8">
-                        {/* Biography */}
-                        <section>
-                            <h2 className="text-xl font-bold mb-3">Biography</h2>
-                            <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed font-sans whitespace-pre-wrap">
-                                {profile?.bio || "No biography provided."}
+                    <div className="flex flex-col gap-6 pb-10">
+                        {/* Biography Card */}
+                        <section className="bg-white dark:bg-[#111317] p-5 sm:p-7 rounded-3xl border border-zinc-200 dark:border-white/10 shadow-sm">
+                            <div className="flex items-center gap-2.5 mb-4">
+                                <div className="size-9 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center border border-amber-500/20">
+                                    <span className="material-symbols-outlined text-xl">person</span>
+                                </div>
+                                <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white tracking-tight">Biography & Background</h2>
+                            </div>
+                            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed font-sans whitespace-pre-wrap text-sm sm:text-base">
+                                {profile?.bio || "No biography provided yet. Cinema professionals can detail their creative journeys, awards, education, and career vision."}
                             </p>
                         </section>
 
-                        {/* Additional Details */}
-                        <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {profile?.location && (
+                        {/* Details Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <section className="bg-white dark:bg-[#111317] p-5 sm:p-7 rounded-3xl border border-zinc-200 dark:border-white/10 shadow-sm space-y-4">
+                                <div className="flex items-center gap-2.5 mb-2">
+                                    <div className="size-8 rounded-lg bg-sky-500/10 text-sky-500 flex items-center justify-center border border-sky-500/20">
+                                        <span className="material-symbols-outlined text-lg">pin_drop</span>
+                                    </div>
+                                    <h3 className="text-base font-bold text-zinc-900 dark:text-white">Location & Operations</h3>
+                                </div>
                                 <div className="space-y-1">
-                                    <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Base Location</h4>
-                                    <p className="font-medium">{profile.location}</p>
+                                    <h4 className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Base City</h4>
+                                    <p className="font-semibold text-sm text-zinc-800 dark:text-zinc-200">{profile?.location || 'Not Specified'}</p>
                                 </div>
-                            )}
-                            {profile?.physicalAttributes?.languages && profile.physicalAttributes.languages.length > 0 && (
-                                <div className="space-y-1">
-                                    <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Languages</h4>
-                                    <p className="font-medium">{profile.physicalAttributes.languages.join(', ')}</p>
-                                </div>
-                            )}
-                        </section>
-
-                        {/* Physical attributes for actors */}
-                        {profile?.role === 'actor' && profile.physicalAttributes && (
-                            <section>
-                                <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-3">Physical Attributes</h4>
-                                <div className="grid grid-cols-2 gap-4">
-                                    {profile.physicalAttributes.height && (
-                                        <div className="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800">
-                                            <p className="text-[10px] text-zinc-500 uppercase font-bold">Height</p>
-                                            <p className="font-bold">{profile.physicalAttributes.height}</p>
+                                {profile?.physicalAttributes?.languages && profile.physicalAttributes.languages.length > 0 && (
+                                    <div className="space-y-1 pt-2">
+                                        <h4 className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Languages Spoken</h4>
+                                        <div className="flex flex-wrap gap-1.5 pt-1">
+                                            {profile.physicalAttributes.languages.map((lang: string) => (
+                                                <span key={lang} className="px-2.5 py-1 rounded-lg bg-zinc-100 dark:bg-white/5 text-zinc-700 dark:text-zinc-300 text-xs font-semibold">
+                                                    {lang}
+                                                </span>
+                                            ))}
                                         </div>
-                                    )}
-                                    {profile.physicalAttributes.weight && (
-                                        <div className="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800">
-                                            <p className="text-[10px] text-zinc-500 uppercase font-bold">Weight</p>
-                                            <p className="font-bold">{profile.physicalAttributes.weight}</p>
-                                        </div>
-                                    )}
-                                </div>
+                                    </div>
+                                )}
                             </section>
-                        )}
+
+                            {/* Physical attributes for actors */}
+                            {profile?.role === 'actor' && profile.physicalAttributes ? (
+                                <section className="bg-white dark:bg-[#111317] p-5 sm:p-7 rounded-3xl border border-zinc-200 dark:border-white/10 shadow-sm space-y-4">
+                                    <div className="flex items-center gap-2.5 mb-2">
+                                        <div className="size-8 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center border border-emerald-500/20">
+                                            <span className="material-symbols-outlined text-lg">accessibility_new</span>
+                                        </div>
+                                        <h3 className="text-base font-bold text-zinc-900 dark:text-white">Physical Profile</h3>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        {profile.physicalAttributes.height && (
+                                            <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-black/30 border border-zinc-200 dark:border-white/5">
+                                                <p className="text-[10px] text-zinc-400 uppercase font-bold tracking-wider">Height</p>
+                                                <p className="font-bold text-base text-zinc-900 dark:text-white mt-0.5">{profile.physicalAttributes.height}</p>
+                                            </div>
+                                        )}
+                                        {profile.physicalAttributes.weight && (
+                                            <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-black/30 border border-zinc-200 dark:border-white/5">
+                                                <p className="text-[10px] text-zinc-400 uppercase font-bold tracking-wider">Weight</p>
+                                                <p className="font-bold text-base text-zinc-900 dark:text-white mt-0.5">{profile.physicalAttributes.weight}</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </section>
+                            ) : (
+                                <section className="bg-white dark:bg-[#111317] p-5 sm:p-7 rounded-3xl border border-zinc-200 dark:border-white/10 shadow-sm flex flex-col justify-center">
+                                    <div className="flex items-center gap-2.5 mb-2">
+                                        <div className="size-8 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center border border-amber-500/20">
+                                            <span className="material-symbols-outlined text-lg">verified_user</span>
+                                        </div>
+                                        <h3 className="text-base font-bold text-zinc-900 dark:text-white">Profile Trust & Verification</h3>
+                                    </div>
+                                    <p className="text-xs text-zinc-500 leading-relaxed">
+                                        This profile is indexed on iFilmDirectory. Contact details and portfolio links are verified by the production board.
+                                    </p>
+                                </section>
+                            )}
+                        </div>
                     </div>
                 )}
 
                 {activeTab === 'Availability' && (
-                    <div className="p-6 pb-8 flex flex-col gap-6">
-                        <section>
-                            <h2 className="text-xl font-bold mb-4">Work Availability</h2>
+                    <div className="flex flex-col gap-6 pb-10">
+                        <section className="bg-white dark:bg-[#111317] p-5 sm:p-7 rounded-3xl border border-zinc-200 dark:border-white/10 shadow-sm">
+                            <div className="flex items-center gap-2.5 mb-5">
+                                <div className="size-9 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center border border-amber-500/20">
+                                    <span className="material-symbols-outlined text-xl">event_available</span>
+                                </div>
+                                <div>
+                                    <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white tracking-tight">Work Availability Status</h2>
+                                    <p className="text-xs text-zinc-500 font-medium">Real-time schedule for film productions and shoots</p>
+                                </div>
+                            </div>
                             {(() => {
                                 const avail = getAvailabilityConfig(profile?.availabilityStatus);
                                 return (
-                                    <div className={`p-6 rounded-2xl border flex flex-col gap-4 shadow-sm ${
+                                    <div className={`p-6 rounded-2xl border flex flex-col gap-5 shadow-xs ${
                                         avail.code === 'available'
                                             ? 'bg-emerald-500/5 border-emerald-500/20'
                                             : avail.code === 'working'
@@ -1209,21 +1366,21 @@ export default function UserProfile() {
                                             : 'bg-zinc-500/5 border-zinc-500/20'
                                     }`}>
                                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className={`size-12 rounded-2xl flex items-center justify-center shrink-0 ${
+                                            <div className="flex items-center gap-3.5">
+                                                <div className={`size-14 rounded-2xl flex items-center justify-center shrink-0 shadow-sm ${
                                                     avail.code === 'available'
-                                                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                                                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
                                                         : avail.code === 'working'
-                                                        ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
-                                                        : 'bg-zinc-500/10 text-zinc-600 dark:text-zinc-400'
+                                                        ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
+                                                        : 'bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border border-zinc-500/20'
                                                 }`}>
-                                                    <span className="material-symbols-outlined text-2xl">
+                                                    <span className="material-symbols-outlined text-3xl">
                                                         {avail.icon}
                                                     </span>
                                                 </div>
                                                 <div>
                                                     <div className="flex items-center gap-2 flex-wrap">
-                                                        <h3 className="font-black text-xl text-zinc-900 dark:text-white flex items-center gap-1.5">
+                                                        <h3 className="font-black text-xl text-zinc-900 dark:text-white flex items-center gap-2">
                                                             <span>{avail.dotEmoji}</span>
                                                             <span>{avail.label}</span>
                                                         </h3>
@@ -1237,7 +1394,7 @@ export default function UserProfile() {
                                             {isMe ? (
                                                 <button
                                                     onClick={() => setIsEditProfileModalOpen(true)}
-                                                    className="px-4 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/10 dark:hover:bg-white/20 text-zinc-900 dark:text-white font-bold text-xs transition-all border border-zinc-200 dark:border-white/10 shrink-0 self-start sm:self-center"
+                                                    className="px-4 py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/10 dark:hover:bg-white/15 text-zinc-900 dark:text-white font-bold text-xs transition-all border border-zinc-200 dark:border-white/10 shrink-0 self-start sm:self-center shadow-xs"
                                                 >
                                                     Update Status
                                                 </button>
@@ -1250,14 +1407,14 @@ export default function UserProfile() {
                                                         }
                                                         navigate(`/chat/${profile?.uid}`);
                                                     }}
-                                                    className={`px-4 py-2 rounded-xl font-bold text-xs transition-all shrink-0 self-start sm:self-center ${
+                                                    className={`px-5 py-2.5 rounded-xl font-bold text-xs transition-all shrink-0 self-start sm:self-center shadow-xs ${
                                                         avail.code === 'unavailable'
                                                             ? 'bg-zinc-100 dark:bg-white/5 text-zinc-500 border border-zinc-200 dark:border-white/10 cursor-not-allowed'
-                                                            : 'bg-amber-500 hover:bg-amber-400 text-black shadow-xs'
+                                                            : 'bg-amber-500 hover:bg-amber-400 text-black shadow-amber-500/20'
                                                     }`}
                                                 >
                                                     {avail.code === 'available'
-                                                        ? 'Book for Projects'
+                                                        ? 'Book for Production'
                                                         : avail.code === 'working'
                                                         ? 'Send Project Enquiry'
                                                         : 'Currently Unavailable'}
@@ -1266,7 +1423,7 @@ export default function UserProfile() {
                                         </div>
 
                                         {profile?.statusMessage && (
-                                            <div className="bg-white/70 dark:bg-black/30 p-4 rounded-xl italic text-sm text-zinc-700 dark:text-zinc-300 border border-black/5 dark:border-white/5">
+                                            <div className="bg-white/80 dark:bg-black/40 p-4 rounded-xl italic text-sm text-zinc-700 dark:text-zinc-300 border border-black/5 dark:border-white/5">
                                                 "{profile.statusMessage}"
                                             </div>
                                         )}
@@ -1278,80 +1435,115 @@ export default function UserProfile() {
                 )}
 
                 {activeTab === 'Contact' && (
-                    <div className="p-6 pb-8">
-                        {/* Contact & Socials */}
-                        <section id="contact" className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            {/* Email */}
-                            {profile?.email ? (
-                                <a
-                                    className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-white dark:bg-[#1c242e] text-[#4f6374] dark:text-[#9dabb8] border border-zinc-200 dark:border-zinc-800 hover:text-primary hover:border-primary transition-all shadow-sm"
-                                    href={`mailto:${profile.email}`}
-                                >
-                                    <span className="material-symbols-outlined">mail</span>
-                                    <span className="text-xs font-sans font-medium">Email</span>
-                                </a>
-                            ) : !isMe && profile?.uid ? (
+                    <div className="flex flex-col gap-6 pb-10">
+                        <section className="bg-white dark:bg-[#111317] p-5 sm:p-7 rounded-3xl border border-zinc-200 dark:border-white/10 shadow-sm">
+                            <div className="flex items-center gap-2.5 mb-6">
+                                <div className="size-9 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center border border-amber-500/20">
+                                    <span className="material-symbols-outlined text-xl">alternate_email</span>
+                                </div>
+                                <div>
+                                    <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white tracking-tight">Direct Channels & Links</h2>
+                                    <p className="text-xs text-zinc-500 font-medium">Connect directly for casting, bookings, and collaborations</p>
+                                </div>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+                                {/* Email */}
+                                {profile?.email ? (
+                                    <a
+                                        className="flex flex-col items-center justify-center gap-2.5 p-5 rounded-2xl bg-zinc-50 dark:bg-black/30 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/10 hover:border-amber-500 hover:text-amber-500 transition-all shadow-xs group"
+                                        href={`mailto:${profile.email}`}
+                                    >
+                                        <div className="size-11 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                            <span className="material-symbols-outlined text-2xl">mail</span>
+                                        </div>
+                                        <span className="text-xs font-bold">Email</span>
+                                    </a>
+                                ) : !isMe && profile?.uid ? (
+                                    <button
+                                        onClick={() => {
+                                            if (!currentUser) {
+                                                openAuthModal(`Sign in to message ${profile.displayName || 'this creator'}`);
+                                                return;
+                                            }
+                                            navigate(`/chat/${profile.uid}`);
+                                        }}
+                                        className="flex flex-col items-center justify-center gap-2.5 p-5 rounded-2xl bg-zinc-50 dark:bg-black/30 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/10 hover:border-amber-500 hover:text-amber-500 transition-all shadow-xs group"
+                                    >
+                                        <div className="size-11 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                            <span className="material-symbols-outlined text-2xl">chat</span>
+                                        </div>
+                                        <span className="text-xs font-bold">Message</span>
+                                    </button>
+                                ) : null}
+
+                                {/* Website */}
+                                {profile?.socialLinks?.website && (
+                                    <a
+                                        className="flex flex-col items-center justify-center gap-2.5 p-5 rounded-2xl bg-zinc-50 dark:bg-black/30 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/10 hover:border-amber-500 hover:text-amber-500 transition-all shadow-xs group"
+                                        href={profile.socialLinks.website.startsWith('http') ? profile.socialLinks.website : `https://${profile.socialLinks.website}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        <div className="size-11 rounded-xl bg-sky-500/10 text-sky-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                            <span className="material-symbols-outlined text-2xl">language</span>
+                                        </div>
+                                        <span className="text-xs font-bold">Website</span>
+                                    </a>
+                                )}
+
+                                {/* IMDb */}
+                                {profile?.socialLinks?.imdb && (
+                                    <a
+                                        className="flex flex-col items-center justify-center gap-2.5 p-5 rounded-2xl bg-zinc-50 dark:bg-black/30 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/10 hover:border-amber-500 hover:text-amber-500 transition-all shadow-xs group"
+                                        href={profile.socialLinks.imdb.startsWith('http') ? profile.socialLinks.imdb : `https://www.imdb.com/name/${profile.socialLinks.imdb}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        <div className="size-11 rounded-xl bg-amber-500/15 text-amber-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                            <span className="material-symbols-outlined text-2xl">movie</span>
+                                        </div>
+                                        <span className="text-xs font-bold">IMDb</span>
+                                    </a>
+                                )}
+
+                                {/* Share */}
                                 <button
-                                    onClick={() => {
-                                        if (!currentUser) {
-                                            openAuthModal(`Sign in to message ${profile.displayName || 'this creator'}`);
-                                            return;
-                                        }
-                                        navigate(`/chat/${profile.uid}`);
-                                    }}
-                                    className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-white dark:bg-[#1c242e] text-[#4f6374] dark:text-[#9dabb8] border border-zinc-200 dark:border-zinc-800 hover:text-primary hover:border-primary transition-all shadow-sm"
+                                    onClick={handleShareProfile}
+                                    className="flex flex-col items-center justify-center gap-2.5 p-5 rounded-2xl bg-zinc-50 dark:bg-black/30 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/10 hover:border-amber-500 hover:text-amber-500 transition-all shadow-xs group"
                                 >
-                                    <span className="material-symbols-outlined">chat</span>
-                                    <span className="text-xs font-sans font-medium">Message</span>
+                                    <div className="size-11 rounded-xl bg-zinc-200 dark:bg-white/10 text-zinc-600 dark:text-zinc-200 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <span className="material-symbols-outlined text-2xl">share</span>
+                                    </div>
+                                    <span className="text-xs font-bold">Share Link</span>
                                 </button>
-                            ) : null}
+                            </div>
 
-                            {/* Website */}
-                            {profile?.socialLinks?.website && (
-                                <a
-                                    className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-white dark:bg-[#1c242e] text-[#4f6374] dark:text-[#9dabb8] border border-zinc-200 dark:border-zinc-800 hover:text-primary hover:border-primary transition-all shadow-sm"
-                                    href={profile.socialLinks.website.startsWith('http') ? profile.socialLinks.website : `https://${profile.socialLinks.website}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    <span className="material-symbols-outlined">language</span>
-                                    <span className="text-xs font-sans font-medium">Website</span>
-                                </a>
-                            )}
-
-                            {/* IMDb */}
-                            {profile?.socialLinks?.imdb && (
-                                <a
-                                    className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-white dark:bg-[#1c242e] text-[#4f6374] dark:text-[#9dabb8] border border-zinc-200 dark:border-zinc-800 hover:text-primary hover:border-primary transition-all shadow-sm"
-                                    href={profile.socialLinks.imdb.startsWith('http') ? profile.socialLinks.imdb : `https://www.imdb.com/name/${profile.socialLinks.imdb}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    <span className="material-symbols-outlined">movie</span>
-                                    <span className="text-xs font-sans font-medium">IMDb</span>
-                                </a>
-                            )}
-
-                            {/* Share */}
-                            <button
-                                onClick={handleShareProfile}
-                                className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-white dark:bg-[#1c242e] text-[#4f6374] dark:text-[#9dabb8] border border-zinc-200 dark:border-zinc-800 hover:text-primary hover:border-primary transition-all shadow-sm"
-                            >
-                                <span className="material-symbols-outlined">share</span>
-                                <span className="text-xs font-sans font-medium">Share</span>
-                            </button>
-
-                            {/* Other Socials */}
-                            {profile?.socialLinks?.instagram && (
-                                <a href={profile.socialLinks.instagram.startsWith('http') ? profile.socialLinks.instagram : `https://instagram.com/${profile.socialLinks.instagram.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="col-span-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-bold font-sans shadow-md hover:opacity-90 transition-all">
-                                    View on Instagram
-                                </a>
-                            )}
-                            {profile?.socialLinks?.twitter && (
-                                <a href={profile.socialLinks.twitter.startsWith('http') ? profile.socialLinks.twitter : `https://twitter.com/${profile.socialLinks.twitter.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="col-span-full flex items-center justify-center gap-2 py-3 bg-black text-white rounded-xl font-bold font-sans shadow-md hover:opacity-90 transition-all">
-                                    View on X (Twitter)
-                                </a>
-                            )}
+                            {/* Additional Social Handles */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+                                {profile?.socialLinks?.instagram && (
+                                    <a 
+                                        href={profile.socialLinks.instagram.startsWith('http') ? profile.socialLinks.instagram : `https://instagram.com/${profile.socialLinks.instagram.replace('@', '')}`} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer" 
+                                        className="flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-2xl font-bold text-xs shadow-md hover:opacity-90 transition-all"
+                                    >
+                                        <span className="material-symbols-outlined text-base">photo_camera</span>
+                                        View on Instagram
+                                    </a>
+                                )}
+                                {profile?.socialLinks?.twitter && (
+                                    <a 
+                                        href={profile.socialLinks.twitter.startsWith('http') ? profile.socialLinks.twitter : `https://twitter.com/${profile.socialLinks.twitter.replace('@', '')}`} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer" 
+                                        className="flex items-center justify-center gap-2 py-3 px-4 bg-black text-white rounded-2xl font-bold text-xs shadow-md hover:opacity-90 transition-all border border-white/10"
+                                    >
+                                        <span className="material-symbols-outlined text-base">tag</span>
+                                        View on X (Twitter)
+                                    </a>
+                                )}
+                            </div>
                         </section>
                     </div>
                 )}

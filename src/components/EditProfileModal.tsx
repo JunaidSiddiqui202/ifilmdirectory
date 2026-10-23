@@ -218,25 +218,37 @@ export default function EditProfileModal({ isOpen, onClose, profile, onSave }: E
 
     return (
         <div
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 sm:p-4 overflow-y-auto"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-2 sm:p-4 overflow-y-auto animate-fade-in"
             onClick={onClose}
         >
             <div
-                className="bg-white dark:bg-zinc-900 rounded-xl w-full max-w-2xl my-2 sm:my-8 flex flex-col shadow-2xl"
+                className="bg-white dark:bg-[#111317] rounded-3xl w-full max-w-2xl my-2 sm:my-8 flex flex-col shadow-2xl border border-zinc-200 dark:border-white/10 overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
             >
-                <div className="p-4 border-b border-zinc-200 dark:border-zinc-800 flex justify-between items-center sticky top-0 bg-white dark:bg-zinc-900 z-10 rounded-t-xl">
-                    <h3 className="text-xl font-bold text-zinc-900 dark:text-white">Edit Profile</h3>
-                    <button onClick={onClose} className="text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300">
-                        <span className="material-symbols-outlined">close</span>
+                <div className="p-5 sm:p-6 border-b border-zinc-200 dark:border-white/10 flex justify-between items-center sticky top-0 bg-white/95 dark:bg-[#111317]/95 backdrop-blur-md z-10">
+                    <div className="flex items-center gap-2.5">
+                        <div className="size-9 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center border border-amber-500/20">
+                            <span className="material-symbols-outlined text-xl">tune</span>
+                        </div>
+                        <div>
+                            <h3 className="text-xl font-black text-zinc-900 dark:text-white tracking-tight">Edit Creator Profile</h3>
+                            <p className="text-xs text-zinc-500 font-medium">Update your industry presence and media information</p>
+                        </div>
+                    </div>
+                    <button 
+                        onClick={onClose} 
+                        className="p-2 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors"
+                        title="Close modal"
+                    >
+                        <span className="material-symbols-outlined text-xl">close</span>
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-6 sm:space-y-8 overflow-y-auto max-h-[85dvh]">
+                <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-6 sm:space-y-8 overflow-y-auto max-h-[80dvh]">
 
                     {/* Basic Info */}
                     <section className="space-y-4">
-                        <h4 className="text-lg font-bold text-primary border-b border-zinc-200 dark:border-zinc-800 pb-2">Basic Information</h4>
+                        <h4 className="text-sm font-black uppercase tracking-wider text-amber-500 border-b border-zinc-200 dark:border-white/10 pb-2">Basic Information</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Display Name</label>
@@ -813,20 +825,30 @@ export default function EditProfileModal({ isOpen, onClose, profile, onSave }: E
                         </div>
                     </section>
 
-                    <div className="flex gap-4 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+                    <div className="flex gap-3 pt-5 border-t border-zinc-200 dark:border-white/10 sticky bottom-0 bg-white/95 dark:bg-[#111317]/95 backdrop-blur-md pb-1 z-10">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 py-3 rounded-lg font-bold text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                            className="flex-1 py-3.5 rounded-2xl font-bold text-xs uppercase tracking-wider text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/10 transition-colors border border-zinc-200 dark:border-white/5 active:scale-98"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={loading}
-                            className="flex-1 py-3 rounded-lg font-bold text-white bg-primary hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                            className="flex-1 py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider text-black bg-amber-500 hover:bg-amber-400 transition-all shadow-md shadow-amber-500/20 disabled:opacity-50 flex items-center justify-center gap-2 active:scale-98"
                         >
-                            {loading ? 'Saving...' : 'Save Changes'}
+                            {loading ? (
+                                <>
+                                    <span className="material-symbols-outlined text-base animate-spin">sync</span>
+                                    <span>Saving...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <span className="material-symbols-outlined text-base">save</span>
+                                    <span>Save Changes</span>
+                                </>
+                            )}
                         </button>
                     </div>
                 </form>
