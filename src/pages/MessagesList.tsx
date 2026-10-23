@@ -2,22 +2,26 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import Logo from '../components/Logo';
+import HamburgerMenu from '../components/HamburgerMenu';
+import SEO from '../components/SEO';
 import { subscribeToChats } from '../services/messagingService';
 import { subscribeToNotifications, markNotificationAsRead, type NotificationData } from '../services/notificationService';
 import { useAuth } from '../context/AuthContext';
 import { useUnread } from '../context/UnreadContext';
+import { useTheme } from '../context/ThemeContext';
 import PostMedia from '../components/PostMedia';
 import { getUserProfile, type UserProfile } from '../services/userService';
 import { formatTimeAgo } from '../utils/dateUtils';
 
 type MainTab = 'messages' | 'notifications';
-type ChatFilterTab = 'primary' | 'requests' | 'general';
-type NotificationFilterTab = 'general' | 'jobs' | 'connections';
+type ChatFilterTab = 'all' | 'unread' | 'collaborations' | 'archived';
+type NotificationFilterTab = 'all' | 'jobs' | 'network' | 'system';
 
 export default function MessagesList() {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const { currentUser } = useAuth();
+    const { isDarkMode, toggleDarkMode } = useTheme();
     const { unreadMessagesCount, unreadNotificationsCount } = useUnread();
 
     // Primary Section Switcher ('messages' | 'notifications')
@@ -25,14 +29,14 @@ export default function MessagesList() {
     const [mainTab, setMainTab] = useState<MainTab>(initialTab);
 
     // Messages State
-    const [activeChatTab, setActiveChatTab] = useState<ChatFilterTab>('primary');
+    const [activeChatTab, setActiveChatTab] = useState<ChatFilterTab>('all');
     const [recentChats, setRecentChats] = useState<any[]>([]);
     const [chatsLoading, setChatsLoading] = useState(true);
     const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
 
     // Notifications State
-    const [activeNotifTab, setActiveNotifTab] = useState<NotificationFilterTab>('general');
+    const [activeNotifTab, setActiveNotifTab] = useState<NotificationFilterTab>('all');
     const [notifications, setNotifications] = useState<NotificationData[]>([]);
     const [notifsLoading, setNotifsLoading] = useState(true);
 
@@ -41,32 +45,46 @@ export default function MessagesList() {
             id: 'ranveer-singh', 
             name: 'Ranveer Singh', 
             role: 'Lead Actor & Producer',
-            message: 'Reviewed the storyboard. Let’s do a read-through tomorrow.', 
+            message: 'Reviewed the storyboard. Let’s do a read-through tomorrow at 11 AM.', 
             time: '2h ago',
-            image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop', 
-            isStory: true,
+            image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop', 
+            isOnline: true,
+            isVerified: true,
             unread: true
         },
         { 
             id: 'jonny-shaik', 
             name: 'Jonny Shaik', 
             role: 'Cinematographer (ISC)',
-            message: 'Sent the ARRI Alexa 35 camera package specs for scene 4.', 
+            message: 'Sent the ARRI Alexa 35 camera package specs and anamorphic lens list for scene 4.', 
             time: '5h ago',
-            image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop', 
-            isStory: false,
+            image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop', 
+            isOnline: false,
+            isVerified: true,
             unread: false
         },
         { 
             id: 'vn-aditya', 
             name: 'V.N. Aditya', 
-            role: 'Director',
-            message: 'Great cut on the teaser reel! Sharing notes with the editor.', 
+            role: 'Film Director',
+            message: 'Great cut on the teaser reel! Sharing final grade notes with the colorist.', 
             time: 'Yesterday',
-            image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop', 
-            isStory: false,
+            image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop', 
+            isOnline: true,
+            isVerified: true,
             unread: false
         },
+        { 
+            id: 'ananya-sen', 
+            name: 'Ananya Sen', 
+            role: 'Costume & Production Designer',
+            message: 'Fabric swatches for the 1980s period drama shoot have arrived.', 
+            time: '2d ago',
+            image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop', 
+            isOnline: false,
+            isVerified: false,
+            unread: false
+        }
     ];
 
     // Synchronize tab state with URL parameter (?tab=messages / ?tab=notifications)
@@ -134,6 +152,7 @@ export default function MessagesList() {
                         let userName = 'Filmmaker';
                         let userRole = 'Production Team';
                         let userImage = `https://ui-avatars.com/api/?name=Filmmaker&background=121316&color=F59E0B`;
+                        let isVerified = false;
 
                         try {
                             const profile = await getUserProfile(otherUserId);
@@ -141,6 +160,7 @@ export default function MessagesList() {
                                 userName = profile.displayName || profile.email?.split('@')[0] || 'Filmmaker';
                                 userRole = (profile as any).role || profile.bio?.slice(0, 24) || 'Filmmaker';
                                 userImage = profile.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=121316&color=F59E0B`;
+                                isVerified = Boolean(profile.verification?.isVerified);
                             }
                         } catch (error) {
                             console.error(`Error fetching profile for ${otherUserId}:`, error);
@@ -175,7 +195,8 @@ export default function MessagesList() {
                             message: c.lastMessage || 'Active project discussion',
                             time: timeStr,
                             image: userImage,
-                            isStory: false,
+                            isOnline: true,
+                            isVerified,
                             unread: isUnread
                         };
                     });
@@ -183,11 +204,11 @@ export default function MessagesList() {
                     const formatted = await Promise.all(formattedPromises);
                     setRecentChats(formatted);
                 } else {
-                    setRecentChats([]);
+                    setRecentChats(mockChats);
                 }
             } catch (err) {
                 console.error('Error processing chats:', err);
-                setRecentChats([]);
+                setRecentChats(mockChats);
             } finally {
                 setChatsLoading(false);
             }
@@ -201,7 +222,7 @@ export default function MessagesList() {
         if (!currentUser) {
             const timer = setTimeout(() => {
                 if (!currentUser) setNotifsLoading(false);
-            }, 1500);
+            }, 1000);
             return () => clearTimeout(timer);
         }
 
@@ -218,23 +239,34 @@ export default function MessagesList() {
                         id: 'mock-1',
                         userId: currentUser.uid,
                         type: 'job',
-                        title: 'Audition Alert',
-                        message: 'A new role for "Cinematographer" matches your gear profile.',
+                        title: 'Audition Call Alert',
+                        message: 'A new role for "Cinematographer" matches your camera package gear profile.',
                         createdAt: { seconds: Date.now() / 1000 } as any,
                         isRead: false,
-                        image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=100&h=100&fit=crop',
+                        image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=120&h=120&fit=crop',
                         actionLink: '/jobs'
                     },
                     {
                         id: 'mock-2',
                         userId: currentUser.uid,
                         type: 'connection',
-                        title: 'Network Request',
-                        message: 'Rohan Das wants to connect with your production network.',
+                        title: 'Production Network Request',
+                        message: 'Rohan Das (Gaffer & Lighting Tech) wants to connect with your crew network.',
                         createdAt: { seconds: (Date.now() - 3600000) / 1000 } as any,
                         isRead: false,
-                        image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop',
+                        image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&h=120&fit=crop',
                         actionLink: `/profile/${currentUser.uid}`
+                    },
+                    {
+                        id: 'mock-3',
+                        userId: currentUser.uid,
+                        type: 'like',
+                        title: 'Project Endorsement',
+                        message: 'V.N. Aditya endorsed your showreel for "Best Dynamic Visual Tone".',
+                        createdAt: { seconds: (Date.now() - 86400000) / 1000 } as any,
+                        isRead: true,
+                        image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&h=120&fit=crop',
+                        actionLink: '/showcase'
                     }
                 ]);
                 setNotifsLoading(false);
@@ -244,21 +276,31 @@ export default function MessagesList() {
         return () => unsubscribe();
     }, [currentUser]);
 
-    // Filter chats
-    const filteredChats = recentChats.filter(chat => 
-        chat.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        chat.message.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    // Filter chats by tab and query
+    const filteredChats = recentChats.filter(chat => {
+        const matchesQuery = 
+            chat.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            chat.message.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (chat.role && chat.role.toLowerCase().includes(searchQuery.toLowerCase()));
+
+        if (!matchesQuery) return false;
+        if (activeChatTab === 'unread') return chat.unread;
+        if (activeChatTab === 'collaborations') return chat.role?.toLowerCase().includes('director') || chat.role?.toLowerCase().includes('producer');
+        if (activeChatTab === 'archived') return false;
+        return true;
+    });
 
     // Filter notifications
     const filteredNotifications = notifications.filter(n => {
         if (activeNotifTab === 'jobs') return n.type === 'job';
-        if (activeNotifTab === 'connections') return n.type === 'connection' || n.type === 'follow';
+        if (activeNotifTab === 'network') return n.type === 'connection' || n.type === 'follow';
+        if (activeNotifTab === 'system') return n.type !== 'job' && n.type !== 'connection' && n.type !== 'follow';
         return true;
     });
 
     const localUnreadNotifCount = notifications.filter(n => !n.isRead).length;
     const displayUnreadNotifs = unreadNotificationsCount || localUnreadNotifCount;
+    const totalUnreadMessages = unreadMessagesCount || recentChats.filter(c => c.unread).length;
 
     const handleNotificationClick = async (notification: NotificationData) => {
         if (!notification.isRead) {
@@ -285,154 +327,195 @@ export default function MessagesList() {
             case 'follow':
                 return { icon: 'person_add', color: 'text-emerald-500 dark:text-emerald-400 bg-emerald-500/15 border-emerald-500/25' };
             case 'like':
-                return { icon: 'favorite', color: 'text-rose-500 dark:text-rose-400 bg-rose-500/15 border-rose-500/25' };
+                return { icon: 'star', color: 'text-purple-500 dark:text-purple-400 bg-purple-500/15 border-purple-500/25' };
             default:
                 return { icon: 'notifications', color: 'text-sky-500 dark:text-sky-400 bg-sky-500/15 border-sky-500/25' };
         }
     };
 
     return (
-        <div className="flex min-h-[100dvh] w-full flex-col bg-slate-50 dark:bg-[#090A0C] text-zinc-900 dark:text-white pb-24 font-display transition-colors">
-            <div className="w-full max-w-md md:max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto flex flex-col flex-1 px-3 sm:px-4">
+        <div className="flex min-h-[100dvh] w-full flex-col bg-slate-50 dark:bg-[#0B0C0E] text-zinc-900 dark:text-white pb-28 font-display transition-colors">
+            <SEO 
+                title="Cinema Comms & Activity | iFilmDirectory" 
+                description="Secure real-time messaging, production circle chats, casting alerts, and industry network notifications."
+            />
+
+            <div className="w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto flex flex-col flex-1 px-3 sm:px-5">
                 
-                {/* Unified Cinema Top Header */}
-                <div className="sticky top-0 bg-white/95 dark:bg-[#090A0C]/95 backdrop-blur-xl z-20 border-b border-zinc-200 dark:border-white/5 pt-3 pb-3 space-y-3">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
+                {/* Unified Cinema Top Navigation Bar */}
+                <header className="sticky top-0 bg-white/95 dark:bg-[#0B0C0E]/95 backdrop-blur-xl z-30 border-b border-zinc-200/80 dark:border-white/[0.08] pt-3.5 pb-3">
+                    <div className="flex items-center justify-between gap-3">
+                        {/* Left: Back / Brand */}
+                        <div className="flex items-center gap-2.5">
                             <button 
                                 onClick={() => navigate(-1)} 
-                                className="p-1.5 -ml-1.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-white/10 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors"
-                                aria-label="Back"
+                                className="flex size-9 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] border border-zinc-200 dark:border-white/[0.08] text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white transition-all active:scale-95"
+                                aria-label="Go Back"
+                                title="Back"
                             >
-                                <span className="material-symbols-outlined text-2xl">arrow_back</span>
+                                <span className="material-symbols-outlined text-lg">arrow_back</span>
                             </button>
-                            <div className="md:hidden flex items-center gap-2 cursor-pointer select-none" onClick={() => navigate('/home')}>
+                            <div className="cursor-pointer select-none" onClick={() => navigate('/home')}>
                                 <Logo size="sm" showText={true} />
                             </div>
-                            <h1 className="hidden md:flex items-center gap-2 text-base font-bold text-zinc-900 dark:text-white tracking-tight">
-                                <span className="material-symbols-outlined text-amber-500 text-xl">
-                                    {mainTab === 'messages' ? 'chat_bubble' : 'notifications'}
-                                </span>
-                                <span>{mainTab === 'messages' ? 'Direct Messages' : 'Activity & Notifications'}</span>
-                            </h1>
                         </div>
 
+                        {/* Center: Desktop Title Tag */}
+                        <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 dark:bg-white/[0.04] border border-zinc-200 dark:border-white/[0.06]">
+                            <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+                            <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 tracking-wide uppercase">
+                                Production Communications Hub
+                            </span>
+                        </div>
+
+                        {/* Right: Actions */}
                         <div className="flex items-center gap-2">
+                            {/* Theme Toggle */}
+                            <button
+                                onClick={toggleDarkMode}
+                                className="flex size-9 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] border border-zinc-200 dark:border-white/[0.08] text-zinc-600 dark:text-zinc-300 transition-colors"
+                                title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                            >
+                                <span className="material-symbols-outlined text-lg">
+                                    {isDarkMode ? 'light_mode' : 'dark_mode'}
+                                </span>
+                            </button>
+
                             {mainTab === 'messages' ? (
                                 <button 
                                     onClick={() => navigate('/browse-profiles')}
-                                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-white font-bold text-xs transition-all shadow-md shadow-amber-500/20 active:scale-95"
+                                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white font-bold text-xs transition-all shadow-md shadow-amber-500/25 active:scale-95"
+                                    title="Start a new message thread"
                                 >
-                                    <span className="material-symbols-outlined text-base text-white">edit_square</span>
-                                    <span className="hidden sm:inline text-white">New Thread</span>
+                                    <span className="material-symbols-outlined text-base">edit_square</span>
+                                    <span className="hidden sm:inline">New Thread</span>
                                 </button>
                             ) : (
                                 localUnreadNotifCount > 0 && (
                                     <button
                                         onClick={handleMarkAllRead}
-                                        className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/[0.08] transition-all active:scale-95"
+                                        className="text-xs font-bold px-3 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.06] dark:hover:bg-white/[0.12] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/[0.08] transition-all active:scale-95"
                                     >
                                         Mark All Read
                                     </button>
                                 )
                             )}
+
+                            <HamburgerMenu />
                         </div>
                     </div>
 
-                    {/* Primary Segmented Switcher: [ Messages ] [ Notifications ] */}
-                    <div className="grid grid-cols-2 p-1 bg-zinc-100 dark:bg-white/[0.04] rounded-2xl border border-zinc-200/80 dark:border-white/10">
+                    {/* Section Switcher: Direct Messages vs Activity & Notifications */}
+                    <div className="mt-3 grid grid-cols-2 p-1 bg-zinc-100/90 dark:bg-white/[0.04] rounded-2xl border border-zinc-200/90 dark:border-white/[0.08]">
                         <button
                             onClick={() => handleTabChange('messages')}
-                            className={`flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-bold transition-all ${
+                            className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs font-bold transition-all ${
                                 mainTab === 'messages'
-                                    ? 'bg-white dark:bg-[#121316] text-zinc-900 dark:text-white shadow-sm border border-zinc-200/60 dark:border-white/10'
-                                    : 'text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-white'
+                                    ? 'bg-white dark:bg-[#15171C] text-zinc-900 dark:text-white shadow-sm border border-zinc-200/70 dark:border-white/10 ring-1 ring-black/5 dark:ring-white/5'
+                                    : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white'
                             }`}
                         >
-                            <span className="material-symbols-outlined text-base">chat_bubble</span>
+                            <span className="material-symbols-outlined text-base text-amber-500">forum</span>
                             <span>Direct Messages</span>
-                            {unreadMessagesCount > 0 && (
-                                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-red-500 text-white font-extrabold animate-pulse">
-                                    {unreadMessagesCount}
+                            {totalUnreadMessages > 0 && (
+                                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-500 text-white font-black animate-pulse">
+                                    {totalUnreadMessages}
                                 </span>
                             )}
                         </button>
 
                         <button
                             onClick={() => handleTabChange('notifications')}
-                            className={`flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-bold transition-all ${
+                            className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs font-bold transition-all ${
                                 mainTab === 'notifications'
-                                    ? 'bg-white dark:bg-[#121316] text-zinc-900 dark:text-white shadow-sm border border-zinc-200/60 dark:border-white/10'
-                                    : 'text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-white'
+                                    ? 'bg-white dark:bg-[#15171C] text-zinc-900 dark:text-white shadow-sm border border-zinc-200/70 dark:border-white/10 ring-1 ring-black/5 dark:ring-white/5'
+                                    : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white'
                             }`}
                         >
-                            <span className="material-symbols-outlined text-base">notifications</span>
+                            <span className="material-symbols-outlined text-base text-amber-500">notifications</span>
                             <span>Notifications</span>
                             {displayUnreadNotifs > 0 && (
-                                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-500 text-white font-extrabold">
+                                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-red-500 text-white font-black">
                                     {displayUnreadNotifs}
                                 </span>
                             )}
                         </button>
                     </div>
-                </div>
+                </header>
 
                 {/* ==================== 1. MESSAGES VIEW ==================== */}
                 {mainTab === 'messages' && (
-                    <div className="animate-in fade-in duration-200">
-                        {/* Search Bar */}
-                        <div className="py-3">
-                            <div className="relative flex items-center bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/10 rounded-xl px-3 py-2.5 focus-within:border-amber-500/50 shadow-sm dark:shadow-none transition-colors">
-                                <span className="material-symbols-outlined text-zinc-400 mr-2 text-xl">search</span>
-                                <input
-                                    type="text"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    placeholder="Search filmmakers, crew, or discussions..."
-                                    className="bg-transparent border-none outline-none text-sm w-full text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
-                                />
-                                {searchQuery && (
-                                    <button onClick={() => setSearchQuery('')} className="text-zinc-400 hover:text-zinc-700 dark:hover:text-white">
-                                        <span className="material-symbols-outlined text-sm">close</span>
-                                    </button>
-                                )}
-                            </div>
+                    <div className="animate-in fade-in duration-200 space-y-4 pt-3">
+                        
+                        {/* Live Filter & Search Bar */}
+                        <div className="relative flex items-center bg-white dark:bg-[#121316] border border-zinc-200/90 dark:border-white/[0.08] rounded-2xl px-3.5 py-2.5 focus-within:border-amber-500/60 focus-within:ring-2 focus-within:ring-amber-500/10 shadow-xs transition-all">
+                            <span className="material-symbols-outlined text-zinc-400 dark:text-zinc-500 mr-2.5 text-xl">search</span>
+                            <input
+                                type="text"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder="Search conversations by crew name, role, or message..."
+                                className="bg-transparent border-none outline-none text-xs sm:text-sm w-full text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
+                            />
+                            {searchQuery && (
+                                <button 
+                                    onClick={() => setSearchQuery('')} 
+                                    className="text-zinc-400 hover:text-zinc-700 dark:hover:text-white p-1 rounded-lg"
+                                >
+                                    <span className="material-symbols-outlined text-sm">close</span>
+                                </button>
+                            )}
                         </div>
 
-                        {/* Active Filmmakers & Collaborators Reel */}
-                        <div className="py-3 border-b border-zinc-200 dark:border-white/5">
-                            <div className="flex items-center justify-between mb-2">
-                                <span className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Production Circle</span>
-                                <span className="text-[11px] text-amber-600 dark:text-amber-400 font-medium">Active Now</span>
+                        {/* Production Circle Reels (Active Filmmakers) */}
+                        <div className="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200/80 dark:border-white/[0.06] shadow-xs">
+                            <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center gap-2">
+                                    <span className="size-2 rounded-full bg-emerald-500 animate-ping" />
+                                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
+                                        Production Circle
+                                    </span>
+                                </div>
+                                <span className="text-[11px] font-semibold text-amber-600 dark:text-amber-400">
+                                    Live On Set
+                                </span>
                             </div>
-                            <div className="flex gap-4 overflow-x-auto no-scrollbar pb-1">
-                                {/* Current User Status */}
-                                <div className="flex flex-col items-center gap-1.5 shrink-0 cursor-pointer group">
+
+                            <div className="flex gap-4 overflow-x-auto no-scrollbar pb-1 pt-0.5">
+                                {/* Current User Broadcast Avatar */}
+                                <div 
+                                    onClick={() => navigate(currentUser ? `/profile/${currentUser.uid}` : '/login')}
+                                    className="flex flex-col items-center gap-1.5 shrink-0 cursor-pointer group"
+                                >
                                     <div className="relative">
-                                        <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-zinc-200 dark:border-white/10 group-hover:border-amber-500/50 transition-colors">
-                                            <PostMedia
-                                                src={userProfile?.photoURL || currentUser?.photoURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop"}
-                                                fallbackType="USER_MALE"
-                                                className="w-full h-full object-cover"
-                                            />
+                                        <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-full overflow-hidden border-2 border-dashed border-amber-500/60 group-hover:border-amber-500 p-0.5 transition-colors">
+                                            <div className="w-full h-full rounded-full overflow-hidden bg-zinc-100 dark:bg-black">
+                                                <PostMedia
+                                                    src={userProfile?.photoURL || currentUser?.photoURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&h=120&fit=crop"}
+                                                    fallbackType="USER_MALE"
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            </div>
                                         </div>
-                                        <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-amber-500 text-white rounded-full flex items-center justify-center border-2 border-white dark:border-[#090A0C] shadow-sm">
-                                            <span className="material-symbols-outlined text-[13px] font-bold text-white">add</span>
+                                        <div className="absolute -bottom-0.5 -right-0.5 size-5 bg-amber-500 text-white rounded-full flex items-center justify-center border-2 border-white dark:border-[#121316] shadow-sm">
+                                            <span className="material-symbols-outlined text-[13px] font-bold">add</span>
                                         </div>
                                     </div>
-                                    <span className="text-[11px] font-semibold text-zinc-800 dark:text-zinc-200">Your Status</span>
+                                    <span className="text-[11px] font-semibold text-zinc-700 dark:text-zinc-300">
+                                        My Status
+                                    </span>
                                 </div>
 
-                                {/* Recent Collaborators */}
-                                {(recentChats.length > 0 ? recentChats : mockChats).slice(0, 8).map((creator) => (
+                                {/* Active Filmmakers / Crew */}
+                                {(recentChats.length > 0 ? recentChats : mockChats).slice(0, 10).map((creator) => (
                                     <div 
                                         key={creator.id} 
                                         onClick={() => navigate(`/chat/${creator.id}`)}
                                         className="flex flex-col items-center gap-1.5 shrink-0 cursor-pointer group"
                                     >
                                         <div className="relative">
-                                            <div className="w-14 h-14 rounded-full p-[2px] bg-gradient-to-tr from-amber-500 via-yellow-400 to-amber-600">
-                                                <div className="w-full h-full rounded-full overflow-hidden border-2 border-white dark:border-[#090A0C]">
+                                            <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-full p-[2px] bg-gradient-to-tr from-amber-500 via-yellow-400 to-amber-600 shadow-sm group-hover:scale-105 transition-transform">
+                                                <div className="w-full h-full rounded-full overflow-hidden border-2 border-white dark:border-[#121316] bg-zinc-900">
                                                     <PostMedia
                                                         src={creator.image}
                                                         fallbackType="USER_MALE"
@@ -440,9 +523,11 @@ export default function MessagesList() {
                                                     />
                                                 </div>
                                             </div>
-                                            <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white dark:border-[#090A0C]" />
+                                            {creator.isOnline && (
+                                                <div className="absolute bottom-0 right-0 size-3.5 bg-emerald-500 rounded-full border-2 border-white dark:border-[#121316] shadow-xs" />
+                                            )}
                                         </div>
-                                        <span className="text-[11px] font-semibold text-zinc-800 dark:text-zinc-200 max-w-[64px] truncate text-center">
+                                        <span className="text-[11px] font-semibold text-zinc-800 dark:text-zinc-200 max-w-[68px] truncate text-center group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors">
                                             {creator.name.split(' ')[0]}
                                         </span>
                                     </div>
@@ -450,59 +535,64 @@ export default function MessagesList() {
                             </div>
                         </div>
 
-                        {/* Message Sub-Tabs */}
-                        <div className="py-3 flex items-center gap-2 overflow-x-auto no-scrollbar">
-                            <button
-                                onClick={() => setActiveChatTab('primary')}
-                                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap shadow-xs ${
-                                    activeChatTab === 'primary'
-                                        ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20'
-                                        : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-white/5 hover:text-zinc-900 dark:hover:text-white'
-                                }`}
-                            >
-                                Direct Messages
-                            </button>
-                            <button
-                                onClick={() => setActiveChatTab('requests')}
-                                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap shadow-xs ${
-                                    activeChatTab === 'requests'
-                                        ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20'
-                                        : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-white/5 hover:text-zinc-900 dark:hover:text-white'
-                                }`}
-                            >
-                                Gigs & Inquiries
-                            </button>
-                            <button
-                                onClick={() => setActiveChatTab('general')}
-                                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap shadow-xs ${
-                                    activeChatTab === 'general'
-                                        ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20'
-                                        : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-white/5 hover:text-zinc-900 dark:hover:text-white'
-                                }`}
-                            >
-                                Archive
-                            </button>
+                        {/* Filter Tabs for Chat Threads */}
+                        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+                            {[
+                                { id: 'all' as const, label: 'All Threads', count: recentChats.length },
+                                { id: 'unread' as const, label: 'Unread', count: totalUnreadMessages },
+                                { id: 'collaborations' as const, label: 'Directors & Heads' },
+                                { id: 'archived' as const, label: 'Archived' },
+                            ].map((tab) => {
+                                const isActive = activeChatTab === tab.id;
+                                return (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => setActiveChatTab(tab.id)}
+                                        className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
+                                            isActive
+                                                ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20'
+                                                : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-white/[0.06] hover:text-zinc-900 dark:hover:text-white hover:border-zinc-300 dark:hover:border-white/20'
+                                        }`}
+                                    >
+                                        <span>{tab.label}</span>
+                                        {tab.count !== undefined && tab.count > 0 && (
+                                            <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
+                                                isActive ? 'bg-black/20 text-white' : 'bg-amber-500/15 text-amber-600 dark:text-amber-400'
+                                            }`}>
+                                                {tab.count}
+                                            </span>
+                                        )}
+                                    </button>
+                                );
+                            })}
                         </div>
 
-                        {/* Chat Threads List */}
-                        <div className="flex-1 overflow-y-auto space-y-2 pt-1 pb-16">
+                        {/* Chat Threads Stream */}
+                        <div className="space-y-2.5">
                             {chatsLoading ? (
                                 <div className="flex flex-col items-center justify-center py-20 gap-3">
-                                    <div className="h-8 w-8 animate-spin rounded-full border-2 border-amber-500 border-t-transparent" />
-                                    <span className="text-xs text-zinc-500 tracking-wider uppercase font-semibold">Loading Filmmaker Comms...</span>
+                                    <div className="size-8 animate-spin rounded-full border-2 border-amber-500 border-t-transparent" />
+                                    <span className="text-xs text-zinc-500 tracking-wider uppercase font-bold">
+                                        Syncing Filmmaker Messages...
+                                    </span>
                                 </div>
                             ) : filteredChats.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center p-12 text-center bg-white dark:bg-[#121316]/40 rounded-2xl border border-zinc-200 dark:border-white/5 my-6 shadow-sm dark:shadow-none">
-                                    <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-4 text-amber-500">
-                                        <span className="material-symbols-outlined text-3xl">forum</span>
+                                <div className="flex flex-col items-center justify-center p-12 text-center bg-white dark:bg-[#121316] rounded-3xl border border-zinc-200 dark:border-white/[0.06] shadow-sm">
+                                    <div className="size-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-4 text-amber-500">
+                                        <span className="material-symbols-outlined text-3xl">chat</span>
                                     </div>
-                                    <h3 className="text-base font-bold text-zinc-900 dark:text-white mb-1">No Active Threads Found</h3>
-                                    <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-xs mb-6">
-                                        Connect with directors, cinematographers, and producers from the Discover hub.
+                                    <h3 className="text-base font-bold text-zinc-900 dark:text-white mb-1.5">
+                                        {searchQuery ? 'No matching conversations' : 'No Active Threads Yet'}
+                                    </h3>
+                                    <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-sm mb-6 leading-relaxed">
+                                        {searchQuery 
+                                            ? `No threads match "${searchQuery}". Try searching for another name or role.`
+                                            : 'Reach out to directors, cinematographers, and production teams from the Talent Directory to kickstart conversations.'
+                                        }
                                     </p>
                                     <button
                                         onClick={() => navigate('/browse-profiles')}
-                                        className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-white font-bold text-xs transition-all shadow-lg shadow-amber-500/20"
+                                        className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-white font-bold text-xs transition-all shadow-lg shadow-amber-500/25 active:scale-95"
                                     >
                                         Explore Filmmakers
                                     </button>
@@ -512,42 +602,62 @@ export default function MessagesList() {
                                     <div
                                         key={chat.id}
                                         onClick={() => navigate(`/chat/${chat.id}`)}
-                                        className="flex items-center justify-between p-3.5 rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/5 hover:border-amber-500/30 hover:bg-zinc-50 dark:hover:bg-[#16171b] cursor-pointer active:scale-[0.99] transition-all group shadow-sm dark:shadow-none"
+                                        className="group relative flex items-center justify-between p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200/90 dark:border-white/[0.06] hover:border-amber-500/40 hover:bg-amber-500/[0.02] dark:hover:bg-white/[0.02] cursor-pointer transition-all shadow-xs hover:shadow-md"
                                     >
                                         <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                                            {/* Avatar with Online Badge */}
                                             <div className="relative shrink-0">
-                                                <div className="w-13 h-13 rounded-full overflow-hidden border border-zinc-200 dark:border-white/10 group-hover:border-amber-500/40 transition-colors">
+                                                <div className="size-13 sm:size-14 rounded-full overflow-hidden border border-zinc-200 dark:border-white/10 group-hover:border-amber-500/50 transition-colors shadow-xs">
                                                     <PostMedia
                                                         src={chat.image}
                                                         fallbackType="USER_MALE"
-                                                        className="w-12 h-12 object-cover rounded-full"
+                                                        className="size-full object-cover"
                                                     />
                                                 </div>
+                                                {chat.isOnline && (
+                                                    <span className="absolute bottom-0 right-0 size-3.5 bg-emerald-500 rounded-full border-2 border-white dark:border-[#121316] shadow-xs" />
+                                                )}
                                                 {chat.unread && (
-                                                    <span className="absolute top-0 right-0 w-3 h-3 bg-amber-500 rounded-full border-2 border-white dark:border-[#090A0C]" />
+                                                    <span className="absolute -top-0.5 -right-0.5 size-3.5 bg-amber-500 rounded-full border-2 border-white dark:border-[#121316] animate-pulse" />
                                                 )}
                                             </div>
+
+                                            {/* Thread Info */}
                                             <div className="min-w-0 flex-1 pr-2">
-                                                <div className="flex items-center justify-between mb-0.5">
-                                                    <h3 className="font-bold text-sm text-zinc-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors truncate">
-                                                        {chat.name}
-                                                    </h3>
-                                                    <span className="text-[11px] text-zinc-500 dark:text-zinc-400 shrink-0 font-medium">
+                                                <div className="flex items-center justify-between gap-2 mb-0.5">
+                                                    <div className="flex items-center gap-1.5 min-w-0">
+                                                        <h3 className="font-bold text-sm text-zinc-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors truncate">
+                                                            {chat.name}
+                                                        </h3>
+                                                        {chat.isVerified && (
+                                                            <span className="material-symbols-outlined text-amber-500 text-xs shrink-0 filled" title="Verified Professional">
+                                                                verified
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <span className="text-[11px] text-zinc-400 dark:text-zinc-500 font-medium shrink-0">
                                                         {chat.time}
                                                     </span>
                                                 </div>
+
                                                 {chat.role && (
-                                                    <p className="text-[10px] text-amber-600 dark:text-amber-400/90 font-bold mb-1 uppercase tracking-wide truncate">
+                                                    <p className="text-[10px] text-amber-600 dark:text-amber-400 font-bold uppercase tracking-wider mb-1 truncate">
                                                         {chat.role}
                                                     </p>
                                                 )}
-                                                <p className={`text-xs truncate ${chat.unread ? 'text-zinc-900 dark:text-zinc-200 font-semibold' : 'text-zinc-600 dark:text-zinc-400'}`}>
+
+                                                <p className={`text-xs truncate leading-relaxed ${
+                                                    chat.unread 
+                                                        ? 'text-zinc-950 dark:text-zinc-100 font-bold' 
+                                                        : 'text-zinc-600 dark:text-zinc-400 font-normal'
+                                                }`}>
                                                     {chat.message}
                                                 </p>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-2 pl-2 shrink-0">
-                                            <span className="material-symbols-outlined text-zinc-400 group-hover:text-zinc-700 dark:group-hover:text-zinc-300 text-lg transition-colors">
+
+                                        <div className="flex items-center gap-1 pl-2 shrink-0">
+                                            <span className="material-symbols-outlined text-zinc-300 dark:text-zinc-600 group-hover:text-amber-500 group-hover:translate-x-0.5 transition-all text-xl">
                                                 chevron_right
                                             </span>
                                         </div>
@@ -560,24 +670,25 @@ export default function MessagesList() {
 
                 {/* ==================== 2. NOTIFICATIONS VIEW ==================== */}
                 {mainTab === 'notifications' && (
-                    <div className="animate-in fade-in duration-200 pt-2 pb-16">
+                    <div className="animate-in fade-in duration-200 space-y-4 pt-3">
                         {/* Notification Filter Sub-Tabs */}
-                        <div className="py-2.5 flex items-center justify-between gap-2 overflow-x-auto no-scrollbar">
+                        <div className="flex items-center justify-between gap-2 overflow-x-auto no-scrollbar">
                             <div className="flex items-center gap-2">
                                 {[
-                                    { id: 'general' as const, label: 'All Activity' },
-                                    { id: 'jobs' as const, label: 'Jobs & Auditions' },
-                                    { id: 'connections' as const, label: 'Network & Circle' },
+                                    { id: 'all' as const, label: 'All Activity' },
+                                    { id: 'jobs' as const, label: 'Casting & Jobs' },
+                                    { id: 'network' as const, label: 'Network & Circle' },
+                                    { id: 'system' as const, label: 'System & Alerts' },
                                 ].map((tab) => {
                                     const isActive = activeNotifTab === tab.id;
                                     return (
                                         <button
                                             key={tab.id}
                                             onClick={() => setActiveNotifTab(tab.id)}
-                                            className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap shadow-xs ${
+                                            className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
                                                 isActive
                                                     ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20'
-                                                    : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-white/5 hover:text-zinc-900 dark:hover:text-white'
+                                                    : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-white/[0.06] hover:text-zinc-900 dark:hover:text-white'
                                             }`}
                                         >
                                             {tab.label}
@@ -586,22 +697,22 @@ export default function MessagesList() {
                                 })}
                             </div>
 
-                            <span className="text-[11px] font-medium text-zinc-400 dark:text-zinc-500 shrink-0">
+                            <span className="text-[11px] font-bold text-zinc-400 dark:text-zinc-500 shrink-0">
                                 {filteredNotifications.length} {filteredNotifications.length === 1 ? 'alert' : 'alerts'}
                             </span>
                         </div>
 
                         {/* Notifications Stream */}
-                        <div className="mt-2">
+                        <div>
                             {notifsLoading ? (
                                 <div className="flex flex-col items-center justify-center py-20 gap-3">
                                     <div className="size-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
                                     <p className="text-xs font-bold text-zinc-400 tracking-wide uppercase">
-                                        Checking notifications...
+                                        Loading Activity Stream...
                                     </p>
                                 </div>
                             ) : filteredNotifications.length > 0 ? (
-                                <div className="flex flex-col divide-y divide-zinc-200 dark:divide-white/[0.05] bg-white dark:bg-[#121316] rounded-2xl border border-zinc-200 dark:border-white/[0.08] overflow-hidden shadow-sm dark:shadow-xl">
+                                <div className="flex flex-col divide-y divide-zinc-200/90 dark:divide-white/[0.05] bg-white dark:bg-[#121316] rounded-3xl border border-zinc-200/90 dark:border-white/[0.08] overflow-hidden shadow-xs">
                                     {filteredNotifications.map((notification) => {
                                         const badge = getNotificationIcon(notification.type);
 
@@ -609,27 +720,27 @@ export default function MessagesList() {
                                             <div
                                                 key={notification.id}
                                                 onClick={() => handleNotificationClick(notification)}
-                                                className={`flex items-start gap-3.5 sm:gap-4 p-4 text-left transition-all cursor-pointer group ${
+                                                className={`flex items-start gap-3.5 sm:gap-4 p-4 sm:p-5 text-left transition-all cursor-pointer group ${
                                                     notification.isRead
                                                         ? 'hover:bg-zinc-50 dark:hover:bg-white/[0.02]'
-                                                        : 'bg-amber-500/[0.06] hover:bg-amber-500/[0.1]'
+                                                        : 'bg-amber-500/[0.05] hover:bg-amber-500/[0.09]'
                                                 }`}
                                             >
                                                 <div className="relative shrink-0">
                                                     {notification.image ? (
                                                         <div
-                                                            className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-cover bg-center border border-zinc-200 dark:border-white/10 group-hover:border-amber-500/40 transition-colors shadow-xs"
+                                                            className="size-11 sm:size-12 rounded-2xl bg-cover bg-center border border-zinc-200 dark:border-white/10 group-hover:border-amber-500/40 transition-colors shadow-xs"
                                                             style={{ backgroundImage: `url(${notification.image})` }}
                                                         />
                                                     ) : (
-                                                        <div className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center border ${badge.color}`}>
-                                                            <span className="material-symbols-outlined text-lg sm:text-xl">
+                                                        <div className={`size-11 sm:size-12 rounded-2xl flex items-center justify-center border ${badge.color}`}>
+                                                            <span className="material-symbols-outlined text-xl">
                                                                 {badge.icon}
                                                             </span>
                                                         </div>
                                                     )}
                                                     {!notification.isRead && (
-                                                        <span className="absolute -top-1 -right-1 w-3 h-3 bg-amber-500 rounded-full border-2 border-white dark:border-[#121316]" />
+                                                        <span className="absolute -top-1 -right-1 size-3 bg-amber-500 rounded-full border-2 border-white dark:border-[#121316] shadow-xs" />
                                                     )}
                                                 </div>
 
@@ -642,22 +753,16 @@ export default function MessagesList() {
                                                             {formatTimeAgo(notification.createdAt)}
                                                         </span>
                                                     </div>
-                                                    <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed line-clamp-2 mb-1">
+                                                    <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed line-clamp-2 mb-1.5">
                                                         {notification.message}
                                                     </p>
                                                 </div>
 
-                                                {notification.type === 'connection' && !notification.isRead && (
+                                                {notification.actionLink && (
                                                     <div className="flex items-center gap-2 shrink-0 self-center">
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                handleNotificationClick(notification);
-                                                            }}
-                                                            className="px-3 py-1.5 bg-amber-500 text-white text-xs font-bold rounded-xl hover:bg-amber-400 transition-all shadow-sm active:scale-95"
-                                                        >
-                                                            View
-                                                        </button>
+                                                        <span className="material-symbols-outlined text-zinc-400 group-hover:text-amber-500 text-lg group-hover:translate-x-0.5 transition-transform">
+                                                            arrow_forward
+                                                        </span>
                                                     </div>
                                                 )}
                                             </div>
@@ -665,19 +770,19 @@ export default function MessagesList() {
                                     })}
                                 </div>
                             ) : (
-                                <div className="flex flex-col items-center justify-center py-16 text-center px-4 rounded-2xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.06] shadow-sm">
-                                    <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-3 text-amber-500 dark:text-amber-400">
+                                <div className="flex flex-col items-center justify-center py-16 text-center px-4 rounded-3xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.06] shadow-xs">
+                                    <div className="size-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-3 text-amber-500 dark:text-amber-400">
                                         <span className="material-symbols-outlined text-3xl">notifications_off</span>
                                     </div>
                                     <h3 className="text-base font-bold text-zinc-900 dark:text-white mb-1">
-                                        No notifications yet
+                                        No Notifications Found
                                     </h3>
-                                    <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-xs mb-5">
-                                        When you receive casting callbacks, job matches, or collaborator alerts, they'll show up here.
+                                    <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-xs mb-5 leading-relaxed">
+                                        When you receive casting callbacks, job matches, or collaborator alerts, they will appear here.
                                     </p>
                                     <button
                                         onClick={() => navigate('/jobs')}
-                                        className="px-4 py-2 rounded-xl bg-amber-500 text-white text-xs font-bold hover:bg-amber-400 transition-all shadow-md shadow-amber-500/10 active:scale-95"
+                                        className="px-4 py-2 rounded-xl bg-amber-500 text-white text-xs font-bold hover:bg-amber-400 transition-all shadow-md shadow-amber-500/15 active:scale-95"
                                     >
                                         Explore Casting Calls
                                     </button>

@@ -1,10 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import PostMedia from '../components/PostMedia';
+import HamburgerMenu from '../components/HamburgerMenu';
+import SEO from '../components/SEO';
 import { uploadFile } from '../services/storageService';
 import { subscribeToMessages, sendMessage, clearChat, markChatAsRead, type Message as FirestoreMessage } from '../services/messagingService';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { getUserProfile, type UserProfile } from '../services/userService';
 
 interface Message extends FirestoreMessage {
@@ -13,9 +16,11 @@ interface Message extends FirestoreMessage {
 }
 
 export default function Messaging() {
+    const navigate = useNavigate();
     const location = useLocation();
     const { id } = useParams();
     const { currentUser } = useAuth();
+    const { isDarkMode, toggleDarkMode } = useTheme();
 
     const [messageText, setMessageText] = useState('');
     const [callState, setCallState] = useState<{ isOpen: boolean; type: 'audio' | 'video' | null }>({
@@ -84,7 +89,57 @@ export default function Messaging() {
         }
     }, [chatId, currentUser, messages.length]);
 
-    const chatName = otherUserProfile?.displayName || (otherUserId ? otherUserId.slice(0, 12) : 'Filmmaker');
+    // Fallback seed messages for demo presentation if thread is empty
+    const mockDemoMessages: Message[] = [
+        {
+            id: 'm1',
+            text: 'Hey! Loved the mood board and lighting reference frames you shared for the rooftop sequence.',
+            senderId: 'other-user',
+            type: 'text',
+            createdAt: { seconds: (Date.now() - 7200000) / 1000 } as any,
+            time: '2 hours ago',
+            isSent: false
+        },
+        {
+            id: 'm2',
+            text: 'Thanks! We are pairing Cooke Anamorphic lenses with the Alexa 35 to capture that warm golden hour bloom.',
+            senderId: currentUserId,
+            type: 'text',
+            createdAt: { seconds: (Date.now() - 3600000) / 1000 } as any,
+            time: '1 hour ago',
+            isSent: true
+        },
+        {
+            id: 'm3',
+            text: 'Perfect. Let’s do a quick read-through with the second AD tomorrow at 11 AM.',
+            senderId: 'other-user',
+            type: 'text',
+            createdAt: { seconds: (Date.now() - 1800000) / 1000 } as any,
+            time: '30 mins ago',
+            isSent: false
+        }
+    ];
+
+    const chatName = otherUserProfile?.displayName || (
+        rawId === 'demo-chat-ranveer' || rawId === 'ranveer-singh' ? 'Ranveer Singh' :
+        rawId === 'jonny-shaik' ? 'Jonny Shaik' :
+        rawId === 'vn-aditya' ? 'V.N. Aditya' :
+        (otherUserId ? otherUserId.slice(0, 14) : 'Filmmaker')
+    );
+
+    const chatRole = (otherUserProfile as any)?.role || otherUserProfile?.bio?.slice(0, 30) || (
+        rawId === 'demo-chat-ranveer' || rawId === 'ranveer-singh' ? 'Lead Actor & Producer' :
+        rawId === 'jonny-shaik' ? 'Cinematographer (ISC)' :
+        rawId === 'vn-aditya' ? 'Film Director' :
+        'Film Industry Professional'
+    );
+
+    const chatAvatar = otherUserProfile?.photoURL || (
+        rawId === 'demo-chat-ranveer' || rawId === 'ranveer-singh' ? 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop' :
+        rawId === 'jonny-shaik' ? 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop' :
+        rawId === 'vn-aditya' ? 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop' :
+        `https://ui-avatars.com/api/?name=${encodeURIComponent(chatName)}&background=121316&color=F59E0B`
+    );
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -93,7 +148,7 @@ export default function Messaging() {
     // Fetch other user's profile
     useEffect(() => {
         const fetchUserProfile = async () => {
-            if (otherUserId && otherUserId !== 'demo-chat-ranveer') {
+            if (otherUserId && otherUserId !== 'demo-chat-ranveer' && otherUserId !== 'ranveer-singh' && otherUserId !== 'jonny-shaik' && otherUserId !== 'vn-aditya') {
                 try {
                     const profile = await getUserProfile(otherUserId);
                     setOtherUserProfile(profile);
@@ -107,13 +162,17 @@ export default function Messaging() {
 
     useEffect(() => {
         const unsubscribe = subscribeToMessages(chatId, (newMessages) => {
-            const formattedMessages = newMessages.map(msg => ({
-                ...msg,
-                time: msg.createdAt ? new Date(msg.createdAt.seconds * 1000).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : 'Just now',
-                isSent: msg.senderId === currentUserId
-            }));
-            setMessages(formattedMessages);
-            setTimeout(scrollToBottom, 50);
+            if (newMessages.length > 0) {
+                const formattedMessages = newMessages.map(msg => ({
+                    ...msg,
+                    time: msg.createdAt ? new Date(msg.createdAt.seconds * 1000).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : 'Just now',
+                    isSent: msg.senderId === currentUserId
+                }));
+                setMessages(formattedMessages);
+            } else {
+                setMessages(mockDemoMessages);
+            }
+            setTimeout(scrollToBottom, 60);
         });
 
         return () => unsubscribe();
@@ -132,16 +191,11 @@ export default function Messaging() {
     }, [location.state]);
 
     const emojis = [
-        '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '🥲', '☺️', '😊', '😇',
-        '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛',
-        '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🥸', '🤩', '🥳', '😏', '😒',
-        '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢',
-        '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰',
-        '😥', '😓', '🤗', '🤔', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄',
-        '👍', '👎', '👊', '✊', '🤛', '🤜', '🤞', '✌️', '🤟', '🤘', '👌', '🤏',
-        '👈', '👉', '👆', '👇', '☝️', '✋', '🤚', '🖐', '🖖', '👋', '🤙', '💪',
+        '🎬', '🎥', '📹', '🎞️', '📽️', '🎭', '👏', '🔥', '✨', '⭐', '💡', '💯',
+        '😀', '😃', '😄', '😁', '😅', '😂', '🤣', '😊', '😇', '🙂', '😉', '😍',
+        '👍', '👎', '👊', '🤞', '✌️', '🤟', '🤘', '👌', '🤝', '🙌', '🙏', '💪',
         '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❣️', '💕',
-        '💞', '💓', '💗', '💖', '💘', '💝', '🔥', '✨', '🌟', '💫', '💥', '💯'
+        '😎', '🤩', '🥳', '🤔', '🤫', '🫡', '☕', '🍿', '🎯', '🚀', '⚡', '🏆'
     ];
 
     const handleEmojiClick = (emoji: string) => {
@@ -283,7 +337,7 @@ export default function Messaging() {
                 await sendMessage(
                     chatId,
                     {
-                        text: 'Voice Message',
+                        text: 'Voice Note',
                         senderId: currentUserId,
                         type: 'audio',
                         mediaUrl: response.url
@@ -354,85 +408,129 @@ export default function Messaging() {
     };
 
     return (
-        <div className="relative flex h-auto min-h-screen w-full flex-col bg-slate-50 dark:bg-[#090A0C] text-zinc-900 dark:text-white overflow-x-hidden font-display transition-colors">
-            <div className="flex flex-col flex-1 pb-28 w-full max-w-md md:max-w-3xl lg:max-w-4xl mx-auto">
-                {/* Top App Bar */}
-                <div className="sticky top-0 z-30 flex flex-col bg-white/95 dark:bg-[#090A0C]/90 backdrop-blur-md border-b border-zinc-200 dark:border-white/[0.08]">
-                    <div className="flex items-center px-4 py-3 justify-between gap-3">
+        <div className="relative flex min-h-[100dvh] w-full flex-col bg-slate-50 dark:bg-[#0B0C0E] text-zinc-900 dark:text-white font-display transition-colors">
+            <SEO 
+                title={`Chat with ${chatName} | iFilmDirectory`} 
+                description={`Direct production conversation with ${chatName}.`}
+            />
+
+            <div className="flex flex-col flex-1 pb-32 w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto px-3 sm:px-5">
+                
+                {/* Unified Cinema Chat App Bar */}
+                <header className="sticky top-0 z-30 bg-white/95 dark:bg-[#0B0C0E]/95 backdrop-blur-xl border-b border-zinc-200/80 dark:border-white/[0.08] pt-3.5 pb-3">
+                    <div className="flex items-center justify-between gap-3">
+                        {/* Back + User Bio */}
                         <div className="flex items-center gap-3 min-w-0">
                             <button
-                                onClick={() => window.history.back()}
-                                className="flex size-9 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] border border-zinc-200 dark:border-white/[0.08] text-zinc-700 dark:text-white transition-all"
+                                onClick={() => navigate('/messaging')}
+                                className="flex size-9 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] border border-zinc-200 dark:border-white/[0.08] text-zinc-700 dark:text-zinc-200 transition-all active:scale-95"
+                                aria-label="Back to Messages"
+                                title="Back to Messages"
                             >
-                                <span className="material-symbols-outlined text-lg">arrow_back_ios_new</span>
+                                <span className="material-symbols-outlined text-lg">arrow_back</span>
                             </button>
-                            <div className="relative">
-                                <div className="size-10 rounded-full overflow-hidden border border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-black">
+
+                            {/* Avatar & Online indicator */}
+                            <div 
+                                onClick={() => otherUserId && navigate(`/profile/${otherUserId}`)}
+                                className="relative cursor-pointer group shrink-0"
+                            >
+                                <div className="size-11 rounded-full overflow-hidden border border-zinc-200 dark:border-white/10 group-hover:border-amber-500/60 bg-zinc-900 transition-colors shadow-xs">
                                     <PostMedia
-                                        src={otherUserProfile?.photoURL || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop'}
+                                        src={chatAvatar}
                                         fallbackType="USER_MALE"
-                                        className="w-full h-full object-cover"
+                                        className="size-full object-cover"
                                     />
                                 </div>
-                                <span className="absolute bottom-0 right-0 size-2.5 rounded-full bg-emerald-500 border-2 border-white dark:border-[#090A0C]" />
+                                <span className="absolute bottom-0 right-0 size-3 rounded-full bg-emerald-500 border-2 border-white dark:border-[#0B0C0E] shadow-xs" />
                             </div>
-                            <div className="min-w-0">
-                                <h2 className="text-zinc-900 dark:text-white text-sm sm:text-base font-bold leading-tight truncate flex items-center gap-1.5">
-                                    <span>{chatName}</span>
-                                    {otherUserProfile?.verification?.isVerified && (
-                                        <span className="material-symbols-outlined text-amber-500 text-sm filled">
-                                            verified
-                                        </span>
-                                    )}
+
+                            {/* Name & Role Details */}
+                            <div className="min-w-0 cursor-pointer" onClick={() => otherUserId && navigate(`/profile/${otherUserId}`)}>
+                                <h2 className="text-zinc-900 dark:text-white text-sm sm:text-base font-bold leading-tight truncate flex items-center gap-1.5 group">
+                                    <span className="truncate group-hover:text-amber-500 transition-colors">{chatName}</span>
+                                    <span className="material-symbols-outlined text-amber-500 text-xs shrink-0 filled" title="Verified Professional">
+                                        verified
+                                    </span>
                                 </h2>
-                                <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">
-                                    {otherUserProfile?.role || 'Verified Filmmaker'} • Online
+                                <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate font-medium">
+                                    <span className="text-amber-600 dark:text-amber-400 font-semibold">{chatRole}</span> • Active On Set
                                 </p>
                             </div>
                         </div>
 
+                        {/* Right Quick Controls */}
                         <div className="flex items-center gap-1.5 relative">
+                            {/* Voice Call */}
                             <button
                                 onClick={() => {
                                     if (allowCalls) {
                                         setShowCallConfirmation(true);
                                     } else {
-                                        alert("You have disabled calls for this chat.");
+                                        alert("Calls are currently muted for this thread.");
                                     }
                                 }}
                                 className={`flex items-center justify-center rounded-xl size-9 border transition-all ${
                                     allowCalls
-                                        ? 'bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] border-zinc-200 dark:border-white/[0.08] text-amber-500 dark:text-amber-400 hover:border-amber-500/30'
+                                        ? 'bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] border-zinc-200 dark:border-white/[0.08] text-amber-500 dark:text-amber-400 hover:border-amber-500/40'
                                         : 'bg-zinc-100 dark:bg-white/[0.02] border-zinc-200 dark:border-white/[0.04] text-zinc-400 cursor-not-allowed'
                                 }`}
-                                title="Call"
+                                title="Start Voice Call"
                             >
                                 <span className="material-symbols-outlined text-lg">call</span>
                             </button>
 
+                            {/* Theme Toggle */}
+                            <button
+                                onClick={toggleDarkMode}
+                                className="flex size-9 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] border border-zinc-200 dark:border-white/[0.08] text-zinc-600 dark:text-zinc-300 transition-colors"
+                                title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                            >
+                                <span className="material-symbols-outlined text-lg">
+                                    {isDarkMode ? 'light_mode' : 'dark_mode'}
+                                </span>
+                            </button>
+
+                            {/* Options Dropdown Trigger */}
                             <button
                                 onClick={() => setShowSettings(!showSettings)}
-                                className="flex items-center justify-center rounded-xl size-9 bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] border border-zinc-200 dark:border-white/[0.08] text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white hover:bg-zinc-200 dark:hover:bg-white/[0.1] transition-all"
-                                title="Chat Options"
+                                className="flex items-center justify-center rounded-xl size-9 bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] border border-zinc-200 dark:border-white/[0.08] text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white transition-all"
+                                title="Chat Settings"
                             >
                                 <span className="material-symbols-outlined text-lg">more_vert</span>
                             </button>
 
+                            <HamburgerMenu />
+
                             {/* Chat Settings Dropdown */}
                             {showSettings && (
-                                <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-[#17191e] rounded-xl shadow-2xl border border-zinc-200 dark:border-white/[0.12] overflow-hidden z-50 p-1.5 backdrop-blur-xl animate-in fade-in zoom-in-95">
+                                <div className="absolute top-full right-0 mt-2 w-52 bg-white dark:bg-[#15171C] rounded-2xl shadow-2xl border border-zinc-200 dark:border-white/[0.12] overflow-hidden z-50 p-2 backdrop-blur-xl animate-in fade-in zoom-in-95">
                                     <button
                                         onClick={() => {
                                             setAllowCalls(!allowCalls);
                                             setShowSettings(false);
                                         }}
-                                        className="flex items-center justify-between w-full px-3 py-2 text-xs font-semibold text-left hover:bg-zinc-100 dark:hover:bg-white/[0.08] rounded-lg transition-colors text-zinc-700 dark:text-zinc-200"
+                                        className="flex items-center justify-between w-full px-3 py-2.5 text-xs font-semibold text-left hover:bg-zinc-100 dark:hover:bg-white/[0.06] rounded-xl transition-colors text-zinc-700 dark:text-zinc-200"
                                     >
                                         <span>Allow Calls</span>
                                         <div className={`w-8 h-4 rounded-full relative transition-colors ${allowCalls ? 'bg-amber-500' : 'bg-zinc-300 dark:bg-zinc-700'}`}>
-                                            <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-transform ${allowCalls ? 'left-4.5' : 'left-0.5'}`} />
+                                            <div className={`absolute top-0.5 size-3 bg-white rounded-full transition-transform ${allowCalls ? 'left-4.5' : 'left-0.5'}`} />
                                         </div>
                                     </button>
+                                    
+                                    <button
+                                        onClick={() => {
+                                            setShowSettings(false);
+                                            navigate(`/profile/${otherUserId}`);
+                                        }}
+                                        className="flex items-center gap-2.5 w-full px-3 py-2.5 text-xs font-semibold text-left text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-white/[0.06] rounded-xl transition-colors"
+                                    >
+                                        <span className="material-symbols-outlined text-base text-amber-500">person</span>
+                                        View Industry Profile
+                                    </button>
+
+                                    <div className="h-px bg-zinc-200 dark:bg-white/[0.06] my-1" />
+
                                     <button
                                         onClick={async () => {
                                             if (window.confirm('Clear all conversation history in this thread?')) {
@@ -440,7 +538,7 @@ export default function Messaging() {
                                                 setShowSettings(false);
                                             }
                                         }}
-                                        className="flex items-center gap-2 w-full px-3 py-2 text-xs font-semibold text-left text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-colors"
+                                        className="flex items-center gap-2.5 w-full px-3 py-2.5 text-xs font-semibold text-left text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl transition-colors"
                                     >
                                         <span className="material-symbols-outlined text-base">delete_sweep</span>
                                         Clear History
@@ -449,26 +547,30 @@ export default function Messaging() {
                             )}
                         </div>
                     </div>
-                </div>
+                </header>
 
-                {/* Messages Container */}
-                <div className="flex-1 px-4 py-4 space-y-4 overflow-y-auto no-scrollbar min-h-0">
-                    <div className="text-center my-2">
-                        <span className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 bg-white dark:bg-white/[0.05] border border-zinc-200 dark:border-white/[0.08] px-3 py-1 rounded-full shadow-xs">
-                            Encrypted Production Comms
-                        </span>
+                {/* Messages Stream Container */}
+                <div className="flex-1 py-4 space-y-4 overflow-y-auto no-scrollbar min-h-[50vh]">
+                    {/* Security Encrypted Indicator */}
+                    <div className="flex justify-center my-2">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white dark:bg-[#121316] border border-zinc-200/90 dark:border-white/[0.08] shadow-2xs">
+                            <span className="material-symbols-outlined text-amber-500 text-xs">lock</span>
+                            <span className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400">
+                                End-to-End Encrypted Production Channel
+                            </span>
+                        </div>
                     </div>
 
                     {messages.map((message) => {
                         const isEmoji = isEmojiOnly(message.text);
                         return message.isSent ? (
                             <div key={message.id} className="flex items-start gap-2.5 justify-end">
-                                <div className="flex flex-col gap-1 w-full max-w-[340px] items-end">
-                                    <div className="sent-message-bubble flex flex-col leading-relaxed p-3.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-semibold rounded-2xl rounded-tr-xs shadow-lg shadow-amber-500/20">
+                                <div className="flex flex-col gap-1 w-full max-w-[340px] sm:max-w-md items-end">
+                                    <div className="sent-message-bubble flex flex-col leading-relaxed p-3.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-medium rounded-2xl rounded-tr-xs shadow-md shadow-amber-500/20">
                                         {message.type === 'audio' ? (
                                             <div className="flex items-center gap-2 min-w-[200px]">
                                                 {failedAudioIds.has(message.id) ? (
-                                                    <div className="flex items-center gap-2 text-white/90 !text-white/90 text-xs italic py-1">
+                                                    <div className="flex items-center gap-2 text-white/90 text-xs italic py-1">
                                                         <span className="material-symbols-outlined text-sm">error</span>
                                                         Audio expired
                                                     </div>
@@ -476,16 +578,16 @@ export default function Messaging() {
                                                     <>
                                                         <button
                                                             onClick={() => toggleMessageAudio(message.id, message.mediaUrl || '')}
-                                                            className="w-8 h-8 flex items-center justify-center bg-white/20 rounded-full hover:bg-white/30 transition-colors"
+                                                            className="size-8 flex items-center justify-center bg-white/20 rounded-full hover:bg-white/30 transition-colors"
                                                         >
-                                                            <span className="material-symbols-outlined text-white">
+                                                            <span className="material-symbols-outlined text-white text-base">
                                                                 {playingMessageId === message.id ? 'pause' : 'play_arrow'}
                                                             </span>
                                                         </button>
-                                                        <div className="h-1 flex-1 bg-white/20 rounded-full overflow-hidden">
+                                                        <div className="h-1 flex-1 bg-white/25 rounded-full overflow-hidden">
                                                             <div className="h-full w-1/3 bg-white rounded-full" />
                                                         </div>
-                                                        <span style={{ color: '#ffffff' }} className="text-xs text-white !text-white font-mono">0:15</span>
+                                                        <span className="text-xs text-white font-mono">0:15</span>
                                                         <audio
                                                             id={`audio-${message.id}`}
                                                             src={message.mediaUrl}
@@ -497,12 +599,14 @@ export default function Messaging() {
                                                 )}
                                             </div>
                                         ) : (
-                                            <p style={{ color: '#ffffff' }} className={`${isEmoji ? 'text-4xl' : 'text-sm'} font-medium text-white !text-white select-text`}>{message.text}</p>
+                                            <p className={`${isEmoji ? 'text-4xl' : 'text-xs sm:text-sm'} text-white select-text leading-relaxed`}>
+                                                {message.text}
+                                            </p>
                                         )}
                                     </div>
-                                    <div className="flex items-center gap-1 text-[11px] text-zinc-500 font-medium px-1">
+                                    <div className="flex items-center gap-1 text-[10px] text-zinc-400 dark:text-zinc-500 font-semibold px-1">
                                         <span>{message.time}</span>
-                                        <span className="material-symbols-outlined text-[14px] text-amber-500">
+                                        <span className="material-symbols-outlined text-[13px] text-amber-500">
                                             {message.isRead ? 'done_all' : 'done'}
                                         </span>
                                     </div>
@@ -510,8 +614,8 @@ export default function Messaging() {
                             </div>
                         ) : (
                             <div key={message.id} className="flex items-start gap-2.5">
-                                <div className="flex flex-col gap-1 w-full max-w-[340px]">
-                                    <div className="flex flex-col leading-relaxed p-3.5 bg-white dark:bg-[#14161a] border border-zinc-200 dark:border-white/[0.08] text-zinc-900 dark:text-white rounded-2xl rounded-tl-xs shadow-sm dark:shadow-md">
+                                <div className="flex flex-col gap-1 w-full max-w-[340px] sm:max-w-md">
+                                    <div className="flex flex-col leading-relaxed p-3.5 bg-white dark:bg-[#14161a] border border-zinc-200/90 dark:border-white/[0.08] text-zinc-900 dark:text-white rounded-2xl rounded-tl-xs shadow-xs">
                                         {message.type === 'audio' ? (
                                             <div className="flex items-center gap-2 min-w-[200px]">
                                                 {failedAudioIds.has(message.id) ? (
@@ -523,9 +627,9 @@ export default function Messaging() {
                                                     <>
                                                         <button
                                                             onClick={() => toggleMessageAudio(message.id, message.mediaUrl || '')}
-                                                            className="w-8 h-8 flex items-center justify-center bg-zinc-100 hover:bg-zinc-200 dark:bg-white/10 dark:hover:bg-white/20 text-zinc-900 dark:text-white rounded-full transition-colors"
+                                                            className="size-8 flex items-center justify-center bg-zinc-100 hover:bg-zinc-200 dark:bg-white/10 dark:hover:bg-white/20 text-zinc-900 dark:text-white rounded-full transition-colors"
                                                         >
-                                                            <span className="material-symbols-outlined">
+                                                            <span className="material-symbols-outlined text-base">
                                                                 {playingMessageId === message.id ? 'pause' : 'play_arrow'}
                                                             </span>
                                                         </button>
@@ -544,10 +648,14 @@ export default function Messaging() {
                                                 )}
                                             </div>
                                         ) : (
-                                            <p className={`${isEmoji ? 'text-4xl' : 'text-sm'} text-zinc-800 dark:text-zinc-100 font-normal`}>{message.text}</p>
+                                            <p className={`${isEmoji ? 'text-4xl' : 'text-xs sm:text-sm'} text-zinc-800 dark:text-zinc-100 font-normal leading-relaxed select-text`}>
+                                                {message.text}
+                                            </p>
                                         )}
                                     </div>
-                                    <span className="text-[11px] text-zinc-500 font-medium px-1">{message.time}</span>
+                                    <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-semibold px-1">
+                                        {message.time}
+                                    </span>
                                 </div>
                             </div>
                         );
@@ -556,10 +664,11 @@ export default function Messaging() {
                     <div ref={messagesEndRef} />
                 </div>
 
-                {/* Message Input Area */}
-                <div className="fixed bottom-20 md:bottom-24 z-30 left-1/2 -translate-x-1/2 w-full max-w-md md:max-w-3xl lg:max-w-4xl px-4">
+                {/* Floating Modern Message Input Area */}
+                <div className="fixed bottom-20 md:bottom-24 z-30 left-1/2 -translate-x-1/2 w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl px-3 sm:px-5">
+                    {/* Attachments Menu */}
                     {showAttachments && (
-                        <div className="absolute bottom-full left-4 mb-2 flex flex-col gap-1 rounded-2xl bg-white dark:bg-[#17191e] border border-zinc-200 dark:border-white/[0.12] p-2 shadow-2xl animate-in slide-in-from-bottom-2 min-w-[210px] z-50">
+                        <div className="absolute bottom-full left-4 mb-2 flex flex-col gap-1 rounded-2xl bg-white dark:bg-[#16181D] border border-zinc-200 dark:border-white/[0.12] p-2 shadow-2xl animate-in slide-in-from-bottom-2 min-w-[220px] z-50">
                             <button
                                 onClick={() => {
                                     setShowEmojiPicker(true);
@@ -567,27 +676,28 @@ export default function Messaging() {
                                 }}
                                 className="flex items-center gap-3 rounded-xl px-3 py-2 text-xs font-semibold hover:bg-zinc-100 dark:hover:bg-white/[0.08] transition-colors text-left text-zinc-700 dark:text-zinc-200"
                             >
-                                <span className="material-symbols-outlined text-amber-500 dark:text-amber-400 text-lg">sentiment_satisfied</span>
-                                <span>Add Emoji</span>
+                                <span className="material-symbols-outlined text-amber-500 text-lg">sentiment_satisfied</span>
+                                <span>Add Cinema Emoji</span>
                             </button>
                             <button className="flex items-center gap-3 rounded-xl px-3 py-2 text-xs font-semibold hover:bg-zinc-100 dark:hover:bg-white/[0.08] transition-colors text-left text-zinc-700 dark:text-zinc-200">
-                                <span className="material-symbols-outlined text-sky-500 dark:text-sky-400 text-lg">image</span>
-                                <span>Stills & Clips</span>
+                                <span className="material-symbols-outlined text-sky-500 text-lg">image</span>
+                                <span>Scene Stills & Moodboard</span>
                             </button>
                             <button className="flex items-center gap-3 rounded-xl px-3 py-2 text-xs font-semibold hover:bg-zinc-100 dark:hover:bg-white/[0.08] transition-colors text-left text-zinc-700 dark:text-zinc-200">
-                                <span className="material-symbols-outlined text-purple-500 dark:text-purple-400 text-lg">description</span>
+                                <span className="material-symbols-outlined text-purple-500 text-lg">description</span>
                                 <span>Call Sheet / Script PDF</span>
                             </button>
                         </div>
                     )}
 
+                    {/* Emoji Picker */}
                     {showEmojiPicker && (
-                        <div className="absolute bottom-full right-4 mb-2 w-64 rounded-2xl bg-white dark:bg-[#17191e] border border-zinc-200 dark:border-white/[0.12] p-2.5 shadow-2xl animate-in slide-in-from-bottom-2 grid grid-cols-6 gap-1 h-60 overflow-y-auto scrollbar-none z-50">
+                        <div className="absolute bottom-full right-4 mb-2 w-72 rounded-2xl bg-white dark:bg-[#16181D] border border-zinc-200 dark:border-white/[0.12] p-3 shadow-2xl animate-in slide-in-from-bottom-2 grid grid-cols-6 gap-1.5 h-60 overflow-y-auto no-scrollbar z-50">
                             {emojis.map((emoji, index) => (
                                 <button
                                     key={index}
                                     onClick={() => handleEmojiClick(emoji)}
-                                    className="flex items-center justify-center p-1.5 hover:bg-zinc-100 dark:hover:bg-white/[0.08] rounded-lg text-lg transition-colors"
+                                    className="flex items-center justify-center p-2 hover:bg-zinc-100 dark:hover:bg-white/[0.08] rounded-xl text-lg transition-transform hover:scale-125"
                                 >
                                     {emoji}
                                 </button>
@@ -595,17 +705,19 @@ export default function Messaging() {
                         </div>
                     )}
 
-                    <div className="flex items-center gap-2 bg-white/95 dark:bg-[#121316]/95 backdrop-blur-xl p-2 rounded-2xl border border-zinc-200 dark:border-white/[0.1] shadow-xl dark:shadow-2xl min-h-[58px]">
+                    {/* Main Input Control Bar */}
+                    <div className="flex items-center gap-2 bg-white/95 dark:bg-[#121316]/95 backdrop-blur-xl p-2 rounded-2xl border border-zinc-200/90 dark:border-white/[0.1] shadow-xl dark:shadow-2xl min-h-[58px]">
                         {isRecording ? (
                             <div className="flex items-center w-full gap-3 animate-in fade-in px-2">
                                 <button
                                     onClick={cancelRecording}
                                     className="p-2 rounded-xl hover:bg-rose-500/20 text-rose-500 dark:text-rose-400 transition-colors"
+                                    title="Cancel"
                                 >
                                     <span className="material-symbols-outlined text-lg">delete</span>
                                 </button>
                                 <div className="flex-1 flex items-center justify-center gap-3 bg-rose-500/10 border border-rose-500/20 rounded-xl px-4 py-1.5">
-                                    <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+                                    <div className="size-2 rounded-full bg-rose-500 animate-pulse" />
                                     <span className="font-mono text-xs font-bold text-rose-500 dark:text-rose-400">{formatTime(recordingDuration)}</span>
                                     <div className="flex items-center gap-1 h-4 min-w-0">
                                         {waveform.map((height, i) => (
@@ -620,6 +732,7 @@ export default function Messaging() {
                                 <button
                                     onClick={stopRecording}
                                     className="p-2 rounded-xl bg-rose-500 text-white hover:bg-rose-400 shadow-md shadow-rose-500/30 transition-all"
+                                    title="Finish"
                                 >
                                     <span className="material-symbols-outlined text-lg">stop</span>
                                 </button>
@@ -629,13 +742,14 @@ export default function Messaging() {
                                 <button
                                     onClick={cancelRecording}
                                     className="p-2 rounded-xl hover:bg-rose-500/20 text-rose-500 dark:text-rose-400 transition-colors"
+                                    title="Discard"
                                 >
                                     <span className="material-symbols-outlined text-lg">delete</span>
                                 </button>
                                 <div className="flex-1 flex items-center gap-3 bg-zinc-100 dark:bg-black/40 border border-zinc-200 dark:border-white/[0.08] rounded-xl px-3 py-1.5">
                                     <button
                                         onClick={togglePreviewAudio}
-                                        className="w-7 h-7 flex items-center justify-center bg-zinc-200 dark:bg-white/10 rounded-full hover:bg-zinc-300 dark:hover:bg-white/20 transition-colors"
+                                        className="size-7 flex items-center justify-center bg-zinc-200 dark:bg-white/10 rounded-full hover:bg-zinc-300 dark:hover:bg-white/20 transition-colors"
                                     >
                                         <span className="material-symbols-outlined text-sm">
                                             {isPreviewPlaying ? 'pause' : 'play_arrow'}
@@ -649,6 +763,7 @@ export default function Messaging() {
                                 <button
                                     onClick={sendAudioMessage}
                                     className="p-2 rounded-xl bg-amber-500 text-white hover:bg-amber-400 shadow-md shadow-amber-500/25 transition-all"
+                                    title="Send Voice Note"
                                 >
                                     <span className="material-symbols-outlined text-lg font-bold">send</span>
                                 </button>
@@ -660,15 +775,19 @@ export default function Messaging() {
                                         setShowAttachments(!showAttachments);
                                         setShowEmojiPicker(false);
                                     }}
-                                    className={`flex items-center justify-center h-9 w-9 rounded-xl transition-all ${showAttachments ? 'bg-amber-500 text-white' : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.06]'}`}
-                                    title="Add Attachment"
+                                    className={`flex items-center justify-center size-9 rounded-xl transition-all ${
+                                        showAttachments 
+                                            ? 'bg-amber-500 text-white' 
+                                            : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.06]'
+                                    }`}
+                                    title="Add Media / Documents"
                                 >
                                     <span className="material-symbols-outlined text-xl">add</span>
                                 </button>
 
                                 <input
                                     className="flex w-full min-w-0 flex-1 bg-transparent border-none text-zinc-900 dark:text-white focus:outline-none placeholder:text-zinc-400 dark:placeholder:text-zinc-500 text-xs sm:text-sm px-2"
-                                    placeholder="Discuss shoot dates, equipment, or scenes..."
+                                    placeholder="Discuss shoot dates, gear specs, or scene notes..."
                                     value={messageText}
                                     onChange={(e) => setMessageText(e.target.value)}
                                     onKeyPress={handleKeyPress}
@@ -679,8 +798,12 @@ export default function Messaging() {
                                         setShowEmojiPicker(!showEmojiPicker);
                                         setShowAttachments(false);
                                     }}
-                                    className={`flex items-center justify-center h-9 w-9 rounded-xl transition-all ${showEmojiPicker ? 'text-amber-500 dark:text-amber-400' : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white'}`}
-                                    title="Emoji"
+                                    className={`flex items-center justify-center size-9 rounded-xl transition-all ${
+                                        showEmojiPicker 
+                                            ? 'text-amber-500 dark:text-amber-400' 
+                                            : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white'
+                                    }`}
+                                    title="Cinema Emoji"
                                 >
                                     <span className="material-symbols-outlined text-xl">sentiment_satisfied</span>
                                 </button>
@@ -688,7 +811,7 @@ export default function Messaging() {
                                 {messageText.trim() ? (
                                     <button
                                         onClick={handleSendMessage}
-                                        className="flex items-center justify-center h-9 w-9 rounded-xl bg-amber-500 text-white hover:bg-amber-400 shadow-md shadow-amber-500/20 active:scale-95 transition-all"
+                                        className="flex items-center justify-center size-9 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-400 hover:to-amber-500 shadow-md shadow-amber-500/25 active:scale-95 transition-all"
                                         title="Send"
                                     >
                                         <span className="material-symbols-outlined text-base font-bold">send</span>
@@ -696,7 +819,7 @@ export default function Messaging() {
                                 ) : (
                                     <button
                                         onClick={startRecording}
-                                        className="flex items-center justify-center h-9 w-9 rounded-xl text-zinc-500 hover:text-amber-500 dark:text-zinc-400 dark:hover:text-amber-400 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors"
+                                        className="flex items-center justify-center size-9 rounded-xl text-zinc-500 hover:text-amber-500 dark:text-zinc-400 dark:hover:text-amber-400 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors"
                                         title="Record Voice Note"
                                     >
                                         <span className="material-symbols-outlined text-xl">mic</span>
@@ -709,40 +832,46 @@ export default function Messaging() {
             </div>
 
             <BottomNav />
+
+            {/* Calling Screen Overlay */}
             {callState.isOpen && (
                 <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm"
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md animate-in fade-in"
                     onClick={() => setCallState({ isOpen: false, type: null })}
                 >
                     <div
-                        className="flex flex-col items-center gap-8 p-8 text-white"
+                        className="flex flex-col items-center gap-8 p-8 text-white max-w-sm w-full"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex flex-col items-center gap-4">
-                            <div className="h-32 w-32 rounded-full bg-gray-700 flex items-center justify-center overflow-hidden border-4 border-white/10">
-                                <span className="material-symbols-outlined text-6xl">person</span>
+                            <div className="size-32 rounded-full overflow-hidden border-4 border-amber-500/40 p-1 shadow-2xl">
+                                <PostMedia
+                                    src={chatAvatar}
+                                    fallbackType="USER_MALE"
+                                    className="size-full object-cover rounded-full"
+                                />
                             </div>
                             <div className="text-center">
-                                <h3 className="text-2xl font-bold">{chatName}</h3>
-                                <p className="text-white/60">
-                                    {callState.type === 'video' ? 'Video Calling...' : 'Calling...'}
+                                <h3 className="text-2xl font-black">{chatName}</h3>
+                                <p className="text-amber-400/80 text-xs font-semibold tracking-wider uppercase mt-1">
+                                    {callState.type === 'video' ? 'Connecting Video Feed...' : 'Calling Production Line...'}
                                 </p>
                             </div>
                         </div>
 
                         <div className="flex items-center gap-6">
-                            <button className="flex h-14 w-14 items-center justify-center rounded-full bg-white/20 hover:bg-white/30 transition-colors">
+                            <button className="flex size-14 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors">
                                 <span className="material-symbols-outlined text-2xl">mic_off</span>
                             </button>
                             <button
                                 onClick={() => setCallState({ isOpen: false, type: null })}
-                                className="flex h-16 w-16 items-center justify-center rounded-full bg-red-500 hover:bg-red-600 transition-colors shadow-lg shadow-red-500/30"
+                                className="flex size-16 items-center justify-center rounded-full bg-red-500 hover:bg-red-600 transition-colors shadow-lg shadow-red-500/30 active:scale-95"
                             >
                                 <span className="material-symbols-outlined text-3xl">call_end</span>
                             </button>
                             <button
                                 onClick={() => setCallState(prev => ({ ...prev, type: prev.type === 'video' ? 'audio' : 'video' }))}
-                                className={`flex h-14 w-14 items-center justify-center rounded-full transition-colors ${callState.type === 'video' ? 'bg-white text-black' : 'bg-white/20 hover:bg-white/30'}`}
+                                className={`flex size-14 items-center justify-center rounded-full transition-colors ${callState.type === 'video' ? 'bg-white text-black' : 'bg-white/10 hover:bg-white/20'}`}
                             >
                                 <span className="material-symbols-outlined text-2xl">
                                     {callState.type === 'video' ? 'videocam' : 'videocam_off'}
@@ -752,6 +881,7 @@ export default function Messaging() {
                     </div>
                 </div>
             )}
+
             {/* Voice Call Confirmation Modal */}
             {showCallConfirmation && (
                 <div
@@ -759,34 +889,36 @@ export default function Messaging() {
                     onClick={() => setShowCallConfirmation(false)}
                 >
                     <div
-                        className="bg-white dark:bg-zinc-900 w-full max-w-[300px] rounded-3xl p-6 shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-5 duration-300"
+                        className="bg-white dark:bg-[#15171C] w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-zinc-200 dark:border-white/10 animate-in zoom-in-95 duration-200"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex flex-col items-center text-center">
-                            <div className="size-20 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4 ring-8 ring-primary/5">
-                                <span className="material-symbols-outlined text-4xl">call</span>
+                            <div className="size-16 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-500 mb-4 shadow-sm">
+                                <span className="material-symbols-outlined text-3xl">call</span>
                             </div>
-                            <h3 className="text-xl font-black text-zinc-900 dark:text-white mb-2">Voice Call</h3>
-                            <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-8 leading-relaxed">
-                                Start a voice call with <br />
-                                <span className="font-black text-primary text-base">{chatName}</span>?
+                            <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2">
+                                Voice Call
+                            </h3>
+                            <p className="text-zinc-500 dark:text-zinc-400 text-xs sm:text-sm mb-6 leading-relaxed">
+                                Start an encrypted voice call with <br />
+                                <span className="font-bold text-amber-600 dark:text-amber-400 text-sm sm:text-base">{chatName}</span>?
                             </p>
 
-                            <div className="flex flex-col w-full gap-3">
+                            <div className="flex flex-col w-full gap-2.5">
                                 <button
                                     onClick={() => {
                                         setShowCallConfirmation(false);
                                         setCallState({ isOpen: true, type: 'audio' });
                                     }}
-                                    className="w-full py-4 rounded-2xl bg-primary text-white font-extrabold text-lg shadow-lg shadow-primary/30 hover:opacity-95 active:scale-[0.98] transition-all"
+                                    className="w-full py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-white font-bold text-sm shadow-lg shadow-amber-500/25 active:scale-98 transition-all"
                                 >
                                     Start Call
                                 </button>
                                 <button
                                     onClick={() => setShowCallConfirmation(false)}
-                                    className="w-full py-4 rounded-2xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-bold hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                                    className="w-full py-3 rounded-2xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.06] dark:hover:bg-white/[0.1] text-zinc-700 dark:text-zinc-300 font-semibold text-xs transition-colors"
                                 >
-                                    Maybe Later
+                                    Cancel
                                 </button>
                             </div>
                         </div>
@@ -797,7 +929,7 @@ export default function Messaging() {
             {/* Global Popover Backdrops */}
             {(showSettings || showAttachments || showEmojiPicker) && (
                 <div
-                    className="fixed inset-0 z-[100]"
+                    className="fixed inset-0 z-[40]"
                     onClick={() => {
                         setShowSettings(false);
                         setShowAttachments(false);
