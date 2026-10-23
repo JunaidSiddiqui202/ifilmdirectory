@@ -36,6 +36,13 @@ export default function Guilds() {
     const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
     const [trendingPosts, setTrendingPosts] = useState<GuildPost[]>([]);
     const [activePostId, setActivePostId] = useState<string | null>(null);
+    const [hasAgreedGuidelines, setHasAgreedGuidelines] = useState<boolean>(() => {
+        try {
+            return localStorage.getItem('ifilmdirectory_guild_standards_agreed') === 'true';
+        } catch {
+            return false;
+        }
+    });
 
     const languages = [
         { code: 'english', name: 'English' },
@@ -419,35 +426,16 @@ export default function Guilds() {
                             </button>
                         </div>
 
-                        {/* Trade Notice & Guidelines */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            {/* Verification Notice */}
-                            <div className="bg-white dark:bg-[#121316] p-4 rounded-2xl border border-zinc-200 dark:border-white/[0.08] flex items-start gap-3 shadow-sm md:col-span-1">
-                                <div className="size-8 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 shrink-0 mt-0.5">
-                                    <span className="material-symbols-outlined text-base">verified_user</span>
-                                </div>
-                                <div className="text-xs text-zinc-600 dark:text-zinc-400 leading-snug">
-                                    <span className="font-bold text-zinc-900 dark:text-white block mb-0.5">Trade Verified Space</span>
-                                    Monitored guild. Showrunners and producers actively scout technical contributors.
-                                </div>
+                        {/* Compact Trade Verified Standards Strip */}
+                        <div className="bg-white dark:bg-[#121316] px-4 py-2.5 rounded-2xl border border-zinc-200 dark:border-white/[0.08] flex flex-wrap items-center justify-between gap-3 text-xs shadow-sm">
+                            <div className="flex items-center gap-2 text-zinc-700 dark:text-zinc-300 min-w-0">
+                                <span className="material-symbols-outlined text-amber-500 text-base shrink-0">verified_user</span>
+                                <span className="font-bold text-zinc-900 dark:text-white shrink-0">Trade Verified Space:</span>
+                                <span className="text-zinc-500 truncate">Strict film craft standards apply. Showrunners scout technical contributors here.</span>
                             </div>
-
-                            {/* Guild Standards */}
-                            <div className="bg-white dark:bg-[#121316] p-4 rounded-2xl border border-zinc-200 dark:border-white/[0.08] shadow-sm md:col-span-2">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <span className="material-symbols-outlined text-sm text-amber-500">policy</span>
-                                    <h4 className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
-                                        Guild Standards & Focus
-                                    </h4>
-                                </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-zinc-600 dark:text-zinc-400">
-                                    {selectedGuild.guidelines?.slice(0, 4).map((g: string, i: number) => (
-                                        <div key={i} className="flex items-start gap-1.5">
-                                            <span className="size-1.5 rounded-full bg-amber-500 mt-1.5 shrink-0" />
-                                            <span className="line-clamp-2">{g}</span>
-                                        </div>
-                                    ))}
-                                </div>
+                            <div className="flex items-center gap-2 text-[11px] text-amber-600 dark:text-amber-400 font-semibold shrink-0">
+                                <span className="size-1.5 rounded-full bg-amber-500" />
+                                <span>No generic spam • Technical breakdowns only • Respect IP rights</span>
                             </div>
                         </div>
 
@@ -838,6 +826,30 @@ export default function Guilds() {
                                 </button>
                             </div>
 
+                            {/* First-time Guild Standards Agreement */}
+                            {!hasAgreedGuidelines && (
+                                <label className="flex items-start gap-2.5 p-2.5 rounded-xl bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/30 cursor-pointer select-none">
+                                    <input
+                                        type="checkbox"
+                                        checked={hasAgreedGuidelines}
+                                        onChange={(e) => {
+                                            const agreed = e.target.checked;
+                                            setHasAgreedGuidelines(agreed);
+                                            if (agreed) {
+                                                try {
+                                                    localStorage.setItem('ifilmdirectory_guild_standards_agreed', 'true');
+                                                } catch {}
+                                            }
+                                        }}
+                                        className="mt-0.5 size-4 rounded accent-amber-500 cursor-pointer shrink-0"
+                                    />
+                                    <div className="text-[11px] leading-snug text-zinc-700 dark:text-zinc-300">
+                                        <span className="font-bold text-zinc-900 dark:text-white block">Guild Standards Agreement</span>
+                                        <span>I agree to trade-verified etiquette: strictly original work/setups, constructive cinema critiques, and respecting IP rights.</span>
+                                    </div>
+                                </label>
+                            )}
+
                             {/* Pro Tip Callout */}
                             <div className="flex items-center gap-2 text-[10px] text-zinc-500 dark:text-zinc-400 font-medium bg-amber-500/5 px-3 py-2 rounded-lg border border-amber-500/15">
                                 <span className="material-symbols-outlined text-amber-500 text-xs shrink-0">info</span>
@@ -855,11 +867,11 @@ export default function Guilds() {
                             </button>
                             <button
                                 onClick={handleCreatePost}
-                                disabled={sharing || !newPostTitle || !newPostContent}
+                                disabled={sharing || !newPostTitle || !newPostContent || !hasAgreedGuidelines}
                                 className="flex-1 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl shadow-md shadow-amber-500/20 transition-all disabled:opacity-50 active:scale-95 flex items-center justify-center gap-1.5"
                             >
                                 <span className="material-symbols-outlined text-sm">send</span>
-                                <span>{sharing ? 'Sharing...' : 'Share with Guild'}</span>
+                                <span>{sharing ? 'Sharing...' : !hasAgreedGuidelines ? 'Agree Standards to Post' : 'Share with Guild'}</span>
                             </button>
                         </div>
                     </div>
@@ -943,6 +955,13 @@ function GuildPostCard({ post, isHighlighted }: { post: GuildPost; isHighlighted
     const [newComment, setNewComment] = useState('');
     const [commentCount, setCommentCount] = useState(post.commentCount);
     const [isPinned, setIsPinned] = useState(post.isPinned || false);
+    const [hasAgreedCommentGuidelines, setHasAgreedCommentGuidelines] = useState<boolean>(() => {
+        try {
+            return localStorage.getItem('ifilmdirectory_guild_standards_agreed') === 'true';
+        } catch {
+            return false;
+        }
+    });
 
     // Load initial comments for inline preview (newest first)
     useEffect(() => {
@@ -1447,22 +1466,48 @@ function GuildPostCard({ post, isHighlighted }: { post: GuildPost; isHighlighted
                             )}
                         </div>
 
+                        {/* First-time Comment Guild Standards Agreement */}
+                        {!hasAgreedCommentGuidelines && (
+                            <div className="px-4 py-2 bg-amber-500/10 dark:bg-amber-500/15 border-t border-amber-500/20">
+                                <label className="flex items-start gap-2 cursor-pointer select-none">
+                                    <input
+                                        type="checkbox"
+                                        checked={hasAgreedCommentGuidelines}
+                                        onChange={(e) => {
+                                            const agreed = e.target.checked;
+                                            setHasAgreedCommentGuidelines(agreed);
+                                            if (agreed) {
+                                                try {
+                                                    localStorage.setItem('ifilmdirectory_guild_standards_agreed', 'true');
+                                                } catch {}
+                                            }
+                                        }}
+                                        className="mt-0.5 size-3.5 rounded accent-amber-500 cursor-pointer shrink-0"
+                                    />
+                                    <span className="text-[10px] leading-tight text-zinc-700 dark:text-zinc-300">
+                                        <span className="font-bold text-zinc-900 dark:text-white">Guild Standards: </span>
+                                        I agree to constructive critique and trade etiquette.
+                                    </span>
+                                </label>
+                            </div>
+                        )}
+
                         {/* Comment Input */}
-                        <div className="p-4 border-t border-border-light dark:border-border-dark flex gap-2">
+                        <div className="p-4 border-t border-zinc-200 dark:border-white/10 flex gap-2">
                             <input
                                 type="text"
                                 value={newComment}
                                 onChange={(e) => setNewComment(e.target.value)}
                                 placeholder="Write a comment..."
-                                className="flex-1 bg-gray-100 dark:bg-white/5 border border-border-light dark:border-border-dark rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-                                onKeyDown={(e) => e.key === 'Enter' && handleSubmitComment()}
+                                className="flex-1 bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded-xl px-4 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500"
+                                onKeyDown={(e) => e.key === 'Enter' && hasAgreedCommentGuidelines && handleSubmitComment()}
                             />
                             <button
                                 onClick={handleSubmitComment}
-                                disabled={!newComment.trim()}
-                                className="px-4 py-2 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 disabled:opacity-50 transition-all"
+                                disabled={!newComment.trim() || !hasAgreedCommentGuidelines}
+                                className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl disabled:opacity-50 transition-all flex items-center justify-center shadow-md shadow-amber-500/20"
                             >
-                                <span className="material-symbols-outlined">send</span>
+                                <span className="material-symbols-outlined text-sm">send</span>
                             </button>
                         </div>
                     </div>
