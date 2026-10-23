@@ -34,7 +34,6 @@ export default function Guilds() {
     const [activeTags, setActiveTags] = useState<string[]>([]);
     const [languageMix, setLanguageMix] = useState('english');
     const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
-    const [showMobileSidebar, setShowMobileSidebar] = useState(false);
     const [trendingPosts, setTrendingPosts] = useState<GuildPost[]>([]);
 
     const languages = [
@@ -116,7 +115,6 @@ export default function Guilds() {
 
     const handleSelectGuild = (guild: Guild) => {
         setSelectedGuild(guild);
-        setShowMobileSidebar(false);
     };
 
 
@@ -244,6 +242,26 @@ export default function Guilds() {
         alert('Your guild request has been submitted for review!');
     };
 
+    // Handle clicking a trending topic card: switch guild and smooth scroll to the post
+    const handleSelectTrendingTopic = (post: GuildPost) => {
+        const targetGuild = guilds.find(g => g.id === post.guildId) || guilds.find(g => g.slug === post.guildId);
+        if (targetGuild && (!selectedGuild || selectedGuild.id !== targetGuild.id)) {
+            setSelectedGuild(targetGuild);
+        }
+
+        // Wait a frame for the feed to render the post if we switched guilds
+        setTimeout(() => {
+            const el = document.getElementById(`post-${post.id}`);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                el.classList.add('ring-2', 'ring-amber-500', 'ring-offset-2', 'dark:ring-offset-zinc-950');
+                setTimeout(() => {
+                    el.classList.remove('ring-2', 'ring-amber-500', 'ring-offset-2', 'dark:ring-offset-zinc-950');
+                }, 2200);
+            }
+        }, 300);
+    };
+
     if (loading && guilds.length === 0) {
         return (
             <div className="flex items-center justify-center min-h-[100dvh]">
@@ -253,7 +271,7 @@ export default function Guilds() {
     }
 
     return (
-        <div className="flex h-[100dvh] bg-[#FAFAFA] dark:bg-zinc-950 overflow-hidden relative">
+        <div className="min-h-screen bg-[#FAFAFA] dark:bg-zinc-950 flex flex-col relative pb-20">
             <SEO
                 title="Cinema Guilds & Film Associations | Industry Unions"
                 description="Explore verified film industry guilds, cinematography societies, writers associations, and cinema unions across Indian and global filmmaking."
@@ -266,202 +284,244 @@ export default function Guilds() {
                     'film trade bodies'
                 ]}
             />
-            {/* Backdrop for mobile */}
-            {showMobileSidebar && (
-                <div
-                    className="fixed inset-0 bg-black/50 z-30 md:hidden backdrop-blur-sm transition-opacity"
-                    onClick={() => setShowMobileSidebar(false)}
-                ></div>
-            )}
 
-            {/* Left Sidebar: Guild List */}
-            <aside className={`fixed inset-y-0 left-0 z-40 w-72 md:w-80 border-r border-zinc-200 dark:border-white/[0.08] flex flex-col bg-white/90 dark:bg-zinc-950/90 backdrop-blur-3xl transform transition-transform duration-300 md:relative md:translate-x-0 ${showMobileSidebar ? 'translate-x-0' : '-translate-x-full'}`}>
-                <div className="p-5 border-b border-zinc-200 dark:border-white/[0.08] flex justify-between items-center bg-white/50 dark:bg-zinc-900/40">
+            {/* Top Navigation & Cinema Department Horizontal Tabs */}
+            <header className="sticky top-0 z-30 bg-white/95 dark:bg-[#090A0C]/95 backdrop-blur-xl border-b border-zinc-200 dark:border-white/[0.08] shadow-xs">
+                {/* Header Bar */}
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => navigate('/groups-forums')}
-                            className="p-1.5 rounded-xl text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] border border-zinc-200 dark:border-white/[0.08] transition-all"
+                            className="p-2 rounded-xl text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] border border-zinc-200 dark:border-white/[0.08] transition-all"
                             title="Back to Forums"
                         >
                             <span className="material-symbols-outlined text-lg">arrow_back</span>
                         </button>
                         <div>
-                            <h2 className="text-base font-bold tracking-tight text-zinc-900 dark:text-white flex items-center gap-1.5">
+                            <div className="flex items-center gap-2">
                                 <span className="material-symbols-outlined text-amber-500 text-xl">groups</span>
-                                <span>Skill Guilds</span>
-                            </h2>
-                            <p className="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium">Trade Craft Departments</p>
+                                <h1 className="text-base sm:text-lg font-black tracking-tight text-zinc-900 dark:text-white">
+                                    Film Craft Guilds
+                                </h1>
+                                <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold uppercase tracking-wider border border-amber-500/20">
+                                    Trade Chapters
+                                </span>
+                            </div>
+                            <p className="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium hidden sm:block">
+                                Specialized industry associations for verified cinema craft professionals
+                            </p>
                         </div>
                     </div>
-                    <button onClick={() => setShowMobileSidebar(false)} className="md:hidden p-1.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-white material-symbols-outlined text-lg">close</button>
-                </div>
 
-                <div className="flex-1 overflow-y-auto p-4 space-y-2 pb-24">
-                    {guilds.map(guild => (
+                    <div className="flex items-center gap-2.5">
                         <button
-                            key={guild.id}
-                            onClick={() => handleSelectGuild(guild)}
-                            className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all cursor-pointer ${selectedGuild?.id === guild.id
-                                ? 'bg-primary/10 border-primary shadow-sm border'
-                                : 'hover:bg-gray-100 dark:hover:bg-white/5 border border-transparent'}`}
+                            onClick={() => setShowRequestModal(true)}
+                            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-dashed border-zinc-300 dark:border-white/20 text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:border-amber-500 hover:text-amber-500 transition-all"
                         >
-                            <span className="material-symbols-outlined text-2xl text-primary">{getGuildIcon(guild)}</span>
-                            <div className="text-left overflow-hidden">
-                                <p className={`font-bold truncate ${selectedGuild?.id === guild.id ? 'text-primary' : ''}`}>{guild.name}</p>
-                                <p className="text-[10px] text-text-subtle-light dark:text-text-subtle-dark font-medium capitalize">{guild.category}</p>
-                            </div>
-                            {selectedGuild?.id === guild.id && (
-                                <div className="ml-auto w-2 h-2 rounded-full bg-primary animate-pulse"></div>
-                            )}
+                            <span className="material-symbols-outlined text-sm">add_circle</span>
+                            <span>Request Guild</span>
                         </button>
-                    ))}
-
-                    <button
-                        onClick={() => setShowRequestModal(true)}
-                        className="w-full flex items-center gap-3 p-3 rounded-xl border border-dashed border-border-light dark:border-border-dark hover:bg-primary/5 hover:border-primary transition-all group"
-                    >
-                        <span className="material-symbols-outlined text-text-subtle-light group-hover:text-primary">add_circle</span>
-                        <div className="text-left">
-                            <p className="text-xs font-bold text-text-subtle-light group-hover:text-primary">Request New Guild</p>
-                        </div>
-                    </button>
+                        <button
+                            onClick={() => setShowCreatePost(true)}
+                            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white font-bold rounded-xl transition-all shadow-md shadow-amber-500/20 active:scale-95 shrink-0 text-xs"
+                        >
+                            <span className="material-symbols-outlined text-base">edit_note</span>
+                            <span>Post in Guild</span>
+                        </button>
+                    </div>
                 </div>
-            </aside>
 
-            {/* Main Area: Feed */}
-            <main className="flex-1 flex flex-col overflow-hidden bg-transparent">
+                {/* Horizontal Cinema Department Tabs */}
+                <div className="border-t border-zinc-100 dark:border-white/[0.04] bg-zinc-50/50 dark:bg-white/[0.01]">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="flex items-center gap-2 overflow-x-auto py-2.5 scrollbar-none snap-x">
+                            {guilds.map((guild) => {
+                                const isActive = selectedGuild?.id === guild.id;
+                                return (
+                                    <button
+                                        key={guild.id}
+                                        onClick={() => handleSelectGuild(guild)}
+                                        className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all snap-start cursor-pointer border ${
+                                            isActive
+                                                ? 'bg-amber-500 text-white border-amber-500 shadow-sm shadow-amber-500/25'
+                                                : 'bg-white dark:bg-zinc-900/80 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-white/[0.08] hover:border-amber-500/40 hover:bg-amber-500/5'
+                                        }`}
+                                    >
+                                        <span className={`material-symbols-outlined text-base ${isActive ? 'text-white' : 'text-amber-500'}`}>
+                                            {getGuildIcon(guild)}
+                                        </span>
+                                        <span>{guild.name}</span>
+                                        <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-semibold ${
+                                            isActive
+                                                ? 'bg-white/20 text-white'
+                                                : 'bg-zinc-100 dark:bg-white/[0.06] text-zinc-500 dark:text-zinc-400'
+                                        }`}>
+                                            {guild.memberCount.toLocaleString()}
+                                        </span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            {/* Main Content Feed Area */}
+            <main className="max-w-5xl mx-auto w-full px-4 sm:px-6 py-6 space-y-6">
                 {selectedGuild && (
                     <>
-                        {/* Feed Header */}
-                        <header className="bg-white/95 dark:bg-[#090A0C]/95 px-5 md:px-8 py-3.5 border-b border-zinc-200 dark:border-white/[0.08] flex justify-between items-center backdrop-blur-xl sticky top-0 z-20 shadow-sm">
-                            <div className="flex items-center gap-3 md:gap-4 overflow-hidden">
-                                <button
-                                    onClick={() => setShowMobileSidebar(true)}
-                                    className="md:hidden p-2 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/[0.08] rounded-xl transition-all"
-                                >
-                                    <span className="material-symbols-outlined text-xl">menu</span>
-                                </button>
-                                <div className="w-11 h-11 md:w-13 md:h-13 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0 text-amber-500 shadow-sm">
-                                    <span className="material-symbols-outlined text-2xl md:text-3xl">{getGuildIcon(selectedGuild)}</span>
+                        {/* Current Guild Banner & Charter Info */}
+                        <div className="bg-white dark:bg-[#121316] p-5 sm:p-6 rounded-3xl border border-zinc-200 dark:border-white/[0.08] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5">
+                            <div className="flex items-start gap-4">
+                                <div className="size-14 rounded-2xl bg-gradient-to-br from-amber-500/20 to-amber-600/10 border border-amber-500/30 flex items-center justify-center text-amber-500 shadow-inner shrink-0">
+                                    <span className="material-symbols-outlined text-3xl">{getGuildIcon(selectedGuild)}</span>
                                 </div>
-                                <div className="min-w-0">
-                                    <div className="flex items-center gap-2 flex-wrap">
-                                        <h3 className="text-base md:text-xl font-bold tracking-tight text-zinc-900 dark:text-white truncate">
+                                <div className="space-y-1">
+                                    <div className="flex items-center gap-2.5 flex-wrap">
+                                        <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white tracking-tight">
                                             {selectedGuild.name}
-                                        </h3>
-                                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-bold uppercase tracking-wider">
+                                        </h2>
+                                        <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-bold uppercase tracking-wider">
                                             {selectedGuild.category}
                                         </span>
                                     </div>
-                                    <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium truncate mt-0.5">
-                                        {selectedGuild.memberCount.toLocaleString()} Industry Members • Official Guild
+                                    <p className="text-xs text-zinc-600 dark:text-zinc-400 max-w-2xl leading-relaxed">
+                                        {selectedGuild.description || 'Dedicated space for verified cinema technicians, department heads, and craft specialists to exchange production standards and technical know-how.'}
+                                    </p>
+                                    <p className="text-[11px] text-zinc-500 font-medium pt-1 flex items-center gap-1.5">
+                                        <span className="size-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                        <span>{selectedGuild.memberCount.toLocaleString()} Industry Members</span>
+                                        <span>•</span>
+                                        <span>Official Cinema Guild</span>
                                     </p>
                                 </div>
                             </div>
                             <button
                                 onClick={() => setShowCreatePost(true)}
-                                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white font-bold rounded-xl transition-all shadow-md shadow-amber-500/20 active:scale-95 shrink-0 text-xs"
+                                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-2xl text-xs transition-all shadow-md shadow-amber-500/20 active:scale-95 shrink-0"
                             >
-                                <span className="material-symbols-outlined text-base">edit_note</span>
-                                <span className="hidden sm:inline">Post in Guild</span>
-                                <span className="sm:hidden">Post</span>
+                                <span className="material-symbols-outlined text-base">add</span>
+                                <span>Start Discussion</span>
                             </button>
-                        </header>
+                        </div>
 
-                        {/* Feed Content */}
-                        <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-5 pb-32">
-                            {/* Observation Notice */}
-                            <div className="bg-white dark:bg-[#121316] p-4 rounded-2xl border border-zinc-200 dark:border-white/[0.08] flex items-center gap-3.5 shadow-sm">
-                                <div className="size-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 shrink-0">
-                                    <span className="material-symbols-outlined text-lg">verified_user</span>
+                        {/* Trade Notice & Guidelines */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {/* Verification Notice */}
+                            <div className="bg-white dark:bg-[#121316] p-4 rounded-2xl border border-zinc-200 dark:border-white/[0.08] flex items-start gap-3 shadow-sm md:col-span-1">
+                                <div className="size-8 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 shrink-0 mt-0.5">
+                                    <span className="material-symbols-outlined text-base">verified_user</span>
                                 </div>
-                                <div className="text-xs text-zinc-600 dark:text-zinc-300 leading-snug">
-                                    <span className="font-bold text-zinc-900 dark:text-white mr-1.5">Trade Verification Notice:</span>
-                                    This is a monitored professional space. Accredited producers, showrunners, and department heads actively scout discussion contributors for film slates.
+                                <div className="text-xs text-zinc-600 dark:text-zinc-400 leading-snug">
+                                    <span className="font-bold text-zinc-900 dark:text-white block mb-0.5">Trade Verified Space</span>
+                                    Monitored guild. Showrunners and producers actively scout technical contributors.
                                 </div>
                             </div>
 
-                            {/* Guidelines Card */}
-                            <div className="bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.08] p-5 rounded-2xl shadow-sm">
-                                <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-3">
-                                    <span className="material-symbols-outlined text-base">policy</span>
-                                    <span>Guild Charter & Discussion Standards</span>
-                                </h4>
-                                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5">
-                                    {selectedGuild.guidelines.map((g: string, i: number) => (
-                                        <li key={i} className="text-xs text-zinc-600 dark:text-zinc-400 flex items-start gap-2">
-                                            <span className="size-1.5 rounded-full bg-amber-500 mt-1.5 shrink-0" />
-                                            <span>{g}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-
-                            {/* Trending Topics Section */}
-                            <div className="bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.08] p-5 rounded-2xl shadow-sm">
-                                <div className="flex items-center justify-between mb-3.5">
-                                    <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
-                                        <span className="material-symbols-outlined text-base">trending_up</span>
-                                        <span>Trending Technical Topics Across Guilds</span>
+                            {/* Guild Standards */}
+                            <div className="bg-white dark:bg-[#121316] p-4 rounded-2xl border border-zinc-200 dark:border-white/[0.08] shadow-sm md:col-span-2">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <span className="material-symbols-outlined text-sm text-amber-500">policy</span>
+                                    <h4 className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+                                        Guild Standards & Focus
                                     </h4>
-                                    <span className="text-[11px] text-zinc-500 font-medium">Updated live</span>
                                 </div>
-                                <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none snap-x snap-mandatory">
-                                    {trendingPosts.length > 0 ? trendingPosts.slice(0, 5).map((post) => (
-                                        <div
-                                            key={post.id}
-                                            onClick={() => {
-                                                // Switch to the guild this post belongs to
-                                                const postGuild = guilds.find(g => g.id === post.guildId);
-                                                if (postGuild) {
-                                                    setSelectedGuild(postGuild);
-                                                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                                                }
-                                            }}
-                                            className="min-w-[280px] max-w-[300px] snap-start bg-zinc-50 dark:bg-white/[0.02] rounded-2xl p-4 border border-zinc-200 dark:border-white/[0.06] hover:border-amber-500/40 hover:shadow-md transition-all cursor-pointer group"
-                                        >
-                                            <div className="flex items-start gap-2.5 mb-2.5">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-zinc-600 dark:text-zinc-400">
+                                    {selectedGuild.guidelines?.slice(0, 4).map((g: string, i: number) => (
+                                        <div key={i} className="flex items-start gap-1.5">
+                                            <span className="size-1.5 rounded-full bg-amber-500 mt-1.5 shrink-0" />
+                                            <span className="line-clamp-2">{g}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Trending Technical Topics Across Guilds Section */}
+                        <div className="bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.08] p-5 rounded-3xl shadow-sm">
+                            <div className="flex items-center justify-between mb-3.5">
+                                <div className="flex items-center gap-2">
+                                    <div className="size-6 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500">
+                                        <span className="material-symbols-outlined text-sm">trending_up</span>
+                                    </div>
+                                    <h3 className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+                                        Trending Technical Topics Across Guilds
+                                    </h3>
+                                </div>
+                                <span className="text-[11px] text-zinc-400 font-medium">Click card to jump directly to thread</span>
+                            </div>
+                            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none snap-x snap-mandatory">
+                                {trendingPosts.length > 0 ? trendingPosts.slice(0, 6).map((post) => (
+                                    <div
+                                        key={post.id}
+                                        onClick={() => handleSelectTrendingTopic(post)}
+                                        className="min-w-[280px] max-w-[310px] snap-start bg-zinc-50 dark:bg-white/[0.02] rounded-2xl p-4 border border-zinc-200 dark:border-white/[0.06] hover:border-amber-500 hover:bg-amber-500/[0.02] hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
+                                    >
+                                        <div>
+                                            <div className="flex items-center gap-2.5 mb-2.5">
                                                 <div
                                                     className="w-8 h-8 rounded-xl bg-cover bg-center shrink-0 border border-zinc-200 dark:border-white/10"
                                                     style={{ backgroundImage: `url(${post.userPhoto || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(post.userName)})` }}
                                                 />
                                                 <div className="flex-1 min-w-0">
                                                     <p className="font-bold text-xs text-zinc-900 dark:text-white truncate">{post.userName}</p>
-                                                    <p className="text-[10px] text-zinc-500 dark:text-zinc-400 truncate">
-                                                        {guilds.find(g => g.id === post.guildId)?.name || 'Guild'}
+                                                    <p className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold truncate">
+                                                        {guilds.find(g => g.id === post.guildId)?.name || 'Guild Thread'}
                                                     </p>
                                                 </div>
                                             </div>
-                                            <h5 className="font-bold text-xs text-zinc-900 dark:text-white mb-1 line-clamp-2 group-hover:text-amber-500 transition-colors leading-snug">
+                                            <h5 className="font-bold text-xs text-zinc-900 dark:text-white mb-1.5 line-clamp-2 group-hover:text-amber-500 transition-colors leading-snug">
                                                 {post.title}
                                             </h5>
                                             <p className="text-[11px] text-zinc-600 dark:text-zinc-400 line-clamp-2 leading-relaxed">
                                                 {post.content}
                                             </p>
-                                            <div className="flex items-center gap-3 mt-3 text-[11px] text-zinc-500 dark:text-zinc-400 pt-2 border-t border-zinc-200/60 dark:border-white/5">
-                                                <span className="flex items-center gap-1">
+                                        </div>
+                                        <div className="flex items-center justify-between mt-3 text-[11px] text-zinc-500 dark:text-zinc-400 pt-2 border-t border-zinc-200/60 dark:border-white/5">
+                                            <div className="flex items-center gap-3">
+                                                <span className="flex items-center gap-1 font-medium">
                                                     <span className="material-symbols-outlined text-xs text-amber-500">thumb_up</span>
                                                     <span>{post.likes}</span>
                                                 </span>
-                                                <span className="flex items-center gap-1">
+                                                <span className="flex items-center gap-1 font-medium">
                                                     <span className="material-symbols-outlined text-xs">chat_bubble</span>
                                                     <span>{post.commentCount}</span>
                                                 </span>
                                             </div>
+                                            <span className="text-[10px] font-bold text-amber-500 group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5">
+                                                <span>View Thread</span>
+                                                <span className="material-symbols-outlined text-xs">arrow_forward</span>
+                                            </span>
                                         </div>
-                                    )) : (
-                                        <div className="w-full py-8 text-center text-zinc-400 text-xs">
-                                            No trending topics yet. Be the first to start a conversation!
-                                        </div>
-                                    )}
-                                </div>
+                                    </div>
+                                )) : (
+                                    <div className="w-full py-8 text-center text-zinc-400 text-xs">
+                                        No trending topics yet. Be the first to start a conversation!
+                                    </div>
+                                )}
                             </div>
+                        </div>
 
-                            {/* Posts */}
+                        {/* Posts Feed */}
+                        <div className="space-y-5">
                             {posts.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center py-20 opacity-50">
-                                    <span className="material-symbols-outlined text-6xl mb-4">forum</span>
-                                    <p className="font-bold">Be the first to share in the {selectedGuild.name}</p>
+                                <div className="bg-white dark:bg-[#121316] rounded-3xl border border-zinc-200 dark:border-white/[0.08] p-12 text-center shadow-sm">
+                                    <div className="size-16 rounded-2xl bg-amber-500/10 text-amber-500 mx-auto flex items-center justify-center mb-4">
+                                        <span className="material-symbols-outlined text-3xl">forum</span>
+                                    </div>
+                                    <h4 className="text-base font-bold text-zinc-900 dark:text-white mb-1">
+                                        No discussions yet in {selectedGuild.name}
+                                    </h4>
+                                    <p className="text-xs text-zinc-500 max-w-md mx-auto mb-5 leading-relaxed">
+                                        Be the first industry professional to start a thread on technique, gear, workflows, or post-production standards.
+                                    </p>
+                                    <button
+                                        onClick={() => setShowCreatePost(true)}
+                                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-xs transition-all shadow-md shadow-amber-500/20"
+                                    >
+                                        <span className="material-symbols-outlined text-base">edit_note</span>
+                                        <span>Create First Post</span>
+                                    </button>
                                 </div>
                             ) : (
                                 posts.map(post => (
@@ -1018,7 +1078,10 @@ function GuildPostCard({ post }: { post: GuildPost }) {
 
     return (
         <>
-            <article className={`bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.08] hover:border-amber-500/30 rounded-3xl shadow-sm hover:shadow-md transition-all group overflow-hidden ${post.type === 'ama' ? 'border-purple-500/30' : ''}`}>
+            <article
+                id={`post-${post.id}`}
+                className={`bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.08] hover:border-amber-500/30 rounded-3xl shadow-sm hover:shadow-md transition-all group overflow-hidden scroll-mt-24 ${post.type === 'ama' ? 'border-purple-500/30' : ''}`}
+            >
                 {/* Post Header */}
                 <div className="p-5 flex items-start gap-3.5">
                     <div className="w-10 h-10 rounded-2xl bg-zinc-100 dark:bg-black overflow-hidden shrink-0 border border-zinc-200 dark:border-white/10 shadow-sm">

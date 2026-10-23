@@ -95,9 +95,207 @@ class GuildService {
         const snapshot = await getDocs(q);
         const guilds = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Guild));
 
-        // Filter out duplicates by slug just in case of seeding issues
-        const uniqueGuilds = Array.from(new Map(guilds.map(g => [g.slug, g])).values());
-        return uniqueGuilds;
+        // Film department slugs whitelist
+        const VALID_FILM_SLUGS = [
+            'cinematography',
+            'directing',
+            'vfx-cgi',
+            'acting',
+            'line-producers',
+            'art-department',
+            'public-relations',
+            'makeup-styling',
+            'music-playback',
+            'post-production',
+            'casting-network'
+        ];
+
+        // Seed fallback film guilds in case firestore hasn't been populated with all cinema guilds yet
+        const DEFAULT_FILM_GUILDS: Guild[] = [
+            {
+                id: 'guild_cinematography',
+                name: 'Cinematography & Camera Guild',
+                slug: 'cinematography',
+                description: 'Director of Photography, Camera Operators, 1st ACs, DITs & Lighting Technicians.',
+                category: 'technical',
+                memberCount: 1420,
+                icon: 'videocam',
+                guidelines: [
+                    'Discuss sensor dynamics, optics, ARRI/RED workflows',
+                    'Share lighting diagrams and technical setups',
+                    'Maintain camera craft professional courtesy'
+                ],
+                moderators: [],
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: 'guild_directing',
+                name: 'Directors & Screenwriters Guild',
+                slug: 'directing',
+                description: 'Feature Film, Series & Commercial Directors, Writers, Script Supervisors.',
+                category: 'creative',
+                memberCount: 1180,
+                icon: 'movie_edit',
+                guidelines: [
+                    'Screenplay craft, scene breakdown & blocking',
+                    'Actor-director collaboration standards',
+                    'Industry pitch decks & festival strategy'
+                ],
+                moderators: [],
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: 'guild_vfx',
+                name: 'VFX & CGI Pros Guild',
+                slug: 'vfx-cgi',
+                description: 'Houdini FX artists, Compositors, 3D Leads, Unreal Engine Virtual Production.',
+                category: 'technical',
+                memberCount: 950,
+                icon: 'movie_filter',
+                guidelines: [
+                    'ACES color space, node graphs, rendering pipelines',
+                    'Virtual production & LED wall camera tracking',
+                    'VFX breakdown breakdowns and credits transparency'
+                ],
+                moderators: [],
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: 'guild_acting',
+                name: 'Actors & Screen Talent Fraternity',
+                slug: 'acting',
+                description: 'Screen actors, voice artists, method performers, stunt coordinators.',
+                category: 'talent',
+                memberCount: 2100,
+                icon: 'theater_comedy',
+                guidelines: [
+                    'Audition etiquette, self-tapes & agent representation',
+                    'Intimacy coordination & on-set performer safety',
+                    'Union rates and contract protections'
+                ],
+                moderators: [],
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: 'guild_post',
+                name: 'Post-Production Suite Guild',
+                slug: 'post-production',
+                description: 'Offline/Online Film Editors, Colorists (DaVinci Resolve), Sound Designers.',
+                category: 'technical',
+                memberCount: 880,
+                icon: 'content_cut',
+                guidelines: [
+                    'Conform workflows, EDL/XML pipeline tips',
+                    'Dolby Atmos mixing & calibrated monitoring',
+                    'Color grading LUTs and HDR delivery specs'
+                ],
+                moderators: [],
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: 'guild_music',
+                name: 'Music & Playback Studio Guild',
+                slug: 'music-playback',
+                description: 'Film Composers, Lyricists, Playback Singers, Orchestrators, Audio Engineers.',
+                category: 'creative',
+                memberCount: 760,
+                icon: 'music_note',
+                guidelines: [
+                    'Score publishing rights & synchronization royalties',
+                    'Multitrack film score recording techniques',
+                    'Background score thematic motifs and cues'
+                ],
+                moderators: [],
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: 'guild_art',
+                name: 'Art & Production Design Guild',
+                slug: 'art-department',
+                description: 'Production Designers, Art Directors, Set Decorators, Prop Masters.',
+                category: 'creative',
+                memberCount: 640,
+                icon: 'palette',
+                guidelines: [
+                    'Period research, moodboards & drafted blueprints',
+                    'Sustainable set construction & material sourcing',
+                    'Prop licensing and safety protocols'
+                ],
+                moderators: [],
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: 'guild_line_producers',
+                name: 'Line Producers & Production Managers',
+                slug: 'line-producers',
+                description: 'Executive Producers, Line Producers, Unit Production Managers, Production Accounts.',
+                category: 'production',
+                memberCount: 910,
+                icon: 'analytics',
+                guidelines: [
+                    'Call sheet templates, shoot schedule optimization',
+                    'Permits, state film subsidies & location compliance',
+                    'Catering, transport & crew welfare standards'
+                ],
+                moderators: [],
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: 'guild_makeup',
+                name: 'Makeup, Prosthetics & Styling Guild',
+                slug: 'makeup-styling',
+                description: 'Special Effects (SFX) Prosthetics, Character Makeup, Costume Designers.',
+                category: 'talent',
+                memberCount: 530,
+                icon: 'face_retouching_natural',
+                guidelines: [
+                    'Silicon appliances, airbrush and blood work safety',
+                    'Continuity logs & 4K camera compatibility',
+                    'Wardrobe breakdown and period authenticity'
+                ],
+                moderators: [],
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: 'guild_pr',
+                name: 'Film PROs & PR Guild',
+                slug: 'public-relations',
+                description: 'Cinema Publicists, Trailer Launch Strategists, Digital Marketers, Media Handlers.',
+                category: 'administrative',
+                memberCount: 490,
+                icon: 'campaign',
+                guidelines: [
+                    'Press meet protocol & teaser reveal timelines',
+                    'Film festival submissions & review embargoes',
+                    'Crisis communications & social sentiment'
+                ],
+                moderators: [],
+                createdAt: new Date().toISOString()
+            }
+        ];
+
+        // Filter out non-film or rogue test records
+        const sanitizedFirestore = guilds.filter(g => {
+            const name = (g.name || '').toLowerCase();
+            const slug = (g.slug || '').toLowerCase();
+            const isDisallowed = name.includes('insolvency') ||
+                name.includes('corporate law') ||
+                name.includes('ca') ||
+                name.includes('firm') ||
+                slug.includes('insolvency') ||
+                slug.includes('corporate');
+            if (isDisallowed) return false;
+            return VALID_FILM_SLUGS.includes(slug) || VALID_FILM_SLUGS.some(s => slug.includes(s));
+        });
+
+        // Merge firestore with default guilds, prioritizing firestore data
+        const mergedMap = new Map<string, Guild>();
+        DEFAULT_FILM_GUILDS.forEach(dg => mergedMap.set(dg.slug, dg));
+        sanitizedFirestore.forEach(fg => {
+            if (fg.slug) mergedMap.set(fg.slug, fg);
+        });
+
+        return Array.from(mergedMap.values());
     }
 
     async requestGuild(requestData: { userId: string, guildName: string, reason: string }) {
