@@ -94,18 +94,14 @@ import { AuthModalProvider } from './context/AuthModalContext';
 import AuthModal from './components/AuthModal';
 import { useLocation } from 'react-router-dom';
 
-function RouteTransitionWrapper({ children }: { children: React.ReactNode }) {
+function ScrollToTop() {
   const location = useLocation();
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, [location.pathname]);
 
-  return (
-    <div className="min-h-screen">
-      {children}
-    </div>
-  );
+  return null;
 }
 
 function App() {
@@ -115,14 +111,14 @@ function App() {
 
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <ToastProvider>
         <AuthModalProvider>
           <UnreadProvider>
             <NotificationListener />
             <AuthModal />
             <Suspense fallback={<PageLoader />}>
-              <RouteTransitionWrapper>
-                <Routes>
+              <Routes>
                   {/* Public Routes */}
                   <Route path="/" element={<Navigate to="/home" replace />} />
                   <Route path="/welcome" element={<Welcome />} />
@@ -174,7 +170,6 @@ function App() {
                   {/* Catch-all fallback */}
                   <Route path="*" element={<Navigate to="/home" replace />} />
                 </Routes>
-              </RouteTransitionWrapper>
             </Suspense>
           </UnreadProvider>
         </AuthModalProvider>

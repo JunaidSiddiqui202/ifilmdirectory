@@ -30,6 +30,7 @@ import PrivacySettingsModal from '../components/PrivacySettingsModal';
 import FollowListModal from '../components/FollowListModal';
 import { useToast } from '../context/ToastContext';
 import SEO, { PersonStructuredData, BreadcrumbStructuredData } from '../components/SEO';
+import { findCuratedTalent } from '../constants/curatedTalent';
 
 // Mock Profiles for fallback
 const mockProfiles: Record<string, any> = {
@@ -217,15 +218,21 @@ export default function UserProfile() {
                         // If not found in Firebase, check mock profiles
                         setProfile(mockProfiles[uid] as UserProfileType);
                     } else {
-                        setProfile(null);
+                        // Check curated talent profiles
+                        const curated = findCuratedTalent(uid);
+                        if (curated) {
+                            setProfile(curated as UserProfileType);
+                        } else {
+                            setProfile(null);
+                        }
                     }
 
                     // Fetch followers/following using the actual UID from the profile
                     const actualUid = data?.uid || uid;
                     const [followers, following, isFollowingUser] = await Promise.all([
-                        getFollowersCount(actualUid),
-                        getFollowingCount(actualUid),
-                        !isMe && currentUser ? isFollowing(currentUser.uid, actualUid) : Promise.resolve(false)
+                        getFollowersCount(actualUid).catch(() => 0),
+                        getFollowingCount(actualUid).catch(() => 0),
+                        !isMe && currentUser ? isFollowing(currentUser.uid, actualUid).catch(() => false) : Promise.resolve(false)
                     ]);
                     setFollowersCount(followers);
                     setFollowingCount(following);
@@ -233,8 +240,15 @@ export default function UserProfile() {
                 }
             } catch (error) {
                 console.error("Error fetching profile:", error);
-                if (id && mockProfiles[id]) {
-                    setProfile(mockProfiles[id] as UserProfileType);
+                if (id) {
+                    if (mockProfiles[id]) {
+                        setProfile(mockProfiles[id] as UserProfileType);
+                    } else {
+                        const curated = findCuratedTalent(id);
+                        if (curated) {
+                            setProfile(curated as UserProfileType);
+                        }
+                    }
                 }
             } finally {
                 setLoading(false);
@@ -445,15 +459,29 @@ export default function UserProfile() {
 
     if (!profile) {
         return (
-            <div className="flex min-h-[100dvh] flex-col items-center justify-center text-zinc-900 dark:text-white bg-background-light dark:bg-background-dark gap-4">
-                <span className="material-symbols-outlined text-6xl text-zinc-400">person_off</span>
-                <p className="text-xl font-bold">User not found</p>
-                <button
-                    onClick={() => navigate(-1)}
-                    className="text-primary hover:underline"
-                >
-                    Go Back
-                </button>
+            <div className="flex min-h-[100dvh] flex-col items-center justify-center text-zinc-900 dark:text-white bg-background-light dark:bg-background-dark px-4 py-12 text-center">
+                <div className="w-16 h-16 rounded-2xl bg-zinc-100 dark:bg-white/5 flex items-center justify-center mb-4 text-zinc-400 dark:text-zinc-500 border border-zinc-200 dark:border-white/10 shadow-sm">
+                    <span className="material-symbols-outlined text-3xl">person_off</span>
+                </div>
+                <h1 className="text-xl sm:text-2xl font-bold tracking-tight mb-2">Profile Not Available</h1>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400 max-w-md mb-6 leading-relaxed">
+                    This profile may have been updated, set to private, or does not exist. Discover verified Indian filmmakers, directors, cinematographers, and actors in our directory.
+                </p>
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={() => navigate('/browse-profiles')}
+                        className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm shadow-md shadow-amber-500/20 transition-all flex items-center gap-2"
+                    >
+                        <span className="material-symbols-outlined text-base">explore</span>
+                        <span>Browse Film Profiles</span>
+                    </button>
+                    <button
+                        onClick={() => navigate('/home')}
+                        className="px-5 py-2.5 rounded-xl bg-zinc-200 dark:bg-white/10 hover:bg-zinc-300 dark:hover:bg-white/20 text-zinc-800 dark:text-white font-semibold text-sm transition-all"
+                    >
+                        Back to Home
+                    </button>
+                </div>
             </div>
         );
     }
