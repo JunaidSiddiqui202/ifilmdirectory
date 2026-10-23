@@ -637,10 +637,10 @@ export default function UserProfile() {
                                 {isMe && (
                                     <button
                                         onClick={() => setIsUploadModalOpen(true)}
-                                        className="absolute bottom-2 right-2 size-9 md:size-10 rounded-full bg-amber-500 border-2 border-white dark:border-[#111317] text-black shadow-xl flex items-center justify-center hover:scale-110 transition-transform active:scale-95 z-20"
-                                        title="Edit photo"
+                                        className="absolute top-1 right-1 size-9 sm:size-10 rounded-full bg-amber-500 hover:bg-amber-400 border-2 border-white dark:border-[#111317] text-black shadow-xl flex items-center justify-center hover:scale-110 transition-transform active:scale-95 z-30"
+                                        title="Change profile photo"
                                     >
-                                        <span className="material-symbols-outlined text-lg md:text-xl font-bold">photo_camera</span>
+                                        <span className="material-symbols-outlined text-lg sm:text-xl font-bold">photo_camera</span>
                                     </button>
                                 )}
                             </div>
