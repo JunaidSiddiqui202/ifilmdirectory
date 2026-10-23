@@ -7,9 +7,12 @@ import AIEnhancedTextarea from '../components/AIEnhancedTextarea';
 import { createPost } from '../services/postService';
 import { showreelService } from '../services/showreelService';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { getUserProfile } from '../services/userService';
 import { Timestamp } from 'firebase/firestore';
 import PostMedia from '../components/PostMedia';
+import HamburgerMenu from '../components/HamburgerMenu';
+import Logo from '../components/Logo';
 
 import SuccessModal from '../components/SuccessModal';
 import { useToast } from '../context/ToastContext';
@@ -19,6 +22,7 @@ type PrivacyOption = 'public' | 'network' | 'private';
 export default function UploadShowreel() {
     const navigate = useNavigate();
     const { currentUser } = useAuth();
+    const { isDarkMode, toggleDarkMode } = useTheme();
     const toast = useToast();
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
@@ -156,58 +160,74 @@ export default function UploadShowreel() {
     };
 
     return (
-        <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark">
-            {/* Header */}
-            <div className="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm">
-                <div className="flex items-center p-4">
-                    <div className="flex size-12 items-center justify-start">
+        <div className="relative flex min-h-screen w-full flex-col bg-slate-50 dark:bg-[#090A0C] text-zinc-900 dark:text-white transition-colors pb-32">
+            {/* Unified Responsive Cinema Header */}
+            <header className="sticky top-0 z-40 bg-white/85 dark:bg-[#090A0C]/85 backdrop-blur-xl border-b border-black/[0.06] dark:border-white/[0.08] px-4 sm:px-6 py-3 transition-colors">
+                <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
                         <button
                             onClick={() => navigate(-1)}
-                            className="hover:opacity-70 transition-opacity"
+                            className="flex size-9 items-center justify-center rounded-xl bg-black/5 dark:bg-white/5 text-zinc-700 dark:text-zinc-300 hover:bg-black/10 dark:hover:bg-white/10 active:scale-95 transition-all"
+                            title="Go Back"
                         >
-                            <span className="material-symbols-outlined text-zinc-900 dark:text-white">arrow_back_ios_new</span>
+                            <span className="material-symbols-outlined text-xl">arrow_back</span>
                         </button>
+                        <HamburgerMenu />
+                        <Logo />
+                        <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-bold tracking-wide">
+                            <span className="material-symbols-outlined text-xs">video_call</span>
+                            Upload Work
+                        </span>
                     </div>
-                    <h2 className="flex-1 text-center text-lg font-bold leading-tight tracking-[-0.015em] text-zinc-900 dark:text-white">
-                        Upload Work
-                    </h2>
-                    <div className="flex w-12 items-center justify-end">
+
+                    <div className="flex items-center gap-2">
+                        {/* Theme Toggle Button */}
+                        <button
+                            onClick={toggleDarkMode}
+                            className="flex size-9 items-center justify-center rounded-xl bg-black/5 dark:bg-white/5 text-zinc-700 dark:text-zinc-300 hover:bg-black/10 dark:hover:bg-white/10 active:scale-95 transition-all"
+                            title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+                        >
+                            <span className="material-symbols-outlined text-lg">
+                                {isDarkMode ? 'light_mode' : 'dark_mode'}
+                            </span>
+                        </button>
+
                         <button
                             onClick={() => navigate(-1)}
-                            className="text-base font-bold leading-normal tracking-[0.015em] text-primary hover:opacity-80 transition-opacity"
+                            className="text-xs sm:text-sm font-bold text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-white px-3 py-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-all"
                         >
                             Cancel
                         </button>
                     </div>
                 </div>
-            </div>
+            </header>
 
-            <div className="flex flex-1 flex-col p-4 pb-28 w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto">
+            <div className="flex flex-1 flex-col p-4 sm:p-6 pb-28 w-full max-w-2xl lg:max-w-3xl mx-auto">
                 {/* Upload Type Toggle */}
-                <div className="flex w-full rounded-lg bg-zinc-100 dark:bg-zinc-900 p-1 mb-6">
+                <div className="flex w-full rounded-2xl bg-black/5 dark:bg-white/5 p-1.5 mb-6 border border-black/[0.04] dark:border-white/[0.06]">
                     <button
                         onClick={() => {
                             setUploadType('embed');
                             setSelectedFile(null);
                         }}
-                        className={`flex-1 rounded-md py-2 text-sm font-bold transition-all ${uploadType === 'embed'
-                            ? 'bg-primary text-white shadow-sm'
-                            : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                        className={`flex-1 rounded-xl py-2.5 text-xs sm:text-sm font-bold transition-all ${uploadType === 'embed'
+                            ? 'bg-amber-500 text-white shadow-md'
+                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                             }`}
                     >
-                        Embed Link (Recommended)
+                        Embed Video Link (YouTube / Vimeo)
                     </button>
                     <button
                         onClick={() => {
                             setUploadType('file');
                             setEmbedUrl('');
                         }}
-                        className={`flex-1 rounded-md py-2 text-sm font-bold transition-all ${uploadType === 'file'
-                            ? 'bg-primary text-white shadow-sm'
-                            : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                        className={`flex-1 rounded-xl py-2.5 text-xs sm:text-sm font-bold transition-all ${uploadType === 'file'
+                            ? 'bg-amber-500 text-white shadow-md'
+                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                             }`}
                     >
-                        Upload File
+                        Upload Video File
                     </button>
                 </div>
 
@@ -530,19 +550,21 @@ export default function UploadShowreel() {
             </div>
 
             {/* Sticky Footer Button */}
-            <div className="fixed bottom-0 left-0 w-full bg-background-light/80 p-4 pb-8 dark:bg-background-dark/80 backdrop-blur-md z-30 border-t border-zinc-200/50 dark:border-white/5">
-                <button
-                    onClick={handleUpload}
-                    disabled={
-                        (uploadType === 'file' && !selectedFile) ||
-                        (uploadType === 'embed' && !embedUrl) ||
-                        !title.trim() ||
-                        isUploading
-                    }
-                    className="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl bg-primary py-4 text-base font-bold text-background-dark disabled:cursor-not-allowed disabled:bg-primary/50 disabled:text-background-dark/50 hover:bg-primary/90 transition-all active:scale-[0.98] shadow-lg shadow-primary/20"
-                >
-                    <span className="truncate">{isUploading ? 'Uploading...' : 'Upload Work'}</span>
-                </button>
+            <div className="fixed bottom-0 left-0 w-full bg-white/90 dark:bg-[#090A0C]/90 p-4 pb-6 backdrop-blur-xl z-30 border-t border-black/[0.06] dark:border-white/[0.08]">
+                <div className="max-w-2xl lg:max-w-3xl mx-auto">
+                    <button
+                        onClick={handleUpload}
+                        disabled={
+                            (uploadType === 'file' && !selectedFile) ||
+                            (uploadType === 'embed' && !embedUrl) ||
+                            !title.trim() ||
+                            isUploading
+                        }
+                        className="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-2xl bg-amber-500 py-3.5 text-base font-black text-black disabled:cursor-not-allowed disabled:opacity-40 hover:bg-amber-400 transition-all active:scale-[0.98] shadow-lg shadow-amber-500/20"
+                    >
+                        <span className="truncate">{isUploading ? 'Uploading Work...' : 'Publish Showreel'}</span>
+                    </button>
+                </div>
             </div>
 
             {/* Portfolio Analysis Modal */}
