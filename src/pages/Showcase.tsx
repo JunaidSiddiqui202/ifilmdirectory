@@ -1147,9 +1147,6 @@ export default function Showcase() {
                         <HamburgerMenu />
                         <div className="flex items-center gap-2 cursor-pointer select-none" onClick={() => navigate('/home')}>
                             <Logo size="sm" showText={true} />
-                            <span className="hidden sm:inline-flex text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/25">
-                                Feed
-                            </span>
                         </div>
                     </div>
 
