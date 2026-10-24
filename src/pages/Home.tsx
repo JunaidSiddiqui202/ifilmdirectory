@@ -68,7 +68,6 @@ export default function Home() {
 
     // Film News & Movie Reviews state
     const [cinemaNews, setCinemaNews] = useState<NewsItem[]>([]);
-    const [newsFilter, setNewsFilter] = useState<'all' | 'review' | 'news'>('all');
     const [selectedNewsArticle, setSelectedNewsArticle] = useState<NewsItem | null>(null);
     const [newsLoading, setNewsLoading] = useState(true);
     const [postsLoading, setPostsLoading] = useState(true);
@@ -249,10 +248,10 @@ export default function Home() {
         }
     };
 
+    // News stream exclusively shows industry news (reviews are featured in the dedicated Movie Reviews widget)
     const filteredNews = cinemaNews.filter(item => {
-        if (newsFilter === 'review') return item.category === 'review' || Boolean(item.rating);
-        if (newsFilter === 'news') return item.category === 'news' && !item.rating;
-        return true;
+        const isReview = item.category === 'review' || Boolean(item.rating);
+        return !isReview;
     });
 
     const handleShareJob = async (job: Job, e: React.MouseEvent) => {
@@ -1069,58 +1068,26 @@ export default function Home() {
                         />
 
 
-                        {/* Film News & Movie Reviews Section (Responsive News Headlines with Small Thumbnails) */}
+                        {/* Film News & Industry Wire Section (Exclusively News Stories — Reviews in Widget) */}
                         <section className="space-y-3">
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
                                         <span className="size-2 rounded-full bg-amber-500 animate-pulse shrink-0" />
                                         <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white tracking-tight">
-                                            Film News & Reviews
+                                            Film News & Industry Wire
                                         </h2>
                                     </div>
                                     <button
                                         onClick={() => navigate('/south-cinema')}
-                                        className="sm:hidden text-xs font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors flex items-center gap-0.5"
+                                        className="sm:hidden text-xs font-bold text-amber-700 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300 transition-colors flex items-center gap-0.5"
                                     >
                                         <span>All Wire</span>
                                         <span className="material-symbols-outlined text-sm">chevron_right</span>
                                     </button>
                                 </div>
 
-                                {/* Filter Pills + Desktop View All */}
                                 <div className="flex items-center justify-between sm:justify-end gap-2">
-                                    <div className="flex items-center bg-zinc-100 dark:bg-white/[0.04] p-0.5 rounded-xl border border-zinc-200 dark:border-white/5 text-[11px] font-bold">
-                                        <button
-                                            onClick={() => setNewsFilter('all')}
-                                            className={`px-2.5 py-1 rounded-lg transition-all ${newsFilter === 'all'
-                                                    ? 'bg-amber-500 text-zinc-950 font-black shadow-xs'
-                                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
-                                                }`}
-                                        >
-                                            All
-                                        </button>
-                                        <button
-                                            onClick={() => setNewsFilter('review')}
-                                            className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 ${newsFilter === 'review'
-                                                    ? 'bg-amber-500 text-zinc-950 font-black shadow-xs'
-                                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
-                                                }`}
-                                        >
-                                            <span className="material-symbols-outlined text-[12px] filled text-zinc-950">star</span>
-                                            <span>Reviews</span>
-                                        </button>
-                                        <button
-                                            onClick={() => setNewsFilter('news')}
-                                            className={`px-2.5 py-1 rounded-lg transition-all ${newsFilter === 'news'
-                                                    ? 'bg-amber-500 text-zinc-950 font-black shadow-xs'
-                                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
-                                                }`}
-                                        >
-                                            News
-                                        </button>
-                                    </div>
-
                                     <button
                                         onClick={() => navigate('/south-cinema')}
                                         className="hidden sm:flex text-xs font-bold text-amber-700 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300 transition-colors items-center gap-0.5"
@@ -1226,7 +1193,7 @@ export default function Home() {
                                         onClick={() => navigate('/south-cinema')}
                                         className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] border border-zinc-200 dark:border-white/10 text-xs font-bold text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-all inline-flex items-center justify-center gap-1.5"
                                     >
-                                        <span>Browse Full Cinema Wire & Reviews ({filteredNews.length})</span>
+                                        <span>Browse Full Cinema Wire ({filteredNews.length})</span>
                                         <span className="material-symbols-outlined text-sm">arrow_forward</span>
                                     </button>
                                 </div>
