@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import HamburgerMenu from '../components/HamburgerMenu';
 import Logo from '../components/Logo';
@@ -21,6 +21,8 @@ import { CURATED_CINEMA_TALENT } from '../constants/curatedTalent';
 
 export default function BrowseProfiles() {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const initialQuery = searchParams.get('q') || '';
     const { currentUser } = useAuth();
     const { openAuthModal } = useAuthModal();
     const { isDarkMode, toggleDarkMode } = useTheme();
@@ -30,7 +32,14 @@ export default function BrowseProfiles() {
     const [pillar, setPillar] = useState<'talent' | 'guilds' | 'studios'>('talent');
 
     // Search and Filters
-    const [searchQuery, setSearchQuery] = useState('');
+    const [searchQuery, setSearchQuery] = useState(initialQuery);
+
+    useEffect(() => {
+        const q = searchParams.get('q');
+        if (q !== null && q !== searchQuery) {
+            setSearchQuery(q);
+        }
+    }, [searchParams]);
     const [activeCraft, setActiveCraft] = useState('All');
     const [activeLocation, setActiveLocation] = useState('All');
     const [availabilityOnly, setAvailabilityOnly] = useState(false);

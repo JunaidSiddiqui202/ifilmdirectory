@@ -306,9 +306,9 @@ export default function Home() {
                 onSubmit={(e) => {
                     e.preventDefault();
                     if (homeSearchQuery.trim()) {
-                        navigate(`/browse-profiles?q=${encodeURIComponent(homeSearchQuery.trim())}`);
+                        navigate(`/search?q=${encodeURIComponent(homeSearchQuery.trim())}`);
                     } else {
-                        navigate('/browse-profiles');
+                        navigate('/search');
                     }
                 }}
                 className="relative flex items-center"
