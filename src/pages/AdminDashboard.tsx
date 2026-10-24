@@ -481,39 +481,48 @@ export default function AdminDashboard() {
     const onlineUsersCount = onlineUsers.length;
 
     return (
-        <div className="flex bg-[#f4f5f8] dark:bg-[#07080a] min-h-screen font-sans text-zinc-900 dark:text-zinc-100 antialiased selection:bg-amber-500 selection:text-black">
+        <div className="flex bg-[#f4f5f8] dark:bg-[#07080a] min-h-[100dvh] h-[100dvh] overflow-hidden font-sans text-zinc-900 dark:text-zinc-100 antialiased selection:bg-amber-500 selection:text-black">
             {/* Sidebar Overlay for Mobile */}
             {isSidebarOpen && (
                 <div
-                    className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm md:hidden"
+                    className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm md:hidden animate-in fade-in"
                     onClick={() => setIsSidebarOpen(false)}
                 />
             )}
 
             {/* Cinematic Admin Sidebar */}
-            <aside className={`fixed inset-y-0 left-0 z-50 w-72 shrink-0 bg-white dark:bg-[#0d0e12] border-r border-zinc-200 dark:border-white/10 transition-transform duration-300 md:relative md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} flex flex-col`}>
-                <div className="p-6 border-b border-zinc-200 dark:border-white/10">
+            <aside className={`fixed inset-y-0 left-0 z-50 w-72 h-[100dvh] max-h-[100dvh] shrink-0 bg-white dark:bg-[#0d0e12] border-r border-zinc-200 dark:border-white/10 transition-transform duration-300 md:static md:translate-x-0 ${isSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'} flex flex-col select-none`}>
+                {/* Header */}
+                <div className="p-5 border-b border-zinc-200 dark:border-white/10 shrink-0 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="size-11 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/25">
-                            <span className="material-symbols-outlined text-black font-black text-2xl">local_movies</span>
+                        <div className="size-11 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/25 shrink-0">
+                            <span className="material-symbols-outlined text-zinc-950 font-black text-2xl">local_movies</span>
                         </div>
                         <div>
                             <div className="flex items-center gap-1.5">
-                                <h1 className="text-lg font-black tracking-tight text-zinc-900 dark:text-white">COMMAND</h1>
-                                <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+                                <h1 className="text-base font-black tracking-tight text-zinc-900 dark:text-white">COMMAND</h1>
+                                <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30">
                                     HQ
                                 </span>
                             </div>
                             <p className="text-[10px] font-bold text-zinc-500 tracking-wider uppercase -mt-0.5">5M Collective Services</p>
                         </div>
                     </div>
+                    {/* Close button for mobile */}
+                    <button
+                        onClick={() => setIsSidebarOpen(false)}
+                        className="md:hidden size-8 rounded-lg bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white"
+                        title="Close Sidebar"
+                    >
+                        <span className="material-symbols-outlined text-lg">close</span>
+                    </button>
                 </div>
 
                 {/* Sidebar Navigation */}
-                <nav className="p-4 space-y-1.5 flex-1 overflow-y-auto custom-scrollbar font-display">
+                <nav className="p-3 space-y-1 flex-1 min-h-0 overflow-y-auto overscroll-contain custom-scrollbar font-display">
                     <button
                         onClick={() => { setActiveTab('dashboard'); setIsSidebarOpen(false); }}
-                        className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all font-bold text-xs uppercase tracking-wider ${activeTab === 'dashboard' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.04]'}`}
+                        className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl transition-all font-bold text-xs uppercase tracking-wider ${activeTab === 'dashboard' ? 'bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30 shadow-sm' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.04]'}`}
                     >
                         <div className="flex items-center gap-3">
                             <span className="material-symbols-outlined text-[20px]">dashboard</span>
@@ -523,14 +532,14 @@ export default function AdminDashboard() {
 
                     <button
                         onClick={() => { setActiveTab('blogs'); setIsSidebarOpen(false); }}
-                        className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all font-bold text-xs uppercase tracking-wider ${activeTab === 'blogs' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.04]'}`}
+                        className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl transition-all font-bold text-xs uppercase tracking-wider ${activeTab === 'blogs' ? 'bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30 shadow-sm' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.04]'}`}
                     >
                         <div className="flex items-center gap-3">
                             <span className="material-symbols-outlined text-[20px]">rate_review</span>
                             <span>Blog Review</span>
                         </div>
                         {pendingBlogsCount > 0 && (
-                            <span className="size-5 rounded-full bg-amber-500 text-white text-[10px] font-black flex items-center justify-center animate-pulse">
+                            <span className="size-5 rounded-full bg-amber-500 text-zinc-950 text-[10px] font-black flex items-center justify-center animate-pulse">
                                 {pendingBlogsCount}
                             </span>
                         )}
@@ -538,7 +547,7 @@ export default function AdminDashboard() {
 
                     <button
                         onClick={() => { setActiveTab('moderation'); setIsSidebarOpen(false); }}
-                        className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all font-bold text-xs uppercase tracking-wider ${activeTab === 'moderation' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.04]'}`}
+                        className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl transition-all font-bold text-xs uppercase tracking-wider ${activeTab === 'moderation' ? 'bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30 shadow-sm' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.04]'}`}
                     >
                         <div className="flex items-center gap-3">
                             <span className="material-symbols-outlined text-[20px]">security</span>
@@ -548,7 +557,7 @@ export default function AdminDashboard() {
 
                     <button
                         onClick={() => { setActiveTab('notices'); setIsSidebarOpen(false); }}
-                        className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all font-bold text-xs uppercase tracking-wider ${activeTab === 'notices' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.04]'}`}
+                        className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl transition-all font-bold text-xs uppercase tracking-wider ${activeTab === 'notices' ? 'bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30 shadow-sm' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.04]'}`}
                     >
                         <div className="flex items-center gap-3">
                             <span className="material-symbols-outlined text-[20px]">campaign</span>
@@ -558,27 +567,27 @@ export default function AdminDashboard() {
 
                     <button
                         onClick={() => { setActiveTab('commercial'); setIsSidebarOpen(false); }}
-                        className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all font-bold text-xs uppercase tracking-wider ${activeTab === 'commercial' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.04]'}`}
+                        className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl transition-all font-bold text-xs uppercase tracking-wider ${activeTab === 'commercial' ? 'bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30 shadow-sm' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.04]'}`}
                     >
                         <div className="flex items-center gap-3">
                             <span className="material-symbols-outlined text-[20px]">monetization_on</span>
                             <span>Commercial & Ads</span>
                         </div>
-                        <span className="text-[10px] text-green-500 font-bold">
+                        <span className="text-[10px] text-green-600 dark:text-green-400 font-black">
                             {commercialMetrics.activeCount} Live
                         </span>
                     </button>
 
                     <button
                         onClick={() => { setActiveTab('users'); setIsSidebarOpen(false); }}
-                        className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all font-bold text-xs uppercase tracking-wider ${activeTab === 'users' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.04]'}`}
+                        className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl transition-all font-bold text-xs uppercase tracking-wider ${activeTab === 'users' ? 'bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30 shadow-sm' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.04]'}`}
                     >
                         <div className="flex items-center gap-3">
                             <span className="material-symbols-outlined text-[20px]">manage_accounts</span>
                             <span>Users & Roles</span>
                         </div>
                         {onlineUsersCount > 0 && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500 text-[10px] font-black border border-emerald-500/20">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 text-[10px] font-black border border-emerald-500/20">
                                 <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                                 {onlineUsersCount} Live
                             </span>
@@ -587,7 +596,7 @@ export default function AdminDashboard() {
 
                     <button
                         onClick={() => { setActiveTab('system'); setIsSidebarOpen(false); }}
-                        className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all font-bold text-xs uppercase tracking-wider ${activeTab === 'system' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.04]'}`}
+                        className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl transition-all font-bold text-xs uppercase tracking-wider ${activeTab === 'system' ? 'bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30 shadow-sm' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.04]'}`}
                     >
                         <div className="flex items-center gap-3">
                             <span className="material-symbols-outlined text-[20px]">tune</span>
@@ -596,15 +605,15 @@ export default function AdminDashboard() {
                     </button>
                 </nav>
 
-                {/* Sidebar Bottom Profile & Return */}
-                <div className="p-4 border-t border-zinc-200 dark:border-white/10 space-y-2">
-                    <div className="p-3 rounded-2xl bg-zinc-100 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/5 flex items-center gap-3">
+                {/* Sidebar Bottom Profile & Return (Shrink-0 to prevent being hidden) */}
+                <div className="p-3 border-t border-zinc-200 dark:border-white/10 space-y-2 shrink-0 bg-white dark:bg-[#0d0e12]">
+                    <div className="p-2.5 rounded-2xl bg-zinc-100 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/5 flex items-center gap-2.5">
                         <div className="size-9 rounded-full overflow-hidden border border-amber-500 shrink-0">
                             <img src={currentUserProfile?.photoURL || ''} alt="" className="size-full object-cover" />
                         </div>
                         <div className="min-w-0 flex-1">
                             <p className="text-xs font-black truncate">{currentUserProfile?.displayName || 'Admin'}</p>
-                            <p className="text-[10px] text-amber-600 dark:text-amber-400 uppercase font-black tracking-wider truncate">
+                            <p className="text-[10px] text-amber-800 dark:text-amber-300 uppercase font-black tracking-wider truncate">
                                 {currentSuperAdmin ? 'Super Admin' : (currentUserProfile?.adminRole || 'Admin')}
                             </p>
                         </div>
@@ -612,7 +621,7 @@ export default function AdminDashboard() {
 
                     <button
                         onClick={() => navigate('/home')}
-                        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-zinc-600 dark:text-zinc-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-zinc-100 dark:hover:bg-white/[0.05] text-xs font-bold transition-all"
+                        className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-zinc-600 dark:text-zinc-400 hover:text-amber-800 dark:hover:text-amber-300 hover:bg-zinc-100 dark:hover:bg-white/[0.05] text-xs font-bold transition-all"
                     >
                         <span className="material-symbols-outlined text-base">arrow_back</span>
                         <span>Return to Main App</span>
@@ -832,14 +841,14 @@ export default function AdminDashboard() {
                             <button
                                 onClick={handleClaimSuperAdmin}
                                 disabled={isClaimingSuperAdmin}
-                                className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-white text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md shadow-amber-500/20 active:scale-95 transition-all"
+                                className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-zinc-950 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md shadow-amber-500/20 active:scale-95 transition-all"
                             >
-                                <span className="material-symbols-outlined text-sm text-white">stars</span>
-                                <span className="text-white">{isClaimingSuperAdmin ? 'Claiming...' : 'Claim Super Admin'}</span>
+                                <span className="material-symbols-outlined text-sm text-zinc-950">stars</span>
+                                <span className="text-zinc-950 font-black">{isClaimingSuperAdmin ? 'Claiming...' : 'Claim Super Admin'}</span>
                             </button>
                         ) : (
-                            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs font-black tracking-wider uppercase">
-                                <span className="material-symbols-outlined text-sm">verified</span>
+                            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-800 dark:text-amber-300 text-xs font-black tracking-wider uppercase">
+                                <span className="material-symbols-outlined text-sm text-amber-600 dark:text-amber-400">verified</span>
                                 <span>Super Admin Verified</span>
                             </div>
                         )}
