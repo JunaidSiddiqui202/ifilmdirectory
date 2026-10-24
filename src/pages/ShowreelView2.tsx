@@ -278,7 +278,7 @@ export default function ShowreelView2() {
                                         </div>
                                     </div>
                                 </div>
-                                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500/10 text-amber-500 border border-amber-500/20 whitespace-nowrap">
+                                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30 whitespace-nowrap">
                                     {job.type}
                                 </span>
                             </div>
@@ -317,7 +317,7 @@ export default function ShowreelView2() {
                                         </div>
                                     </div>
                                 </div>
-                                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500/10 text-amber-500 border border-amber-500/20 whitespace-nowrap">
+                                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30 whitespace-nowrap">
                                     {audition.type}
                                 </span>
                             </div>

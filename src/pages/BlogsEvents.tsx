@@ -212,7 +212,7 @@ export default function BlogsEvents() {
                         <div className="md:hidden flex items-center gap-2.5 cursor-pointer select-none" onClick={() => navigate('/home')}>
                             <HamburgerMenu />
                             <Logo size="sm" showText={true} />
-                            <span className="hidden sm:inline-block text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                            <span className="hidden sm:inline-block text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30">
                                 Editorial
                             </span>
                         </div>
@@ -532,7 +532,7 @@ export default function BlogsEvents() {
                             {/* Header Row: Category, Date, & Article Social Sharing */}
                             <div className="flex items-center justify-between gap-2 mb-4">
                                 <div className="flex items-center gap-2">
-                                    <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 text-xs font-semibold border border-amber-500/20">
+                                    <span className="px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-300 text-xs font-bold border border-amber-500/30">
                                         {activePost.category}
                                     </span>
                                     <span className="text-xs text-zinc-400">

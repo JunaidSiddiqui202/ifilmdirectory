@@ -768,7 +768,7 @@ export default function BrowseProfiles() {
 
                                                     {/* Primary Craft Pill */}
                                                     <div className="flex items-center gap-1">
-                                                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 truncate capitalize">
+                                                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30 truncate capitalize">
                                                             {profile.role || 'Cinema Professional'}
                                                         </span>
                                                     </div>
@@ -844,7 +844,7 @@ export default function BrowseProfiles() {
                                                             <span>{profile.displayName || 'Filmmaker'}</span>
                                                             {renderVerificationBadge(tier)}
                                                         </h3>
-                                                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 capitalize">
+                                                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30 capitalize">
                                                             {profile.role || 'Cinema Professional'}
                                                         </span>
                                                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border flex items-center gap-1 ${avail.badgeBg} ${avail.badgeText} ${avail.badgeBorder}`}>

@@ -659,12 +659,12 @@ export default function Showcase() {
                             <span className="material-symbols-outlined text-amber-500 text-[16px] filled" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
                         )}
                         {post.role && (
-                            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                            <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30">
                                 {post.role}
                             </span>
                         )}
                         {mainFeedTab === 'news' && (
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30">
                                 Filmmaker
                             </span>
                         )}
@@ -679,7 +679,7 @@ export default function Showcase() {
                         className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95 ${
                             post.isFollowing
                                 ? 'bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 border border-black/5 dark:border-white/10'
-                                : 'bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-white border border-amber-500/20'
+                                : 'bg-amber-500/15 text-amber-800 dark:text-amber-300 hover:bg-amber-500 hover:text-black border border-amber-500/30'
                         }`}
                     >
                         {post.isFollowing ? 'Following' : '+ Follow'}
