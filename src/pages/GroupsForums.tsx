@@ -8,6 +8,7 @@ import PostMedia from '../components/PostMedia';
 import SEO from '../components/SEO';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { useTheme } from '../context/ThemeContext';
 
 const formatTimeAgo = (timestamp: any) => {
     if (!timestamp) return 'Just now';
@@ -38,6 +39,7 @@ export default function GroupsForums() {
     const [searchParams, setSearchParams] = useSearchParams();
     const { currentUser } = useAuth();
     const toast = useToast();
+    const { isDarkMode, toggleDarkMode } = useTheme();
 
     // Filters and search
     const [activeTab, setActiveTab] = useState<'all' | 'popular' | 'joined'>('all');
@@ -295,7 +297,7 @@ export default function GroupsForums() {
                         <div>
                             <h1 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
                                 <span>Guilds & Forums</span>
-                                <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-semibold">
+                                <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30 font-semibold">
                                     {groups.length} Channels Active
                                 </span>
                             </h1>
@@ -306,10 +308,20 @@ export default function GroupsForums() {
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={toggleDarkMode}
+                        aria-label="Toggle Theme"
+                        className="size-9 rounded-xl bg-zinc-100 dark:bg-white/[0.05] border border-zinc-200 dark:border-white/[0.08] flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:text-amber-500 transition-colors"
+                        title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+                    >
+                        <span className="material-symbols-outlined text-lg">
+                            {isDarkMode ? 'light_mode' : 'dark_mode'}
+                        </span>
+                    </button>
                     <button
                         onClick={() => navigate('/guilds')}
-                        className="hidden sm:flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] border border-zinc-200 dark:border-white/[0.08] transition-all"
+                        className="hidden sm:flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] border border-zinc-200 dark:border-white/[0.08] transition-all"
                         title="View Detailed Skill Guild Channels"
                     >
                         <span className="material-symbols-outlined text-base text-amber-500">groups</span>
@@ -317,7 +329,7 @@ export default function GroupsForums() {
                     </button>
                     <button
                         onClick={() => setShowCreateModal(true)}
-                        className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 px-4 py-2 text-xs font-bold text-white shadow-lg shadow-amber-500/25 transition-all active:scale-95"
+                        className="flex items-center gap-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 px-3.5 py-2 text-xs font-black text-zinc-950 shadow-md shadow-amber-500/20 transition-all active:scale-95"
                     >
                         <span className="material-symbols-outlined text-base">edit_note</span>
                         <span>Start Discussion</span>
@@ -326,7 +338,7 @@ export default function GroupsForums() {
             </header>
 
             {/* Container */}
-            <div className="w-full max-w-6xl mx-auto flex flex-col flex-1 px-4 md:px-8 py-6 gap-6">
+            <div className="w-full max-w-7xl mx-auto flex flex-col flex-1 px-4 md:px-8 py-6 gap-6">
                 
                 {/* Hero Banner with Search */}
                 <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-zinc-900 via-zinc-950 to-black text-white p-6 md:p-8 border border-white/10 shadow-2xl">
@@ -498,10 +510,10 @@ export default function GroupsForums() {
                                     }
                                     setSearchParams(searchParams);
                                 }}
-                                className={`whitespace-nowrap px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
+                                className={`whitespace-nowrap px-3.5 py-1.5 rounded-xl text-xs transition-all border ${
                                     selectedCategory === cat && !activeDepartmentGroup
-                                        ? 'bg-amber-500 text-white border-transparent shadow-sm'
-                                        : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-white/[0.06] hover:border-zinc-300 dark:hover:border-white/20'
+                                        ? 'bg-amber-500 text-zinc-950 font-black border-amber-500 shadow-md shadow-amber-500/20'
+                                        : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 font-bold border-zinc-200 dark:border-white/[0.08] hover:border-zinc-300 dark:hover:border-white/20'
                                 }`}
                             >
                                 {cat}
