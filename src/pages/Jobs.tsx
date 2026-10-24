@@ -356,11 +356,11 @@ export default function Jobs() {
                                 onClick={() => setFilter(item.id as any)}
                                 className={`whitespace-nowrap flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all ${
                                     filter === item.id
-                                        ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20'
-                                        : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 border border-zinc-200 dark:border-white/5 shadow-sm'
+                                        ? 'bg-amber-500 text-zinc-950 font-black shadow-xs'
+                                        : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 border border-zinc-200 dark:border-white/5 shadow-xs'
                                 }`}
                             >
-                                <span className="material-symbols-outlined text-[15px]">{item.icon}</span>
+                                <span className={`material-symbols-outlined text-[15px] ${filter === item.id ? 'text-zinc-950 font-bold' : ''}`}>{item.icon}</span>
                                 <span>{item.label}</span>
                             </button>
                         ))}

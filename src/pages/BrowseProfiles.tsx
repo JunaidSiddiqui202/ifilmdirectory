@@ -367,7 +367,7 @@ export default function BrowseProfiles() {
                                 onClick={() => setViewMode(prev => prev === 'grid' ? 'directory' : 'grid')}
                                 className={`size-9 rounded-xl flex items-center justify-center transition-all ${
                                     viewMode === 'directory'
-                                        ? 'bg-amber-500 text-white shadow-md'
+                                        ? 'bg-amber-500 text-zinc-950 font-bold shadow-xs'
                                         : 'bg-white dark:bg-[#121316] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/10 hover:text-zinc-900 dark:hover:text-white'
                                 }`}
                                 title={viewMode === 'grid' ? "Switch to Directory List" : "Switch to Grid View"}
@@ -379,7 +379,7 @@ export default function BrowseProfiles() {
                         )}
                         <button
                             onClick={() => setShowMap(true)}
-                            className="size-9 rounded-xl bg-amber-500/10 text-amber-500 dark:text-amber-400 border border-amber-500/25 flex items-center justify-center active:scale-95 transition-all"
+                            className="size-9 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/25 flex items-center justify-center active:scale-95 transition-all"
                             title="Interactive Map Discovery"
                         >
                             <span className="material-symbols-outlined text-xl">map</span>
@@ -389,14 +389,14 @@ export default function BrowseProfiles() {
                                 onClick={() => setShowFilterModal(true)}
                                 className={`size-9 rounded-xl flex items-center justify-center relative transition-all ${
                                     activeFilterCount > 0
-                                        ? 'bg-amber-500 text-white font-bold'
+                                        ? 'bg-amber-500 text-zinc-950 font-bold'
                                         : 'bg-white dark:bg-[#121316] text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/10'
                                 }`}
                                 title="Filters"
                             >
                                 <span className="material-symbols-outlined text-xl">tune</span>
                                 {activeFilterCount > 0 && (
-                                    <span className="absolute -top-1 -right-1 size-4 bg-amber-400 text-white font-black text-[9px] rounded-full flex items-center justify-center shadow-md">
+                                    <span className="absolute -top-1 -right-1 size-4 bg-amber-500 text-zinc-950 font-black text-[9px] rounded-full flex items-center justify-center shadow-xs">
                                         {activeFilterCount}
                                     </span>
                                 )}
@@ -425,27 +425,27 @@ export default function BrowseProfiles() {
                         <div className="flex items-center gap-2.5">
 
                             {pillar === 'talent' && (
-                                <div className="flex items-center bg-white dark:bg-[#121316] p-1 rounded-xl border border-zinc-200 dark:border-white/10 shadow-sm">
+                                <div className="flex items-center bg-white dark:bg-[#121316] p-1 rounded-xl border border-zinc-200 dark:border-white/10 shadow-xs">
                                     <button
                                         onClick={() => setViewMode('grid')}
                                         className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
                                             viewMode === 'grid'
-                                                ? 'bg-amber-500 text-white shadow-sm'
+                                                ? 'bg-amber-500 text-zinc-950 font-black shadow-xs'
                                                 : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                         }`}
                                     >
-                                        <span className="material-symbols-outlined text-base">grid_view</span>
+                                        <span className={`material-symbols-outlined text-base ${viewMode === 'grid' ? 'text-zinc-950 font-bold' : ''}`}>grid_view</span>
                                         <span>Grid</span>
                                     </button>
                                     <button
                                         onClick={() => setViewMode('directory')}
                                         className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
                                             viewMode === 'directory'
-                                                ? 'bg-amber-500 text-white shadow-sm'
+                                                ? 'bg-amber-500 text-zinc-950 font-black shadow-xs'
                                                 : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                         }`}
                                     >
-                                        <span className="material-symbols-outlined text-base">format_list_bulleted</span>
+                                        <span className={`material-symbols-outlined text-base ${viewMode === 'directory' ? 'text-zinc-950 font-bold' : ''}`}>format_list_bulleted</span>
                                         <span>Directory</span>
                                     </button>
                                 </div>

@@ -340,7 +340,7 @@ export default function SouthCinemaNews() {
                             <button
                                 onClick={handleManualRefresh}
                                 disabled={isRefreshing}
-                                className="px-3 py-2 rounded-xl bg-amber-500 text-white hover:bg-amber-400 font-bold text-xs transition-all active:scale-95 disabled:opacity-50 shadow-sm flex items-center gap-1.5"
+                                className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-zinc-950 font-black text-xs transition-all active:scale-95 disabled:opacity-50 shadow-xs flex items-center gap-1.5"
                                 title="Refresh all cinema RSS feeds"
                             >
                                 <span className={`material-symbols-outlined text-base ${isRefreshing ? 'animate-spin' : ''}`}>sync</span>
@@ -486,7 +486,7 @@ export default function SouthCinemaNews() {
                             onClick={() => setActiveTab('all')}
                             className={`px-3.5 py-2 rounded-xl text-xs font-bold shrink-0 transition-all ${
                                 activeTab === 'all'
-                                    ? 'bg-amber-500 text-white shadow-md'
+                                    ? 'bg-amber-500 text-zinc-950 font-black shadow-xs'
                                     : 'bg-white dark:bg-[#121316] text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/[0.08]'
                             }`}
                         >
@@ -653,8 +653,8 @@ export default function SouthCinemaNews() {
                                                 {badge.label}
                                             </span>
                                             {isReview && (
-                                                <span className="text-[10px] font-black px-2 py-0.5 rounded-lg bg-amber-500 text-white shadow-md flex items-center gap-0.5 border border-amber-400/30">
-                                                    <span className="material-symbols-outlined text-[11px] filled text-white">star</span>
+                                                <span className="text-[10px] font-black px-2 py-0.5 rounded-lg bg-amber-500 text-zinc-950 shadow-md flex items-center gap-0.5 border border-amber-400/50">
+                                                    <span className="material-symbols-outlined text-[11px] filled text-zinc-950">star</span>
                                                     <span>{item.rating || 'REVIEW'}</span>
                                                 </span>
                                             )}
