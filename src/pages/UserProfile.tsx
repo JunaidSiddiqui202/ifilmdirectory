@@ -192,6 +192,7 @@ export default function UserProfile() {
     const [isFollowListModalOpen, setIsFollowListModalOpen] = useState(false);
     const [followListType, setFollowListType] = useState<'followers' | 'following'>('followers');
     const [isAddToProjectOpen, setIsAddToProjectOpen] = useState(false);
+    const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
 
     const isMe = !id || (currentUser && (id === currentUser.uid || profile?.uid === currentUser.uid));
 
@@ -446,6 +447,23 @@ export default function UserProfile() {
             console.error("Error saving privacy settings:", error);
             toast.error("Failed to update privacy settings.");
             throw error;
+        }
+    };
+
+    const openExternalPopup = (url: string, windowName: string = 'iFilmExternalPopup') => {
+        if (!url) return;
+        const width = Math.min(1060, Math.max(680, Math.floor(window.innerWidth * 0.88)));
+        const height = Math.min(900, Math.max(600, Math.floor(window.innerHeight * 0.90)));
+        const left = Math.max(0, Math.floor((window.screen.width - width) / 2));
+        const top = Math.max(0, Math.floor((window.screen.height - height) / 2));
+
+        const popupFeatures = `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes,status=no,toolbar=no,menubar=no,location=yes`;
+        const popup = window.open(url, windowName, popupFeatures);
+
+        if (popup) {
+            popup.focus();
+        } else {
+            window.open(url, '_blank', 'noopener,noreferrer');
         }
     };
 
@@ -1395,15 +1413,16 @@ export default function UserProfile() {
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
                                 {/* Email */}
                                 {profile?.email ? (
-                                    <a
-                                        className="flex flex-col items-center justify-center gap-2.5 p-5 rounded-2xl bg-zinc-50 dark:bg-black/30 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/10 hover:border-amber-500 hover:text-amber-500 transition-all shadow-xs group"
-                                        href={`mailto:${profile.email}`}
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsEmailModalOpen(true)}
+                                        className="flex flex-col items-center justify-center gap-2.5 p-5 rounded-2xl bg-zinc-50 dark:bg-black/30 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/10 hover:border-amber-500 hover:text-amber-500 transition-all shadow-xs group cursor-pointer"
                                     >
                                         <div className="size-11 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center group-hover:scale-110 transition-transform">
                                             <span className="material-symbols-outlined text-2xl">mail</span>
                                         </div>
                                         <span className="text-xs font-bold">Email</span>
-                                    </a>
+                                    </button>
                                 ) : !isMe && profile?.uid ? (
                                     <button
                                         onClick={() => {
@@ -1424,32 +1443,40 @@ export default function UserProfile() {
 
                                 {/* Website */}
                                 {profile?.socialLinks?.website && (
-                                    <a
-                                        className="flex flex-col items-center justify-center gap-2.5 p-5 rounded-2xl bg-zinc-50 dark:bg-black/30 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/10 hover:border-amber-500 hover:text-amber-500 transition-all shadow-xs group"
-                                        href={profile.socialLinks.website.startsWith('http') ? profile.socialLinks.website : `https://${profile.socialLinks.website}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const siteUrl = profile.socialLinks!.website!.startsWith('http') 
+                                                ? profile.socialLinks!.website! 
+                                                : `https://${profile.socialLinks!.website!}`;
+                                            openExternalPopup(siteUrl, 'WebsitePopup');
+                                        }}
+                                        className="flex flex-col items-center justify-center gap-2.5 p-5 rounded-2xl bg-zinc-50 dark:bg-black/30 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/10 hover:border-amber-500 hover:text-amber-500 transition-all shadow-xs group cursor-pointer"
                                     >
                                         <div className="size-11 rounded-xl bg-sky-500/10 text-sky-500 flex items-center justify-center group-hover:scale-110 transition-transform">
                                             <span className="material-symbols-outlined text-2xl">language</span>
                                         </div>
                                         <span className="text-xs font-bold">Website</span>
-                                    </a>
+                                    </button>
                                 )}
 
                                 {/* IMDb */}
                                 {profile?.socialLinks?.imdb && (
-                                    <a
-                                        className="flex flex-col items-center justify-center gap-2.5 p-5 rounded-2xl bg-zinc-50 dark:bg-black/30 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/10 hover:border-amber-500 hover:text-amber-500 transition-all shadow-xs group"
-                                        href={profile.socialLinks.imdb.startsWith('http') ? profile.socialLinks.imdb : `https://www.imdb.com/name/${profile.socialLinks.imdb}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const imdbUrl = profile.socialLinks!.imdb!.startsWith('http') 
+                                                ? profile.socialLinks!.imdb! 
+                                                : `https://www.imdb.com/name/${profile.socialLinks!.imdb!}`;
+                                            openExternalPopup(imdbUrl, 'IMDbPopup');
+                                        }}
+                                        className="flex flex-col items-center justify-center gap-2.5 p-5 rounded-2xl bg-zinc-50 dark:bg-black/30 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-white/10 hover:border-amber-500 hover:text-amber-500 transition-all shadow-xs group cursor-pointer"
                                     >
                                         <div className="size-11 rounded-xl bg-amber-500/15 text-amber-500 flex items-center justify-center group-hover:scale-110 transition-transform">
                                             <span className="material-symbols-outlined text-2xl">movie</span>
                                         </div>
                                         <span className="text-xs font-bold">IMDb</span>
-                                    </a>
+                                    </button>
                                 )}
 
                                 {/* Share */}
@@ -1530,6 +1557,86 @@ export default function UserProfile() {
                         setIsAddToProjectOpen(false);
                     }}
                 />
+            )}
+
+            {/* Email Contact Popup Window/Modal */}
+            {isEmailModalOpen && profile?.email && (
+                <div 
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in"
+                    onClick={() => setIsEmailModalOpen(false)}
+                >
+                    <div 
+                        className="bg-white dark:bg-[#14161b] rounded-3xl border border-zinc-200 dark:border-white/10 shadow-2xl w-full max-w-md p-6 space-y-5 animate-in zoom-in-95"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Header */}
+                        <div className="flex items-center justify-between border-b border-zinc-200 dark:border-white/10 pb-4">
+                            <div className="flex items-center gap-3">
+                                <div className="size-10 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center border border-amber-500/20">
+                                    <span className="material-symbols-outlined text-2xl">mail</span>
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-zinc-900 dark:text-white text-base">Direct Email Channel</h3>
+                                    <p className="text-xs text-zinc-500 font-medium">Contact {profile.displayName || 'Creator'}</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setIsEmailModalOpen(false)}
+                                className="size-8 rounded-full bg-zinc-100 hover:bg-zinc-200 dark:bg-white/5 dark:hover:bg-white/10 text-zinc-500 dark:text-zinc-400 flex items-center justify-center transition-colors cursor-pointer"
+                            >
+                                <span className="material-symbols-outlined text-lg">close</span>
+                            </button>
+                        </div>
+
+                        {/* Email Address Display */}
+                        <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-black/30 border border-zinc-200 dark:border-white/10 space-y-1.5">
+                            <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Official Inquiries & Bookings</span>
+                            <div className="flex items-center justify-between gap-2">
+                                <span className="text-sm font-semibold text-zinc-900 dark:text-white font-mono break-all select-all">
+                                    {profile.email}
+                                </span>
+                                <button
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(profile.email || '');
+                                        toast.success("Email copied to clipboard!");
+                                    }}
+                                    className="px-2.5 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-bold transition-all border border-amber-500/30 flex items-center gap-1 shrink-0 cursor-pointer"
+                                    title="Copy Email"
+                                >
+                                    <span className="material-symbols-outlined text-sm">content_copy</span>
+                                    <span>Copy</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="grid grid-cols-2 gap-2.5 pt-1">
+                            {/* Direct Mail Client */}
+                            <a
+                                href={`mailto:${profile.email}?subject=Project%20Inquiry%20via%20iFilmDirectory`}
+                                onClick={() => setIsEmailModalOpen(false)}
+                                className="py-3 px-4 rounded-xl bg-amber-500 text-black hover:bg-amber-400 font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/20 transition-all text-center"
+                            >
+                                <span className="material-symbols-outlined text-base">send</span>
+                                <span>Default App</span>
+                            </a>
+
+                            {/* Webmail Popups (Gmail) */}
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(profile.email || '')}&su=${encodeURIComponent('Project Inquiry via iFilmDirectory')}`;
+                                    openExternalPopup(gmailUrl, 'GmailComposePopup');
+                                    setIsEmailModalOpen(false);
+                                }}
+                                className="py-3 px-4 rounded-xl bg-zinc-100 dark:bg-white/10 hover:bg-zinc-200 dark:hover:bg-white/15 text-zinc-900 dark:text-white font-bold text-xs flex items-center justify-center gap-1.5 border border-zinc-200 dark:border-white/10 transition-all text-center cursor-pointer"
+                            >
+                                <span className="material-symbols-outlined text-base">open_in_new</span>
+                                <span>Webmail / Gmail</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );
