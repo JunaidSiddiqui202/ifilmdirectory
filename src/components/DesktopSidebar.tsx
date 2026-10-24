@@ -98,7 +98,7 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                                 title={item.label}
                                 className={`relative group flex items-center justify-center xl:justify-start gap-4 px-3 py-2.5 rounded-2xl transition-all duration-200 ${
                                     active
-                                        ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold border border-amber-500/30 dark:border-amber-500/20 shadow-sm'
+                                        ? 'bg-zinc-900 text-white dark:bg-amber-500/15 dark:text-amber-400 font-bold border border-zinc-800 dark:border-amber-500/30 shadow-sm'
                                         : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.05]'
                                 }`}
                                 aria-current={active ? 'page' : undefined}
@@ -106,7 +106,7 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                                 {/* Icon */}
                                 <div className="relative flex items-center justify-center shrink-0">
                                     {item.isProfile ? (
-                                        <div className={`size-7 rounded-full overflow-hidden border-2 transition-all ${active ? 'border-amber-500 ring-2 ring-amber-500/30' : 'border-zinc-300 dark:border-white/20 group-hover:border-zinc-500 dark:group-hover:border-white/50'}`}>
+                                        <div className={`size-7 rounded-full overflow-hidden border-2 transition-all ${active ? 'border-zinc-900 dark:border-amber-500 ring-2 ring-zinc-900/20 dark:ring-amber-500/30' : 'border-zinc-300 dark:border-white/20 group-hover:border-zinc-500 dark:group-hover:border-white/50'}`}>
                                             <PostMedia
                                                 src={currentUser?.photoURL || ''}
                                                 fallbackType="USER_MALE"
@@ -116,7 +116,7 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                                     ) : (
                                         <span
                                             className={`material-symbols-outlined text-[24px] transition-transform duration-200 group-hover:scale-110 ${
-                                                active ? 'filled text-amber-500 dark:text-amber-400' : 'text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white'
+                                                active ? 'filled text-amber-400 dark:text-amber-400' : 'text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white'
                                             }`}
                                             style={active ? { fontVariationSettings: "'FILL' 1" } : undefined}
                                         >
@@ -131,7 +131,7 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                                 </div>
 
                                 {/* Label (Visible on xl) */}
-                                <span className={`hidden xl:inline text-sm tracking-tight truncate ${active ? 'font-bold text-zinc-900 dark:text-white' : 'font-medium text-zinc-700 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-white'}`}>
+                                <span className={`hidden xl:inline text-sm tracking-tight truncate ${active ? 'font-bold text-white dark:text-white' : 'font-medium text-zinc-700 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-white'}`}>
                                     {item.label}
                                 </span>
 
@@ -153,11 +153,11 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                                 }
                                 setIsCreateOpen(!isCreateOpen);
                             }}
-                            className="w-full flex items-center justify-center xl:justify-start gap-3.5 px-3 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white font-extrabold shadow-lg shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-95 group"
+                            className="w-full flex items-center justify-center xl:justify-start gap-3.5 px-3 py-2.5 rounded-2xl bg-zinc-900 hover:bg-black text-white dark:bg-gradient-to-r dark:from-amber-500 dark:to-amber-600 dark:hover:from-amber-400 dark:hover:to-amber-500 font-extrabold shadow-md hover:shadow-lg transition-all hover:scale-[1.02] active:scale-95 group border border-zinc-800 dark:border-amber-400/20"
                             title="Create Post / Job / Reel"
                         >
-                            <span className="material-symbols-outlined text-[24px] font-black">add_circle</span>
-                            <span className="hidden xl:inline text-sm font-black tracking-wide">
+                            <span className="material-symbols-outlined text-[24px] font-black text-amber-400 dark:text-white">add_circle</span>
+                            <span className="hidden xl:inline text-sm font-black tracking-wide text-white">
                                 Create / Post
                             </span>
 

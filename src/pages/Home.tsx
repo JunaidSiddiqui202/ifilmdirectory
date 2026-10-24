@@ -289,11 +289,11 @@ export default function Home() {
 
     // Reusable Primary Discovery Hub (Find Talent, Find Work, Search)
     const PrimaryDiscoveryHub = () => (
-        <section className="rounded-2xl sm:rounded-3xl bg-gradient-to-br from-amber-500/10 via-white dark:via-[#121316] to-zinc-50 dark:to-[#0d0e11] border border-amber-500/20 p-4 sm:p-5 shadow-sm space-y-3.5">
+        <section className="rounded-2xl sm:rounded-3xl bg-white dark:bg-[#121316] border border-zinc-200/90 dark:border-white/5 p-4 sm:p-5 shadow-xs dark:shadow-none space-y-3.5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                 <div>
                     <h2 className="text-base sm:text-base font-black text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
-                        <span className="material-symbols-outlined text-amber-500 text-xl" aria-hidden="true">theater_comedy</span>
+                        <span className="material-symbols-outlined text-amber-600 dark:text-amber-400 text-xl" aria-hidden="true">theater_comedy</span>
                         <span>Find Talent & Production Opportunities</span>
                     </h2>
                     <p className="text-xs sm:text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
@@ -321,11 +321,11 @@ export default function Home() {
                     onChange={(e) => setHomeSearchQuery(e.target.value)}
                     placeholder="Search actors, directors, crew, auditions, studios..."
                     aria-label="Search film directory by name, craft, or role"
-                    className="w-full pl-10 sm:pl-11 pr-24 sm:pr-28 py-2.5 sm:py-2.5 rounded-xl sm:rounded-2xl bg-white dark:bg-black/50 border border-zinc-200 dark:border-white/10 text-sm sm:text-sm text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:border-amber-500 shadow-xs"
+                    className="w-full pl-10 sm:pl-11 pr-24 sm:pr-28 py-2.5 sm:py-2.5 rounded-xl sm:rounded-2xl bg-zinc-50 dark:bg-black/50 border border-zinc-200 dark:border-white/10 text-sm sm:text-sm text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:border-amber-500 shadow-xs"
                 />
                 <button
                     type="submit"
-                    className="absolute right-1.5 sm:right-2 px-3.5 sm:px-3 py-1.5 sm:py-1.5 rounded-lg sm:rounded-xl bg-amber-500 hover:bg-amber-600 text-black font-black text-xs sm:text-xs transition-all shadow-xs"
+                    className="absolute right-1.5 sm:right-2 px-3.5 sm:px-3 py-1.5 sm:py-1.5 rounded-lg sm:rounded-xl bg-zinc-900 hover:bg-black text-white dark:bg-amber-500 dark:hover:bg-amber-600 dark:text-black font-black text-xs sm:text-xs transition-all shadow-xs"
                 >
                     Search
                 </button>
@@ -335,9 +335,9 @@ export default function Home() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-0.5">
                 <Link
                     to="/browse-profiles"
-                    className="flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-2.5 rounded-xl sm:rounded-2xl bg-white dark:bg-[#18191d] border border-zinc-200 dark:border-white/5 hover:border-amber-500/40 transition-all group shadow-xs"
+                    className="flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-2.5 rounded-xl sm:rounded-2xl bg-zinc-50 dark:bg-[#18191d] border border-zinc-200/80 dark:border-white/5 hover:border-amber-500/40 transition-all group shadow-xs"
                 >
-                    <div className="size-9 sm:size-8 rounded-xl sm:rounded-lg bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                    <div className="size-9 sm:size-8 rounded-xl sm:rounded-lg bg-amber-500/15 text-amber-700 dark:text-amber-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                         <span className="material-symbols-outlined text-lg sm:text-base" aria-hidden="true">person_search</span>
                     </div>
                     <div className="min-w-0">
@@ -871,7 +871,7 @@ export default function Home() {
                             </button>
                             <button
                                 onClick={() => navigate('/south-cinema')}
-                                className="px-3 py-1 rounded-full text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 hover:bg-amber-500/20 transition-all flex items-center gap-1"
+                                className="px-3 py-1 rounded-full text-xs font-bold text-amber-700 dark:text-amber-400 bg-amber-500/15 border border-amber-500/25 hover:bg-amber-500/25 transition-all flex items-center gap-1"
                             >
                                 <span className="material-symbols-outlined text-xs">theaters</span>
                                 <span>South Cinema Wire</span>
@@ -957,7 +957,7 @@ export default function Home() {
                     <div className="xl:col-span-2 space-y-6">
 
                         {/* Welcome Banner with LinkedIn-Style Cinema Availability Ribbon & 1-Click Status Switcher */}
-                        <div className="rounded-2xl sm:rounded-3xl bg-gradient-to-r from-amber-500/10 via-zinc-100/90 to-zinc-50 dark:from-amber-500/10 dark:via-[#141519] dark:to-[#18191d] border border-amber-500/20 dark:border-white/[0.08] p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="rounded-2xl sm:rounded-3xl bg-white dark:bg-[#141519] border border-zinc-200/90 dark:border-white/[0.08] p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                             <div className="flex items-center gap-3.5 sm:gap-4 min-w-0">
                                 {currentUser ? (
                                     <div className="relative group cursor-pointer" onClick={() => navigate('/profile')}>
