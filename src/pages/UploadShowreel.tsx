@@ -202,352 +202,426 @@ export default function UploadShowreel() {
                 </div>
             </header>
 
-            <div className="flex flex-1 flex-col p-4 sm:p-6 pb-28 w-full max-w-2xl lg:max-w-3xl mx-auto">
-                {/* Upload Type Toggle */}
-                <div className="flex w-full rounded-2xl bg-black/5 dark:bg-white/5 p-1.5 mb-6 border border-black/[0.04] dark:border-white/[0.06]">
-                    <button
-                        onClick={() => {
-                            setUploadType('embed');
-                            setSelectedFile(null);
-                        }}
-                        className={`flex-1 rounded-xl py-2.5 text-xs sm:text-sm font-bold transition-all ${uploadType === 'embed'
-                            ? 'bg-amber-500 text-white shadow-md'
-                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
-                            }`}
-                    >
-                        Embed Video Link (YouTube / Vimeo)
-                    </button>
-                    <button
-                        onClick={() => {
-                            setUploadType('file');
-                            setEmbedUrl('');
-                        }}
-                        className={`flex-1 rounded-xl py-2.5 text-xs sm:text-sm font-bold transition-all ${uploadType === 'file'
-                            ? 'bg-amber-500 text-white shadow-md'
-                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
-                            }`}
-                    >
-                        Upload Video File
-                    </button>
+            <main className="flex-1 w-full max-w-2xl lg:max-w-3xl mx-auto px-4 sm:px-6 py-6 pb-36 space-y-6">
+                {/* Hero / Intro Card */}
+                <div className="text-center max-w-lg mx-auto space-y-2">
+                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 inline-flex items-center gap-1.5">
+                        <span className="material-symbols-outlined text-sm">video_library</span>
+                        <span>Creator & Talent Showreel Hub</span>
+                    </span>
+                    <h1 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white tracking-tight">
+                        Upload Your Showreel
+                    </h1>
+                    <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
+                        Share your best performance, cinematography reel, or craft breakdown with casting directors and producers.
+                    </p>
                 </div>
 
-                {/* Embed Link Input */}
-                {uploadType === 'embed' && (
-                    <div className="flex flex-col gap-4 mb-6">
-                        <div className="flex flex-col gap-2">
-                            <label className="text-base font-medium leading-normal text-zinc-900 dark:text-white">Video Link</label>
-                            <input
-                                className="form-input flex h-14 w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-4 text-base font-normal leading-normal text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:border-primary focus:outline-0 focus:ring-0"
-                                placeholder="Paste video link (YouTube, YouTube Shorts, Vimeo)..."
-                                value={embedUrl}
-                                onChange={(e) => setEmbedUrl(e.target.value)}
-                            />
-                            <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                                Supports YouTube, YouTube Shorts, and Vimeo. Upload file for other video types.
-                            </p>
-                        </div>
-
-                        {/* Embed Preview - Using PostMedia for proper rendering */}
-                        {embedUrl && (
-                            <div className="rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700">
-                                <PostMedia src={embedUrl} alt="Video preview" className="w-full" />
-                            </div>
-                        )}
+                {/* Section 1: Video Media Source */}
+                <section className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.08] shadow-sm space-y-5">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-sm font-black text-zinc-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                            <span className="material-symbols-outlined text-amber-500 text-base">movie</span>
+                            <span>Video Source</span>
+                        </h2>
+                        <span className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400">Step 1 of 3</span>
                     </div>
-                )}
 
-                {/* Video Upload Area */}
-                {uploadType === 'file' && !selectedFile && !isUploading && (
-                    <div className="flex flex-col items-center gap-6 rounded-xl border-2 border-dashed border-zinc-300 dark:border-zinc-700 px-6 py-14">
-                        <div className="flex flex-col items-center gap-2">
-                            <span className="material-symbols-outlined text-4xl text-primary">upload_file</span>
-                            <p className="text-center text-lg font-bold leading-tight tracking-[-0.015em] text-zinc-900 dark:text-white">
-                                Tap to select a video
-                            </p>
-                            <p className="max-w-[480px] text-center text-sm font-normal leading-normal text-zinc-500 dark:text-zinc-400">
-                                Select a video file to upload as your showreel.
-                            </p>
-                            <p className="text-xs text-orange-500 font-medium bg-orange-100 dark:bg-orange-400/10 px-2 py-1 rounded">
-                                Max size: 35MB
-                            </p>
-                        </div>
-                        <label className="flex h-10 min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-zinc-900 dark:bg-white px-4 text-sm font-bold leading-normal tracking-[0.015em] text-white dark:text-black hover:opacity-90 transition-opacity">
-                            <span className="truncate">Select Video</span>
-                            <input
-                                type="file"
-                                accept="video/*"
-                                onChange={handleFileSelect}
-                                className="hidden"
-                            />
-                        </label>
+                    {/* Segmented Control */}
+                    <div className="flex h-12 w-full items-center justify-center rounded-2xl bg-zinc-100 dark:bg-white/[0.04] p-1.5 border border-zinc-200 dark:border-white/[0.06]">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setUploadType('embed');
+                                setSelectedFile(null);
+                            }}
+                            className={`flex flex-1 items-center justify-center gap-2 h-full rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                                uploadType === 'embed'
+                                    ? 'bg-amber-500 text-zinc-950 font-black shadow-md shadow-amber-500/20'
+                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                            }`}
+                        >
+                            <span className="material-symbols-outlined text-base">link</span>
+                            <span>Embed Video (YouTube / Vimeo)</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setUploadType('file');
+                                setEmbedUrl('');
+                            }}
+                            className={`flex flex-1 items-center justify-center gap-2 h-full rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                                uploadType === 'file'
+                                    ? 'bg-amber-500 text-zinc-950 font-black shadow-md shadow-amber-500/20'
+                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                            }`}
+                        >
+                            <span className="material-symbols-outlined text-base">cloud_upload</span>
+                            <span>Upload Video File</span>
+                        </button>
                     </div>
-                )}
 
-                {/* Video Preview & Progress (File) */}
-                {uploadType === 'file' && (selectedFile || isUploading) && (
-                    <div className="relative mb-4 w-full overflow-hidden rounded-xl">
-                        {selectedFile && !isUploading ? (
-                            <>
-                                <div className="relative w-full aspect-[9/16] max-h-[500px] mx-auto bg-black rounded-xl overflow-hidden">
-                                    <video
-                                        src={URL.createObjectURL(selectedFile)}
-                                        className="w-full h-full object-contain"
-                                        controls
-                                        playsInline
-                                        onLoadedMetadata={(e) => {
-                                            const video = e.currentTarget;
-                                            const isVertical = video.videoHeight > video.videoWidth;
-                                            setVideoOrientation(isVertical ? 'vertical' : 'horizontal');
-                                        }}
+                    {/* Embed Link Input */}
+                    {uploadType === 'embed' && (
+                        <div className="space-y-3">
+                            <label className="flex flex-col gap-1.5">
+                                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                                    Video URL *
+                                </span>
+                                <div className="relative">
+                                    <input
+                                        className="w-full rounded-xl bg-zinc-50 dark:bg-black/30 border border-zinc-200 dark:border-white/10 pl-11 pr-4 py-3 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-amber-500 transition-colors"
+                                        placeholder="https://www.youtube.com/watch?v=... or Vimeo"
+                                        value={embedUrl}
+                                        onChange={(e) => setEmbedUrl(e.target.value)}
                                     />
-                                    <button
-                                        onClick={() => {
-                                            setSelectedFile(null);
-                                            setVideoOrientation(null);
-                                        }}
-                                        className="absolute top-3 right-3 flex size-10 items-center justify-center rounded-full bg-black/60 backdrop-blur-sm text-white hover:bg-black/80 transition-colors z-10 border border-white/20"
-                                    >
-                                        <span className="material-symbols-outlined text-lg">close</span>
-                                    </button>
-                                    <div className="absolute bottom-3 left-3 right-3 bg-black/60 backdrop-blur-sm rounded-lg p-3 border border-white/10">
-                                        <p className="text-white text-sm font-medium truncate">{selectedFile.name}</p>
-                                        <p className="text-white/70 text-xs mt-1">
-                                            {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
-                                        </p>
-                                    </div>
+                                    <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 text-lg">
+                                        smart_display
+                                    </span>
                                 </div>
+                                <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                                    Supports YouTube Videos, YouTube Shorts, and Vimeo public streams.
+                                </p>
+                            </label>
 
-                                {/* Orientation Warning */}
-                                {videoOrientation === 'horizontal' && (
-                                    <div className="mt-3 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl flex items-start gap-3">
-                                        <span className="material-symbols-outlined text-amber-600 dark:text-amber-400 text-xl shrink-0">warning</span>
-                                        <div className="flex-1">
-                                            <p className="text-sm font-bold text-amber-900 dark:text-amber-300 mb-1">
-                                                Horizontal Video Detected
-                                            </p>
-                                            <p className="text-xs text-amber-800 dark:text-amber-400 leading-relaxed">
-                                                This video is in landscape (16:9) format. For the best viewing experience in the showreel viewer,
-                                                we recommend using vertical (9:16) videos like TikTok or Instagram Reels.
-                                                Horizontal videos will display with black bars on the sides.
-                                            </p>
-                                        </div>
-                                    </div>
-                                )}
-                            </>
-                        ) : (
-                            <div className="h-48 w-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center rounded-xl relative overflow-hidden">
-                                <span className="material-symbols-outlined text-6xl text-white/50">videocam</span>
-                                <div className="absolute inset-0 bg-black/50 flex flex-col justify-end p-4">
-                                    <div className="flex flex-col gap-2">
-                                        <div className="flex justify-between">
-                                            <p className="text-white text-base font-medium leading-normal">Uploading...</p>
-                                            <p className="text-white text-sm font-normal leading-normal">{uploadProgress}%</p>
-                                        </div>
-                                        <div className="rounded-full bg-white/30">
-                                            <div
-                                                className="h-2 rounded-full bg-primary transition-all duration-300"
-                                                style={{ width: `${uploadProgress}%` }}
-                                            />
-                                        </div>
-                                        <p className="text-white/80 text-sm font-normal leading-normal">Do not close the app</p>
-                                    </div>
+                            {/* Embed Preview */}
+                            {embedUrl && (
+                                <div className="rounded-2xl overflow-hidden bg-black/5 dark:bg-black/40 border border-zinc-200 dark:border-white/10 shadow-inner">
+                                    <PostMedia src={embedUrl} alt="Video preview" className="w-full" />
                                 </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Video Upload Area */}
+                    {uploadType === 'file' && !selectedFile && !isUploading && (
+                        <div className="flex flex-col items-center gap-4 rounded-2xl border-2 border-dashed border-zinc-300 dark:border-white/10 px-6 py-10 hover:border-amber-500/50 bg-zinc-50/50 dark:bg-black/20 transition-colors text-center">
+                            <div className="size-14 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 flex items-center justify-center">
+                                <span className="material-symbols-outlined text-3xl">upload_file</span>
                             </div>
-                        )}
-                    </div>
-                )}
+                            <div className="space-y-1">
+                                <p className="text-base font-bold text-zinc-900 dark:text-white">
+                                    Drag & drop or tap to select a video
+                                </p>
+                                <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-sm">
+                                    MP4, MOV, or WebM format recommended. Max file size: 35MB.
+                                </p>
+                            </div>
+                            <label className="cursor-pointer inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 font-bold text-xs uppercase tracking-wider transition-all shadow-md active:scale-95">
+                                <span className="material-symbols-outlined text-base">folder_open</span>
+                                <span>Browse Files</span>
+                                <input
+                                    type="file"
+                                    accept="video/*"
+                                    onChange={handleFileSelect}
+                                    className="hidden"
+                                />
+                            </label>
+                        </div>
+                    )}
 
-                {/* Form Fields */}
-                <div className="flex flex-col gap-6 pt-6">
+                    {/* Video Preview & Progress (File) */}
+                    {uploadType === 'file' && (selectedFile || isUploading) && (
+                        <div className="relative w-full overflow-hidden rounded-2xl">
+                            {selectedFile && !isUploading ? (
+                                <>
+                                    <div className="relative w-full aspect-[9/16] max-h-[460px] mx-auto bg-black rounded-2xl overflow-hidden shadow-lg">
+                                        <video
+                                            src={URL.createObjectURL(selectedFile)}
+                                            className="w-full h-full object-contain"
+                                            controls
+                                            playsInline
+                                            onLoadedMetadata={(e) => {
+                                                const video = e.currentTarget;
+                                                const isVertical = video.videoHeight > video.videoWidth;
+                                                setVideoOrientation(isVertical ? 'vertical' : 'horizontal');
+                                            }}
+                                        />
+                                        <button
+                                            onClick={() => {
+                                                setSelectedFile(null);
+                                                setVideoOrientation(null);
+                                            }}
+                                            className="absolute top-3 right-3 flex size-9 items-center justify-center rounded-full bg-black/70 backdrop-blur-md text-white hover:bg-red-500 transition-colors z-10 border border-white/20"
+                                            title="Remove Video"
+                                        >
+                                            <span className="material-symbols-outlined text-lg">close</span>
+                                        </button>
+                                        <div className="absolute bottom-3 left-3 right-3 bg-black/70 backdrop-blur-md rounded-xl p-3 border border-white/10 flex items-center justify-between">
+                                            <div className="min-w-0 pr-2">
+                                                <p className="text-white text-xs font-bold truncate">{selectedFile.name}</p>
+                                                <p className="text-white/70 text-[11px] mt-0.5">
+                                                    {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
+                                                </p>
+                                            </div>
+                                            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-white/20 text-white shrink-0 uppercase tracking-wider">
+                                                {videoOrientation || 'Video'}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* Orientation Warning */}
+                                    {videoOrientation === 'horizontal' && (
+                                        <div className="mt-3 p-3.5 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-start gap-3">
+                                            <span className="material-symbols-outlined text-amber-600 dark:text-amber-400 text-lg shrink-0 mt-0.5">warning</span>
+                                            <div className="flex-1 text-xs">
+                                                <p className="font-bold text-amber-900 dark:text-amber-300">
+                                                    Horizontal Video Detected
+                                                </p>
+                                                <p className="text-amber-800 dark:text-amber-400 mt-0.5 leading-relaxed">
+                                                    For the best mobile showreel viewer experience, vertical 9:16 reels are recommended. Landscape videos will be centered with cinematic framing.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                <div className="h-44 w-full bg-zinc-900 rounded-2xl flex items-center justify-center relative overflow-hidden">
+                                    <div className="flex flex-col items-center gap-3 w-full max-w-xs px-4">
+                                        <span className="material-symbols-outlined text-4xl text-amber-500 animate-pulse">cloud_upload</span>
+                                        <div className="w-full">
+                                            <div className="flex justify-between text-xs font-bold text-white mb-1.5">
+                                                <span>Uploading Media...</span>
+                                                <span className="text-amber-400">{uploadProgress}%</span>
+                                            </div>
+                                            <div className="h-2 w-full rounded-full bg-white/10 overflow-hidden">
+                                                <div
+                                                    className="h-full rounded-full bg-amber-500 transition-all duration-300"
+                                                    style={{ width: `${uploadProgress}%` }}
+                                                />
+                                            </div>
+                                        </div>
+                                        <p className="text-white/60 text-[11px]">Please keep this page open</p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </section>
+
+                {/* Section 2: Showreel Details */}
+                <section className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.08] shadow-sm space-y-4">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-sm font-black text-zinc-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                            <span className="material-symbols-outlined text-amber-500 text-base">edit_note</span>
+                            <span>Showreel Details</span>
+                        </h2>
+                        <span className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400">Step 2 of 3</span>
+                    </div>
+
                     {/* Title */}
-                    <label className="flex flex-col">
-                        <p className="pb-2 text-base font-medium leading-normal text-zinc-900 dark:text-white">Title</p>
+                    <label className="flex flex-col gap-1.5">
+                        <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                            Showreel Title *
+                        </span>
                         <input
-                            className="form-input flex h-14 w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-4 text-base font-normal leading-normal text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:border-primary focus:outline-0 focus:ring-0"
-                            placeholder="Enter showreel title"
+                            className="w-full rounded-xl bg-zinc-50 dark:bg-black/30 border border-zinc-200 dark:border-white/10 px-4 py-3 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-amber-500 transition-colors"
+                            placeholder="e.g. Lead Dramatic Monologue Reel 2025 or DOP Action Showreel"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                         />
                     </label>
 
                     {/* Description */}
-                    <AIEnhancedTextarea
-                        label="Description"
-                        context="Showreel Description"
-                        value={description}
-                        onValueChange={setDescription}
-                        placeholder="Add a brief summary of your work"
-                        rows={4}
-                    />
-
-                    {/* Professional Links Section - NEW! */}
-                    <div className="flex flex-col gap-4 p-4 rounded-xl bg-gradient-to-r from-primary/10 to-purple-600/10 border border-primary/30">
-                        <div className="flex items-center gap-2 mb-2">
-                            <span className="material-symbols-outlined text-primary text-2xl">verified</span>
-                            <div>
-                                <h3 className="text-zinc-900 dark:text-white font-bold text-lg">Professional Links</h3>
-                                <p className="text-sm text-zinc-500 dark:text-zinc-400">Add your profiles for more accurate AI analysis</p>
-                            </div>
-                        </div>
-
-                        {/* IMDb Profile */}
-                        <label className="flex flex-col">
-                            <div className="flex items-center gap-2 pb-2">
-                                <span className="material-symbols-outlined text-yellow-500 text-lg">movie</span>
-                                <p className="text-base font-medium leading-normal text-zinc-900 dark:text-white">IMDb Profile (Optional)</p>
-                            </div>
-                            <input
-                                className="form-input flex h-14 w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-4 text-base font-normal leading-normal text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:border-primary focus:outline-0 focus:ring-0"
-                                placeholder="https://www.imdb.com/name/nm..."
-                                value={imdbUrl}
-                                onChange={(e) => setImdbUrl(e.target.value)}
-                            />
-                            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">AI will analyze your filmography, ratings, and roles</p>
-                        </label>
-
-                        {/* Wikipedia Profile */}
-                        <label className="flex flex-col">
-                            <div className="flex items-center gap-2 pb-2">
-                                <span className="material-symbols-outlined text-blue-400 text-lg">article</span>
-                                <p className="text-base font-medium leading-normal text-zinc-900 dark:text-white">Wikipedia Page (Optional)</p>
-                            </div>
-                            <input
-                                className="form-input flex h-14 w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-4 text-base font-normal leading-normal text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:border-primary focus:outline-0 focus:ring-0"
-                                placeholder="https://en.wikipedia.org/wiki/..."
-                                value={wikipediaUrl}
-                                onChange={(e) => setWikipediaUrl(e.target.value)}
-                            />
-                            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">AI will analyze your career highlights and awards</p>
-                        </label>
-
-                        {/* CV/Resume Upload */}
-                        <div className="flex flex-col">
-                            <div className="flex items-center gap-2 pb-2">
-                                <span className="material-symbols-outlined text-green-400 text-lg">description</span>
-                                <p className="text-base font-medium leading-normal text-zinc-900 dark:text-white">CV/Resume (Optional)</p>
-                            </div>
-                            <div className="flex gap-2">
-                                <label className="flex-1 flex items-center justify-center h-14 px-4 py-2 border-2 border-dashed border-zinc-300 dark:border-zinc-600 rounded-lg text-zinc-500 dark:text-zinc-400 hover:border-primary hover:text-primary transition-colors cursor-pointer bg-white dark:bg-zinc-900">
-                                    <span className="material-symbols-outlined mr-2">upload_file</span>
-                                    <span className="text-sm font-medium">
-                                        {cvFile ? cvFile.name : 'Upload CV (PDF, DOC)'}
-                                    </span>
-                                    <input
-                                        type="file"
-                                        accept=".pdf,.doc,.docx"
-                                        onChange={(e) => {
-                                            const file = e.target.files?.[0];
-                                            if (file) setCvFile(file);
-                                        }}
-                                        className="hidden"
-                                    />
-                                </label>
-                                {cvFile && (
-                                    <button
-                                        onClick={() => setCvFile(null)}
-                                        className="flex items-center justify-center w-14 h-14 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors"
-                                    >
-                                        <span className="material-symbols-outlined">delete</span>
-                                    </button>
-                                )}
-                            </div>
-                            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">AI will extract your experience, skills, and education</p>
-                        </div>
-
-                        {/* Info Box */}
-                        <div className="bg-blue-100 dark:bg-blue-500/10 border border-blue-300 dark:border-blue-500/30 rounded-lg p-3 flex items-start gap-2">
-                            <span className="material-symbols-outlined text-blue-500 dark:text-blue-400 text-lg mt-0.5">info</span>
-                            <div className="flex-1">
-                                <p className="text-blue-700 dark:text-blue-300 text-sm font-bold mb-1">Why add these?</p>
-                                <p className="text-blue-600 dark:text-blue-200 text-xs">
-                                    AI will analyze your complete professional profile for more accurate insights,
-                                    industry comparisons, and personalized recommendations based on your actual credits and experience.
-                                </p>
-                            </div>
-                        </div>
+                    <div>
+                        <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 block mb-1.5">
+                            Description & Film Credits
+                        </span>
+                        <AIEnhancedTextarea
+                            label=""
+                            context="Showreel Description"
+                            value={description}
+                            onValueChange={setDescription}
+                            placeholder="Detail your roles, directors worked with, film projects, gear used, or standout scenes..."
+                            rows={4}
+                        />
                     </div>
 
-                    {/* AI Analysis Button */}
-                    {(title.trim() || description.trim()) && (
-                        <div className="bg-gradient-to-r from-primary/10 to-purple-600/10 dark:from-primary/20 dark:to-purple-600/20 rounded-xl p-4 border border-primary/30">
-                            <div className="flex items-start gap-3 mb-3">
-                                <span className="material-symbols-outlined text-primary text-2xl">auto_awesome</span>
-                                <div className="flex-1">
-                                    <h4 className="text-zinc-900 dark:text-white font-bold mb-1">Get AI Feedback</h4>
-                                    <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                                        Let AI analyze your portfolio and provide professional insights
-                                    </p>
-                                </div>
-                            </div>
-                            <AIButton
-                                onClick={() => setShowAnalysisModal(true)}
-                                label="Analyze My Portfolio"
-                                variant="primary"
-                                className="w-full justify-center"
-                            />
-                        </div>
-                    )}
-
                     {/* Tags */}
-                    <div className="flex flex-col">
-                        <p className="pb-2 text-base font-medium leading-normal text-zinc-900 dark:text-white">Tags</p>
-                        <div className="flex flex-wrap items-center gap-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-2 focus-within:border-primary">
+                    <div className="space-y-1.5">
+                        <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                                Craft & Role Tags
+                            </span>
+                            <span className="text-[11px] text-zinc-400">Press Enter to add</span>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-black/30 p-2.5 focus-within:border-amber-500 transition-colors">
                             {tags.map((tag) => (
-                                <div key={tag} className="flex items-center gap-1 rounded-full bg-primary/20 px-3 py-1">
-                                    <span className="text-sm font-medium text-primary">{tag}</span>
+                                <div key={tag} className="flex items-center gap-1 rounded-lg bg-amber-500/15 border border-amber-500/30 px-2.5 py-1 text-xs font-bold text-amber-700 dark:text-amber-400">
+                                    <span>#{tag}</span>
                                     <button
+                                        type="button"
                                         onClick={() => handleRemoveTag(tag)}
-                                        className="text-primary/70 hover:text-primary transition-colors"
+                                        className="text-amber-600 dark:text-amber-400/80 hover:text-amber-800 dark:hover:text-amber-200 transition-colors ml-0.5"
                                     >
-                                        <span className="material-symbols-outlined !text-sm">close</span>
+                                        <span className="material-symbols-outlined !text-sm leading-none">close</span>
                                     </button>
                                 </div>
                             ))}
                             <input
-                                className="form-input flex-1 bg-transparent p-2 text-base text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-0 border-none"
-                                placeholder="Add tags..."
+                                className="flex-1 min-w-[120px] bg-transparent px-2 py-1 text-xs sm:text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none"
+                                placeholder="Add role tag (e.g., DOP, Editor, Fight Choreographer)..."
                                 value={newTag}
                                 onChange={(e) => setNewTag(e.target.value)}
                                 onKeyDown={handleAddTag}
                             />
                         </div>
                     </div>
+                </section>
 
-                    {/* Privacy Settings */}
-                    <div className="flex flex-col gap-3">
-                        <p className="text-base font-medium leading-normal text-zinc-900 dark:text-white">Privacy</p>
-                        <div className="grid grid-cols-3 gap-2 rounded-xl bg-zinc-100 dark:bg-zinc-900 p-1">
-                            <button
-                                onClick={() => setPrivacy('public')}
-                                className={`rounded-lg py-2 text-center text-sm font-semibold transition-colors ${privacy === 'public'
-                                    ? 'bg-primary text-background-dark'
-                                    : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800'
-                                    }`}
-                            >
-                                Public
-                            </button>
-                            <button
-                                onClick={() => setPrivacy('network')}
-                                className={`rounded-lg py-2 text-center text-sm font-semibold transition-colors ${privacy === 'network'
-                                    ? 'bg-primary text-background-dark'
-                                    : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800'
-                                    }`}
-                            >
-                                Network Only
-                            </button>
-                            <button
-                                onClick={() => setPrivacy('private')}
-                                className={`rounded-lg py-2 text-center text-sm font-semibold transition-colors ${privacy === 'private'
-                                    ? 'bg-primary text-background-dark'
-                                    : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800'
-                                    }`}
-                            >
-                                Private
-                            </button>
+                {/* Section 3: Professional Profiles & AI Analysis */}
+                <section className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.08] shadow-sm space-y-4">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-sm font-black text-zinc-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                            <span className="material-symbols-outlined text-amber-500 text-base">verified</span>
+                            <span>Industry Proof & AI Audit</span>
+                        </h2>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 uppercase tracking-wide">
+                            Enhanced
+                        </span>
+                    </div>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                        Link your verified IMDb, Wikipedia, or CV to unlock intelligent portfolio benchmarking.
+                    </p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+                        {/* IMDb Profile */}
+                        <label className="flex flex-col gap-1.5">
+                            <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
+                                <span className="material-symbols-outlined text-amber-500 text-sm">movie</span>
+                                <span>IMDb Profile</span>
+                            </span>
+                            <input
+                                className="w-full rounded-xl bg-zinc-50 dark:bg-black/30 border border-zinc-200 dark:border-white/10 px-3.5 py-2.5 text-xs sm:text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-amber-500 transition-colors"
+                                placeholder="https://www.imdb.com/name/nm..."
+                                value={imdbUrl}
+                                onChange={(e) => setImdbUrl(e.target.value)}
+                            />
+                        </label>
+
+                        {/* Wikipedia Profile */}
+                        <label className="flex flex-col gap-1.5">
+                            <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
+                                <span className="material-symbols-outlined text-sky-500 text-sm">article</span>
+                                <span>Wikipedia / Press</span>
+                            </span>
+                            <input
+                                className="w-full rounded-xl bg-zinc-50 dark:bg-black/30 border border-zinc-200 dark:border-white/10 px-3.5 py-2.5 text-xs sm:text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-amber-500 transition-colors"
+                                placeholder="https://en.wikipedia.org/wiki/..."
+                                value={wikipediaUrl}
+                                onChange={(e) => setWikipediaUrl(e.target.value)}
+                            />
+                        </label>
+                    </div>
+
+                    {/* CV/Resume Upload */}
+                    <div className="space-y-1.5">
+                        <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
+                            <span className="material-symbols-outlined text-emerald-500 text-sm">description</span>
+                            <span>Resume / Portfolio Document</span>
+                        </span>
+                        <div className="flex items-center gap-2">
+                            <label className="flex-1 flex items-center justify-between h-11 px-3.5 border border-dashed border-zinc-300 dark:border-white/15 rounded-xl text-zinc-500 dark:text-zinc-400 hover:border-amber-500 hover:text-amber-500 transition-colors cursor-pointer bg-zinc-50 dark:bg-black/30">
+                                <span className="flex items-center gap-2 text-xs truncate">
+                                    <span className="material-symbols-outlined text-base">upload_file</span>
+                                    <span className="font-medium truncate">{cvFile ? cvFile.name : 'Upload CV / Bio (PDF, DOC)'}</span>
+                                </span>
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-zinc-200 dark:bg-white/10 uppercase tracking-wider text-zinc-700 dark:text-zinc-300 shrink-0">
+                                    {cvFile ? 'Change' : 'Choose'}
+                                </span>
+                                <input
+                                    type="file"
+                                    accept=".pdf,.doc,.docx"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) setCvFile(file);
+                                    }}
+                                    className="hidden"
+                                />
+                            </label>
+                            {cvFile && (
+                                <button
+                                    type="button"
+                                    onClick={() => setCvFile(null)}
+                                    className="size-11 flex items-center justify-center rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors shrink-0"
+                                    title="Remove document"
+                                >
+                                    <span className="material-symbols-outlined text-base">delete</span>
+                                </button>
+                            )}
                         </div>
                     </div>
-                </div>
-            </div>
+
+                    {/* AI Analysis Card */}
+                    {(title.trim() || description.trim()) && (
+                        <div className="rounded-2xl p-4 bg-gradient-to-r from-purple-500/10 via-amber-500/5 to-transparent border border-purple-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3">
+                            <div className="flex items-start gap-2.5">
+                                <span className="material-symbols-outlined text-purple-600 dark:text-purple-400 text-2xl shrink-0 mt-0.5">auto_awesome</span>
+                                <div>
+                                    <h4 className="text-xs font-black text-zinc-900 dark:text-white uppercase tracking-wider">
+                                        AI Showreel Feedback
+                                    </h4>
+                                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                                        Analyze credits, pacing, and keywords for casting director search engines.
+                                    </p>
+                                </div>
+                            </div>
+                            <AIButton
+                                onClick={() => setShowAnalysisModal(true)}
+                                label="Audit My Reel"
+                                variant="primary"
+                                className="shrink-0"
+                            />
+                        </div>
+                    )}
+                </section>
+
+                {/* Section 4: Privacy Settings */}
+                <section className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.08] shadow-sm space-y-3">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-sm font-black text-zinc-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                            <span className="material-symbols-outlined text-amber-500 text-base">lock</span>
+                            <span>Audience & Privacy</span>
+                        </h2>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2 rounded-2xl bg-zinc-100 dark:bg-white/[0.04] p-1.5 border border-zinc-200 dark:border-white/[0.06]">
+                        <button
+                            type="button"
+                            onClick={() => setPrivacy('public')}
+                            className={`rounded-xl py-2.5 text-center text-xs font-bold transition-all ${
+                                privacy === 'public'
+                                    ? 'bg-amber-500 text-zinc-950 font-black shadow-md shadow-amber-500/20'
+                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                            }`}
+                        >
+                            Public
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setPrivacy('network')}
+                            className={`rounded-xl py-2.5 text-center text-xs font-bold transition-all ${
+                                privacy === 'network'
+                                    ? 'bg-amber-500 text-zinc-950 font-black shadow-md shadow-amber-500/20'
+                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                            }`}
+                        >
+                            Industry Only
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setPrivacy('private')}
+                            className={`rounded-xl py-2.5 text-center text-xs font-bold transition-all ${
+                                privacy === 'private'
+                                    ? 'bg-amber-500 text-zinc-950 font-black shadow-md shadow-amber-500/20'
+                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                            }`}
+                        >
+                            Private Link
+                        </button>
+                    </div>
+                </section>
+            </main>
 
             {/* Sticky Footer Button */}
             <div className="fixed bottom-0 left-0 w-full bg-white/90 dark:bg-[#090A0C]/90 p-4 pb-6 backdrop-blur-xl z-30 border-t border-black/[0.06] dark:border-white/[0.08]">
