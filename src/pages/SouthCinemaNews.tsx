@@ -308,9 +308,6 @@ export default function SouthCinemaNews() {
                                 <div>
                                     <h1 className="text-sm font-black text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
                                         <span>South Cinema Wire</span>
-                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-500/15 text-red-600 dark:text-red-400 border border-red-500/20">
-                                            Live Wire
-                                        </span>
                                     </h1>
                                     <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
                                         Tollywood • Kollywood • Mollywood • Sandalwood
