@@ -230,8 +230,8 @@ export default function PostJob() {
                 </header>
 
                 <main className="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 md:p-8 flex flex-col justify-center">
-                    <div className="text-center max-w-lg mx-auto mb-8 space-y-1.5">
-                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 inline-flex items-center gap-1.5">
+                    <div className="text-center max-w-lg mx-auto mb-8 space-y-2">
+                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30 inline-flex items-center gap-1.5 shadow-sm">
                             <span className="material-symbols-outlined text-sm">hub</span>
                             <span>Creator & Industry Studio Hub</span>
                         </span>
@@ -250,10 +250,10 @@ export default function PostJob() {
                             className="flex flex-col text-left p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#121316] border border-amber-500/30 hover:border-amber-500 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-200 group relative overflow-hidden"
                         >
                             <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl group-hover:bg-amber-500/20 transition-all" />
-                            <div className="size-14 rounded-2xl bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <div className="size-14 rounded-2xl bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                                 <span className="material-symbols-outlined text-3xl">work</span>
                             </div>
-                            <span className="text-[10px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-1 flex items-center gap-1">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-amber-800 dark:text-amber-300 mb-1 flex items-center gap-1">
                                 <span className="size-1.5 rounded-full bg-amber-500 animate-pulse" />
                                 <span>Recruiter & Casting Call</span>
                             </span>
@@ -263,7 +263,7 @@ export default function PostJob() {
                             <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed mb-4">
                                 Recruit verified cast, technicians, directors, DOPs, editors, and production crew for your next film.
                             </p>
-                            <div className="mt-auto flex items-center gap-1 text-xs font-black text-amber-600 dark:text-amber-400 group-hover:translate-x-1 transition-transform">
+                            <div className="mt-auto flex items-center gap-1 text-xs font-black text-amber-800 dark:text-amber-300 group-hover:translate-x-1 transition-transform">
                                 <span>Start Casting Wizard</span>
                                 <span className="material-symbols-outlined text-base">arrow_forward</span>
                             </div>
@@ -445,42 +445,67 @@ export default function PostJob() {
         }
 
         return (
-            <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark pb-24">
-                <header className="sticky top-0 z-10 flex items-center justify-between bg-background-light/80 p-4 backdrop-blur-sm dark:bg-background-dark/80 border-b border-zinc-200 dark:border-zinc-800">
-                    <button onClick={() => setCreationMode('select')} className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors">
-                        <span className="material-symbols-outlined">arrow_back</span>
+            <div className="relative flex min-h-[100dvh] w-full flex-col bg-slate-50 dark:bg-[#090A0C] text-zinc-900 dark:text-white pb-24 transition-colors font-display">
+                <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-zinc-200 dark:border-white/[0.08] bg-white/95 dark:bg-[#090A0C]/90 px-4 md:px-8 backdrop-blur-md">
+                    <button
+                        onClick={() => setCreationMode('select')}
+                        className="flex size-10 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] border border-zinc-200 dark:border-white/[0.08] text-zinc-700 dark:text-zinc-200 transition-all"
+                        title="Back to Selection"
+                    >
+                        <span className="material-symbols-outlined text-xl">arrow_back</span>
                     </button>
-                    <h1 className="text-lg font-bold text-zinc-900 dark:text-white">Share Update</h1>
+                    <div className="text-center px-2">
+                        <h1 className="text-base font-black text-zinc-900 dark:text-white tracking-tight uppercase">
+                            Share Showcase Update
+                        </h1>
+                        <p className="text-[10px] text-zinc-500 dark:text-zinc-400 font-semibold hidden sm:block">
+                            Post to the community feed & network with filmmakers
+                        </p>
+                    </div>
                     <button
                         onClick={handlePostSubmit}
                         disabled={loading || !postContent.trim()}
-                        className="px-4 py-1.5 bg-primary text-background-dark font-bold rounded-full disabled:opacity-50"
+                        className="rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 px-4 py-2 text-xs font-black text-zinc-950 shadow-lg shadow-amber-500/20 transition-all active:scale-95 disabled:opacity-40 flex items-center gap-1.5"
                     >
-                        {loading ? 'Posting...' : 'Post'}
+                        <span className="material-symbols-outlined text-base">send</span>
+                        <span>{loading ? 'Posting...' : 'Publish'}</span>
                     </button>
                 </header>
 
-                <main className="p-4 flex flex-col gap-4 w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto">
-                    <div className="flex gap-3">
-                        <div className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-700 bg-cover bg-center shrink-0"
-                            style={{ backgroundImage: `url(${currentUser?.photoURL || ''})` }}
-                        />
-                        <div className="flex-1">
-                            <AIEnhancedTextarea
-                                label=""
-                                context="Social Media Post"
-                                value={postContent}
-                                onValueChange={setPostContent}
-                                placeholder="What's happening in your professional world?"
-                                rows={6}
-                                className="text-lg"
+                <main className="p-4 sm:p-6 flex flex-col gap-5 w-full max-w-2xl lg:max-w-3xl mx-auto">
+                    {/* Post Author Card */}
+                    <div className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.08] shadow-sm space-y-4">
+                        <div className="flex gap-3.5">
+                            <div
+                                className="size-11 rounded-2xl bg-zinc-200 dark:bg-zinc-700 bg-cover bg-center shrink-0 border border-black/10 dark:border-white/10"
+                                style={{ backgroundImage: `url(${currentUser?.photoURL || ''})` }}
                             />
+                            <div className="flex-1">
+                                <p className="text-xs font-black text-zinc-900 dark:text-white uppercase tracking-wider mb-1">
+                                    {currentUser?.displayName || 'Film Professional'}
+                                </p>
+                                <AIEnhancedTextarea
+                                    label=""
+                                    context="Social Media Post"
+                                    value={postContent}
+                                    onValueChange={setPostContent}
+                                    placeholder="What's happening in your production? Share behind-the-scenes thoughts, milestones, or questions..."
+                                    rows={5}
+                                    className="text-sm sm:text-base leading-relaxed"
+                                />
+                            </div>
                         </div>
                     </div>
 
-                    {/* Image Carousel & Input */}
-                    <div className="border-t border-zinc-200 dark:border-zinc-800 pt-4 space-y-4">
-                        <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 block">Attach Images (Max 10)</label>
+                    {/* Image Attachments */}
+                    <div className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/[0.08] shadow-sm space-y-4">
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-xs font-black text-zinc-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                                <span className="material-symbols-outlined text-amber-500 text-base">photo_library</span>
+                                <span>Production Stills & Images (Max 10)</span>
+                            </h2>
+                            <span className="text-[11px] font-bold text-zinc-400">{postImages.length}/10</span>
+                        </div>
 
                         {/* Input Row */}
                         <div className="flex flex-col gap-3">
@@ -488,11 +513,11 @@ export default function PostJob() {
                             <button
                                 onClick={triggerFileSelect}
                                 disabled={isUploadingImages || postImages.length >= 10}
-                                className="flex items-center justify-center w-full h-12 rounded-lg bg-zinc-100 dark:bg-zinc-900 border border-dashed border-zinc-300 dark:border-zinc-700 cursor-pointer hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
+                                className="flex items-center justify-center w-full h-14 rounded-2xl bg-zinc-50 dark:bg-black/20 border-2 border-dashed border-zinc-300 dark:border-white/15 cursor-pointer hover:border-amber-500/50 hover:bg-zinc-100 dark:hover:bg-white/5 transition-all text-center"
                             >
-                                <span className="material-symbols-outlined mr-2 text-zinc-500">add_photo_alternate</span>
-                                <span className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
-                                    {isUploadingImages ? 'Uploading...' : 'Pick from Gallery'}
+                                <span className="material-symbols-outlined mr-2 text-amber-500">add_photo_alternate</span>
+                                <span className="text-xs sm:text-sm font-bold text-zinc-700 dark:text-zinc-300">
+                                    {isUploadingImages ? 'Uploading Images...' : 'Select Stills from Device'}
                                 </span>
                             </button>
                             <input
@@ -504,19 +529,18 @@ export default function PostJob() {
                                 onChange={handleFileSelect}
                             />
 
-                            {/* URL Input (Optional) */}
+                            {/* URL Input */}
                             <div className="flex gap-2">
                                 <input
-                                    className="flex-1 p-3 rounded-lg bg-zinc-100 dark:bg-zinc-900 border-none text-zinc-900 dark:text-white placeholder:text-zinc-500 dark:placeholder:text-zinc-500 text-sm"
+                                    className="flex-1 rounded-xl bg-zinc-50 dark:bg-black/30 border border-zinc-200 dark:border-white/10 px-4 py-2.5 text-xs sm:text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-amber-500 transition-colors"
                                     placeholder="Or paste direct image URL (.jpg, .png, etc.)"
                                     value={newImageUrl}
                                     onChange={(e) => setNewImageUrl(e.target.value)}
-                                // onKeyDown={(e) => e.key === 'Enter' && handleAddImage()} // Removed to avoid submitting form accidentally
                                 />
                                 <button
                                     onClick={handleAddImage}
                                     disabled={!newImageUrl.trim() || postImages.length >= 10}
-                                    className="px-4 py-2 bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-white font-medium rounded-lg hover:bg-zinc-300 dark:hover:bg-zinc-700 disabled:opacity-50 text-sm"
+                                    className="px-4 py-2.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 font-black rounded-xl disabled:opacity-40 text-xs uppercase tracking-wider transition-all"
                                 >
                                     Add
                                 </button>
@@ -525,19 +549,20 @@ export default function PostJob() {
 
                         {/* Carousel / List */}
                         {postImages.length > 0 && (
-                            <div className="flex gap-3 overflow-x-auto pb-2 snap-x scrollbar-hide">
+                            <div className="flex gap-3 overflow-x-auto pb-2 snap-x scrollbar-hide pt-2">
                                 {postImages.map((img, idx) => (
-                                    <div key={idx} className="relative w-32 h-32 shrink-0 snap-start rounded-lg bg-zinc-100 dark:bg-zinc-900 overflow-hidden group border border-zinc-200 dark:border-zinc-800">
+                                    <div key={idx} className="relative size-28 shrink-0 snap-start rounded-2xl bg-black overflow-hidden group border border-zinc-200 dark:border-white/10 shadow-sm">
                                         <img src={img} alt={`Attachment ${idx + 1}`} className="w-full h-full object-cover" />
-                                        <div className="absolute top-1 right-1 flex gap-1">
-                                            <div className="bg-black/60 text-white text-[10px] px-1 rounded backdrop-blur-sm">
+                                        <div className="absolute top-1.5 right-1.5 flex gap-1">
+                                            <div className="bg-black/70 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full backdrop-blur-sm">
                                                 {idx + 1}
                                             </div>
                                             <button
                                                 onClick={() => handleRemoveImage(idx)}
-                                                className="p-1 bg-red-500/80 text-white rounded-full hover:bg-red-600 transition-colors"
+                                                className="size-6 flex items-center justify-center bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow"
+                                                title="Remove Image"
                                             >
-                                                <span className="material-symbols-outlined text-[10px] block">close</span>
+                                                <span className="material-symbols-outlined text-[13px] block">close</span>
                                             </button>
                                         </div>
                                     </div>
@@ -586,7 +611,7 @@ export default function PostJob() {
                         type="button"
                         onClick={() => handleJobSubmit()}
                         disabled={loading}
-                        className="rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 px-4 py-2 text-xs font-black text-white shadow-lg shadow-amber-500/20 transition-all active:scale-95 disabled:opacity-50 flex items-center gap-1.5"
+                        className="rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 px-4 py-2 text-xs font-black text-zinc-950 shadow-lg shadow-amber-500/20 transition-all active:scale-95 disabled:opacity-50 flex items-center gap-1.5"
                     >
                         <span className="material-symbols-outlined text-base">send</span>
                         <span>{loading ? 'Posting...' : 'Publish'}</span>
@@ -603,7 +628,7 @@ export default function PostJob() {
                             onClick={() => setPostType('Job')}
                             className={`flex flex-1 items-center justify-center gap-2 h-full rounded-xl text-xs font-black transition-all ${
                                 postType === 'Job'
-                                    ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20'
+                                    ? 'bg-amber-500 text-zinc-950 shadow-md shadow-amber-500/20'
                                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                             }`}
                         >
@@ -615,7 +640,7 @@ export default function PostJob() {
                             onClick={() => setPostType('Audition')}
                             className={`flex flex-1 items-center justify-center gap-2 h-full rounded-xl text-xs font-black transition-all ${
                                 postType === 'Audition'
-                                    ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20'
+                                    ? 'bg-amber-500 text-zinc-950 shadow-md shadow-amber-500/20'
                                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                             }`}
                         >
@@ -1032,7 +1057,7 @@ export default function PostJob() {
                         type="button"
                         onClick={() => handleJobSubmit()}
                         disabled={loading}
-                        className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white font-black text-base py-4 rounded-2xl shadow-xl shadow-amber-500/20 hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                        className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 font-black text-base py-4 rounded-2xl shadow-xl shadow-amber-500/20 hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                         {loading ? (
                             <>
