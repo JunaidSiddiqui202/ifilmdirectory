@@ -308,98 +308,106 @@ export default function CalendarAndAvailability({ isEditable = false, showHeader
 
     const renderAddBookingModal = () => (
         <div
-            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in"
             onClick={() => setShowAddBooking(false)}
         >
             <div
-                className="bg-white dark:bg-zinc-900 w-full max-w-md rounded-3xl p-6 shadow-xl animate-in slide-in-from-bottom-10 fade-in duration-300"
+                className="bg-white dark:bg-zinc-900 w-full max-w-sm sm:max-w-md max-h-[88vh] flex flex-col rounded-3xl shadow-2xl border border-zinc-200 dark:border-white/10 animate-in zoom-in-95 duration-200 overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
             >
-                <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold text-zinc-900 dark:text-white">Add Booking</h2>
+                {/* Header */}
+                <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-100 dark:border-white/10 shrink-0">
+                    <div>
+                        <h2 className="text-base sm:text-lg font-black text-zinc-900 dark:text-white">Add Booking / Shoot</h2>
+                        <p className="text-[11px] text-zinc-500">Lock dates on your production calendar</p>
+                    </div>
                     <button
                         onClick={() => setShowAddBooking(false)}
-                        className="text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 font-medium"
+                        className="size-8 rounded-full bg-zinc-100 dark:bg-white/10 flex items-center justify-center text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer"
                     >
-                        Cancel
+                        <span className="material-symbols-outlined text-lg">close</span>
                     </button>
                 </div>
 
-                <div className="space-y-6">
+                <div className="p-5 space-y-4 overflow-y-auto custom-scrollbar flex-1 text-xs sm:text-sm">
                     <div>
-                        <label className="block text-sm font-bold text-zinc-900 dark:text-white mb-3">Booking Type</label>
-                        <div className="grid grid-cols-4 gap-3">
-                            <button className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-100 dark:border-blue-800 text-blue-500">
-                                <span className="material-symbols-outlined">videocam</span>
-                                <span className="text-xs font-medium">Shoot</span>
-                            </button>
-                            {[1, 2, 3].map((i) => (
-                                <div key={i} className="bg-zinc-50 dark:bg-zinc-800/50 rounded-xl" />
+                        <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5 uppercase tracking-wider">Booking Type</label>
+                        <div className="grid grid-cols-3 gap-2">
+                            {[
+                                { id: 'shoot', label: 'Feature Shoot', icon: 'videocam', color: 'text-amber-500 bg-amber-500/10 border-amber-500/30' },
+                                { id: 'post', label: 'Post / Edit', icon: 'content_cut', color: 'text-cyan-500 bg-cyan-500/10 border-cyan-500/30' },
+                                { id: 'rehearsal', label: 'Rehearsal / Pre', icon: 'theater_comedy', color: 'text-purple-500 bg-purple-500/10 border-purple-500/30' }
+                            ].map((type) => (
+                                <button
+                                    key={type.id}
+                                    type="button"
+                                    className={`flex flex-col items-center justify-center gap-1 p-2 rounded-xl border text-center transition-all cursor-pointer ${type.color}`}
+                                >
+                                    <span className="material-symbols-outlined text-lg">{type.icon}</span>
+                                    <span className="text-[11px] font-bold">{type.label}</span>
+                                </button>
                             ))}
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-bold text-zinc-900 dark:text-white mb-2">Title</label>
+                        <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5 uppercase tracking-wider">Production Title</label>
                         <input
                             type="text"
-                            placeholder="e.g., Production: Midnight Run"
-                            className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-primary/50 text-zinc-900 dark:text-white placeholder-zinc-400"
+                            placeholder="e.g. Feature Film Shoot / Ad Film"
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-black/40 border border-zinc-200 dark:border-white/10 focus:outline-none focus:border-amber-500 text-xs sm:text-sm text-zinc-900 dark:text-white placeholder-zinc-400"
                         />
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-bold text-zinc-900 dark:text-white mb-2">Dates</label>
-                        <div className="flex items-center justify-between mb-3">
-                            <span className="text-zinc-900 dark:text-white">Start</span>
-                            <div className="px-4 py-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white font-medium text-sm">
+                    <div className="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5 uppercase tracking-wider">Start Date</label>
+                            <div className="px-3 py-2 rounded-xl bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-zinc-800 dark:text-zinc-200 font-bold text-xs">
                                 Nov 30, 2025
                             </div>
                         </div>
-                        <div className="flex items-center justify-between">
-                            <span className="text-zinc-900 dark:text-white">End</span>
-                            <div className="px-4 py-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white font-medium text-sm">
+                        <div>
+                            <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5 uppercase tracking-wider">End Date</label>
+                            <div className="px-3 py-2 rounded-xl bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-zinc-800 dark:text-zinc-200 font-bold text-xs">
                                 Dec 1, 2025
                             </div>
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-bold text-zinc-900 dark:text-white mb-2">Location</label>
+                        <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5 uppercase tracking-wider">Location / Studio</label>
                         <input
                             type="text"
-                            placeholder="e.g., Los Angeles, CA"
-                            className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-primary/50 text-zinc-900 dark:text-white placeholder-zinc-400"
+                            placeholder="e.g. Annapurna Studios / Hyderabad"
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-black/40 border border-zinc-200 dark:border-white/10 focus:outline-none focus:border-amber-500 text-xs sm:text-sm text-zinc-900 dark:text-white placeholder-zinc-400"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-bold text-zinc-900 dark:text-white mb-2">Notes (Optional)</label>
+                        <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5 uppercase tracking-wider">Notes (Optional)</label>
                         <textarea
-                            rows={3}
-                            className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-primary/50 text-zinc-900 dark:text-white resize-none"
+                            rows={2}
+                            placeholder="Call sheets, shoot timing, special requirements..."
+                            className="w-full px-3.5 py-2 rounded-xl bg-zinc-50 dark:bg-black/40 border border-zinc-200 dark:border-white/10 focus:outline-none focus:border-amber-500 text-xs sm:text-sm text-zinc-900 dark:text-white resize-none"
                         />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-2.5 pt-1">
                         <button
                             onClick={() => navigate('/messaging', { state: { startCall: true } })}
-                            className="flex items-center justify-center gap-2 py-4 rounded-xl bg-green-500 text-white font-bold text-lg shadow-lg shadow-green-500/30 hover:opacity-90 transition-opacity"
+                            className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-500/20 hover:bg-emerald-400 transition-all cursor-pointer"
                         >
-                            <span className="material-symbols-outlined">call</span>
-                            Call
+                            <span className="material-symbols-outlined text-base">call</span>
+                            <span>Direct Call</span>
                         </button>
                         <button
                             onClick={() => navigate('/messaging')}
-                            className="flex items-center justify-center gap-2 py-4 rounded-xl bg-blue-500 text-white font-bold text-lg shadow-lg shadow-blue-500/30 hover:opacity-90 transition-opacity"
+                            className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-amber-500 text-black font-bold text-xs shadow-md shadow-amber-500/20 hover:bg-amber-400 transition-all cursor-pointer"
                         >
-                            <span className="material-symbols-outlined">chat</span>
-                            Message
+                            <span className="material-symbols-outlined text-base">chat</span>
+                            <span>Direct Chat</span>
                         </button>
                     </div>
-                    <p className="text-center text-xs text-zinc-400">
-                        Contact to confirm booking details
-                    </p>
                 </div>
             </div>
         </div>
