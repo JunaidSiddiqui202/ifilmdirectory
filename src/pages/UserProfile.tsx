@@ -1363,95 +1363,18 @@ export default function UserProfile() {
                 {activeTab === 'Availability' && (
                     <div className="flex flex-col gap-6 pb-10">
                         <section className="bg-white dark:bg-[#111317] p-5 sm:p-7 rounded-3xl border border-zinc-200 dark:border-white/10 shadow-sm">
-                            <div className="flex items-center gap-2.5 mb-5">
-                                <div className="size-9 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center border border-amber-500/20">
-                                    <span className="material-symbols-outlined text-xl">event_available</span>
-                                </div>
-                                <div>
-                                    <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white tracking-tight">Work Availability Status</h2>
-                                    <p className="text-xs text-zinc-500 font-medium">Real-time schedule for film productions and shoots</p>
-                                </div>
-                            </div>
-                            {(() => {
-                                const avail = getAvailabilityConfig(profile?.availabilityStatus);
-                                return (
-                                    <div className={`p-6 rounded-2xl border flex flex-col gap-5 shadow-xs ${
-                                        avail.code === 'available'
-                                            ? 'bg-emerald-500/5 border-emerald-500/20'
-                                            : avail.code === 'working'
-                                            ? 'bg-amber-500/5 border-amber-500/20'
-                                            : 'bg-zinc-500/5 border-zinc-500/20'
-                                    }`}>
-                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                            <div className="flex items-center gap-3.5">
-                                                <div className={`size-14 rounded-2xl flex items-center justify-center shrink-0 shadow-sm ${
-                                                    avail.code === 'available'
-                                                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
-                                                        : avail.code === 'working'
-                                                        ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
-                                                        : 'bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border border-zinc-500/20'
-                                                }`}>
-                                                    <span className="material-symbols-outlined text-3xl">
-                                                        {avail.icon}
-                                                    </span>
-                                                </div>
-                                                <div>
-                                                    <div className="flex items-center gap-2 flex-wrap">
-                                                        <h3 className="font-black text-xl text-zinc-900 dark:text-white flex items-center gap-2">
-                                                            <span>{avail.dotEmoji}</span>
-                                                            <span>{avail.label}</span>
-                                                        </h3>
-                                                    </div>
-                                                    <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 mt-0.5">
-                                                        Status: <span className="text-zinc-800 dark:text-zinc-200">{avail.statusText}</span>
-                                                    </p>
-                                                </div>
-                                            </div>
-
-                                            {isMe ? (
-                                                <button
-                                                    onClick={() => setIsEditProfileModalOpen(true)}
-                                                    className="px-4 py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/10 dark:hover:bg-white/15 text-zinc-900 dark:text-white font-bold text-xs transition-all border border-zinc-200 dark:border-white/10 shrink-0 self-start sm:self-center shadow-xs"
-                                                >
-                                                    Update Status
-                                                </button>
-                                            ) : (
-                                                <button
-                                                    onClick={() => {
-                                                        if (!currentUser) {
-                                                            openAuthModal(`Sign in to contact ${profile?.displayName || 'this creator'}`);
-                                                            return;
-                                                        }
-                                                        navigate(`/chat/${profile?.uid}`);
-                                                    }}
-                                                    className={`px-5 py-2.5 rounded-xl font-bold text-xs transition-all shrink-0 self-start sm:self-center shadow-xs ${
-                                                        avail.code === 'unavailable'
-                                                            ? 'bg-zinc-100 dark:bg-white/5 text-zinc-500 border border-zinc-200 dark:border-white/10 cursor-not-allowed'
-                                                            : 'bg-amber-500 hover:bg-amber-400 text-black shadow-amber-500/20'
-                                                    }`}
-                                                >
-                                                    {avail.code === 'available'
-                                                        ? 'Book for Production'
-                                                        : avail.code === 'working'
-                                                        ? 'Send Project Enquiry'
-                                                        : 'Currently Unavailable'}
-                                                </button>
-                                            )}
-                                        </div>
-
-                                        {profile?.statusMessage && (
-                                            <div className="bg-white/80 dark:bg-black/40 p-4 rounded-xl italic text-sm text-zinc-700 dark:text-zinc-300 border border-black/5 dark:border-white/5">
-                                                "{profile.statusMessage}"
-                                            </div>
-                                        )}
-                                    </div>
-                                );
-                            })()}
-                        </section>
-
-                        {/* Interactive Shoot Schedule & Booking Calendar */}
-                        <section className="bg-white dark:bg-[#111317] p-5 sm:p-7 rounded-3xl border border-zinc-200 dark:border-white/10 shadow-sm">
-                            <CalendarAndAvailability isEditable={Boolean(isMe)} showHeader={false} />
+                            <CalendarAndAvailability
+                                isEditable={Boolean(isMe)}
+                                showHeader={false}
+                                userProfile={{
+                                    displayName: profile?.displayName || undefined,
+                                    location: profile?.location,
+                                    role: profile?.role,
+                                    statusMessage: profile?.statusMessage,
+                                    availabilityStatus: profile?.availabilityStatus
+                                }}
+                                onUpdateStatus={() => setIsEditProfileModalOpen(true)}
+                            />
                         </section>
                     </div>
                 )}
