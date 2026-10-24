@@ -248,9 +248,6 @@ export default function Jobs() {
                                 <div>
                                     <h1 className="text-lg font-black text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
                                         <span>Film & Media Fraternity Jobs</span>
-                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                                            Active Board
-                                        </span>
                                     </h1>
                                     <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
                                         Verified Industry Openings, Studio Castings & Production Crew Calls
