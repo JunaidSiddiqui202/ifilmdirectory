@@ -363,8 +363,8 @@ export default function Home() {
                     to="/post-job"
                     className="flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-2.5 rounded-xl sm:rounded-2xl bg-white dark:bg-[#18191d] border border-zinc-200 dark:border-white/5 hover:border-amber-500/40 transition-all group shadow-xs"
                 >
-                    <div className="size-9 sm:size-8 rounded-xl sm:rounded-lg bg-amber-500 text-black flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                        <span className="material-symbols-outlined text-lg sm:text-base" aria-hidden="true">campaign</span>
+                    <div className="size-9 sm:size-8 rounded-xl sm:rounded-lg bg-amber-500 text-zinc-950 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-2xs">
+                        <span className="material-symbols-outlined text-lg sm:text-base font-bold" aria-hidden="true">campaign</span>
                     </div>
                     <div className="min-w-0">
                         <span className="text-sm sm:text-xs font-extrabold sm:font-bold text-zinc-900 dark:text-white block leading-tight truncate">Post Call</span>
@@ -678,14 +678,14 @@ export default function Home() {
                                         }}
                                     />
                                     {item.rating && (
-                                        <div className="absolute inset-x-0 bottom-0 bg-amber-500 text-white font-black text-[9px] text-center leading-tight py-0.5">
+                                        <div className="absolute inset-x-0 bottom-0 bg-amber-500 text-zinc-950 font-black text-[9px] text-center leading-tight py-0.5">
                                             {item.rating}
                                         </div>
                                     )}
                                 </div>
                                 <div className="min-w-0 flex-1">
                                     <div className="flex items-center gap-1.5 mb-0.5">
-                                        <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 truncate">
+                                        <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 truncate">
                                             {item.rating ? '★ Review' : 'Film Scoop'}
                                         </span>
                                         <button
@@ -694,14 +694,14 @@ export default function Home() {
                                                 e.stopPropagation();
                                                 openSourcePopup(item.link, item.title);
                                             }}
-                                            className="text-[10px] text-zinc-500 hover:text-amber-500 dark:text-zinc-400 dark:hover:text-amber-400 transition-colors flex items-center gap-0.5 cursor-pointer"
+                                            className="text-[10px] text-zinc-500 hover:text-amber-700 dark:text-zinc-400 dark:hover:text-amber-400 transition-colors flex items-center gap-0.5 cursor-pointer"
                                             title={`Open ${item.source} in pop-up window`}
                                         >
                                             <span>• {item.source}</span>
                                             <span className="material-symbols-outlined text-[10px]">open_in_new</span>
                                         </button>
                                     </div>
-                                    <h4 className="text-xs font-bold text-zinc-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors line-clamp-2 leading-snug">
+                                    <h4 className="text-xs font-bold text-zinc-900 dark:text-white group-hover:text-amber-700 dark:group-hover:text-amber-400 transition-colors line-clamp-2 leading-snug">
                                         {item.title}
                                     </h4>
                                 </div>
@@ -1101,7 +1101,7 @@ export default function Home() {
                                         <button
                                             onClick={() => setNewsFilter('all')}
                                             className={`px-2.5 py-1 rounded-lg transition-all ${newsFilter === 'all'
-                                                    ? 'bg-amber-500 text-white shadow-sm'
+                                                    ? 'bg-amber-500 text-zinc-950 font-black shadow-xs'
                                                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                                 }`}
                                         >
@@ -1110,17 +1110,17 @@ export default function Home() {
                                         <button
                                             onClick={() => setNewsFilter('review')}
                                             className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 ${newsFilter === 'review'
-                                                    ? 'bg-amber-500 text-white shadow-sm'
+                                                    ? 'bg-amber-500 text-zinc-950 font-black shadow-xs'
                                                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                                 }`}
                                         >
-                                            <span className="material-symbols-outlined text-[12px] filled text-white">star</span>
+                                            <span className="material-symbols-outlined text-[12px] filled text-zinc-950">star</span>
                                             <span>Reviews</span>
                                         </button>
                                         <button
                                             onClick={() => setNewsFilter('news')}
                                             className={`px-2.5 py-1 rounded-lg transition-all ${newsFilter === 'news'
-                                                    ? 'bg-amber-500 text-white shadow-sm'
+                                                    ? 'bg-amber-500 text-zinc-950 font-black shadow-xs'
                                                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                                                 }`}
                                         >
@@ -1130,7 +1130,7 @@ export default function Home() {
 
                                     <button
                                         onClick={() => navigate('/south-cinema')}
-                                        className="hidden sm:flex text-xs font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors items-center gap-0.5"
+                                        className="hidden sm:flex text-xs font-bold text-amber-700 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300 transition-colors items-center gap-0.5"
                                         title="Explore all cinema news"
                                     >
                                         <span>All Wire</span>
@@ -1174,7 +1174,7 @@ export default function Home() {
                                                         }}
                                                     />
                                                     {isReview && item.rating && (
-                                                        <div className="absolute inset-x-0 bottom-0 bg-amber-500 text-white font-black text-[9px] text-center leading-tight py-0.5 shadow-xs">
+                                                        <div className="absolute inset-x-0 bottom-0 bg-amber-500 text-zinc-950 font-black text-[9px] text-center leading-tight py-0.5 shadow-xs">
                                                             ★ {item.rating}
                                                         </div>
                                                     )}
