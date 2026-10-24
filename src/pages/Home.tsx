@@ -1189,7 +1189,7 @@ export default function Home() {
                                                                 e.stopPropagation();
                                                                 openSourcePopup(item.link, item.title);
                                                             }}
-                                                            className="text-xs sm:text-[10px] font-bold uppercase tracking-wider text-amber-600 hover:text-amber-500 dark:text-amber-400 dark:hover:text-amber-300 truncate max-w-[140px] flex items-center gap-0.5 hover:underline"
+                                                            className="text-xs sm:text-[10px] font-bold uppercase tracking-wider text-amber-700 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-300 truncate max-w-[140px] flex items-center gap-0.5 hover:underline"
                                                             title={`Open ${item.source} in pop-up window`}
                                                         >
                                                             <span>{item.source}</span>
@@ -1198,13 +1198,13 @@ export default function Home() {
                                                         <span className="text-xs sm:text-[10px] text-zinc-400">•</span>
                                                         <span className="text-xs sm:text-[10px] text-zinc-500 dark:text-zinc-400">{formatNewsTimeAgo(item.timestamp)}</span>
                                                         {isReview && !item.rating && (
-                                                            <span className="text-[10px] sm:text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                                                            <span className="text-[10px] sm:text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-800 dark:text-amber-400 border border-amber-500/30">
                                                                 REVIEW
                                                             </span>
                                                         )}
                                                     </div>
 
-                                                    <h3 className="font-bold text-sm sm:text-xs text-zinc-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors line-clamp-2 leading-snug">
+                                                    <h3 className="font-bold text-sm sm:text-xs text-zinc-900 dark:text-white group-hover:text-amber-700 dark:group-hover:text-amber-400 transition-colors line-clamp-2 leading-snug">
                                                         {item.title}
                                                     </h3>
                                                 </div>

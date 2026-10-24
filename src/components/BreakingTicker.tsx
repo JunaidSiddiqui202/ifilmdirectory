@@ -190,8 +190,8 @@ export default function BreakingTicker({ variant = 'home', onNewsClick, onJobCli
                 <div key={`job-${job.id}-${currentIndex}`} className="flex items-center gap-2 sm:gap-2.5 min-w-0 w-full animate-ticker-slide">
                     {/* Job Type Tag */}
                     <span className={`shrink-0 text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border flex items-center gap-1 ${isAudition
-                        ? 'bg-amber-500 text-white border-amber-600'
-                        : 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
+                        ? 'bg-amber-600 text-white dark:bg-amber-500 dark:text-black border-amber-700 dark:border-amber-400'
+                        : 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30'
                         }`}>
                         <span className="material-symbols-outlined text-[11px]">
                             {isAudition ? 'theater_comedy' : 'work'}
@@ -201,17 +201,17 @@ export default function BreakingTicker({ variant = 'home', onNewsClick, onJobCli
 
                     {/* Fraternity Role Tag */}
                     {job.fraternityRole && (
-                        <span className="hidden sm:inline-flex shrink-0 text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-purple-500/15 text-purple-600 dark:text-purple-300 border border-purple-500/30">
+                        <span className="hidden sm:inline-flex shrink-0 text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30">
                             {job.fraternityRole}
                         </span>
                     )}
 
                     {/* Job Title & Company */}
-                    <div className="min-w-0 flex-1 flex items-center gap-1.5 text-sm sm:text-xs font-bold text-zinc-900 dark:text-white group-hover:text-amber-500 transition-colors">
+                    <div className="min-w-0 flex-1 flex items-center gap-1.5 text-sm sm:text-xs font-bold text-zinc-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
                         <span className="truncate">
                             {job.title}
                         </span>
-                        <span className="shrink-0 text-amber-600 dark:text-amber-400 font-extrabold text-xs sm:text-[11px]">
+                        <span className="shrink-0 text-amber-700 dark:text-amber-400 font-extrabold text-xs sm:text-[11px]">
                             @{job.company}
                         </span>
                         {job.location && (
