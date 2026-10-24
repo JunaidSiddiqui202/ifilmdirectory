@@ -49,18 +49,36 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
         return location.pathname === path;
     };
 
-    const navItems = [
-        { path: '/home', label: 'Home', icon: 'home' },
-        { path: '/showcase', label: 'Feed', icon: 'movie' },
-        { path: '/south-cinema', label: 'Cinema Wire', icon: 'newspaper' },
-        { path: '/jobs', label: 'Jobs & Castings', icon: 'work' },
-        { path: '/browse-profiles', label: 'Talent Directory', icon: 'explore' },
-        { path: '/booking-facilities', label: 'Facilities & Gear', icon: 'domain' },
-        { path: '/groups-forums', label: 'Guilds & Forums', icon: 'forum' },
-        { path: '/messaging', label: 'Messages', icon: 'chat_bubble', hasBadge: hasUnreadMessages || hasUnreadNotifications },
-        { path: '/projects', label: 'My Projects', icon: 'architecture' },
-        { path: '/saved', label: 'Saved Items', icon: 'bookmarks' },
-        { path: '/profile', label: 'Profile', icon: 'person', isProfile: true },
+    const sections = [
+        {
+            title: 'Discovery & Feed',
+            items: [
+                { path: '/home', label: 'Home', icon: 'home' },
+                { path: '/showcase', label: 'Feed & Showcase', icon: 'movie' },
+                { path: '/south-cinema', label: 'Cinema Wire', icon: 'newspaper' },
+                { path: '/blogs-events', label: 'Blogs & Events', icon: 'event' },
+            ]
+        },
+        {
+            title: 'Casting & Production',
+            items: [
+                { path: '/jobs', label: 'Jobs & Castings', icon: 'work' },
+                { path: '/browse-profiles', label: 'Talent Directory', icon: 'person_search' },
+                { path: '/guilds', label: 'Skill Guilds', icon: 'groups' },
+                { path: '/booking-facilities', label: 'Facilities & Gear', icon: 'domain' },
+                { path: '/projects', label: 'Production Projects', icon: 'architecture' },
+                { path: '/marketplace', label: 'Service Marketplace', icon: 'handshake' },
+            ]
+        },
+        {
+            title: 'Community & Connect',
+            items: [
+                { path: '/groups-forums', label: 'Guilds & Forums', icon: 'forum' },
+                { path: '/messaging', label: 'Messages', icon: 'chat_bubble', hasBadge: hasUnreadMessages || hasUnreadNotifications },
+                { path: '/saved', label: 'Saved Items', icon: 'bookmarks' },
+                { path: '/profile', label: 'My Profile', icon: 'person', isProfile: true },
+            ]
+        }
     ];
 
     return (
@@ -81,67 +99,80 @@ export default function DesktopSidebar({ isCreateOpen, setIsCreateOpen }: Deskto
                     </div>
                 </Link>
 
-                {/* Primary Nav Links */}
-                <nav className="flex flex-col gap-1" aria-label="Desktop Primary Navigation">
-                    {navItems.map((item) => {
-                        const active = isActive(item.path);
-                        return (
-                            <Link
-                                key={item.path}
-                                to={item.path}
-                                onClick={(e) => {
-                                    if (!currentUser && ['/messaging', '/projects', '/saved', '/profile'].includes(item.path)) {
-                                        e.preventDefault();
-                                        openAuthModal(`Sign in to access your ${item.label.toLowerCase()}`);
-                                    }
-                                }}
-                                title={item.label}
-                                className={`relative group flex items-center justify-center xl:justify-start gap-4 px-3 py-2.5 rounded-2xl transition-all duration-200 ${
-                                    active
-                                        ? 'bg-zinc-900 text-white dark:bg-amber-500/15 dark:text-amber-400 font-bold border border-zinc-800 dark:border-amber-500/30 shadow-sm'
-                                        : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.05]'
-                                }`}
-                                aria-current={active ? 'page' : undefined}
-                            >
-                                {/* Icon */}
-                                <div className="relative flex items-center justify-center shrink-0">
-                                    {item.isProfile ? (
-                                        <div className={`size-7 rounded-full overflow-hidden border-2 transition-all ${active ? 'border-zinc-900 dark:border-amber-500 ring-2 ring-zinc-900/20 dark:ring-amber-500/30' : 'border-zinc-300 dark:border-white/20 group-hover:border-zinc-500 dark:group-hover:border-white/50'}`}>
-                                            <PostMedia
-                                                src={currentUser?.photoURL || ''}
-                                                fallbackType="USER_MALE"
-                                                className="w-full h-full object-cover"
-                                            />
+                {/* Primary Nav Links Grouped in Flat Clean Sections */}
+                <nav className="flex flex-col gap-4" aria-label="Desktop Primary Navigation">
+                    {sections.map((section, sIdx) => (
+                        <div key={section.title} className="flex flex-col gap-1">
+                            {/* Section Header (Visible on xl expanded sidebar) */}
+                            <p className="hidden xl:block px-3 text-[10px] font-black uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-display">
+                                {section.title}
+                            </p>
+                            {/* Divider on compact tablet (md - lg) */}
+                            {sIdx > 0 && (
+                                <div className="xl:hidden my-1 mx-2 h-px bg-zinc-200 dark:bg-white/10" />
+                            )}
+
+                            {section.items.map((item) => {
+                                const active = isActive(item.path);
+                                return (
+                                    <Link
+                                        key={item.path}
+                                        to={item.path}
+                                        onClick={(e) => {
+                                            if (!currentUser && ['/messaging', '/projects', '/saved', '/profile'].includes(item.path)) {
+                                                e.preventDefault();
+                                                openAuthModal(`Sign in to access your ${item.label.toLowerCase()}`);
+                                            }
+                                        }}
+                                        title={item.label}
+                                        className={`relative group flex items-center justify-center xl:justify-start gap-3.5 px-3 py-2 rounded-2xl transition-all duration-200 ${
+                                            active
+                                                ? 'bg-zinc-900 text-white dark:bg-amber-500/15 dark:text-amber-400 font-bold border border-zinc-800 dark:border-amber-500/30 shadow-sm'
+                                                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.05]'
+                                        }`}
+                                        aria-current={active ? 'page' : undefined}
+                                    >
+                                        {/* Icon */}
+                                        <div className="relative flex items-center justify-center shrink-0">
+                                            {item.isProfile ? (
+                                                <div className={`size-6 rounded-full overflow-hidden border-2 transition-all ${active ? 'border-zinc-900 dark:border-amber-500 ring-2 ring-zinc-900/20 dark:ring-amber-500/30' : 'border-zinc-300 dark:border-white/20 group-hover:border-zinc-500 dark:group-hover:border-white/50'}`}>
+                                                    <PostMedia
+                                                        src={currentUser?.photoURL || ''}
+                                                        fallbackType="USER_MALE"
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <span
+                                                    className={`material-symbols-outlined text-[22px] transition-transform duration-200 group-hover:scale-110 ${
+                                                        active ? 'filled text-amber-400 dark:text-amber-400' : 'text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white'
+                                                    }`}
+                                                    style={active ? { fontVariationSettings: "'FILL' 1" } : undefined}
+                                                >
+                                                    {item.icon}
+                                                </span>
+                                            )}
+
+                                            {/* Unread Indicator Dot */}
+                                            {item.hasBadge && (
+                                                <span className="absolute -top-1 -right-1 size-2.5 bg-red-500 rounded-full ring-2 ring-white dark:ring-[#141416] animate-pulse shadow-sm shadow-red-500/60" />
+                                            )}
                                         </div>
-                                    ) : (
-                                        <span
-                                            className={`material-symbols-outlined text-[24px] transition-transform duration-200 group-hover:scale-110 ${
-                                                active ? 'filled text-amber-400 dark:text-amber-400' : 'text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white'
-                                            }`}
-                                            style={active ? { fontVariationSettings: "'FILL' 1" } : undefined}
-                                        >
-                                            {item.icon}
+
+                                        {/* Label (Visible on xl) */}
+                                        <span className={`hidden xl:inline text-xs tracking-tight truncate ${active ? 'font-bold text-white dark:text-white' : 'font-semibold text-zinc-700 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-white'}`}>
+                                            {item.label}
                                         </span>
-                                    )}
 
-                                    {/* Unread Indicator Dot */}
-                                    {item.hasBadge && (
-                                        <span className="absolute -top-1 -right-1 size-2.5 bg-red-500 rounded-full ring-2 ring-white dark:ring-[#141416] animate-pulse shadow-sm shadow-red-500/60" />
-                                    )}
-                                </div>
-
-                                {/* Label (Visible on xl) */}
-                                <span className={`hidden xl:inline text-sm tracking-tight truncate ${active ? 'font-bold text-white dark:text-white' : 'font-medium text-zinc-700 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-white'}`}>
-                                    {item.label}
-                                </span>
-
-                                {/* Tooltip on collapsed tablet/desktop (md - lg) */}
-                                <span className="xl:hidden opacity-0 pointer-events-none group-hover:opacity-100 absolute left-full ml-3 px-2.5 py-1 bg-zinc-900 text-white dark:bg-[#18191D] dark:text-white border border-zinc-700 dark:border-white/10 text-xs font-semibold rounded-lg shadow-xl whitespace-nowrap z-50 transition-opacity">
-                                    {item.label}
-                                </span>
-                            </Link>
-                        );
-                    })}
+                                        {/* Tooltip on collapsed tablet/desktop (md - lg) */}
+                                        <span className="xl:hidden opacity-0 pointer-events-none group-hover:opacity-100 absolute left-full ml-3 px-2.5 py-1 bg-zinc-900 text-white dark:bg-[#18191D] dark:text-white border border-zinc-700 dark:border-white/10 text-xs font-semibold rounded-lg shadow-xl whitespace-nowrap z-50 transition-opacity">
+                                            {item.label}
+                                        </span>
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    ))}
 
                     {/* Instagram-Style Standout CREATE Button */}
                     <div className="pt-1.5">

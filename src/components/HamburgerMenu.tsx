@@ -43,27 +43,37 @@ export default function HamburgerMenu() {
 
     const sections = [
         {
-            title: 'Production & Discovery',
+            title: 'Discovery & Feed',
             items: [
-                { icon: 'person_search', label: 'Browse Network', path: '/browse-profiles' },
-                { icon: 'groups', label: 'Skill Guilds', path: '/guilds' },
-                { icon: 'architecture', label: 'Production Projects', path: '/projects' },
-                { icon: 'domain', label: 'Book a Facility', path: '/booking-facilities' },
+                { icon: 'home', label: 'Home', path: '/home' },
+                { icon: 'movie', label: 'Feed & Showcase', path: '/showcase' },
+                { icon: 'newspaper', label: 'Cinema Wire', path: '/south-cinema' },
+                { icon: 'event', label: 'Blogs & Events', path: '/blogs-events' },
             ]
         },
         {
-            title: 'Cinema Wire & Editorial',
+            title: 'Casting & Production',
             items: [
-                { icon: 'newspaper', label: 'South Cinema Wire', path: '/south-cinema' },
-                { icon: 'event', label: 'Blogs & Events', path: '/blogs-events' },
-                { icon: 'bookmarks', label: 'Saved Items', path: '/saved' },
-                { icon: 'forum', label: 'Community Forums', path: '/groups-forums' },
+                { icon: 'work', label: 'Jobs & Castings', path: '/jobs' },
+                { icon: 'person_search', label: 'Talent Directory', path: '/browse-profiles' },
+                { icon: 'groups', label: 'Skill Guilds', path: '/guilds' },
+                { icon: 'domain', label: 'Facilities & Gear', path: '/booking-facilities' },
+                { icon: 'architecture', label: 'Production Projects', path: '/projects' },
                 { icon: 'handshake', label: 'Service Marketplace', path: '/marketplace' },
             ]
         },
         {
-            title: 'Account',
+            title: 'Community & Connect',
             items: [
+                { icon: 'forum', label: 'Guilds & Forums', path: '/groups-forums' },
+                { icon: 'chat_bubble', label: 'Messages', path: '/messaging' },
+                { icon: 'bookmarks', label: 'Saved Items', path: '/saved' },
+            ]
+        },
+        {
+            title: 'Account & Settings',
+            items: [
+                ...(currentUser ? [{ icon: 'person', label: 'My Profile', path: '/profile' }] : []),
                 ...(isAdmin ? [{ icon: 'admin_panel_settings', label: 'Admin Command HQ', path: '/-admin' }] : []),
                 { icon: 'settings', label: 'Settings & Privacy', path: '/settings' },
             ]
