@@ -1148,6 +1148,19 @@ export default function Showcase() {
                         <div className="flex items-center gap-2 cursor-pointer select-none" onClick={() => navigate('/home')}>
                             <Logo size="sm" showText={true} />
                         </div>
+                        <div className="hidden md:flex items-center gap-2 pl-3 ml-2 border-l border-zinc-200 dark:border-white/10">
+                            <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 dark:text-amber-400">
+                                <span className="material-symbols-outlined text-lg">movie</span>
+                            </div>
+                            <div className="leading-tight">
+                                <h1 className="text-base font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
+                                    <span>Feed & Showcase</span>
+                                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30 font-semibold">
+                                        Live
+                                    </span>
+                                </h1>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Quick navigation to Showreel Views */}
