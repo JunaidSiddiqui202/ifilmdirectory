@@ -18,6 +18,7 @@ import { useTheme } from '../context/ThemeContext';
 import SEO from '../components/SEO';
 
 import { CURATED_CINEMA_TALENT } from '../constants/curatedTalent';
+import { parseNaturalProductionQuery } from '../services/aiProductionSearchService';
 
 export default function BrowseProfiles() {
     const navigate = useNavigate();
@@ -531,9 +532,17 @@ export default function BrowseProfiles() {
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && searchQuery.trim()) {
+                                    const parsed = parseNaturalProductionQuery(searchQuery.trim());
+                                    if (parsed.isNaturalAIQuery || parsed.isProductionPackage || parsed.isLowBudget || parsed.targetDate) {
+                                        navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+                                    }
+                                }
+                            }}
                             placeholder={
                                 pillar === 'talent'
-                                    ? "Search directors, cinematographers, actors, editors, skills (e.g. Alexa 35)..."
+                                    ? "Search natural queries (e.g. '15th nov cameraman', 'near me editors', 'lead actor 25-30')..."
                                     : pillar === 'guilds'
                                     ? "Search cinema associations, unions & societies (WICA, SWA, FWICE)..."
                                     : "Search sound stages, camera rental houses, dubbing suites..."
@@ -669,10 +678,22 @@ export default function BrowseProfiles() {
                             </button>
                         </div>
                     ) : filteredProfiles.length === 0 ? (
-                        <div className="py-16 px-4 bg-white dark:bg-[#121316] rounded-2xl border border-zinc-200 dark:border-white/5 my-4 shadow-sm">
+                        <div className="py-16 px-4 bg-white dark:bg-[#121316] rounded-2xl border border-zinc-200 dark:border-white/5 my-4 shadow-sm text-center">
+                            {searchQuery.trim() && (
+                                <div className="mb-4 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-xs font-bold text-amber-700 dark:text-amber-300">
+                                    <span className="material-symbols-outlined text-sm">auto_awesome</span>
+                                    <span>Looking for complete cast, dates or natural queries?</span>
+                                    <button
+                                        onClick={() => navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`)}
+                                        className="underline hover:text-amber-500 font-extrabold cursor-pointer ml-1"
+                                    >
+                                        Run AI Film Search &rarr;
+                                    </button>
+                                </div>
+                            )}
                             <EmptyState
                                 message={activeTab === 'connections' ? "No connections in your circle yet" : "No film professionals found"}
-                                subMessage={activeTab === 'connections' ? "Discover and follow filmmakers across India to build your production circle!" : "Try adjusting your craft role, location filter, or search query."}
+                                subMessage={activeTab === 'connections' ? "Discover and follow filmmakers across India to build your production circle!" : "Try adjusting your craft role, location filter, or try running an AI Production Search."}
                                 icon={activeTab === 'connections' ? "group_off" : "person_search"}
                                 actionLabel={activeTab === 'connections' ? "Browse All Filmmakers" : "Reset All Filters"}
                                 onAction={() => {

@@ -6,7 +6,7 @@ export type AgeBracket = 'child' | 'young' | 'middle' | 'senior' | 'all';
 
 export interface ParsedProductionQuery {
     isNaturalAIQuery: boolean;
-    isProductionPackage: boolean; // e.g. "whole cast and crew", "complete crew", "build team"
+    isProductionPackage: boolean; // e.g. "whole cast and crew", "complete crew", "build team", "set cast and crew for small budget movie"
     isAgeSpecific: boolean;
     targetAgeRange?: { min: number; max: number; label: string };
     characterArchetype?: string; // "lead", "villain", "grandfather", "hero", "heroine", "child", etc.
@@ -17,6 +17,11 @@ export interface ParsedProductionQuery {
         maxBudget?: number; // e.g. 25000
         nearMe?: boolean;
         city?: string;
+    };
+    isLowBudget?: boolean;
+    targetDate?: {
+        raw: string;
+        formatted?: string;
     };
     aiSummary?: string;
 }
@@ -110,9 +115,29 @@ export function inferActorAge(user: UserProfile): { age: number | null; bracket:
 export function parseNaturalProductionQuery(rawQuery: string): ParsedProductionQuery {
     const q = rawQuery.trim().toLowerCase();
     
-    // Test if query is an AI natural language request
-    const isPackageQuery = /\b(whole|all|complete|full)\s*(cast\s*and\s*crew|crew|team|package|production\s*list)\b/i.test(q) ||
-        /\b(give\s*me|show\s*me|build|assemble|make)\s*(a|an|the)?\s*(film|movie|cast|crew|team|production)\b/i.test(q);
+    // Test if query is an AI natural language request / production package assembly
+    const isPackageQuery = /\b(whole|all|complete|full|set|assemble|build|package|roster|crew\s*list)\s*(cast\s*and\s*crew|cast|crew|team|production|members)?\b/i.test(q) ||
+        /\b(give\s*me|show\s*me|build|assemble|make|set\s*up|hire|find|arrange)\s*(a|an|the)?\s*(film|movie|cast|crew|team|production|unit)\b/i.test(q) ||
+        /\b(cast\s*and\s*crew|small\s*budget\s*movie|indie\s*film|feature\s*film\s*crew|low\s*budget)\b/i.test(q);
+
+    const isLowBudget = /\b(small\s*budget|low\s*budget|budget\s*friendly|affordable|cheap|indie|micro\s*budget)\b/i.test(q);
+
+    // Extract Date / Calendar queries (e.g. "15th nov", "15 nov", "15th november", "tomorrow", "december 20")
+    let targetDate: { raw: string; formatted?: string } | undefined;
+    const dateMatch = q.match(/\b(\d{1,2})(?:st|nd|rd|th)?\s*(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\b/i) ||
+        q.match(/\b(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\s*(\d{1,2})(?:st|nd|rd|th)?\b/i);
+
+    if (dateMatch) {
+        targetDate = {
+            raw: dateMatch[0],
+            formatted: dateMatch[0].toUpperCase()
+        };
+    } else if (/\b(available\s*now|available\s*today|tomorrow|this\s*weekend)\b/i.test(q)) {
+        targetDate = {
+            raw: 'immediately available',
+            formatted: 'Available Now'
+        };
+    }
 
     // Extract Age Constraints
     let isAgeSpecific = false;
@@ -149,7 +174,7 @@ export function parseNaturalProductionQuery(rawQuery: string): ParsedProductionQ
     else if (/\bmother\b/i.test(q)) characterArchetype = 'Mother Character';
     else if (/\bchild\s*artist|kid\b/i.test(q)) characterArchetype = 'Child Artist';
 
-    // Extract Budget Constraints (e.g. "25k budget", "under 25k", "budget 25000", "25,000")
+    // Extract Budget Constraints (e.g. "25k budget", "under 25k", "budget 25000", "25,000", "small budget")
     let maxBudget: number | undefined;
     const kMatch = q.match(/\b(\d+)\s*k\s*(?:budget)?\b/i) || q.match(/\bbudget\s*(?:of\s*)?(\d+)\s*k\b/i);
     if (kMatch) {
@@ -159,12 +184,14 @@ export function parseNaturalProductionQuery(rawQuery: string): ParsedProductionQ
             q.match(/\b(\d{4,6})\s*(?:budget|inr|rs|rupees)\b/i);
         if (fullNumberMatch) {
             maxBudget = parseInt(fullNumberMatch[1], 10);
+        } else if (isLowBudget) {
+            maxBudget = 30000; // Small budget movie default ceiling for studios/facilities
         }
     }
 
     // Extract Location & Studio criteria (e.g. "old house near me", "villa under 25k")
     const isLocationQuery = /\b(old\s*house|house|villa|bungalow|haveli|location|courtroom|police\s*station|shooting\s*floor|studio|dubbing)\b/i.test(q);
-    const nearMe = /\b(near\s*me|nearby|around\s*here|closest)\b/i.test(q);
+    const nearMe = /\b(near\s*me|nearby|around\s*here|closest|local|in\s*my\s*city)\b/i.test(q);
     
     let locationType: string | undefined;
     if (/\b(old\s*house|traditional\s*house|vintage\s*house|haveli)\b/i.test(q)) locationType = 'Old House / Heritage';
@@ -185,7 +212,7 @@ export function parseNaturalProductionQuery(rawQuery: string): ParsedProductionQ
     if (/\b(director|filmmaker)\b/i.test(q) || isPackageQuery) requestedCrafts.push('director');
     if (/\b(ad|assistant\s*director|associate\s*director)\b/i.test(q) || isPackageQuery) requestedCrafts.push('ad');
     if (/\b(dop|cameraman|cinematographer|camera\s*operator)\b/i.test(q) || isPackageQuery) requestedCrafts.push('dop');
-    if (/\b(editor|colorist|editing)\b/i.test(q) || isPackageQuery) requestedCrafts.push('editor');
+    if (/\b(editor|editors|colorist|editing)\b/i.test(q) || isPackageQuery) requestedCrafts.push('editor');
     if (/\b(lyricist|lyric\s*writer|songwriter)\b/i.test(q) || isPackageQuery) requestedCrafts.push('lyricist');
     if (/\b(writer|screenwriter|dialogue\s*writer)\b/i.test(q) || isPackageQuery) requestedCrafts.push('writer');
     if (/\b(sound|audiographer|sound\s*designer)\b/i.test(q) || isPackageQuery) requestedCrafts.push('sound');
@@ -193,7 +220,7 @@ export function parseNaturalProductionQuery(rawQuery: string): ParsedProductionQ
     if (/\b(stunt|fight\s*master|action)\b/i.test(q) || isPackageQuery) requestedCrafts.push('stunt');
     if (/\b(art\s*director|production\s*designer)\b/i.test(q) || isPackageQuery) requestedCrafts.push('art');
 
-    const isNaturalAIQuery = isPackageQuery || isAgeSpecific || !!maxBudget || nearMe || !!characterArchetype || q.split(/\s+/).length >= 4;
+    const isNaturalAIQuery = isPackageQuery || isAgeSpecific || !!maxBudget || nearMe || !!characterArchetype || !!targetDate || isLowBudget || q.split(/\s+/).length >= 3;
 
     return {
         isNaturalAIQuery,
@@ -202,7 +229,9 @@ export function parseNaturalProductionQuery(rawQuery: string): ParsedProductionQ
         targetAgeRange,
         characterArchetype,
         requestedCrafts,
-        locationQuery: isLocationQuery || maxBudget ? {
+        isLowBudget,
+        targetDate,
+        locationQuery: isLocationQuery || maxBudget || nearMe ? {
             requested: true,
             type: locationType,
             maxBudget,

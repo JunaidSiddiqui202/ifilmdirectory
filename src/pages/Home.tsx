@@ -318,17 +318,41 @@ export default function Home() {
                     type="text"
                     value={homeSearchQuery}
                     onChange={(e) => setHomeSearchQuery(e.target.value)}
-                    placeholder="Search actors, directors, crew, auditions, studios..."
+                    placeholder="Search naturally (e.g. 'set cast and crew for small budget movie', 'near me editors')..."
                     aria-label="Search film directory by name, craft, or role"
                     className="w-full pl-10 sm:pl-11 pr-24 sm:pr-28 py-2.5 sm:py-2.5 rounded-xl sm:rounded-2xl bg-zinc-50 dark:bg-black/50 border border-zinc-200 dark:border-white/10 text-sm sm:text-sm text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:border-amber-500 shadow-xs"
                 />
                 <button
                     type="submit"
-                    className="absolute right-1.5 sm:right-2 px-3.5 sm:px-3 py-1.5 sm:py-1.5 rounded-lg sm:rounded-xl bg-zinc-900 hover:bg-black text-white dark:bg-amber-500 dark:hover:bg-amber-600 dark:text-black font-black text-xs sm:text-xs transition-all shadow-xs"
+                    className="absolute right-1.5 sm:right-2 px-3.5 sm:px-3 py-1.5 sm:py-1.5 rounded-lg sm:rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 font-black text-xs sm:text-xs transition-all shadow-xs flex items-center gap-1"
                 >
-                    Search
+                    <span className="material-symbols-outlined text-sm">auto_awesome</span>
+                    <span>Search</span>
                 </button>
             </form>
+
+            {/* AI Natural Search Chips */}
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+                <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider shrink-0 flex items-center gap-1">
+                    <span className="material-symbols-outlined text-xs">auto_awesome</span>
+                    <span>AI Ideas:</span>
+                </span>
+                {[
+                    { label: '🎬 Small budget movie crew', q: 'set cast and crew for small budget movie' },
+                    { label: '📅 15th Nov cameraman', q: '15th nov cameraman' },
+                    { label: '📍 Near me editors', q: 'near me editors' },
+                    { label: '🏡 25k budget old house', q: '25k budget old house near me' },
+                ].map((item) => (
+                    <button
+                        key={item.q}
+                        type="button"
+                        onClick={() => navigate(`/search?q=${encodeURIComponent(item.q)}`)}
+                        className="px-2.5 py-1 rounded-full bg-zinc-100 hover:bg-amber-500/10 dark:bg-white/5 dark:hover:bg-amber-500/15 border border-zinc-200 dark:border-white/10 hover:border-amber-500/40 text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 hover:text-amber-600 dark:hover:text-amber-300 transition-all shrink-0 cursor-pointer"
+                    >
+                        {item.label}
+                    </button>
+                ))}
+            </div>
 
             {/* Core Action Tiles */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-0.5">

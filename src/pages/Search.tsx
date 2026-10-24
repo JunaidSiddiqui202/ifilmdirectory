@@ -562,11 +562,17 @@ export default function Search() {
 
             // 0A. AI NATURAL LANGUAGE PRODUCTION PREDICTION (Cast & Crew package, age filters, budget location finder)
             const parsedAi = parseNaturalProductionQuery(trimmed);
-            if (parsedAi.isNaturalAIQuery || parsedAi.isProductionPackage || !!parsedAi.locationQuery?.maxBudget || !!parsedAi.targetAgeRange) {
-                let aiTitle = '✨ AI Film Search: Assemble Cast & Crew Package';
+            if (parsedAi.isNaturalAIQuery || parsedAi.isProductionPackage || !!parsedAi.locationQuery?.maxBudget || !!parsedAi.targetAgeRange || !!parsedAi.targetDate || !!parsedAi.isLowBudget) {
+                let aiTitle = '✨ AI Film Search: Assemble Cast & Crew';
                 let aiSubtitle = 'Auto-categorizes cast by age brackets, crew by craft, and locations by budget';
                 
-                if (parsedAi.locationQuery?.maxBudget) {
+                if (parsedAi.isProductionPackage || parsedAi.isLowBudget) {
+                    aiTitle = parsedAi.isLowBudget ? '✨ Assemble Small Budget Film Cast & Crew' : '✨ Assemble Complete Cast & Crew Package';
+                    aiSubtitle = 'Categorizes cast by age, direction, camera, editors, sound, and low-cost shooting locations';
+                } else if (parsedAi.targetDate) {
+                    aiTitle = `✨ Available Professionals for ${parsedAi.targetDate.formatted}`;
+                    aiSubtitle = `Finding confirmed available cast and crew for dates around ${parsedAi.targetDate.formatted}`;
+                } else if (parsedAi.locationQuery?.maxBudget) {
                     aiTitle = `✨ Find Locations within ₹${parsedAi.locationQuery.maxBudget.toLocaleString('en-IN')}`;
                     if (parsedAi.locationQuery.type) {
                         aiSubtitle = `Search ${parsedAi.locationQuery.type} properties under ₹${parsedAi.locationQuery.maxBudget.toLocaleString('en-IN')}${parsedAi.locationQuery.nearMe ? ' near you' : ''}`;
@@ -574,9 +580,6 @@ export default function Search() {
                 } else if (parsedAi.targetAgeRange) {
                     aiTitle = `✨ Search Actors in Age Bracket: ${parsedAi.targetAgeRange.label}`;
                     aiSubtitle = parsedAi.characterArchetype ? `Finding ${parsedAi.characterArchetype} profiles matching ${parsedAi.targetAgeRange.label}` : `Categorizes young leads, character artists & seniors by age`;
-                } else if (parsedAi.isProductionPackage) {
-                    aiTitle = '✨ Assemble Complete Cast & Crew Package';
-                    aiSubtitle = 'Full production breakdown: Cast by age, direction, camera, post, art & locations';
                 }
 
                 matches.push({
@@ -839,11 +842,16 @@ export default function Search() {
                 // Build AI Production Package if natural language, age bracket, or budget query
                 const parsedAi = parseNaturalProductionQuery(query);
                 let generatedPackage: ProductionPackageResult | null = null;
-                if (parsedAi.isNaturalAIQuery || parsedAi.isProductionPackage || !!parsedAi.locationQuery?.maxBudget || !!parsedAi.targetAgeRange) {
+                if (parsedAi.isNaturalAIQuery || parsedAi.isProductionPackage || !!parsedAi.locationQuery?.maxBudget || !!parsedAi.targetAgeRange || !!parsedAi.targetDate || !!parsedAi.isLowBudget) {
                     generatedPackage = await buildAIProductionPackage(query, datasets.users, datasets.studios, userLocation);
                     setProductionPackage(generatedPackage);
-                    if (parsedAi.isProductionPackage || (parsedAi.locationQuery?.maxBudget && parsedAi.locationQuery?.requested)) {
+                    if (parsedAi.isProductionPackage || parsedAi.isLowBudget || (parsedAi.locationQuery?.maxBudget && parsedAi.locationQuery?.requested)) {
                         setActiveTab('ai_package');
+                    } else if (parsedAi.locationQuery?.nearMe) {
+                        // User specifically asked for "near me editors" or "cameraman near me"
+                        if (matchingCrafts.length > 0) {
+                            setActiveTab('people');
+                        }
                     }
                 } else {
                     setProductionPackage(null);
@@ -1273,7 +1281,9 @@ export default function Search() {
                                 </div>
                                 <div className="flex flex-wrap items-center justify-center gap-2">
                                     {[
-                                        { label: '✨ Give me whole cast and crews list', query: 'give me whole cast and crews list' },
+                                        { label: '✨ Set cast and crew for small budget movie', query: 'set cast and crew for small budget movie' },
+                                        { label: '📅 15th Nov cameraman', query: '15th nov cameraman' },
+                                        { label: '📍 Near me editors', query: 'near me editors' },
                                         { label: '🏡 25k budget old house near me', query: '25k budget old house near me' },
                                         { label: '🌟 Hero 25-30 age & Heroine 20-25', query: 'hero 25-30 age and heroine 20-25' },
                                         { label: '🎭 Senior character artists 50+ age', query: 'senior character artists 50+ age' },
@@ -1382,6 +1392,17 @@ export default function Search() {
                                                     <span className="material-symbols-outlined text-[15px]">auto_awesome</span>
                                                     AI PRODUCTION PACKAGE
                                                 </span>
+                                                {productionPackage.parsed.isLowBudget && (
+                                                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30">
+                                                        🎬 Small / Indie Budget Package
+                                                    </span>
+                                                )}
+                                                {productionPackage.parsed.targetDate && (
+                                                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20 flex items-center gap-1">
+                                                        <span className="material-symbols-outlined text-[13px]">calendar_month</span>
+                                                        Shoot Date: {productionPackage.parsed.targetDate.formatted}
+                                                    </span>
+                                                )}
                                                 {productionPackage.parsed.targetAgeRange && (
                                                     <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
                                                         Age: {productionPackage.parsed.targetAgeRange.label}
@@ -1397,9 +1418,15 @@ export default function Search() {
                                                         Type: {productionPackage.parsed.locationQuery.type}
                                                     </span>
                                                 )}
+                                                {productionPackage.parsed.locationQuery?.nearMe && (
+                                                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-violet-500/10 text-violet-600 dark:text-violet-400 border border-violet-500/20 flex items-center gap-1">
+                                                        <span className="material-symbols-outlined text-[13px]">near_me</span>
+                                                        Near Me / Nearby
+                                                    </span>
+                                                )}
                                             </div>
                                             <h3 className="text-base sm:text-lg font-black text-zinc-900 dark:text-white mt-1.5 flex items-center gap-2">
-                                                Cast, Crew & Location Assembly
+                                                {productionPackage.parsed.isLowBudget ? 'Small Budget Film Cast, Crew & Location Assembly' : 'Cast, Crew & Location Assembly'}
                                             </h3>
                                         </div>
 

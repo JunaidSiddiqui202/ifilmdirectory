@@ -365,7 +365,19 @@ export default function GroupsForums() {
                                     type="text"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    placeholder="Search gear, optics, OTT, SOPs..."
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' && searchQuery.trim()) {
+                                            const q = searchQuery.trim().toLowerCase();
+                                            // If user searches for people, crew, cast, dates or services
+                                            if (
+                                                /\b(cast|crew|dop|cameraman|director|editor|actor|artists|small\s*budget|near\s*me|nov|dec|jan)\b/i.test(q) ||
+                                                q.split(/\s+/).length >= 3
+                                            ) {
+                                                navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+                                            }
+                                        }
+                                    }}
+                                    placeholder="Search discussions, gear, optics, OTT, SOPs..."
                                     className="w-full pl-10 pr-4 py-3 rounded-2xl bg-white/10 border border-white/15 text-xs text-white placeholder:text-zinc-400 focus:outline-none focus:border-amber-500 focus:bg-white/15 transition-all backdrop-blur-md"
                                 />
                                 {searchQuery && (
