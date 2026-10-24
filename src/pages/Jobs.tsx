@@ -247,7 +247,7 @@ export default function Jobs() {
                                 </div>
                                 <div>
                                     <h1 className="text-lg font-black text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
-                                        <span>Film & Media Fraternity Jobs</span>
+                                        <span>Jobs & Castings</span>
                                     </h1>
                                     <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
                                         Verified Industry Openings, Studio Castings & Production Crew Calls

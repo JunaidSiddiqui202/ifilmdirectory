@@ -43,7 +43,7 @@ export default function ServiceMarketplace() {
             <header className="sticky top-0 z-40 bg-white/70 dark:bg-zinc-950/70 px-6 pt-5 pb-4 backdrop-blur-3xl border-b border-black/[0.02] dark:border-white/[0.02] flex justify-between items-center">
                 <div className="flex items-center gap-3">
                     <HamburgerMenu />
-                    <h1 className="text-xl font-black tracking-tight text-zinc-900 dark:text-white uppercase">Marketplace</h1>
+                    <h1 className="text-xl font-black tracking-tight text-zinc-900 dark:text-white uppercase">Service Marketplace</h1>
                 </div>
                 <button className="size-10 bg-zinc-100 dark:bg-zinc-900 rounded-full flex items-center justify-center">
                     <span className="material-symbols-outlined text-zinc-500">search</span>

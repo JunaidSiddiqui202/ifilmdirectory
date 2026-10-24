@@ -85,11 +85,11 @@ export default function BookingFacilities() {
                     </div>
                     <div className="hidden md:flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 dark:text-amber-400">
-                            <span className="material-symbols-outlined text-xl">apartment</span>
+                            <span className="material-symbols-outlined text-xl">domain</span>
                         </div>
                         <div>
                             <h1 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
-                                <span>Film Studios & Production Facilities</span>
+                                <span>Facilities & Gear</span>
                                 <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-medium">
                                     {facilities.length} Verified
                                 </span>
@@ -116,7 +116,7 @@ export default function BookingFacilities() {
                 {/* Hero Spotlight Header on Mobile / Tablet */}
                 <div className="md:hidden mb-4">
                     <h1 className="text-xl font-black text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
-                        <span>Film Studios & Gear</span>
+                        <span>Facilities & Gear</span>
                         <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-bold">
                             {facilities.length}
                         </span>

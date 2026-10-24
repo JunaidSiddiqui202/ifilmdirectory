@@ -294,9 +294,9 @@ export default function GroupsForums() {
                         </div>
                         <div>
                             <h1 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
-                                <span>Film Industry Guilds & Forums</span>
+                                <span>Guilds & Forums</span>
                                 <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-semibold">
-                                    {groups.length} Guilds Active
+                                    {groups.length} Channels Active
                                 </span>
                             </h1>
                             <p className="text-xs text-zinc-500 dark:text-zinc-400">

@@ -322,7 +322,7 @@ export default function Guilds() {
                             <div className="flex items-center gap-2">
                                 <span className="material-symbols-outlined text-amber-500 text-xl">groups</span>
                                 <h1 className="text-base sm:text-lg font-black tracking-tight text-zinc-900 dark:text-white">
-                                    Film Craft Guilds
+                                    Skill Guilds
                                 </h1>
                                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold uppercase tracking-wider border border-amber-500/20">
                                     Trade Chapters

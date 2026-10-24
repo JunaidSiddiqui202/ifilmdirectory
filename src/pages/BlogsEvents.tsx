@@ -217,8 +217,8 @@ export default function BlogsEvents() {
                             </span>
                         </div>
                         <h1 className="hidden md:flex items-center gap-2 text-base font-bold text-zinc-900 dark:text-white">
-                            <span className="material-symbols-outlined text-amber-500 text-xl">auto_stories</span>
-                            <span>Cinema Journal & Industry Events</span>
+                            <span className="material-symbols-outlined text-amber-500 text-xl">event</span>
+                            <span>Blogs & Events</span>
                         </h1>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">

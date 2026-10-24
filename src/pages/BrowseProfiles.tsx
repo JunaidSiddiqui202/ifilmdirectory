@@ -414,9 +414,9 @@ export default function BrowseProfiles() {
                                 Certified Cinema Directory & Production Network
                             </span>
                             <h1 className="text-2xl lg:text-3xl font-black text-zinc-900 dark:text-white tracking-tight flex items-center gap-2.5">
-                                <span>Discover Industry Talent & Studios</span>
-                                <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/25 tracking-normal">
-                                    {pillar === 'talent' ? `${filteredProfiles.length} Creators` : pillar === 'guilds' ? `${guilds.length} Guilds` : `${facilities.length} Studios`}
+                                <span>Talent Directory</span>
+                                <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/25 tracking-normal">
+                                    {pillar === 'talent' ? `${filteredProfiles.length} Verified Creatives` : pillar === 'guilds' ? `${guilds.length} Guilds` : `${facilities.length} Studios`}
                                 </span>
                             </h1>
                         </div>
