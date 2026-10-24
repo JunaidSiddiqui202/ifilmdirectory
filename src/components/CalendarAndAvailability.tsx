@@ -296,7 +296,7 @@ export default function CalendarAndAvailability({ isEditable = false }: Calendar
                             <span>{booking.date}</span>
                         </div>
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${booking.status === 'Confirmed' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${booking.status === 'Confirmed' ? 'bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30'
                         }`}>
                         {booking.status}
                     </span>

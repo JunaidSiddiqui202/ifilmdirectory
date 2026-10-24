@@ -345,8 +345,8 @@ export default function GroupsForums() {
                     <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
                     <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                         <div className="max-w-xl">
-                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-amber-400 text-xs font-semibold mb-3">
-                                <span className="material-symbols-outlined text-sm">verified</span>
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-bold mb-3 shadow-xs">
+                                <span className="material-symbols-outlined text-sm text-amber-400">verified</span>
                                 <span>Indian & Global Cinema Community</span>
                             </div>
                             <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white mb-2">
@@ -441,7 +441,14 @@ export default function GroupsForums() {
                                             </div>
                                         </div>
 
-                                        <h3 className="text-xs font-bold text-zinc-900 dark:text-white line-clamp-1 group-hover:text-amber-500 transition-colors w-full" title={group.name}>
+                                        <h3
+                                            className={`text-xs font-bold line-clamp-1 transition-colors w-full ${
+                                                isSelected
+                                                    ? 'text-amber-800 dark:text-amber-300 font-black'
+                                                    : 'text-zinc-900 dark:text-white group-hover:text-amber-800 dark:group-hover:text-amber-300'
+                                            }`}
+                                            title={group.name}
+                                        >
                                             {group.name}
                                         </h3>
                                         <p className="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium mt-0.5">

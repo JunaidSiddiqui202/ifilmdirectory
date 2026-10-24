@@ -87,7 +87,7 @@ export default function UserStatusModal({ isOpen, onClose, user, onUpdateStatus,
                             <div className="flex gap-2 mt-1">
                                 {isProtectedAdmin && <span className="text-xs bg-zinc-100 text-zinc-700 px-2 py-0.5 rounded-full font-bold border border-zinc-200 uppercase tracking-tighter">System Admin</span>}
                                 {(user.warningCount || 0) > 0 && (
-                                    <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-bold border border-yellow-200">
+                                    <span className="text-xs bg-amber-500/15 text-amber-800 dark:text-amber-300 px-2 py-0.5 rounded-full font-bold border border-amber-500/30">
                                         {user.warningCount} Warnings
                                     </span>
                                 )}
@@ -151,7 +151,7 @@ export default function UserStatusModal({ isOpen, onClose, user, onUpdateStatus,
                                                 type="button"
                                                 onClick={handleWarning}
                                                 disabled={loading}
-                                                className="flex-1 py-2 rounded-lg border border-yellow-200 bg-yellow-50 text-yellow-700 font-bold text-sm hover:bg-yellow-100 flex items-center justify-center gap-1"
+                                                className="flex-1 py-2 rounded-lg border border-amber-500/30 bg-amber-500/15 text-amber-800 dark:text-amber-300 font-bold text-sm hover:bg-amber-500/25 flex items-center justify-center gap-1"
                                             >
                                                 <span className="material-symbols-outlined text-lg">warning</span>
                                                 Issue Warning
