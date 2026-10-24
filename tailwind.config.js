@@ -35,19 +35,19 @@ export default {
           900: '#1e3a8a',
           950: '#081636',
         },
-        // Iconic CNN Red & Editorial Newsroom palette
+        // Golden Cinema / Hollywood Amber palette
         amber: {
-          50: '#FEF2F2',
-          100: '#FEE2E2',
-          200: '#FECACA',
-          300: '#FCA5A5',
-          400: '#EF4444', // Alert Red
-          500: '#CC0000', // Signature Iconic CNN Red
-          600: '#B30000', // Authoritative CNN Crimson
-          700: '#990000', // Deep Newsroom Red
-          800: '#7F0000',
-          900: '#450A0A',
-          950: '#1F0404',
+          50: '#FFFBEB',
+          100: '#FEF3C7',
+          200: '#FDE68A',
+          300: '#FCD34D',
+          400: '#FBBF24', // Studio Spotlight Amber
+          500: '#F59E0B', // Signature Golden Cinema Amber
+          600: '#D97706', // Deep Gold / Trophy Amber
+          700: '#B45309', // Warm Bronze
+          800: '#92400E',
+          900: '#78350F',
+          950: '#451A03',
         },
       },
       fontFamily: {

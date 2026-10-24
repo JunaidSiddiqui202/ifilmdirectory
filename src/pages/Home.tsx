@@ -162,7 +162,7 @@ export default function Home() {
                 if (fetchedPosts && fetchedPosts.length > 0) {
                     setNetworkPosts(fetchedPosts.slice(0, 10));
                 }
-                
+
                 if (fetchedReels && fetchedReels.length > 0) {
                     setReels(fetchedReels);
                 } else {
@@ -468,11 +468,10 @@ export default function Home() {
                                 }
                                 setSelectedPollOption(option.id);
                             }}
-                            className={`relative w-full text-left p-2.5 rounded-xl border transition-all overflow-hidden ${
-                                isSelected
+                            className={`relative w-full text-left p-2.5 rounded-xl border transition-all overflow-hidden ${isSelected
                                     ? 'border-amber-500 bg-amber-500/10'
                                     : 'border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-white/[0.02] hover:border-amber-500/30 dark:hover:border-white/20'
-                            }`}
+                                }`}
                         >
                             {selectedPollOption !== null && (
                                 <div
@@ -845,7 +844,7 @@ export default function Home() {
                 ]}
             />
             <div className="w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-6xl 2xl:max-w-7xl mx-auto flex flex-col flex-1 px-4 sm:px-6">
-                
+
                 {/* 1. CINEMA TOP HEADER: Official Logo + Quick Shortcuts + Comms */}
                 <header className="sticky top-0 z-30 flex items-center justify-between py-3 sm:py-3.5 bg-white/95 dark:bg-[#090A0C]/95 backdrop-blur-md border-b border-zinc-200 dark:border-white/5 transition-colors">
                     <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
@@ -953,10 +952,10 @@ export default function Home() {
 
                 {/* 2. RESPONSIVE TWO-COLUMN GRID ON DESKTOP (xl:) / 1-COLUMN ON MOBILE */}
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 pt-4">
-                    
+
                     {/* PRIMARY CINEMA STREAM (Left 2 cols on xl) */}
                     <div className="xl:col-span-2 space-y-6">
-                        
+
                         {/* Welcome Banner with LinkedIn-Style Cinema Availability Ribbon & 1-Click Status Switcher */}
                         <div className="rounded-2xl sm:rounded-3xl bg-gradient-to-r from-amber-500/10 via-zinc-100/90 to-zinc-50 dark:from-amber-500/10 dark:via-[#141519] dark:to-[#18191d] border border-amber-500/20 dark:border-white/[0.08] p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                             <div className="flex items-center gap-3.5 sm:gap-4 min-w-0">
@@ -1023,11 +1022,10 @@ export default function Home() {
                                                                         type="button"
                                                                         disabled={isUpdatingStatus}
                                                                         onClick={() => handleQuickStatusChange(opt.value)}
-                                                                        className={`w-full text-left p-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-start gap-2.5 transition-colors cursor-pointer ${
-                                                                            isSelected
+                                                                        className={`w-full text-left p-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-start gap-2.5 transition-colors cursor-pointer ${isSelected
                                                                                 ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
                                                                                 : 'hover:bg-zinc-100 dark:hover:bg-white/5 text-zinc-700 dark:text-zinc-300'
-                                                                        }`}
+                                                                            }`}
                                                                     >
                                                                         <span className="text-base mt-0.5">{opt.emoji}</span>
                                                                         <div className="min-w-0 flex-1">
@@ -1102,32 +1100,29 @@ export default function Home() {
                                     <div className="flex items-center bg-zinc-100 dark:bg-white/[0.04] p-0.5 rounded-xl border border-zinc-200 dark:border-white/5 text-[11px] font-bold">
                                         <button
                                             onClick={() => setNewsFilter('all')}
-                                            className={`px-2.5 py-1 rounded-lg transition-all ${
-                                                newsFilter === 'all'
+                                            className={`px-2.5 py-1 rounded-lg transition-all ${newsFilter === 'all'
                                                     ? 'bg-amber-500 text-white shadow-sm'
                                                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
-                                            }`}
+                                                }`}
                                         >
                                             All
                                         </button>
                                         <button
                                             onClick={() => setNewsFilter('review')}
-                                            className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 ${
-                                                newsFilter === 'review'
+                                            className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 ${newsFilter === 'review'
                                                     ? 'bg-amber-500 text-white shadow-sm'
                                                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
-                                            }`}
+                                                }`}
                                         >
                                             <span className="material-symbols-outlined text-[12px] filled text-white">star</span>
                                             <span>Reviews</span>
                                         </button>
                                         <button
                                             onClick={() => setNewsFilter('news')}
-                                            className={`px-2.5 py-1 rounded-lg transition-all ${
-                                                newsFilter === 'news'
+                                            className={`px-2.5 py-1 rounded-lg transition-all ${newsFilter === 'news'
                                                     ? 'bg-amber-500 text-white shadow-sm'
                                                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
-                                            }`}
+                                                }`}
                                         >
                                             News
                                         </button>
@@ -1175,7 +1170,7 @@ export default function Home() {
                                                         loading="lazy"
                                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                                         onError={(e) => {
-                                                             (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=200&h=200&fit=crop';
+                                                            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=200&h=200&fit=crop';
                                                         }}
                                                     />
                                                     {isReview && item.rating && (
@@ -1289,7 +1284,7 @@ export default function Home() {
                                                 />
                                             </div>
                                             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent pointer-events-none" />
-                                            
+
                                             <div className="absolute top-2.5 right-2.5 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/10 flex items-center gap-1 pointer-events-none">
                                                 <span className="material-symbols-outlined text-[10px] text-amber-400 filled" style={{ fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
                                                 <span className="text-white text-[9px] font-bold">{formatViews(reel.views)}</span>
@@ -1458,7 +1453,7 @@ export default function Home() {
                                                                         text: post.content.slice(0, 100),
                                                                         url: shareUrl,
                                                                     });
-                                                                } catch {}
+                                                                } catch { }
                                                             } else {
                                                                 await navigator.clipboard.writeText(shareUrl);
                                                                 toast.success('Post link copied to clipboard!');
@@ -1917,11 +1912,11 @@ export default function Home() {
 
             {/* PLATFORM SAFETY DISCLAIMER MODAL (1st Time Only) */}
             {showDisclaimerModal && (
-                <div 
+                <div
                     className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in"
                     onClick={() => setShowDisclaimerModal(false)}
                 >
-                    <div 
+                    <div
                         className="bg-white dark:bg-[#141519] border border-amber-300/60 dark:border-amber-500/30 rounded-3xl p-6 sm:p-7 max-w-lg w-full shadow-2xl space-y-5 animate-scale-in"
                         onClick={(e) => e.stopPropagation()}
                     >
