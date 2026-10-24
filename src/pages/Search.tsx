@@ -1564,12 +1564,18 @@ export default function Search() {
                                                                         </div>
                                                                     </div>
 
-                                                                    <div className="mt-2.5 pt-2 border-t border-zinc-100 dark:border-white/10 flex items-center justify-between">
+                                                                    <div className="mt-2.5 pt-2 border-t border-zinc-100 dark:border-white/10 flex items-center justify-between gap-1 flex-wrap">
                                                                         <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full border ${bracketColor}`}>
                                                                             {age ? `Age ~${age}` : bracketLabel}
                                                                         </span>
+                                                                        {productionPackage.parsed.targetDate && (
+                                                                            <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
+                                                                                <span className="material-symbols-outlined text-[11px]">event_available</span>
+                                                                                <span>Free {productionPackage.parsed.targetDate.formatted}</span>
+                                                                            </span>
+                                                                        )}
                                                                         <span className="text-[10px] text-zinc-400 group-hover:text-amber-500 flex items-center gap-0.5 font-bold">
-                                                                            Profile
+                                                                            Profile & Calendar
                                                                             <span className="material-symbols-outlined text-[13px]">arrow_forward</span>
                                                                         </span>
                                                                     </div>
@@ -1634,7 +1640,7 @@ export default function Search() {
                                                             Camera & DOP Unit
                                                         </span>
                                                         <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-500 border border-cyan-500/20">
-                                                            {productionPackage.crew.camera.length} Available
+                                                            {productionPackage.parsed.targetDate ? `Free for ${productionPackage.parsed.targetDate.formatted}` : `${productionPackage.crew.camera.length} Available`}
                                                         </span>
                                                     </div>
                                                     <div className="space-y-1.5 max-h-36 overflow-y-auto no-scrollbar">

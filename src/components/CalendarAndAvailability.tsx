@@ -6,9 +6,10 @@ type AvailabilityStatus = 'available' | 'busy' | 'tentative';
 
 interface CalendarAndAvailabilityProps {
     isEditable?: boolean;
+    showHeader?: boolean;
 }
 
-export default function CalendarAndAvailability({ isEditable = false }: CalendarAndAvailabilityProps) {
+export default function CalendarAndAvailability({ isEditable = false, showHeader = true }: CalendarAndAvailabilityProps) {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<SubTab>('calendar');
 
@@ -578,46 +579,72 @@ export default function CalendarAndAvailability({ isEditable = false }: Calendar
     return (
         <div className="flex flex-col w-full">
             {/* Header */}
-            <div className="flex items-center justify-between mb-6 px-2">
-                <div className="flex items-center gap-4">
-                    <button className="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
-                        <span className="material-symbols-outlined text-zinc-900 dark:text-white">arrow_back</span>
-                    </button>
-                    <button
-                        onClick={() => setShowSyncCalendars(true)}
-                        className="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-                    >
-                        <span className="material-symbols-outlined text-zinc-900 dark:text-white">refresh</span>
-                    </button>
-                </div>
-                <button
-                    onClick={() => setShowAddBooking(true)}
-                    className="p-2 rounded-full bg-black dark:bg-white text-white dark:text-black hover:opacity-80 transition-opacity"
-                >
-                    <span className="material-symbols-outlined">add</span>
-                </button>
-            </div>
+            {showHeader && (
+                <>
+                    <div className="flex items-center justify-between mb-6 px-2">
+                        <div className="flex items-center gap-4">
+                            <button onClick={() => navigate(-1)} className="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
+                                <span className="material-symbols-outlined text-zinc-900 dark:text-white">arrow_back</span>
+                            </button>
+                            <button
+                                onClick={() => setShowSyncCalendars(true)}
+                                className="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                                title="Sync Calendars"
+                            >
+                                <span className="material-symbols-outlined text-zinc-900 dark:text-white">refresh</span>
+                            </button>
+                        </div>
+                        <button
+                            onClick={() => setShowAddBooking(true)}
+                            className="p-2 rounded-full bg-amber-500 text-black hover:bg-amber-400 transition-all shadow-sm"
+                            title="Add Booking"
+                        >
+                            <span className="material-symbols-outlined">add</span>
+                        </button>
+                    </div>
 
-            <h1 className="text-3xl font-bold text-zinc-900 dark:text-white mb-6 px-2">
-                Calendar & Availability
-            </h1>
+                    <h1 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white mb-6 px-2">
+                        Calendar & Shoot Schedule
+                    </h1>
+                </>
+            )}
 
             {/* Sub-Tabs */}
-            <div className="flex gap-4 mb-8 px-2 overflow-x-auto no-scrollbar">
-                {(['calendar', 'availability', 'bookings'] as SubTab[]).map((tab) => (
+            <div className="flex items-center justify-between gap-4 mb-6 px-2 flex-wrap">
+                <div className="flex gap-2 overflow-x-auto no-scrollbar">
+                    {(['calendar', 'availability', 'bookings'] as SubTab[]).map((tab) => (
+                        <button
+                            key={tab}
+                            onClick={() => setActiveTab(tab)}
+                            className={`
+                                px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold capitalize whitespace-nowrap transition-all cursor-pointer
+                                ${activeTab === tab
+                                    ? 'bg-amber-500 text-black shadow-md shadow-amber-500/20'
+                                    : 'bg-zinc-100 dark:bg-white/5 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-white/10'}
+                            `}
+                        >
+                            {tab === 'calendar' ? '📅 Shoot Calendar' : tab === 'availability' ? '⚙️ Shoot Status' : '📋 Bookings'}
+                        </button>
+                    ))}
+                </div>
+                <div className="flex items-center gap-2">
                     <button
-                        key={tab}
-                        onClick={() => setActiveTab(tab)}
-                        className={`
-                            px-6 py-2 rounded-full text-sm font-bold capitalize whitespace-nowrap transition-all
-                            ${activeTab === tab
-                                ? 'bg-[#d946ef] text-white shadow-lg shadow-[#d946ef]/30'
-                                : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-700'}
-                        `}
+                        onClick={() => setShowSyncCalendars(true)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/5 dark:hover:bg-white/10 text-zinc-700 dark:text-zinc-300 text-xs font-bold transition-all border border-zinc-200 dark:border-white/10"
                     >
-                        {tab}
+                        <span className="material-symbols-outlined text-sm">sync</span>
+                        <span>Sync</span>
                     </button>
-                ))}
+                    {isEditable && (
+                        <button
+                            onClick={() => setShowAddBooking(true)}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 text-black hover:bg-amber-400 text-xs font-bold transition-all shadow-sm"
+                        >
+                            <span className="material-symbols-outlined text-sm">add</span>
+                            <span>Add Shoot</span>
+                        </button>
+                    )}
+                </div>
             </div>
 
             {/* Content */}

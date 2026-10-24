@@ -7,6 +7,7 @@ import Logo from '../components/Logo';
 import HamburgerMenu from '../components/HamburgerMenu';
 import MediaUploadModal from '../components/MediaUploadModal';
 import ProfileEnhancementModal from '../components/ProfileEnhancementModal';
+import CalendarAndAvailability from '../components/CalendarAndAvailability';
 import EditProfileModal from '../components/EditProfileModal';
 import ExperienceModal, { type ExperienceItem } from '../components/ExperienceModal';
 import { type EnhancedProfile } from '../services/aiService';
@@ -937,8 +938,8 @@ export default function UserProfile() {
                     <div className="flex w-full md:justify-center min-w-max px-4 gap-2 sm:gap-4 py-2">
                         {[
                             { id: 'Portfolio', label: 'Portfolio', icon: 'grid_on' },
-                            { id: 'Availability', label: 'Availability', icon: 'event_available' },
                             { id: 'About', label: 'Filmography & About', icon: 'person' },
+                            { id: 'Availability', label: 'Calendar & Availability', icon: 'calendar_month' },
                             { id: 'Contact', label: 'Contact', icon: 'alternate_email' }
                         ].map((tab) => (
                             <button
@@ -1446,6 +1447,11 @@ export default function UserProfile() {
                                     </div>
                                 );
                             })()}
+                        </section>
+
+                        {/* Interactive Shoot Schedule & Booking Calendar */}
+                        <section className="bg-white dark:bg-[#111317] p-5 sm:p-7 rounded-3xl border border-zinc-200 dark:border-white/10 shadow-sm">
+                            <CalendarAndAvailability isEditable={Boolean(isMe)} showHeader={false} />
                         </section>
                     </div>
                 )}
