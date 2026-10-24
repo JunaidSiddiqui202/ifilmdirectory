@@ -869,13 +869,6 @@ export default function Home() {
                             >
                                 Community Feed
                             </button>
-                            <button
-                                onClick={() => navigate('/south-cinema')}
-                                className="px-3 py-1 rounded-full text-xs font-bold text-amber-700 dark:text-amber-400 bg-amber-500/15 border border-amber-500/25 hover:bg-amber-500/25 transition-all flex items-center gap-1"
-                            >
-                                <span className="material-symbols-outlined text-xs">theaters</span>
-                                <span>South Cinema Wire</span>
-                            </button>
                         </div>
                     </div>
 
