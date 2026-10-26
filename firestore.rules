@@ -323,6 +323,11 @@ service cloud.firestore {
           request.resource.data.diff(resource.data).affectedKeys().hasOnly([
             'lastMessage', 'lastMessageTime', 'lastSenderId', 'updatedAt', 'unreadBy'
           ]) &&
+          // When publishing a new message preview, caller MUST be the lastSenderId (anti-spoofing)
+          (
+            !request.resource.data.diff(resource.data).affectedKeys().hasAny(['lastMessage', 'lastMessageTime']) ||
+            request.resource.data.lastSenderId == request.auth.uid
+          ) &&
           (
             !('lastSenderId' in request.resource.data) || 
             request.resource.data.lastSenderId == request.auth.uid ||
@@ -335,7 +340,10 @@ service cloud.firestore {
           (
             !('unreadBy' in request.resource.data) ||
             (request.resource.data.unreadBy is list &&
-             resource.data.participants.hasAll(request.resource.data.unreadBy))
+             resource.data.participants.hasAll(request.resource.data.unreadBy) &&
+             // A sender cannot mark themselves as unread
+             (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['lastMessage', 'lastMessageTime']) ||
+              !request.resource.data.unreadBy.hasAny([request.auth.uid])))
           )
         )
       );
@@ -392,11 +400,12 @@ service cloud.firestore {
       allow read: if isOwner(resource.data.userId) || isAdmin();
       
       // Notification creation:
-      // - Regular users can ONLY send user-level peer notifications ('like', 'comment', 'follow', 'job', 'connection', 'message')
-      // - Sending 'system' notifications is strictly prohibited for standard users (reserved for admin/backend)
-      // - Must not notify oneself
-      // - Field keys strictly limited to permitted notification schema
-      // - String length limits and initial unread status enforced
+      // - Standard users CANNOT create event notifications (likes, comments, follows, jobs, system alerts)
+      //   All event-based notifications are securely produced server-side by Firebase Cloud Functions.
+      // - Standard users can ONLY notify a peer when sending a direct peer-to-peer message (type == 'message')
+      //   where senderId matches auth.uid and recipient is a valid external user.
+      // - Self-notifications and fake system alerts are strictly rejected.
+      // - Schema strictly whitelisted to allowed keys with length limits.
       allow create: if isAuthenticated() && (
         isAdmin() || (
           request.resource.data.keys().hasOnly(['userId', 'senderId', 'type', 'title', 'message', 'createdAt', 'isRead', 'actionLink', 'image', 'metadata']) &&
@@ -404,7 +413,7 @@ service cloud.firestore {
           request.resource.data.userId is string &&
           request.resource.data.userId.size() > 0 &&
           request.resource.data.userId != request.auth.uid &&
-          request.resource.data.type in ['like', 'comment', 'follow', 'job', 'connection', 'message'] &&
+          request.resource.data.type == 'message' &&
           request.resource.data.title is string &&
           request.resource.data.title.size() <= 200 &&
           request.resource.data.message is string &&
