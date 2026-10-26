@@ -11,6 +11,7 @@ import { useAuthModal } from '../context/AuthModalContext';
 import PostMedia from '../components/PostMedia';
 import SEO from '../components/SEO';
 import { useToast } from '../context/ToastContext';
+import DOMPurify from 'dompurify';
 
 const formatTimeAgo = (timestamp: any) => {
     if (!timestamp) return 'Just now';
@@ -660,7 +661,7 @@ export default function BlogsEvents() {
                                                 <div key={blockId} className="group/para relative space-y-2">
                                                     <div
                                                         className="text-sm leading-relaxed text-zinc-700 dark:text-zinc-300"
-                                                        dangerouslySetInnerHTML={{ __html: block.content }}
+                                                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(block.content) }}
                                                     />
 
                                                     {/* Inline Comment & Share Action Pill on Each Block */}

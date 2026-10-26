@@ -20,7 +20,6 @@ export async function generateWithGemini(options: GeminiGenerateOptions): Promis
         throw new Error('Gemini API key not configured');
     }
 
-    console.log('[Gemini] API Key loaded:', GEMINI_API_KEY ? `${GEMINI_API_KEY.substring(0, 20)}...` : 'NOT FOUND');
 
     // Try both v1 and v1beta endpoints with multiple models
     const endpoints = [

@@ -8,6 +8,7 @@ import PostMedia from '../components/PostMedia';
 import { useToast } from '../context/ToastContext';
 import FilmPhotoSearchModal from '../components/FilmPhotoSearchModal';
 import { detectFilmsInText, type FilmImageResult } from '../services/filmImageService';
+import DOMPurify from 'dompurify';
 
 interface LanguageOption {
     code: string;
@@ -1124,7 +1125,7 @@ Make them dramatic, insightful, and appealing to film professionals and movie bu
                                     <div key={idx} className="group/para relative space-y-2">
                                         <div
                                             className="text-sm sm:text-base leading-relaxed text-zinc-700 dark:text-zinc-200"
-                                            dangerouslySetInnerHTML={{ __html: block.content }}
+                                            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(block.content) }}
                                         />
 
                                         {/* Inline Paragraph Action Bar */}

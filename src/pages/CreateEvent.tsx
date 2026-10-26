@@ -5,6 +5,7 @@ import { uploadFile } from '../services/storageService';
 import { blogService, type ContentBlock } from '../services/blogService';
 import { useAuth } from '../context/AuthContext';
 import PostMedia from '../components/PostMedia';
+import DOMPurify from 'dompurify';
 
 export default function CreateEvent() {
     const navigate = useNavigate();
@@ -334,7 +335,7 @@ export default function CreateEvent() {
                                             suppressContentEditableWarning
                                             onBlur={(e) => updateTextBlock(block.id, e.currentTarget.innerHTML)}
                                             className="min-h-[100px] p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-transparent focus:border-fuchsia-500 focus:ring-2 focus:ring-fuchsia-500/20 outline-none text-lg leading-relaxed whitespace-pre-wrap"
-                                            dangerouslySetInnerHTML={{ __html: block.content }}
+                                            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(block.content) }}
                                         />
                                         <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <button
