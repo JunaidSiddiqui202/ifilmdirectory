@@ -16,10 +16,30 @@ export interface GeminiGenerateOptions {
  * Uses v1 stable API which is confirmed to work
  */
 export async function generateWithGemini(options: GeminiGenerateOptions): Promise<string> {
+    // 1. Try secure backend endpoint first
+    try {
+        const proxyRes = await fetch('/api/ai-proxy', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                prompt: options.prompt,
+                provider: 'gemini',
+                jsonMode: options.jsonMode
+            })
+        });
+        if (proxyRes.ok) {
+            const data = await proxyRes.json();
+            if (data.text) {
+                return data.text;
+            }
+        }
+    } catch (_) {
+        // Fall back to client direct call if backend unavailable
+    }
+
     if (!GEMINI_API_KEY) {
         throw new Error('Gemini API key not configured');
     }
-
 
     // Try both v1 and v1beta endpoints with multiple models
     const endpoints = [

@@ -212,7 +212,7 @@ export default function MessagesList() {
             } finally {
                 setChatsLoading(false);
             }
-        });
+        }, currentUser.uid);
 
         return () => unsubscribe();
     }, [currentUser]);

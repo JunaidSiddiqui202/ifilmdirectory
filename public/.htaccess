@@ -51,8 +51,9 @@
   RewriteEngine On
   RewriteBase /
 
-  # Allow clean URL for RSS proxy
+  # Allow clean URL for RSS proxy & AI proxy
   RewriteRule ^api/rss-proxy/?$ api/rss-proxy.php [L,QSA]
+  RewriteRule ^api/ai-proxy/?$ api/ai-proxy.php [L,QSA]
 
   # Do not rewrite actual files or directories
   RewriteCond %{REQUEST_FILENAME} -f [OR]

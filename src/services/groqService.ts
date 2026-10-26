@@ -28,7 +28,30 @@ export const generateText = async (prompt: string, context: string = '', languag
         return { text: cached.text, provider: 'cache' };
     }
 
-    // 1. Gather all active cloud providers from environment
+    // 1. Try secure backend endpoint first
+    try {
+        const proxyRes = await fetch('/api/ai-proxy', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                prompt,
+                context,
+                language,
+                provider: 'groq'
+            })
+        });
+        if (proxyRes.ok) {
+            const data = await proxyRes.json();
+            if (data.text) {
+                responseCache.set(cacheKey, { text: data.text, timestamp: Date.now() });
+                return { text: data.text, provider: 'backend-ai-proxy' };
+            }
+        }
+    } catch (_) {
+        // Fall back to client pool if backend proxy unavailable
+    }
+
+    // 2. Gather active cloud providers as fallback
     const providers: AIProviderConfig[] = [];
 
     // Groq Primary

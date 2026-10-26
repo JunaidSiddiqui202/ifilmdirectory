@@ -53,16 +53,7 @@ export const sendMessage = async (
     senderPhoto?: string
 ) => {
     try {
-        const messagesRef = collection(db, 'chats', chatId, 'messages');
-        const newMessage = {
-            ...message,
-            recipientId: recipientId || '',
-            createdAt: serverTimestamp(),
-            isRead: false
-        };
-        await addDoc(messagesRef, newMessage);
-
-        // Update the chat document for the list view with participants and unread tracking
+        // 1. Ensure the parent chat document exists and participants are established
         const chatRef = doc(db, 'chats', chatId);
         const chatUpdatePayload: any = {
             lastMessage: message.text || (message.type === 'audio' ? '🎤 Voice message' : 'Media file'),
@@ -79,6 +70,16 @@ export const sendMessage = async (
         }
 
         await setDoc(chatRef, chatUpdatePayload, { merge: true });
+
+        // 2. Add message to the verified parent chat
+        const messagesRef = collection(db, 'chats', chatId, 'messages');
+        const newMessage = {
+            ...message,
+            recipientId: recipientId || '',
+            createdAt: serverTimestamp(),
+            isRead: false
+        };
+        await addDoc(messagesRef, newMessage);
 
         // Dispatch in-app notification to the recipient so sound & toast trigger immediately
         if (recipientId && recipientId !== message.senderId) {
@@ -172,12 +173,18 @@ export const getChats = async () => {
 };
 
 /**
- * Real-time subscription to chats
+ * Real-time subscription to chats for a specific user
  */
-export const subscribeToChats = (callback: (chats: ChatThread[]) => void) => {
+export const subscribeToChats = (
+    callback: (chats: ChatThread[]) => void,
+    userId?: string
+) => {
     const chatsRef = collection(db, 'chats');
+    const chatsQuery = userId 
+        ? query(chatsRef, where('participants', 'array-contains', userId))
+        : chatsRef;
 
-    return onSnapshot(chatsRef, (snapshot) => {
+    return onSnapshot(chatsQuery, (snapshot) => {
         const chats = snapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()

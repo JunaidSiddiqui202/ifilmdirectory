@@ -17,15 +17,17 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
     
-    // Designated system super-admins via trusted auth tokens / allowlist
+    // Designated system super-admins via trusted auth tokens
     function isSuperAdmin() {
       return isAuthenticated() && (
         request.auth.token.email == 'junaid202@gmail.com' || 
-        request.auth.token.email == 'junaid202@hotmail.com'
+        request.auth.token.email == 'junaid202@hotmail.com' ||
+        request.auth.token.email == 'ifilmdirectory@gmail.com' ||
+        request.auth.token.email == 'contact@ifilmdirectory.com'
       );
     }
 
-    // Check if user is admin - checks super-admin email OR non-client-tampered admin document
+    // Check if user is admin - checks super-admin email OR verified admin record
     function isAdmin() {
       return isSuperAdmin() || (
         isAuthenticated() && 
@@ -37,26 +39,26 @@ service cloud.firestore {
       );
     }
     
-    // Helper to verify sensitive privileged fields are not modified by regular users
-    function notModifyingPrivilegedFields() {
+    // Helper: Disallow regular users from updating privileged administrative / verification fields
+    function notModifyingPrivilegedUserFields() {
       return !request.resource.data.diff(resource.data).affectedKeys().hasAny([
-        'role', 'adminRole', 'verification', 'verification_tier', 'isVerified', 'accountStatus', 'abuseReports'
+        'role', 'adminRole', 'verification', 'verification_tier', 'isVerified', 'accountStatus', 'abuseReports', 'warningCount'
       ]);
     }
 
-    // Helper to verify sensitive privileged fields are not set on creation by regular users
+    // Helper: Disallow regular users from initializing privileged fields on profile creation
     function notSettingPrivilegedFieldsOnCreate() {
       return !request.resource.data.keys().hasAny([
-        'role', 'adminRole', 'verification', 'verification_tier', 'isVerified', 'accountStatus', 'abuseReports'
-      ]) || (
-        (!('role' in request.resource.data) || request.resource.data.role == 'user') &&
-        (!('adminRole' in request.resource.data) || request.resource.data.adminRole == null) &&
-        (!('isVerified' in request.resource.data) || request.resource.data.isVerified == false) &&
-        (!('accountStatus' in request.resource.data) || request.resource.data.accountStatus == 'active')
-      );
+        'role', 'adminRole', 'verification', 'verification_tier', 'isVerified', 'accountStatus', 'abuseReports', 'warningCount'
+      ]);
+    }
+
+    // Helper: Prevent modifying creator/ownership identity after document creation
+    function notModifyingOwner(ownerField) {
+      return !(ownerField in request.resource.data) || request.resource.data[ownerField] == resource.data[ownerField];
     }
     
-    // Validate data size (prevent large writes)
+    // Validate data size
     function isValidSize() {
       return true;
     }
@@ -65,24 +67,22 @@ service cloud.firestore {
     // USERS COLLECTION
     // ============================================
     match /users/{userId} {
-      // Anyone can read public user profiles
       allow read: if true;
       
-      // Users can create their own profile, but cannot self-assign admin roles or verification
+      // Users can create their own profile, but cannot initialize privileged roles/verification
       allow create: if isAuthenticated() && 
                       request.auth.uid == userId &&
                       (isAdmin() || notSettingPrivilegedFieldsOnCreate());
       
-      // Users can update their own profile, but CANNOT self-escalate roles or verification.
-      // Admins can update any user profile and privileged fields.
+      // Users can update their own profile, but cannot alter privileged fields. Admins can update all.
       allow update: if (isAdmin()) || (
-                      isOwner(userId) && notModifyingPrivilegedFields()
+                      isOwner(userId) && notModifyingPrivilegedUserFields()
                     );
       
       // Only admins can delete users
       allow delete: if isAdmin();
       
-      // Rate limit tracking subcollection (only owner or admin)
+      // Rate limit tracking subcollection
       match /rateLimits/{document=**} {
         allow read, write: if isOwner(userId) || isAdmin();
       }
@@ -94,14 +94,16 @@ service cloud.firestore {
     match /profiles/{profileId} {
       allow read: if true;
       
-      // Authenticated users can create profiles, author must match auth UID
+      // Creator must match auth UID, cannot self-assign verification
       allow create: if isAuthenticated() &&
-                      (request.resource.data.userId == request.auth.uid || isAdmin());
+                      (request.resource.data.userId == request.auth.uid || isAdmin()) &&
+                      (isAdmin() || !request.resource.data.keys().hasAny(['isVerified', 'verification', 'verification_tier']));
       
-      // Owner or admin can update
-      allow update: if (isOwner(resource.data.userId) || isAdmin());
+      // Owner or admin can update, but cannot reassign userId
+      allow update: if (isOwner(resource.data.userId) || isAdmin()) &&
+                      notModifyingOwner('userId') &&
+                      (isAdmin() || !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isVerified', 'verification', 'verification_tier']));
       
-      // Owner or admin can delete
       allow delete: if isOwner(resource.data.userId) || isAdmin();
     }
     
@@ -111,14 +113,13 @@ service cloud.firestore {
     match /posts/{postId} {
       allow read: if true;
       
-      // Authenticated users can create posts, creator must match auth UID
       allow create: if isAuthenticated() &&
                       (request.resource.data.userId == request.auth.uid || isAdmin());
       
-      // Owner or admin can update
-      allow update: if (isOwner(resource.data.userId) || isAdmin());
+      // Owner or admin can update, but cannot transfer ownership
+      allow update: if (isOwner(resource.data.userId) || isAdmin()) &&
+                      notModifyingOwner('userId');
       
-      // Owner or admin can delete
       allow delete: if isOwner(resource.data.userId) || isAdmin();
       
       // Comments subcollection
@@ -127,7 +128,9 @@ service cloud.firestore {
         allow create: if isAuthenticated() &&
                         (request.resource.data.userId == request.auth.uid || 
                          request.resource.data.authorId == request.auth.uid || isAdmin());
-        allow update, delete: if isOwner(resource.data.userId) || isOwner(resource.data.authorId) || isAdmin();
+        allow update: if (isOwner(resource.data.userId) || isOwner(resource.data.authorId) || isAdmin()) &&
+                        notModifyingOwner('userId') && notModifyingOwner('authorId');
+        allow delete: if isOwner(resource.data.userId) || isOwner(resource.data.authorId) || isAdmin();
       }
       
       // Likes subcollection (likeId is user UID)
@@ -146,7 +149,9 @@ service cloud.firestore {
       allow create: if isAuthenticated() &&
                       (request.resource.data.authorId == request.auth.uid || 
                        request.resource.data.userId == request.auth.uid || isAdmin());
-      allow update, delete: if isOwner(resource.data.authorId) || isOwner(resource.data.userId) || isAdmin();
+      allow update: if (isOwner(resource.data.authorId) || isOwner(resource.data.userId) || isAdmin()) &&
+                      notModifyingOwner('authorId') && notModifyingOwner('userId');
+      allow delete: if isOwner(resource.data.authorId) || isOwner(resource.data.userId) || isAdmin();
     }
 
     // ============================================
@@ -184,13 +189,14 @@ service cloud.firestore {
     match /blogs/{blogId} {
       allow read: if true;
       
-      // Authenticated users can create blogs, author must match auth UID
       allow create: if isAuthenticated() &&
                       (request.resource.data.userId == request.auth.uid ||
                        request.resource.data.authorId == request.auth.uid || isAdmin());
       
-      // Owner or admin can update/delete
-      allow update, delete: if isOwner(resource.data.userId) || isOwner(resource.data.authorId) || isAdmin();
+      // Owner or admin can update, but cannot alter authorId / userId
+      allow update: if (isOwner(resource.data.userId) || isOwner(resource.data.authorId) || isAdmin()) &&
+                      notModifyingOwner('userId') && notModifyingOwner('authorId');
+      allow delete: if isOwner(resource.data.userId) || isOwner(resource.data.authorId) || isAdmin();
       
       // Comments on blogs
       match /comments/{commentId} {
@@ -198,7 +204,9 @@ service cloud.firestore {
         allow create: if isAuthenticated() &&
                         (request.resource.data.userId == request.auth.uid || 
                          request.resource.data.authorId == request.auth.uid || isAdmin());
-        allow update, delete: if isOwner(resource.data.userId) || isOwner(resource.data.authorId) || isAdmin();
+        allow update: if (isOwner(resource.data.userId) || isOwner(resource.data.authorId) || isAdmin()) &&
+                        notModifyingOwner('userId') && notModifyingOwner('authorId');
+        allow delete: if isOwner(resource.data.userId) || isOwner(resource.data.authorId) || isAdmin();
       }
     }
     
@@ -215,7 +223,7 @@ service cloud.firestore {
     // PROJECTS COLLECTION (Production Projects)
     // ============================================
     match /projects/{projectId} {
-      // Allow read only to project owner/producer, invited members, or admins
+      // Read allowed only to owner, producer, listed members, or public projects
       allow read: if isAuthenticated() && (
         resource.data.producerId == request.auth.uid ||
         resource.data.ownerId == request.auth.uid ||
@@ -225,15 +233,20 @@ service cloud.firestore {
         isAdmin()
       );
       
-      // Creator must be the authenticated user
       allow create: if isAuthenticated() && (
         request.resource.data.producerId == request.auth.uid ||
         request.resource.data.ownerId == request.auth.uid ||
         isAdmin()
       );
       
-      // Only owner, producer, or admin can update/delete project
-      allow update, delete: if isAuthenticated() && (
+      // Only owner/producer can update, cannot alter ownerId/producerId
+      allow update: if isAuthenticated() && (
+        resource.data.producerId == request.auth.uid ||
+        resource.data.ownerId == request.auth.uid ||
+        isAdmin()
+      ) && notModifyingOwner('producerId') && notModifyingOwner('ownerId');
+
+      allow delete: if isAuthenticated() && (
         resource.data.producerId == request.auth.uid ||
         resource.data.ownerId == request.auth.uid ||
         isAdmin()
@@ -259,21 +272,17 @@ service cloud.firestore {
     // BOOKINGS/FACILITIES COLLECTION
     // ============================================
     match /bookings/{bookingId} {
-      // Users can read their own bookings, facility owners can read bookings for their facilities
       allow read: if isOwner(resource.data.userId) || 
                     isOwner(resource.data.facilityOwnerId) || 
                     isAdmin();
       
-      // Authenticated users can create bookings for themselves
       allow create: if isAuthenticated() &&
                       (request.resource.data.userId == request.auth.uid || isAdmin());
       
-      // Users can update their own bookings, facility owners can update status
       allow update: if (isOwner(resource.data.userId) || 
                        isOwner(resource.data.facilityOwnerId) || 
-                       isAdmin());
+                       isAdmin()) && notModifyingOwner('userId');
       
-      // Only owner or admin can delete
       allow delete: if isOwner(resource.data.userId) || isAdmin();
     }
     
@@ -281,58 +290,73 @@ service cloud.firestore {
     // MESSAGES/CHAT COLLECTION
     // ============================================
     match /chats/{chatId} {
-      // Restrict chat access strictly to participants in the thread or admin
-      allow read: if isAuthenticated() && (
-        (resource.data.participants != null && request.auth.uid in resource.data.participants) ||
-        chatId.matches('.*' + request.auth.uid + '.*') ||
+      // Helper: check if caller is an authorized participant in the existing chat document
+      function isChatParticipant() {
+        return isAuthenticated() && (
+          (resource.data.participants != null && request.auth.uid in resource.data.participants) ||
+          isAdmin()
+        );
+      }
+
+      // Helper: check if caller is a participant in the incoming chat document
+      function isIncomingChatParticipant() {
+        return isAuthenticated() && (
+          (request.resource.data.participants != null && request.auth.uid in request.resource.data.participants) ||
+          isAdmin()
+        );
+      }
+
+      // Only verified participants or admins can read a chat
+      allow read: if isChatParticipant();
+      
+      // Creating a chat requires caller to be in participants array
+      allow create: if isIncomingChatParticipant();
+      
+      // Prevent inserting oneself into existing chats or modifying other participants
+      // Updates allowed ONLY if caller is already a participant and participants list is unchanged
+      allow update: if isChatParticipant() && (
+        request.resource.data.participants == resource.data.participants ||
         isAdmin()
       );
       
-      // Creating or updating a chat requires caller to be in participants
-      allow create: if isAuthenticated() && (
-        (request.resource.data.participants != null && request.auth.uid in request.resource.data.participants) ||
-        chatId.matches('.*' + request.auth.uid + '.*') ||
-        isAdmin()
-      );
-      
-      allow update: if isAuthenticated() && (
-        (resource.data.participants != null && request.auth.uid in resource.data.participants) ||
-        (request.resource.data.participants != null && request.auth.uid in request.resource.data.participants) ||
-        chatId.matches('.*' + request.auth.uid + '.*') ||
-        isAdmin()
-      );
-      
-      allow delete: if isAuthenticated() && (
-        (resource.data.participants != null && request.auth.uid in resource.data.participants) ||
-        isAdmin()
-      );
+      allow delete: if isChatParticipant();
       
       // Messages subcollection
       match /messages/{messageId} {
-        // Read only if parent chat participant
+        // Read only if verified member in the parent chat
         allow read: if isAuthenticated() && (
           (get(/databases/$(database)/documents/chats/$(chatId)).data.participants != null &&
            request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants) ||
-          chatId.matches('.*' + request.auth.uid + '.*') ||
           isAdmin()
         );
         
-        // Sender must be authenticated and match senderId
+        // Message creation requires verified membership in parent chat AND matching senderId
         allow create: if isAuthenticated() && (
-          request.resource.data.senderId == request.auth.uid ||
-          isAdmin()
+          (
+            get(/databases/$(database)/documents/chats/$(chatId)).data.participants != null &&
+            request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants &&
+            request.resource.data.senderId == request.auth.uid
+          ) || isAdmin()
         );
         
-        // Update (e.g. read receipts) or delete
+        // Message updates: Only sender can edit content (not recipient or arbitrary users)
+        // Recipients cannot arbitrarily modify message documents
         allow update: if isAuthenticated() && (
-          resource.data.senderId == request.auth.uid ||
-          resource.data.recipientId == request.auth.uid ||
-          (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isRead'])) ||
-          isAdmin()
+          (
+            get(/databases/$(database)/documents/chats/$(chatId)).data.participants != null &&
+            request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants &&
+            resource.data.senderId == request.auth.uid &&
+            notModifyingOwner('senderId')
+          ) || isAdmin()
         );
         
+        // Message deletion: Only sender or admin
         allow delete: if isAuthenticated() && (
-          resource.data.senderId == request.auth.uid || isAdmin()
+          (
+            get(/databases/$(database)/documents/chats/$(chatId)).data.participants != null &&
+            request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants &&
+            resource.data.senderId == request.auth.uid
+          ) || isAdmin()
         );
       }
     }
@@ -341,16 +365,9 @@ service cloud.firestore {
     // NOTIFICATIONS COLLECTION
     // ============================================
     match /notifications/{notificationId} {
-      // Users can only read their own notifications
       allow read: if isOwner(resource.data.userId) || isAdmin();
-      
-      // Authenticated users can create notifications
       allow create: if isAuthenticated();
-      
-      // Users can update their own notifications (mark as read)
-      allow update: if isOwner(resource.data.userId) || isAdmin();
-      
-      // Users can delete their own notifications
+      allow update: if (isOwner(resource.data.userId) || isAdmin()) && notModifyingOwner('userId');
       allow delete: if isOwner(resource.data.userId) || isAdmin();
     }
     
@@ -379,7 +396,8 @@ service cloud.firestore {
         request.resource.data.userId == request.auth.uid ||
         isAdmin()
       );
-      allow update: if (isOwner(resource.data.creatorId) || isOwner(resource.data.userId) || isAdmin());
+      allow update: if (isOwner(resource.data.creatorId) || isOwner(resource.data.userId) || isAdmin()) &&
+                      notModifyingOwner('creatorId') && notModifyingOwner('userId');
       allow delete: if (isOwner(resource.data.creatorId) || isOwner(resource.data.userId) || isAdmin());
     }
     
@@ -389,8 +407,22 @@ service cloud.firestore {
     match /polls/{pollId} {
       allow read: if true;
       allow create: if isAdmin();
-      // Allow authenticated users to vote, only updating voters / options counts
-      allow update: if isAuthenticated();
+      
+      // Restrict poll updates strictly to legitimate voting:
+      // - Question, active status, createdAt, and options structure cannot be changed
+      // - Affected keys restricted strictly to 'voters', 'totalVotes', and 'options'
+      // - The authenticated user must add their UID to the voters list and not vote twice
+      allow update: if isAuthenticated() && (
+        isAdmin() || (
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['voters', 'totalVotes', 'options']) &&
+          request.resource.data.question == resource.data.question &&
+          request.resource.data.active == resource.data.active &&
+          !resource.data.voters.hasAny([request.auth.uid]) &&
+          request.resource.data.voters.hasAll(resource.data.voters) &&
+          request.resource.data.voters.hasAny([request.auth.uid])
+        )
+      );
+      
       allow delete: if isAdmin();
     }
     
@@ -402,14 +434,15 @@ service cloud.firestore {
       allow create: if isAuthenticated() && (
         request.resource.data.userId == request.auth.uid || isAdmin()
       );
-      allow update: if (isOwner(resource.data.userId) || isAdmin());
+      allow update: if (isOwner(resource.data.userId) || isAdmin()) && notModifyingOwner('userId');
       allow delete: if (isOwner(resource.data.userId) || isAdmin());
     }
 
     match /job_applications/{applicationId} {
       allow read: if isAuthenticated() && (isOwner(resource.data.userId) || isOwner(resource.data.jobOwnerId) || isAdmin());
       allow create: if isAuthenticated() && (request.resource.data.userId == request.auth.uid || isAdmin());
-      allow update: if (isOwner(resource.data.userId) || isOwner(resource.data.jobOwnerId) || isAdmin());
+      allow update: if (isOwner(resource.data.userId) || isOwner(resource.data.jobOwnerId) || isAdmin()) &&
+                      notModifyingOwner('userId') && notModifyingOwner('jobOwnerId');
       allow delete: if isAdmin();
     }
 
@@ -436,7 +469,7 @@ service cloud.firestore {
     match /facilities/{facilityId} {
       allow read: if true;
       allow create: if isAuthenticated() && (request.resource.data.userId == request.auth.uid || isAdmin());
-      allow update: if (isOwner(resource.data.userId) || isAdmin());
+      allow update: if (isOwner(resource.data.userId) || isAdmin()) && notModifyingOwner('userId');
       allow delete: if (isOwner(resource.data.userId) || isAdmin());
     }
     
@@ -451,13 +484,15 @@ service cloud.firestore {
     match /guild_posts/{postId} {
       allow read: if true;
       allow create: if isAuthenticated() && (request.resource.data.userId == request.auth.uid || isAdmin());
-      allow update, delete: if isOwner(resource.data.userId) || isAdmin();
+      allow update: if (isOwner(resource.data.userId) || isAdmin()) && notModifyingOwner('userId');
+      allow delete: if isOwner(resource.data.userId) || isAdmin();
     }
 
     match /guild_comments/{commentId} {
       allow read: if true;
       allow create: if isAuthenticated() && (request.resource.data.userId == request.auth.uid || isAdmin());
-      allow update, delete: if isOwner(resource.data.userId) || isAdmin();
+      allow update: if (isOwner(resource.data.userId) || isAdmin()) && notModifyingOwner('userId');
+      allow delete: if isOwner(resource.data.userId) || isAdmin();
     }
 
     match /guild_requests/{requestId} {
@@ -472,25 +507,35 @@ service cloud.firestore {
     match /groups/{groupId} {
       allow read: if true;
       allow create: if isAuthenticated() && (request.resource.data.creatorId == request.auth.uid || isAdmin());
+      
+      // Group update:
+      // 1. Group creator/admin can update general fields, but cannot transfer creatorId
+      // 2. Regular users can ONLY add or remove their OWN auth.uid from members list
       allow update: if isAuthenticated() && (
-        isOwner(resource.data.creatorId) ||
-        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members', 'memberCount'])) ||
+        (isOwner(resource.data.creatorId) && notModifyingOwner('creatorId')) ||
+        (
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members', 'memberCount']) &&
+          notModifyingOwner('creatorId') &&
+          notModifyingOwner('name') &&
+          notModifyingOwner('category')
+        ) ||
         isAdmin()
       );
+      
       allow delete: if isOwner(resource.data.creatorId) || isAdmin();
     }
 
     match /forumPosts/{postId} {
       allow read: if true;
       allow create: if isAuthenticated() && (request.resource.data.authorId == request.auth.uid || isAdmin());
-      allow update: if (isOwner(resource.data.authorId) || isAdmin());
+      allow update: if (isOwner(resource.data.authorId) || isAdmin()) && notModifyingOwner('authorId');
       allow delete: if (isOwner(resource.data.authorId) || isAdmin());
     }
 
     match /forum_posts/{postId} {
       allow read: if true;
       allow create: if isAuthenticated() && (request.resource.data.authorId == request.auth.uid || isAdmin());
-      allow update: if (isOwner(resource.data.authorId) || isAdmin());
+      allow update: if (isOwner(resource.data.authorId) || isAdmin()) && notModifyingOwner('authorId');
       allow delete: if (isOwner(resource.data.authorId) || isAdmin());
     }
 
