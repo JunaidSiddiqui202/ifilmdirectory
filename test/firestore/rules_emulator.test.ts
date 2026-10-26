@@ -4,30 +4,9 @@
  * Target Project: ifilmdirectory-94b82
  * Test Framework: @firebase/rules-unit-testing + Vitest
  * 
- * Verifies live Firestore Security Rules logic when executed against the
- * Firebase Local Emulator Suite (or CI environment with Java + Firebase CLI).
- * 
- * Scenarios tested across positive and negative paths:
- * - /chats/{chatId} & /chats/{chatId}/messages/{messageId}
- *   * Chat creation by participant
- *   * Participant metadata updates
- *   * Non-participant read/write rejection
- *   * Outsider message creation rejection
- *   * Non-admin/non-creator chat deletion rejection
- * - /groups/{groupId}
- *   * Self-joining public group with valid count increment
- *   * Outsider injecting 3rd party rejection
- *   * Self-joining private group rejection
- * - /polls/{pollId}
- *   * Valid single vote and option increment
- *   * Inactive poll vote rejection
- *   * Double voting rejection
- *   * Option key injection & vote count tampering rejection
- * - /notifications/{notificationId}
- *   * Valid peer notification with sender matching auth
- *   * Forged senderId rejection
- *   * Standard user sending 'system' type rejection
- *   * Arbitrary schema key injection rejection
+ * FAIL-FAST CONFIGURATION:
+ * Strictly throws an error if the Firebase Firestore Emulator is unavailable,
+ * guaranteeing that all security rules are directly evaluated against real emulator instances.
  */
 
 import { describe, it, beforeAll, afterAll, beforeEach } from 'vitest';
@@ -45,31 +24,30 @@ const PROJECT_ID = 'ifilmdirectory-94b82';
 const RULES_PATH = path.resolve(__dirname, '../../firestore.rules');
 
 describe("Firebase Rules Unit Testing Suite (@firebase/rules-unit-testing)", () => {
-    let testEnv: RulesTestEnvironment | null = null;
-    let emulatorAvailable = false;
+    let testEnv: RulesTestEnvironment;
 
     beforeAll(async () => {
-        // Attempt connecting to the local Firebase Emulator if running
+        const rules = fs.readFileSync(RULES_PATH, 'utf8');
+        const host = process.env.FIRESTORE_EMULATOR_HOST?.split(':')[0] || '127.0.0.1';
+        const port = parseInt(process.env.FIRESTORE_EMULATOR_HOST?.split(':')[1] || '8080', 10);
+
         try {
-            const rules = fs.readFileSync(RULES_PATH, 'utf8');
             testEnv = await initializeTestEnvironment({
                 projectId: PROJECT_ID,
                 firestore: {
                     rules,
-                    host: process.env.FIRESTORE_EMULATOR_HOST?.split(':')[0] || '127.0.0.1',
-                    port: parseInt(process.env.FIRESTORE_EMULATOR_HOST?.split(':')[1] || '8080', 10)
+                    host,
+                    port
                 }
             });
 
-            // Quick probe to verify if the emulator is actively listening
+            // Probe emulator to verify active connectivity
             const probeContext = testEnv.authenticatedContext('probe_user');
             await getDoc(doc(probeContext.firestore(), 'config/probe')).catch(() => {});
-            emulatorAvailable = true;
-        } catch {
-            // If the local environment has no active Java/Emulator, log clear status
-            console.warn("\n[INFO] Firebase Firestore Emulator is not running on 127.0.0.1:8080.");
-            console.warn("[INFO] This test suite is configured for CI environments with Java & Firebase Emulator installed.\n");
-            emulatorAvailable = false;
+        } catch (err: any) {
+            console.error(`\n[FATAL] Firestore Emulator is not accessible on ${host}:${port}.`);
+            console.error(`[FATAL] Ensure 'firebase emulators:exec' or 'npm run test:rules' is running with Java enabled.\n`);
+            throw new Error(`Firestore Emulator connection failed at ${host}:${port}: ${err?.message || err}`);
         }
     });
 
@@ -80,14 +58,13 @@ describe("Firebase Rules Unit Testing Suite (@firebase/rules-unit-testing)", () 
     });
 
     beforeEach(async () => {
-        if (testEnv && emulatorAvailable) {
+        if (testEnv) {
             await testEnv.clearFirestore();
         }
     });
 
     describe("/chats/{chatId} & /chats/{chatId}/messages/{messageId}", () => {
         it("allows participant to create chat with valid participant list and creatorId", async () => {
-            if (!emulatorAvailable || !testEnv) return;
             const aliceDb = testEnv.authenticatedContext('alice').firestore();
             const chatRef = doc(aliceDb, 'chats', 'chat_123');
 
@@ -100,7 +77,6 @@ describe("Firebase Rules Unit Testing Suite (@firebase/rules-unit-testing)", () 
         });
 
         it("REJECTS outsider from reading or writing messages in another's chat", async () => {
-            if (!emulatorAvailable || !testEnv) return;
             await testEnv.withSecurityRulesDisabled(async (adminContext) => {
                 await setDoc(doc(adminContext.firestore(), 'chats', 'chat_secret'), {
                     participants: ['alice', 'bob'],
@@ -120,7 +96,6 @@ describe("Firebase Rules Unit Testing Suite (@firebase/rules-unit-testing)", () 
         });
 
         it("REJECTS standard participant from deleting entire chat conversation", async () => {
-            if (!emulatorAvailable || !testEnv) return;
             await testEnv.withSecurityRulesDisabled(async (adminContext) => {
                 await setDoc(doc(adminContext.firestore(), 'chats', 'chat_owned_by_alice'), {
                     participants: ['alice', 'bob'],
@@ -135,7 +110,6 @@ describe("Firebase Rules Unit Testing Suite (@firebase/rules-unit-testing)", () 
 
     describe("/groups/{groupId} Membership Toggle", () => {
         it("allows user to self-join public group and increments count by 1", async () => {
-            if (!emulatorAvailable || !testEnv) return;
             await testEnv.withSecurityRulesDisabled(async (adminContext) => {
                 await setDoc(doc(adminContext.firestore(), 'groups', 'group_writers'), {
                     name: 'Screenwriters Guild',
@@ -155,7 +129,6 @@ describe("Firebase Rules Unit Testing Suite (@firebase/rules-unit-testing)", () 
         });
 
         it("REJECTS outsider adding arbitrary 3rd party into a group", async () => {
-            if (!emulatorAvailable || !testEnv) return;
             await testEnv.withSecurityRulesDisabled(async (adminContext) => {
                 await setDoc(doc(adminContext.firestore(), 'groups', 'group_camera'), {
                     name: 'Camera Dept',
@@ -176,7 +149,6 @@ describe("Firebase Rules Unit Testing Suite (@firebase/rules-unit-testing)", () 
 
     describe("/polls/{pollId} Tamper-Proof Voting", () => {
         it("ALLOWS valid vote and increments exactly one option", async () => {
-            if (!emulatorAvailable || !testEnv) return;
             await testEnv.withSecurityRulesDisabled(async (adminContext) => {
                 await setDoc(doc(adminContext.firestore(), 'polls', 'poll_oscars'), {
                     question: 'Best Picture Pick',
@@ -203,7 +175,6 @@ describe("Firebase Rules Unit Testing Suite (@firebase/rules-unit-testing)", () 
         });
 
         it("REJECTS duplicate voting by same UID", async () => {
-            if (!emulatorAvailable || !testEnv) return;
             await testEnv.withSecurityRulesDisabled(async (adminContext) => {
                 await setDoc(doc(adminContext.firestore(), 'polls', 'poll_double'), {
                     question: 'Vote Once',
@@ -229,7 +200,6 @@ describe("Firebase Rules Unit Testing Suite (@firebase/rules-unit-testing)", () 
         });
 
         it("REJECTS options containing rogue keys or unexpected fields", async () => {
-            if (!emulatorAvailable || !testEnv) return;
             await testEnv.withSecurityRulesDisabled(async (adminContext) => {
                 await setDoc(doc(adminContext.firestore(), 'polls', 'poll_rogue'), {
                     question: 'Rogue Test',
@@ -257,7 +227,6 @@ describe("Firebase Rules Unit Testing Suite (@firebase/rules-unit-testing)", () 
 
     describe("/notifications/{id} Impersonation and Schema Rules", () => {
         it("ALLOWS standard peer notification with valid recipient and matching senderId", async () => {
-            if (!emulatorAvailable || !testEnv) return;
             const aliceDb = testEnv.authenticatedContext('alice').firestore();
 
             await assertSucceeds(addDoc(collection(aliceDb, 'notifications'), {
@@ -273,7 +242,6 @@ describe("Firebase Rules Unit Testing Suite (@firebase/rules-unit-testing)", () 
         });
 
         it("REJECTS standard user creating 'system' type notification", async () => {
-            if (!emulatorAvailable || !testEnv) return;
             const aliceDb = testEnv.authenticatedContext('alice').firestore();
 
             await assertFails(addDoc(collection(aliceDb, 'notifications'), {
@@ -287,7 +255,6 @@ describe("Firebase Rules Unit Testing Suite (@firebase/rules-unit-testing)", () 
         });
 
         it("REJECTS forged senderId impersonating another user", async () => {
-            if (!emulatorAvailable || !testEnv) return;
             const aliceDb = testEnv.authenticatedContext('alice').firestore();
 
             await assertFails(addDoc(collection(aliceDb, 'notifications'), {
