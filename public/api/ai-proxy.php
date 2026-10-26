@@ -97,11 +97,26 @@ if (!$authenticatedUid) {
 }
 
 // 5. Atomic Rate Limiting (Independent Per-Account AND Per-IP Quotas via File Locking)
-$clientIp = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-// In case of multiple forwarded IPs, use the first client IP
-if (strpos($clientIp, ',') !== false) {
-    $ipParts = explode(',', $clientIp);
-    $clientIp = trim($ipParts[0]);
+// Anti-Spoofing: Strictly use REMOTE_ADDR unless requests come from known trusted proxies (Cloudflare / Hostinger reverse proxies)
+$remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+$trustedProxies = [
+    '127.0.0.1',
+    '::1',
+    '195.35.44.253' // Hostinger server internal loopback / proxy
+];
+
+// Determine if connection is through a verified trusted proxy before accepting forwarded headers
+$isTrustedProxy = in_array($remoteAddr, $trustedProxies, true) ||
+                  preg_match('/^(10\.|172\.(1[6-9]|2[0-9]|3[01])\.|192\.168\.)/', $remoteAddr);
+
+if ($isTrustedProxy && !empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+    $clientIp = trim($_SERVER['HTTP_CF_CONNECTING_IP']);
+} elseif ($isTrustedProxy && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+    $forwarded = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+    $clientIp = trim($forwarded[0]);
+} else {
+    // Untrusted or direct connection: strictly bind to the physical TCP socket IP
+    $clientIp = $remoteAddr;
 }
 
 // Function to atomically evaluate sliding-window rate limit
@@ -187,29 +202,40 @@ $GROQ_KEY = getenv('GROQ_API_KEY') ?: getenv('REDIRECT_GROQ_API_KEY');
 $GEMINI_KEY = getenv('GEMINI_API_KEY') ?: getenv('REDIRECT_GEMINI_API_KEY');
 
 if (!$GROQ_KEY || !$GEMINI_KEY) {
-    // Check for secure configuration file outside public web root (e.g. Hostinger parent /home/u.../ or repository parent)
-    $candidatePaths = [
-        dirname($_SERVER['DOCUMENT_ROOT'] ?? '') . '/config.secure.php',
-        dirname($_SERVER['DOCUMENT_ROOT'] ?? '') . '/.env.ai',
-        dirname(__DIR__, 2) . '/.env.ai',
-        dirname(__DIR__, 2) . '/.env' // Root workspace directory, never uploaded to /public_html
-    ];
+    // 1. Check for PHP configuration array outside web root
+    $securePhpConfig = dirname($_SERVER['DOCUMENT_ROOT'] ?? '') . '/config.secure.php';
+    if (file_exists($securePhpConfig) && is_readable($securePhpConfig)) {
+        $cfg = @include $securePhpConfig;
+        if (is_array($cfg)) {
+            if (!$GROQ_KEY && !empty($cfg['GROQ_API_KEY'])) $GROQ_KEY = $cfg['GROQ_API_KEY'];
+            if (!$GEMINI_KEY && !empty($cfg['GEMINI_API_KEY'])) $GEMINI_KEY = $cfg['GEMINI_API_KEY'];
+        }
+    }
 
-    foreach ($candidatePaths as $candidate) {
-        if (!empty($candidate) && file_exists($candidate) && is_readable($candidate)) {
-            $lines = @file($candidate, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
-            foreach ($lines as $line) {
-                $line = trim($line);
-                if (strpos($line, '#') === 0) continue;
-                if (strpos($line, '=') !== false) {
-                    list($k, $v) = explode('=', $line, 2);
-                    $k = trim($k);
-                    $v = trim($v);
-                    if (($k === 'GROQ_API_KEY' || $k === 'VITE_GROQ_API_KEY') && !$GROQ_KEY) $GROQ_KEY = $v;
-                    if (($k === 'GEMINI_API_KEY' || $k === 'VITE_GEMINI_API_KEY') && !$GEMINI_KEY) $GEMINI_KEY = $v;
+    // 2. Check for external environment files located strictly above public_html
+    if (!$GROQ_KEY || !$GEMINI_KEY) {
+        $candidatePaths = [
+            dirname($_SERVER['DOCUMENT_ROOT'] ?? '') . '/.env.ai',
+            dirname(__DIR__, 2) . '/.env.ai',
+            dirname(__DIR__, 2) . '/.env' // Root workspace repository level (excluded from public_html)
+        ];
+
+        foreach ($candidatePaths as $candidate) {
+            if (!empty($candidate) && file_exists($candidate) && is_readable($candidate)) {
+                $lines = @file($candidate, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
+                foreach ($lines as $line) {
+                    $line = trim($line);
+                    if (strpos($line, '#') === 0) continue;
+                    if (strpos($line, '=') !== false) {
+                        list($k, $v) = explode('=', $line, 2);
+                        $k = trim($k);
+                        $v = trim($v);
+                        if (($k === 'GROQ_API_KEY' || $k === 'VITE_GROQ_API_KEY') && !$GROQ_KEY) $GROQ_KEY = $v;
+                        if (($k === 'GEMINI_API_KEY' || $k === 'VITE_GEMINI_API_KEY') && !$GEMINI_KEY) $GEMINI_KEY = $v;
+                    }
                 }
+                if ($GROQ_KEY && $GEMINI_KEY) break;
             }
-            if ($GROQ_KEY && $GEMINI_KEY) break;
         }
     }
 }

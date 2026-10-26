@@ -329,11 +329,20 @@ service cloud.firestore {
           (
             !('lastMessage' in request.resource.data) ||
             (request.resource.data.lastMessage is string && request.resource.data.lastMessage.size() <= 2000)
+          ) &&
+          (
+            !('unreadBy' in request.resource.data) ||
+            request.resource.data.unreadBy is list
           )
         )
       );
       
-      allow delete: if isChatParticipant() || isAdmin();
+      // Chat deletion restricted to administrators or original chat creator
+      allow delete: if isAdmin() || (
+        isAuthenticated() && 
+        'creatorId' in resource.data && 
+        resource.data.creatorId == request.auth.uid
+      );
       
       // Messages subcollection
       match /messages/{messageId} {
@@ -379,16 +388,18 @@ service cloud.firestore {
     match /notifications/{notificationId} {
       allow read: if isOwner(resource.data.userId) || isAdmin();
       
-      // Notification creation requires authenticated user matching senderId,
-      // strictly valid recipient (cannot notify oneself maliciously),
-      // permissible notification types, bounded size, and initial unread status
+      // Notification creation:
+      // - Regular users can ONLY send user-level peer notifications ('like', 'comment', 'follow', 'job', 'connection', 'message')
+      // - Sending 'system' notifications is strictly prohibited for standard users (reserved for admin/backend)
+      // - Must not notify oneself
+      // - String length limits and initial unread status enforced
       allow create: if isAuthenticated() && (
         isAdmin() || (
           request.resource.data.senderId == request.auth.uid &&
           request.resource.data.userId is string &&
           request.resource.data.userId.size() > 0 &&
           request.resource.data.userId != request.auth.uid &&
-          request.resource.data.type in ['like', 'comment', 'follow', 'job', 'system', 'connection', 'message'] &&
+          request.resource.data.type in ['like', 'comment', 'follow', 'job', 'connection', 'message'] &&
           request.resource.data.title is string &&
           request.resource.data.title.size() <= 200 &&
           request.resource.data.message is string &&
@@ -438,13 +449,63 @@ service cloud.firestore {
       allow read: if true;
       allow create: if isAdmin();
       
+      // Helper function to verify that exactly ONE option was incremented by 1,
+      // all other options remained identical, and option text/ids were not altered:
+      function isValidOptionIncrement() {
+        let oldOpts = resource.data.options;
+        let newOpts = request.resource.data.options;
+        let n = oldOpts.size();
+
+        // 2-Option Polls
+        let valid2 = (n == 2) && (
+          (
+            newOpts[0].id == oldOpts[0].id && newOpts[0].text == oldOpts[0].text &&
+            newOpts[1].id == oldOpts[1].id && newOpts[1].text == oldOpts[1].text
+          ) && (
+            (newOpts[0].votes == oldOpts[0].votes + 1 && newOpts[1].votes == oldOpts[1].votes) ||
+            (newOpts[0].votes == oldOpts[0].votes && newOpts[1].votes == oldOpts[1].votes + 1)
+          )
+        );
+
+        // 3-Option Polls
+        let valid3 = (n == 3) && (
+          (
+            newOpts[0].id == oldOpts[0].id && newOpts[0].text == oldOpts[0].text &&
+            newOpts[1].id == oldOpts[1].id && newOpts[1].text == oldOpts[1].text &&
+            newOpts[2].id == oldOpts[2].id && newOpts[2].text == oldOpts[2].text
+          ) && (
+            (newOpts[0].votes == oldOpts[0].votes + 1 && newOpts[1].votes == oldOpts[1].votes && newOpts[2].votes == oldOpts[2].votes) ||
+            (newOpts[0].votes == oldOpts[0].votes && newOpts[1].votes == oldOpts[1].votes + 1 && newOpts[2].votes == oldOpts[2].votes) ||
+            (newOpts[0].votes == oldOpts[0].votes && newOpts[1].votes == oldOpts[1].votes && newOpts[2].votes == oldOpts[2].votes + 1)
+          )
+        );
+
+        // 4-Option Polls
+        let valid4 = (n == 4) && (
+          (
+            newOpts[0].id == oldOpts[0].id && newOpts[0].text == oldOpts[0].text &&
+            newOpts[1].id == oldOpts[1].id && newOpts[1].text == oldOpts[1].text &&
+            newOpts[2].id == oldOpts[2].id && newOpts[2].text == oldOpts[2].text &&
+            newOpts[3].id == oldOpts[3].id && newOpts[3].text == oldOpts[3].text
+          ) && (
+            (newOpts[0].votes == oldOpts[0].votes + 1 && newOpts[1].votes == oldOpts[1].votes && newOpts[2].votes == oldOpts[2].votes && newOpts[3].votes == oldOpts[3].votes) ||
+            (newOpts[0].votes == oldOpts[0].votes && newOpts[1].votes == oldOpts[1].votes + 1 && newOpts[2].votes == oldOpts[2].votes && newOpts[3].votes == oldOpts[3].votes) ||
+            (newOpts[0].votes == oldOpts[0].votes && newOpts[1].votes == oldOpts[1].votes && newOpts[2].votes == oldOpts[2].votes + 1 && newOpts[3].votes == oldOpts[3].votes) ||
+            (newOpts[0].votes == oldOpts[0].votes && newOpts[1].votes == oldOpts[1].votes && newOpts[2].votes == oldOpts[2].votes && newOpts[3].votes == oldOpts[3].votes + 1)
+          )
+        );
+
+        return valid2 || valid3 || valid4;
+      }
+      
       // Restrict poll updates strictly to legitimate single-vote operations on active polls:
       // 1. Poll must be active (active == true) and cannot be marked inactive by voters
-      // 2. Question, type, active, createdAt, and options length cannot change
+      // 2. Question, type, active, createdAt cannot change
       // 3. User must not have already voted (!voters.hasAny([request.auth.uid]))
       // 4. Exactly one new voter (the calling user) must be added and old voters preserved
       // 5. totalVotes must increment by exactly 1
-      // 6. Affected keys restricted strictly to ['voters', 'totalVotes', 'options']
+      // 6. Exactly ONE option count increments by 1, all other options unchanged (tamper-proof)
+      // 7. Affected keys restricted strictly to ['voters', 'totalVotes', 'options']
       allow update: if isAuthenticated() && (
         isAdmin() || (
           resource.data.active == true &&
@@ -461,7 +522,8 @@ service cloud.firestore {
           request.resource.data.totalVotes == resource.data.totalVotes + 1 &&
           resource.data.options is list &&
           request.resource.data.options is list &&
-          request.resource.data.options.size() == resource.data.options.size()
+          request.resource.data.options.size() == resource.data.options.size() &&
+          isValidOptionIncrement()
         )
       );
       
