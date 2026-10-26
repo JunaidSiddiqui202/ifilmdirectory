@@ -427,6 +427,26 @@ export default function Search() {
 
     const inputRef = useRef<HTMLInputElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const searchContainerRef = useRef<HTMLDivElement>(null);
+
+    // Close predictions dropdown when clicking outside anywhere on the screen
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+            if (
+                searchContainerRef.current &&
+                !searchContainerRef.current.contains(event.target as Node)
+            ) {
+                setShowPredictions(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('touchstart', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('touchstart', handleClickOutside);
+        };
+    }, []);
 
     // Cache datasets across keystrokes so predictions are instant (<10ms)
     const datasetsRef = useRef<{
@@ -1108,7 +1128,7 @@ export default function Search() {
                             <span className="material-symbols-outlined text-lg">arrow_back</span>
                         </button>
                         
-                        <div className="flex-1 relative">
+                        <div ref={searchContainerRef} className="flex-1 relative">
                             <input
                                 ref={inputRef}
                                 autoFocus
