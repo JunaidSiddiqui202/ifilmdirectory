@@ -492,8 +492,8 @@ export default function Home() {
                                 setSelectedPollOption(option.id);
                             }}
                             className={`relative w-full text-left p-2.5 rounded-xl border transition-all overflow-hidden ${isSelected
-                                    ? 'border-amber-500 bg-amber-500/10'
-                                    : 'border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-white/[0.02] hover:border-amber-500/30 dark:hover:border-white/20'
+                                ? 'border-amber-500 bg-amber-500/10'
+                                : 'border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-white/[0.02] hover:border-amber-500/30 dark:hover:border-white/20'
                                 }`}
                         >
                             {selectedPollOption !== null && (
@@ -1039,8 +1039,8 @@ export default function Home() {
                                                                         disabled={isUpdatingStatus}
                                                                         onClick={() => handleQuickStatusChange(opt.value)}
                                                                         className={`w-full text-left p-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-start gap-2.5 transition-colors cursor-pointer ${isSelected
-                                                                                ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
-                                                                                : 'hover:bg-zinc-100 dark:hover:bg-white/5 text-zinc-700 dark:text-zinc-300'
+                                                                            ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
+                                                                            : 'hover:bg-zinc-100 dark:hover:bg-white/5 text-zinc-700 dark:text-zinc-300'
                                                                             }`}
                                                                     >
                                                                         <span className="text-base mt-0.5">{opt.emoji}</span>

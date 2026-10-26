@@ -10,6 +10,7 @@ import { useAuth } from '../context/AuthContext';
 import { Timestamp } from 'firebase/firestore';
 import { getUserProfile } from '../services/userService';
 import { useTheme } from '../context/ThemeContext';
+import { useToast } from '../context/ToastContext';
 
 import { uploadFile } from '../services/storageService';
 
@@ -17,6 +18,7 @@ export default function PostJob() {
     const navigate = useNavigate();
     const { currentUser } = useAuth();
     const { isDarkMode, toggleDarkMode } = useTheme();
+    const toast = useToast();
 
     // Modes: 'select' | 'job' | 'post'
     const [creationMode, setCreationMode] = useState<'select' | 'job' | 'post'>('select');
@@ -156,12 +158,12 @@ export default function PostJob() {
     // --- Post Handlers ---
     const handlePostSubmit = async () => {
         if (!postContent.trim()) {
-            alert("Please write something to post.");
+            toast.error("Please write something to post.");
             return;
         }
 
         if (!currentUser) {
-            alert("You must be logged in.");
+            toast.error("You must be logged in to post.");
             return;
         }
 
@@ -184,11 +186,11 @@ export default function PostJob() {
                 createdAt: Timestamp.now()
             });
 
-            alert("Posted to Showcase!");
+            toast.success("Posted to Showcase!");
             navigate('/showcase');
         } catch (error) {
             console.error("Error creating post:", error);
-            alert("Failed to post.");
+            toast.error("Failed to post.");
         } finally {
             setLoading(false);
         }
@@ -367,7 +369,7 @@ export default function PostJob() {
             const trimmedUrl = newImageUrl.trim();
             if (trimmedUrl) {
                 if (postImages.length >= 10) {
-                    alert("You can only add up to 10 images.");
+                    toast.error("You can only add up to 10 images.");
                     return;
                 }
 
@@ -375,7 +377,7 @@ export default function PostJob() {
                 try {
                     new URL(trimmedUrl);
                 } catch {
-                    alert("Please enter a valid URL.");
+                    toast.error("Please enter a valid image URL.");
                     return;
                 }
 
@@ -399,7 +401,7 @@ export default function PostJob() {
             if (!files || files.length === 0) return;
 
             if (postImages.length + files.length > 10) {
-                alert("You can only add up to 10 images.");
+                toast.error("You can only add up to 10 images.");
                 return;
             }
 
@@ -410,7 +412,6 @@ export default function PostJob() {
 
                 const uploadedUrls: string[] = [];
                 for (const file of filesToUpload) {
-                    console.log('Uploading file:', file.name);
                     const result = await uploadFile(file);
                     if (result.url) {
                         uploadedUrls.push(result.url);
@@ -421,12 +422,13 @@ export default function PostJob() {
 
                 if (uploadedUrls.length > 0) {
                     setPostImages(prev => [...prev, ...uploadedUrls]);
+                    toast.success(`Uploaded ${uploadedUrls.length} image(s)!`);
                 } else {
-                    alert("No images were uploaded. Please try again.");
+                    toast.error("No images were uploaded. Please try again.");
                 }
             } catch (error) {
                 console.error("Image upload failed:", error);
-                alert("Failed to upload images. Check console for details.");
+                toast.error("Failed to upload images. Please check file sizes.");
             } finally {
                 setIsUploadingImages(false);
                 // Reset file input
@@ -930,12 +932,13 @@ export default function PostJob() {
                                             const result = await uploadFile(file);
                                             if (result.url) {
                                                 setJobFormData(prev => ({ ...prev, videoUrl: result.url! }));
+                                                toast.success('Video uploaded successfully!');
                                             } else {
-                                                alert('Failed to upload video: ' + (result.error || 'Unknown error'));
+                                                toast.error('Failed to upload video: ' + (result.error || 'Unknown error'));
                                             }
                                         } catch (error) {
                                             console.error('Video upload error:', error);
-                                            alert('Failed to upload video.');
+                                            toast.error('Failed to upload video.');
                                         } finally {
                                             setIsUploadingVideo(false);
                                             if (videoInputRef.current) videoInputRef.current.value = '';
@@ -1002,7 +1005,7 @@ export default function PostJob() {
                                         if (!file) return;
 
                                         if (jobAttachments.length >= 3) {
-                                            alert('Maximum 3 attachments allowed.');
+                                            toast.error('Maximum 3 attachments allowed.');
                                             return;
                                         }
 
@@ -1011,12 +1014,13 @@ export default function PostJob() {
                                             const result = await uploadFile(file);
                                             if (result.url) {
                                                 setJobAttachments(prev => [...prev, { name: file.name, url: result.url! }]);
+                                                toast.success('Attachment added!');
                                             } else {
-                                                alert('Failed to upload file: ' + (result.error || 'Unknown error'));
+                                                toast.error('Failed to upload file: ' + (result.error || 'Unknown error'));
                                             }
                                         } catch (error) {
                                             console.error('Attachment upload error:', error);
-                                            alert('Failed to upload attachment.');
+                                            toast.error('Failed to upload attachment.');
                                         } finally {
                                             setIsUploadingAttachment(false);
                                             if (attachmentInputRef.current) {

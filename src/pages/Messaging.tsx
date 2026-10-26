@@ -8,6 +8,7 @@ import { uploadFile } from '../services/storageService';
 import { subscribeToMessages, sendMessage, clearChat, markChatAsRead, type Message as FirestoreMessage } from '../services/messagingService';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { useToast } from '../context/ToastContext';
 import { getUserProfile, type UserProfile } from '../services/userService';
 
 interface Message extends FirestoreMessage {
@@ -21,6 +22,7 @@ export default function Messaging() {
     const { id } = useParams();
     const { currentUser } = useAuth();
     const { isDarkMode, toggleDarkMode } = useTheme();
+    const toast = useToast();
 
     const [messageText, setMessageText] = useState('');
     const [callState, setCallState] = useState<{ isOpen: boolean; type: 'audio' | 'video' | null }>({
@@ -54,6 +56,7 @@ export default function Messaging() {
     };
 
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const mediaStreamRef = useRef<MediaStream | null>(null);
     const audioChunksRef = useRef<Blob[]>([]);
     const audioContextRef = useRef<AudioContext | null>(null);
     const analyserRef = useRef<AnalyserNode | null>(null);
@@ -186,7 +189,17 @@ export default function Messaging() {
         return () => {
             if (timerRef.current) clearInterval(timerRef.current);
             if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
-            if (audioContextRef.current) audioContextRef.current.close();
+            if (audioContextRef.current) {
+                audioContextRef.current.close().catch(() => {});
+                audioContextRef.current = null;
+            }
+            if (mediaStreamRef.current) {
+                mediaStreamRef.current.getTracks().forEach(track => track.stop());
+                mediaStreamRef.current = null;
+            }
+            if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+                try { mediaRecorderRef.current.stop(); } catch (_) {}
+            }
         };
     }, [location.state]);
 
@@ -234,11 +247,13 @@ export default function Messaging() {
     const startRecording = async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaStreamRef.current = stream;
             const mediaRecorder = new MediaRecorder(stream);
             mediaRecorderRef.current = mediaRecorder;
             audioChunksRef.current = [];
 
-            const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+            const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+            const audioContext = new AudioCtx();
             const analyser = audioContext.createAnalyser();
             const source = audioContext.createMediaStreamSource(stream);
             source.connect(analyser);
@@ -277,12 +292,15 @@ export default function Messaging() {
                 setAudioBlob(blob);
                 setAudioPreview(url);
                 stream.getTracks().forEach(track => track.stop());
+                mediaStreamRef.current = null;
 
                 if (audioContextRef.current) {
-                    audioContextRef.current.close();
+                    audioContextRef.current.close().catch(() => {});
+                    audioContextRef.current = null;
                 }
                 if (animationFrameRef.current) {
                     cancelAnimationFrame(animationFrameRef.current);
+                    animationFrameRef.current = null;
                 }
             };
 
@@ -294,7 +312,7 @@ export default function Messaging() {
             }, 1000);
         } catch (error) {
             console.error('Error accessing microphone:', error);
-            alert('Could not access microphone');
+            toast.error('Could not access microphone. Please check permissions.');
         }
     };
 
@@ -308,12 +326,17 @@ export default function Messaging() {
             }
             if (animationFrameRef.current) {
                 cancelAnimationFrame(animationFrameRef.current);
+                animationFrameRef.current = null;
             }
         }
     };
 
     const cancelRecording = () => {
         stopRecording();
+        if (mediaStreamRef.current) {
+            mediaStreamRef.current.getTracks().forEach(track => track.stop());
+            mediaStreamRef.current = null;
+        }
         setAudioPreview(null);
         setAudioBlob(null);
         setRecordingDuration(0);
@@ -348,11 +371,11 @@ export default function Messaging() {
                 );
                 scrollToBottom();
             } else {
-                alert('Failed to upload voice message');
+                toast.error('Failed to upload voice message');
             }
         } catch (error) {
             console.error("Error sending audio message:", error);
-            alert("Failed to send audio message.");
+            toast.error("Failed to send audio message.");
         }
     };
 
@@ -467,7 +490,7 @@ export default function Messaging() {
                                     if (allowCalls) {
                                         setShowCallConfirmation(true);
                                     } else {
-                                        alert("Calls are currently muted for this thread.");
+                                        toast.info("Voice calls are currently disabled for this thread.");
                                     }
                                 }}
                                 className={`flex items-center justify-center rounded-xl size-9 border transition-all ${

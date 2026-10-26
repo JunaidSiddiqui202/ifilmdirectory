@@ -179,7 +179,7 @@ export default function ShowreelView1() {
 
     // Handle Likes
     const handleLike = async (reelId: string) => {
-        if (!currentUser) return alert("Please login to like!");
+        if (!currentUser) return showToast("Please login to like!", "error");
 
         setReels(prev => prev.map(r =>
             r.id === reelId ? { ...r, isLiked: !r.isLiked, likes: r.isLiked ? Math.max(0, r.likes - 1) : r.likes + 1 } : r
@@ -194,7 +194,7 @@ export default function ShowreelView1() {
 
     // Handle Save Reel
     const handleSaveReel = async (reelId: string) => {
-        if (!currentUser) return alert("Please login to save!");
+        if (!currentUser) return showToast("Please login to save!", "error");
 
         const result = await toggleSavePost(reelId, currentUser.uid, 'showreel');
         if (result.success) {
@@ -205,8 +205,8 @@ export default function ShowreelView1() {
         }
     };
     const handleFollow = async (creatorId: string) => {
-        if (!currentUser) return alert("Please login to follow creators!");
-        if (currentUser.uid === creatorId) return alert("You cannot follow yourself.");
+        if (!currentUser) return showToast("Please login to follow creators!", "error");
+        if (currentUser.uid === creatorId) return showToast("You cannot follow yourself.", "error");
 
         const creatorReels = reels.filter(r => r.creatorId === creatorId);
         const isCurrentlyFollowing = creatorReels[0]?.isFollowing;
@@ -263,7 +263,7 @@ export default function ShowreelView1() {
     };
 
     const handleCommentLike = async (commentId: string) => {
-        if (!currentUser) return alert("Please login to like!");
+        if (!currentUser) return showToast("Please login to like!", "error");
 
         const updatedRaw = reelComments.map(c => {
             if (c.id === commentId) {
@@ -329,7 +329,7 @@ export default function ShowreelView1() {
                 r.id === activeCommentReelId ? { ...r, comments: (r.comments || 0) + 1 } : r
             ));
         } catch (err) {
-            alert("Failed to post comment");
+            showToast("Failed to post comment. Please try again.", "error");
         } finally {
             setIsSubmittingComment(false);
         }

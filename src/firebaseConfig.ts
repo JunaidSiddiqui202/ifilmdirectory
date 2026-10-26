@@ -20,23 +20,11 @@ if (missingKeys.length > 0) {
     console.error('[Firebase] Missing configuration keys:', missingKeys);
 }
 
-console.log('[Firebase] Initializing with config:', {
-    projectId: firebaseConfig.projectId,
-    authDomain: firebaseConfig.authDomain
-});
-
 // Initialize Firebase services
 export const app: FirebaseApp = initializeApp(firebaseConfig);
-console.log('[Firebase] App initialized successfully');
-
 export const auth: Auth = getAuth(app);
-console.log('[Firebase] Auth initialized successfully');
-
 export const db: Firestore = getFirestore(app);
-console.log('[Firebase] Firestore initialized successfully');
-
 export const storage: FirebaseStorage = getStorage(app);
-console.log('[Firebase] Storage initialized successfully');
 
 export const googleProvider = new GoogleAuthProvider();
 
