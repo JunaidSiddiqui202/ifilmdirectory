@@ -1,7 +1,6 @@
 import {
     getFirestore,
     collection,
-    addDoc,
     query,
     orderBy,
     onSnapshot,
@@ -9,7 +8,6 @@ import {
     getDocs,
     deleteDoc,
     doc,
-    setDoc,
     updateDoc,
     where,
     arrayRemove,
@@ -53,7 +51,10 @@ export const sendMessage = async (
     senderPhoto?: string
 ) => {
     try {
-        // 1. Ensure the parent chat document exists and participants are established
+        // 1. Atomically batch the parent chat metadata update and message document creation
+        const { writeBatch } = await import('firebase/firestore');
+        const batch = writeBatch(db);
+
         const chatRef = doc(db, 'chats', chatId);
         const chatUpdatePayload: any = {
             lastMessage: message.text || (message.type === 'audio' ? '🎤 Voice message' : 'Media file'),
@@ -69,17 +70,21 @@ export const sendMessage = async (
             chatUpdatePayload.participants = arrayUnion(message.senderId);
         }
 
-        await setDoc(chatRef, chatUpdatePayload, { merge: true });
+        batch.set(chatRef, chatUpdatePayload, { merge: true });
 
-        // 2. Add message to the verified parent chat
+        // 2. Add message to the verified parent chat within the exact same atomic transaction batch
         const messagesRef = collection(db, 'chats', chatId, 'messages');
+        const messageDocRef = doc(messagesRef);
         const newMessage = {
             ...message,
             recipientId: recipientId || '',
             createdAt: serverTimestamp(),
             isRead: false
         };
-        await addDoc(messagesRef, newMessage);
+        batch.set(messageDocRef, newMessage);
+
+        // Commit both writes atomically: metadata cannot be updated without a corresponding message
+        await batch.commit();
 
         // Dispatch in-app notification to the recipient so sound & toast trigger immediately
         if (recipientId && recipientId !== message.senderId) {

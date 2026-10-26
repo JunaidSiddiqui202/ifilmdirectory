@@ -91,10 +91,32 @@ export const markNotificationAsRead = async (notificationId: string) => {
     }
 };
 
+// In-memory throttling map to prevent duplicate notification bursts and client abuse
+const recentNotifications = new Map<string, number>();
+
 export const createNotification = async (notification: Omit<NotificationData, 'id' | 'createdAt' | 'isRead'>) => {
     try {
         const { auth } = await import('../firebaseConfig');
         const senderId = auth.currentUser?.uid || '';
+        if (!senderId || senderId === notification.userId) return;
+
+        // Deduplication & Quota Check: Prevent identical notification bursts within 60 seconds
+        const dedupKey = `${senderId}_${notification.userId}_${notification.type}_${notification.title}`;
+        const now = Date.now();
+        const lastSent = recentNotifications.get(dedupKey);
+        if (lastSent && (now - lastSent) < 60000) {
+            console.warn("Throttling duplicate notification to user:", notification.userId);
+            return;
+        }
+        recentNotifications.set(dedupKey, now);
+
+        // Clean up old entries in throttling map
+        if (recentNotifications.size > 100) {
+            for (const [k, v] of recentNotifications.entries()) {
+                if (now - v > 120000) recentNotifications.delete(k);
+            }
+        }
+
         const notificationsRef = collection(db, 'notifications');
         await addDoc(notificationsRef, {
             ...notification,

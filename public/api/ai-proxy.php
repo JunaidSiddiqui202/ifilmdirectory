@@ -65,8 +65,19 @@ $idToken = $matches[1];
 
 // 4. Verify Firebase ID Token via Google Identity Toolkit
 // Note: We never trust user IDs passed in the body.
-$verifyUrl = "https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=" . 
-    (getenv('VITE_FIREBASE_API_KEY') ?: 'AIzaSyA0Cy6uodQxw7mC05S5f09XVww9X9P6nnE');
+$firebaseApiKey = getenv('VITE_FIREBASE_API_KEY') ?: getenv('FIREBASE_API_KEY');
+if (!$firebaseApiKey) {
+    // Attempt reading from secure server config outside public web root
+    $securePhpConfig = dirname($_SERVER['DOCUMENT_ROOT'] ?? '') . '/config.secure.php';
+    if (file_exists($securePhpConfig) && is_readable($securePhpConfig)) {
+        $cfg = @include $securePhpConfig;
+        if (is_array($cfg) && !empty($cfg['FIREBASE_API_KEY'])) {
+            $firebaseApiKey = $cfg['FIREBASE_API_KEY'];
+        }
+    }
+}
+
+$verifyUrl = "https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=" . urlencode($firebaseApiKey ?: '');
 
 $ch = curl_init($verifyUrl);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -97,26 +108,85 @@ if (!$authenticatedUid) {
 }
 
 // 5. Atomic Rate Limiting (Independent Per-Account AND Per-IP Quotas via File Locking)
-// Anti-Spoofing: Strictly use REMOTE_ADDR unless requests come from known, explicitly configured trusted reverse proxies
+// Anti-Spoofing & Trusted Edge Topology:
+// Validate REMOTE_ADDR against loopback or official Cloudflare edge IP subnets before honoring forwarding headers
 $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-$trustedProxies = [
-    '127.0.0.1',
-    '::1',
-    '195.35.44.253' // Hostinger dedicated server outbound / local loopback interface
+
+function ipInCidr(string $ip, string $cidr): bool {
+    if (strpos($cidr, '/') === false) return $ip === $cidr;
+    list($subnet, $bits) = explode('/', $cidr, 2);
+    $bits = (int)$bits;
+    
+    // IPv4
+    if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) && filter_var($subnet, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+        $ipLong = ip2long($ip);
+        $subnetLong = ip2long($subnet);
+        $mask = -1 << (32 - $bits);
+        $subnetLong &= $mask;
+        return ($ipLong & $mask) === $subnetLong;
+    }
+    // IPv6
+    if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) && filter_var($subnet, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+        $ipBin = inet_pton($ip);
+        $subnetBin = inet_pton($subnet);
+        if ($ipBin === false || $subnetBin === false) return false;
+        $byteLength = intdiv($bits, 8);
+        $bitLength = $bits % 8;
+        if (substr($ipBin, 0, $byteLength) !== substr($subnetBin, 0, $byteLength)) return false;
+        if ($bitLength > 0) {
+            $mask = chr(0xFF << (8 - $bitLength));
+            return ($ipBin[$byteLength] & $mask) === ($subnetBin[$byteLength] & $mask);
+        }
+        return true;
+    }
+    return false;
+}
+
+$trustedCidrs = [
+    '127.0.0.1/32',
+    '::1/128',
+    '173.245.48.0/20',
+    '103.21.244.0/22',
+    '103.22.200.0/22',
+    '103.31.4.0/22',
+    '141.101.64.0/18',
+    '108.162.192.0/18',
+    '190.93.240.0/20',
+    '188.114.96.0/20',
+    '197.234.240.0/22',
+    '198.41.128.0/17',
+    '162.158.0.0/15',
+    '104.16.0.0/13',
+    '104.24.0.0/14',
+    '172.64.0.0/13',
+    '131.0.72.0/22',
+    '2400:cb00::/32',
+    '2606:4700::/32',
+    '2803:f800::/32',
+    '2405:b500::/32',
+    '2405:8100::/32',
+    '2a06:98c0::/29',
+    '2c0f:f248::/32'
 ];
 
-// Anti-Spoofing Defense: Never trust unverified RFC1918 client IP spoofing
-$isTrustedProxy = in_array($remoteAddr, $trustedProxies, true);
+$isTrustedProxy = false;
+foreach ($trustedCidrs as $cidr) {
+    if (ipInCidr($remoteAddr, $cidr)) {
+        $isTrustedProxy = true;
+        break;
+    }
+}
 
+$candidateIp = $remoteAddr;
 if ($isTrustedProxy && !empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
-    $clientIp = trim($_SERVER['HTTP_CF_CONNECTING_IP']);
+    $candidateIp = trim($_SERVER['HTTP_CF_CONNECTING_IP']);
 } elseif ($isTrustedProxy && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
     $forwarded = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
-    $clientIp = trim($forwarded[0]);
-} else {
-    // Untrusted, shared network, or direct connection: strictly bind to the physical TCP socket IP
-    $clientIp = $remoteAddr;
+    $candidateIp = trim($forwarded[0]);
 }
+
+// Canonical validation: Fall back strictly to socket IP if candidate is invalid or malformed
+$clientIp = filter_var($candidateIp, FILTER_VALIDATE_IP) ? $candidateIp : $remoteAddr;
 
 // Function to atomically evaluate sliding-window rate limit
 function checkAtomicRateLimit(string $bucketName, string $idKey, int $maxRequests, int $windowSeconds, string $errorMessage): void {

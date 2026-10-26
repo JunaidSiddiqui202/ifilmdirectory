@@ -693,7 +693,7 @@ export default function Guilds() {
                                                     )}
                                                 </div>
                                             ))}
-                                            {pollOptions.length < 5 && (
+                                            {pollOptions.length < 4 && (
                                                 <button
                                                     onClick={() => setPollOptions([...pollOptions, ''])}
                                                     className="w-full py-1.5 border border-dashed border-zinc-300 dark:border-white/10 rounded-lg text-xs font-bold text-zinc-500 hover:text-amber-500 hover:border-amber-500/50 hover:bg-amber-500/[0.02] transition-all flex items-center justify-center gap-1.5"
