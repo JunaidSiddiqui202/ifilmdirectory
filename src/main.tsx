@@ -17,15 +17,15 @@ if (import.meta.env.PROD && import.meta.env.VITE_SENTRY_DSN) {
     integrations: [
       Sentry.browserTracingIntegration(),
       Sentry.replayIntegration({
-        maskAllText: false,
-        blockAllMedia: false,
+        maskAllText: true,
+        blockAllMedia: true,
       }),
     ],
-    // Performance Monitoring
-    tracesSampleRate: 1.0,
-    // Session Replay
-    replaysSessionSampleRate: 0.1,
-    replaysOnErrorSampleRate: 1.0,
+    // Performance Monitoring - balanced sampling for production privacy & budget
+    tracesSampleRate: 0.1,
+    // Session Replay - privacy-safe masked capture with conservative sample rates
+    replaysSessionSampleRate: 0.05,
+    replaysOnErrorSampleRate: 0.5,
     environment: import.meta.env.MODE,
     release: `ifilmdirectory@${import.meta.env.VITE_APP_VERSION || '1.0.0'}`,
     ignoreErrors: [

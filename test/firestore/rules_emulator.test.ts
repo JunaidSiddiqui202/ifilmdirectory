@@ -44,10 +44,11 @@ describe("Firebase Rules Unit Testing Suite (@firebase/rules-unit-testing)", () 
             // Probe emulator to verify active connectivity
             const probeContext = testEnv.authenticatedContext('probe_user');
             await getDoc(doc(probeContext.firestore(), 'config/probe')).catch(() => {});
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error(`\n[FATAL] Firestore Emulator is not accessible on ${host}:${port}.`);
             console.error(`[FATAL] Ensure 'firebase emulators:exec' or 'npm run test:rules' is running with Java enabled.\n`);
-            throw new Error(`Firestore Emulator connection failed at ${host}:${port}: ${err?.message || err}`);
+            const errMsg = err instanceof Error ? err.message : String(err);
+            throw new Error(`Firestore Emulator connection failed at ${host}:${port}: ${errMsg}`);
         }
     });
 
@@ -260,10 +261,76 @@ describe("Firebase Rules Unit Testing Suite (@firebase/rules-unit-testing)", () 
             await assertFails(addDoc(collection(aliceDb, 'notifications'), {
                 userId: 'bob',
                 senderId: 'admin_root', // Forged senderId
-                type: 'like',
-                title: 'Liked your post',
-                message: 'Nice post!',
+                type: 'message',
+                title: 'New Message',
+                message: 'Hello!',
                 isRead: false
+            }));
+        });
+
+        it("REJECTS standard user fabricating client-side activity notifications (like, comment, follow)", async () => {
+            const aliceDb = testEnv.authenticatedContext('alice').firestore();
+
+            // Direct client writes of activity events are strictly prohibited;
+            // only Cloud Functions backend can generate event notifications
+            await assertFails(addDoc(collection(aliceDb, 'notifications'), {
+                userId: 'bob',
+                senderId: 'alice',
+                type: 'like',
+                title: 'Fake Like',
+                message: 'Liked your post',
+                isRead: false
+            }));
+
+            await assertFails(addDoc(collection(aliceDb, 'notifications'), {
+                userId: 'bob',
+                senderId: 'alice',
+                type: 'follow',
+                title: 'Fake Follow',
+                message: 'Started following you',
+                isRead: false
+            }));
+        });
+    });
+
+    describe("/chats/{chatId} Preview & Unread Anti-Spoofing", () => {
+        it("REJECTS participant spoofing lastSenderId when updating lastMessage preview", async () => {
+            await testEnv.withSecurityRulesDisabled(async (adminContext) => {
+                await setDoc(doc(adminContext.firestore(), 'chats', 'chat_spoof_test'), {
+                    participants: ['alice', 'bob'],
+                    creatorId: 'alice',
+                    lastMessage: 'Old message',
+                    lastSenderId: 'alice',
+                    unreadBy: []
+                });
+            });
+
+            const bobDb = testEnv.authenticatedContext('bob').firestore();
+            // Bob attempts to claim Alice sent the message
+            await assertFails(updateDoc(doc(bobDb, 'chats', 'chat_spoof_test'), {
+                lastMessage: 'I am Alice and I agree to terms',
+                lastSenderId: 'alice',
+                unreadBy: ['bob']
+            }));
+        });
+
+        it("REJECTS sender marking themselves as unread during message update", async () => {
+            await testEnv.withSecurityRulesDisabled(async (adminContext) => {
+                await setDoc(doc(adminContext.firestore(), 'chats', 'chat_unread_test'), {
+                    participants: ['alice', 'bob'],
+                    creatorId: 'alice',
+                    lastMessage: 'Hi',
+                    lastSenderId: 'alice',
+                    unreadBy: []
+                });
+            });
+
+            const aliceDb = testEnv.authenticatedContext('alice').firestore();
+            // Alice cannot put herself in unreadBy when sending
+            await assertFails(updateDoc(doc(aliceDb, 'chats', 'chat_unread_test'), {
+                lastMessage: 'New text',
+                lastSenderId: 'alice',
+                unreadBy: ['alice']
             }));
         });
     });
