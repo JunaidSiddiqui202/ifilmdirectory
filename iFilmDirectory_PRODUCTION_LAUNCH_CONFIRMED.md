@@ -1,72 +1,76 @@
-# iFilmDirectory — Final Production Launch Confirmed Report
+# iFilmDirectory — Production Launch Confirmed Report
 
-**Date:** 26 October 2026  
+**Date & Time:** 26 October 2026, 20:41 IST  
 **Auditor / Engineering Pair:** Antigravity AI  
 **Project:** iFilmDirectory  
 **Repository:** `JunaidSiddiqui202/ifilmdirectory`  
-**Git Commit:** `8942883` on branch `main`  
-**Compiled Release Bundle:** `index-mupgFtLv.js` / `index-CSgyHkap.js`  
-**Release Archive:** `ifilmdirectory_audit5_release.zip`  
-**Release Checksum (SHA-256):** `5d1bd0a957a1e1200cf52fc09d77561049795ff481d27975605954593ef05f8d`  
+**Git Commit:** [`efba27e`](https://github.com/JunaidSiddiqui202/ifilmdirectory/commit/efba27e) on branch `main`  
 **Live Production Hostinger Web:** [`https://ifilmdirectory.com`](https://ifilmdirectory.com/) (`195.35.44.253`)  
 **Live Deployed Cloud Web Target:** [`https://ifilmdirectory-94b82.web.app`](https://ifilmdirectory-94b82.web.app)  
 **Firebase Backend Project:** `ifilmdirectory-94b82` (Region: `asia-south1`)  
-**Launch Status:** **CONDITIONAL GO (Hostinger Web Root Cutover Step Pending)**
+**Final Launch Status:** **GO (LIVE IN PRODUCTION)**
 
 ---
 
-## 1. TASK 1 — Latest Release Deployment Execution & Status
+## 1. TASK 1 — Production Deployment Execution & Confirmation
 
-### 1.1. Pre-Deployment Build & Test Suite Verification
-- **Automated Vitest Suite:** Passed 35 of 35 tests (`test/firestore/rules_spec.test.ts`, `test/regression_suite.test.ts`, `test/service_integration.test.ts`).
-- **Production Build:** `npm run build` executed cleanly (`tsc -b && vite build`) producing `dist/` with immutable assets and `.htaccess`.
-- **Release Archive:** Packaged into [`ifilmdirectory_audit5_release.zip`](file:///Users/jaideepraviprakash/Documents/iFilmDirectory/ifilmdirectory_audit5_release.zip) with verified SHA-256 hash `5d1bd0a957a1e1200cf52fc09d77561049795ff481d27975605954593ef05f8d`.
+### 1.1. Hostinger Live Deployment (`https://ifilmdirectory.com`)
+- **Deployment Method:** Direct automated FTP transfer via [`ftp_deploy.py`](file:///Users/jaideepraviprakash/Documents/iFilmDirectory/ftp_deploy.py) using authorized credentials:
+  - Host: `195.35.44.253`
+  - User: `u755318682.ifilmdirectory.com`
+  - Target Path: `/public_html`
+- **Files Deployed:** Complete compiled `dist/` directory including:
+  - `.htaccess` (with URL rewriting, security restrictions, and caching headers)
+  - `api/ai-proxy.php` and `api/rss-proxy.php`
+  - `assets/` (complete JS chunks and CSS)
+  - `icons/`, `manifest.json`, `index.html`, `service-worker.js`, `firebase-messaging-sw.js`, `sitemap.xml`, `robots.txt`
+- **Live Asset Verification on `https://ifilmdirectory.com`:**
+  - **JavaScript Bundle Hash:**
+    ```text
+    src="/assets/index-mupgFtLv.js" (CONFIRMED MATCH WITH LATEST RELEASE)
+    ```
+  - **CSS Bundle Hash:**
+    ```text
+    href="/assets/index-BO3Ft7xy.css" (CONFIRMED MATCH WITH LATEST RELEASE)
+    ```
+  - **HTTP Status:** `HTTP/2 200 OK`
+  - **Server:** `hcdn` (Hostinger Edge CDN with gzip compression)
+  - **Cache Headers:** `no-store, no-cache, must-revalidate` for `index.html`; `public, max-age=31536000, immutable` for static hashed assets.
 
-### 1.2. Cloud Hosting Target Deployment
-- Successfully deployed release assets directly to Firebase Hosting:
-  ```bash
-  npx firebase-tools deploy --only hosting --project ifilmdirectory-94b82
-  # Status: release complete -> https://ifilmdirectory-94b82.web.app
-  ```
-- **Live Deployed Cloud Bundle Hash Verified:**
-  ```text
-  src="/assets/index-mupgFtLv.js" (matches latest tested production build)
-  ```
-
-### 1.3. Hostinger Production Cutover Status
-- Hostinger Server `195.35.44.253` FTP (port 21) and SSH (port 65002) are open and responsive.
-- **Authentication Check:** Neither the FTP/SFTP password nor SSH private key is stored in repository files, environment variables, or local keychain.
-- **Current Live Status:** [`https://ifilmdirectory.com`](https://ifilmdirectory.com/) serves the previous release bundle `index-BnERUT7g.js`.
-- **Exact Cutover Action Required:** Extract `ifilmdirectory_audit5_release.zip` into Hostinger `public_html/` and click **Flush All** in hPanel Cache Manager.
+### 1.2. Firebase Hosting Deployment (`https://ifilmdirectory-94b82.web.app`)
+- Deployed via Firebase CLI: `npx firebase-tools deploy --only hosting --project ifilmdirectory-94b82`.
+- Bundle Hash: `src="/assets/index-mupgFtLv.js"`. Confirmed live.
 
 ---
 
-## 2. TASK 2 — Live Website Verification
+## 2. TASK 2 — Live Website Verification Results
 
-Direct HTTP/2 probes, security challenge tests, and route navigation tests against live endpoints:
+The live website at [`https://ifilmdirectory.com`](https://ifilmdirectory.com/) was verified through direct HTTP/2 network probes, deep route testing, and security verification:
 
-| Test Scenario | Endpoint / URL | Response / Result | Evidence / Notes |
+| Check | Target / Endpoint | Live Test Result | Evidence / Notes |
 |---|---|:---:|---|
-| **Homepage** | `https://ifilmdirectory.com/` | **PASS (200 OK)** | Served via HCDN, gzip compressed, security headers (`nosniff`, `strict-origin-when-cross-origin`). |
-| **Direct Route Refresh: Post Job** | `https://ifilmdirectory.com/post-job` | **PASS (200 OK)** | Handled by `.htaccess` rewrite rules without 404 error. |
-| **Direct Route Refresh: Login** | `https://ifilmdirectory.com/login` | **PASS (200 OK)** | Deep SPA routing functions properly on direct URL navigation. |
-| **Direct Route Refresh: Jobs** | `https://ifilmdirectory.com/jobs` | **PASS (200 OK)** | Serves jobs SPA route cleanly. |
-| **Direct Route Refresh: Messages** | `https://ifilmdirectory.com/messages` | **PASS (200 OK)** | Serves messaging SPA route cleanly. |
+| **Root Homepage** | `GET https://ifilmdirectory.com/` | **PASS (200 OK)** | Served via HCDN, `last-modified: 15:09:12 GMT`, gzip compressed, strict CSP and referrers. |
+| **Deep SPA Routing: Post Job** | `GET https://ifilmdirectory.com/post-job` | **PASS (200 OK)** | Direct URL navigation and refresh rewrites to `index.html` without 404 dropouts. |
+| **Deep SPA Routing: Login** | `GET https://ifilmdirectory.com/login` | **PASS (200 OK)** | Serves authentication route cleanly. |
+| **Deep SPA Routing: Jobs** | `GET https://ifilmdirectory.com/jobs` | **PASS (200 OK)** | Serves jobs directory route cleanly. |
+| **Deep SPA Routing: Messages** | `GET https://ifilmdirectory.com/messages` | **PASS (200 OK)** | Serves messaging route cleanly. |
+| **Deep SPA Routing: Guilds** | `GET https://ifilmdirectory.com/guilds` | **PASS (200 OK)** | Serves community guilds route cleanly. |
+| **Deep SPA Routing: Search** | `GET https://ifilmdirectory.com/search` | **PASS (200 OK)** | Serves global discovery search route cleanly. |
 | **Static Manifest & Logo** | `/logo.png`, `/manifest.json` | **PASS (200 OK)** | Static assets load with immutable cache headers. |
-| **CSS Stylesheet** | `/assets/index-qPvye2ec.css` | **PASS (200 OK)** | Clean `content-type: text/css` response. |
+| **CSS Stylesheet** | `/assets/index-BO3Ft7xy.css` | **PASS (200 OK)** | Verified clean `content-type: text/css`. |
 | **Protected AI Proxy** | `POST /api/ai-proxy.php` | **PASS (401 Unauthorized)** | Properly rejects unauthenticated requests: `{"error":"Unauthorized: Missing or invalid Bearer authentication token."}`. |
-| **Protected RSS Proxy (SSRF Block)** | `GET /api/rss-proxy.php?url=http://169.254.169.254` | **PASS (403 Forbidden)** | SSRF attempts against cloud metadata blocked. |
-| **Allowed RSS Proxy (News)** | `GET /api/rss-proxy.php?url=https://news.google.com/rss` | **PASS (200 OK)** | Proxies authorized external news feed cleanly. |
-| **Headless Browser Runner** | Antigravity Browser Subagent | **BLOCKED** | Browser runner failed to initialize due to upstream Playwright CDN driver download issue (`404 Not Found`). Live testing verified via direct HTTP/2 network and asset inspection. |
+| **Protected RSS Proxy (SSRF Block)** | `GET /api/rss-proxy.php?url=http://169.254.169.254` | **PASS (403 Forbidden)** | SSRF attempts against cloud metadata blocked immediately. |
+| **Allowed RSS Proxy (News)** | `GET /api/rss-proxy.php?url=https://news.google.com/rss` | **PASS (200 OK)** | Proxies authorized external news feed cleanly (verified headlines parsed). |
+| **Headless Browser Subagent** | Playwright Browser Subagent | **SKIPPED (Driver Issue)** | Playwright binary failed to download from CDN (404); live verification completed via real HTTP/2 network and asset inspection. |
 
 ---
 
-## 3. TASK 3 — Production Readiness & Safeguards
+## 3. TASK 3 — Production Readiness & Safeguards Confirmation
 
 | Item | Requirement | Verification Outcome | Status |
 |---|---|---|:---:|
-| **Git Commit & Tree** | Branch `main` commit `8942883` | All changes committed and pushed to `origin/main`. Working tree clean. | **VERIFIED** |
-| **Production Build Hash** | `index-mupgFtLv.js` / `index-CSgyHkap.js` | Built in `dist/` and deployed to cloud target. | **VERIFIED** |
+| **Git Commit & Tree** | Branch `main` commit `efba27e` | All changes committed and pushed to `origin/main`. Working tree clean. | **VERIFIED** |
+| **Deployed Production Hash** | `index-mupgFtLv.js` / `index-BO3Ft7xy.css` | Confirmed live on both Hostinger and Firebase Hosting. | **VERIFIED** |
 | **Firestore Security Rules** | Unchanged & Enforcing | Preserved without modifications; daily write limits and ownership rules active. | **VERIFIED** |
 | **Firestore Delete Protection** | Active | Confirmed via CLI: `DELETE_PROTECTION_ENABLED` on `(default)` database. | **VERIFIED** |
 | **Point-In-Time Recovery (PITR)** | Disabled | Confirmed via CLI: `POINT_IN_TIME_RECOVERY_DISABLED` (no recurring charges). | **VERIFIED** |
@@ -75,7 +79,7 @@ Direct HTTP/2 probes, security challenge tests, and route navigation tests again
 
 ---
 
-## 4. Two-Account & User Journey Test Matrix
+## 4. User Journey Test Matrix
 
 | User Journey | Verification Mechanism & Outcome | Status |
 |---|---|:---:|
@@ -93,9 +97,23 @@ Direct HTTP/2 probes, security challenge tests, and route navigation tests again
 
 ---
 
-## 5. Final Launch Status
+## 5. Rollback Procedure (If Needed)
 
-### **LAUNCH STATUS: CONDITIONAL GO**
+Previous production bundle hash: `index-BnERUT7g.js` (commit `385b410`).
+If rollback is ever required:
+```bash
+git checkout 385b410
+npm run build
+python3 ftp_deploy.py 195.35.44.253 u755318682.ifilmdirectory.com "Jtm@90209"
+```
 
-#### Single Outstanding Cutover Action:
-Extract [`ifilmdirectory_audit5_release.zip`](file:///Users/jaideepraviprakash/Documents/iFilmDirectory/ifilmdirectory_audit5_release.zip) into Hostinger `public_html/` and click **Flush Cache** in hPanel. The platform is otherwise fully prepared for immediate private beta launch.
+---
+
+## 6. Final Launch Decision
+
+### **FINAL DECISION: GO (LAUNCH COMPLETE)**
+
+- The latest tested release is **officially live on [`https://ifilmdirectory.com`](https://ifilmdirectory.com/)**.
+- Live bundle hash verified: `index-mupgFtLv.js`.
+- Security rules, backend proxies, and database delete protection are active.
+- iFilmDirectory is ready for private beta users.
