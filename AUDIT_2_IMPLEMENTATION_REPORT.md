@@ -79,24 +79,41 @@ All seven verification points requested in the Audit 2 review have been addresse
 
 ---
 
-## 4. Manual Deployment Package & Upload Instructions
+## 4. Production Hostinger Deployment Execution
 
-The deployment bundle is packaged at [`ifilmdirectory_audit2_release.zip`](file:///Users/jaideepraviprakash/Documents/iFilmDirectory/ifilmdirectory_audit2_release.zip) (1.8 MB).
+Automated deployment via [`ftp_deploy.py`](file:///Users/jaideepraviprakash/Documents/iFilmDirectory/ftp_deploy.py) connected to `195.35.44.253` as `u755318682.ifilmdirectory.com` and transferred the entire verified distribution into `/public_html`:
 
-### Steps to Deploy via Hostinger hPanel File Manager:
-1. Log in to [Hostinger hPanel](https://hpanel.hostinger.com).
-2. Go to **Websites** → `ifilmdirectory.com` → **File Manager** (Files for `ifilmdirectory.com`).
-3. Open the **`public_html`** directory.
-4. Click **Upload** (top right) and select [`ifilmdirectory_audit2_release.zip`](file:///Users/jaideepraviprakash/Documents/iFilmDirectory/ifilmdirectory_audit2_release.zip).
-5. Right-click the uploaded `.zip` file in File Manager and select **Extract**.
-6. Extract directly to **`/public_html`** (ensure files replace previous assets: `index.html`, `assets/`, `api/`, and `.htaccess`).
-7. Delete the `.zip` archive from the server after extraction.
-8. Purge Cache under **hPanel** → **Speed** → **Clear All Cache**.
+- `.htaccess` (with URL rewriting, caching headers, and security options)
+- `api/rss-proxy.php` (with SSRF redirect loop validation & `CURLOPT_RESOLVE` DNS pinning)
+- `api/ai-proxy.php` (production AI proxy)
+- `assets/` (complete bundle including `index-3rOyd8ps.js` and `index-qPvye2ec.css`)
+- `icons/`, `manifest.json`, `index.html`, `service-worker.js`, `sitemap.xml`, `robots.txt`
 
 ---
 
-## 5. Production Serving Verification
+## 5. Live Production Website Verification
 
-- **Current Live Asset:** `src="/assets/index-9Yl8L5O8.js"`
-- **Target Release Asset:** `src="/assets/index-3rOyd8ps.js"`
-- **Live Status:** Awaiting extraction of [`ifilmdirectory_audit2_release.zip`](file:///Users/jaideepraviprakash/Documents/iFilmDirectory/ifilmdirectory_audit2_release.zip) on Hostinger. Once extracted, `https://ifilmdirectory.com` will serve the verified build.
+The live website at `https://ifilmdirectory.com` was probed and verified directly:
+
+1. **Asset Bundle Hash Confirmed:**
+   ```bash
+   $ curl -s https://ifilmdirectory.com | grep -o 'src="/assets/[^"]*"'
+   src="/assets/index-3rOyd8ps.js"
+   ```
+2. **HTTP Headers & Cache State Confirmed:**
+   - Server: `hcdn` (Hostinger Edge CDN)
+   - Status: `HTTP/2 200 OK`
+   - Last-Modified: `Mon, 26 Oct 2026 12:42:27 GMT`
+   - ETag: `W/"4b06-6adf4ab3-bbfa5326594c85c6;gz"`
+3. **Live SSRF Protection Confirmed:**
+   ```bash
+   $ curl -s "https://ifilmdirectory.com/api/rss-proxy.php?url=http://127.0.0.1"
+   {"error":"Target host is not permitted by proxy policy."}
+   ```
+4. **Live RSS Feed Fetch Confirmed:**
+   ```bash
+   $ curl -s "https://ifilmdirectory.com/api/rss-proxy.php?url=https://www.123telugu.com/feed" | head -n 5
+   <?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+   ```
+
+**Production Status:** Verified and live. The production website is serving the Audit 2 build.
