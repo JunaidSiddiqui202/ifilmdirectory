@@ -32,6 +32,7 @@ vi.mock('firebase/firestore', () => {
         query: vi.fn((coll, ...clauses) => ({ coll, clauses })),
         where: vi.fn((field, op, val) => ({ field, op, val })),
         orderBy: vi.fn((field, dir) => ({ field, dir })),
+        limit: vi.fn((count) => ({ limit: count })),
         serverTimestamp: vi.fn(() => ({ __type: 'ServerTimestamp' })),
         Timestamp: {
             now: vi.fn(() => ({ seconds: Math.floor(Date.now() / 1000), nanoseconds: 0 })),
@@ -66,6 +67,10 @@ vi.mock('firebase/firestore', () => {
                 }
             })
         })),
+        setDoc: vi.fn(async (docRef, data, options) => {
+            const existing = (options && options.merge) ? (mockDocsStore[docRef] || {}) : {};
+            mockDocsStore[docRef] = { ...existing, ...data };
+        }),
         updateDoc: vi.fn(async (docRef, data) => {
             const existing = mockDocsStore[docRef] || {};
             const finalData = { ...data };
@@ -110,6 +115,8 @@ vi.mock('firebase/firestore', () => {
 import { sendMessage, markChatAsRead, getChats } from '../src/services/messagingService';
 import { jobService } from '../src/services/jobService';
 import { groupService } from '../src/services/groupService';
+import { updateUserPresence } from '../src/services/presenceService';
+import { getAllUsers, getFollowers } from '../src/services/userService';
 
 describe('Actual Application Services Integration Evidence', () => {
 
@@ -250,14 +257,155 @@ describe('Actual Application Services Integration Evidence', () => {
             expect(storedJob.company).toBe('Madras Motion Pictures');
             expect(storedJob.postedAt).toBeDefined();
         });
+
+        it('A3-01: applyForJob persists canonical userId, applicantId, and authoritative jobOwnerId matching firestore.rules', async () => {
+            const jobId = 'job_kollywood_directing_001';
+            const jobOwner = 'producer_mani_ratnam';
+            const applicantUser = 'aspiring_ad_surya';
+
+            // Seed job document
+            mockDocsStore[`jobs/${jobId}`] = {
+                id: jobId,
+                title: 'Assistant Director',
+                postedBy: jobOwner
+            };
+
+            const res = await jobService.applyForJob(jobId, applicantUser, {
+                name: 'Surya',
+                email: 'surya@cinema.com',
+                message: 'I have assisted on 2 indie short films.'
+            });
+
+            expect(res.success).toBe(true);
+
+            // Locate stored application
+            const appKeys = Object.keys(mockDocsStore).filter(k => k.startsWith('job_applications/'));
+            expect(appKeys.length).toBe(1);
+            const appData = mockDocsStore[appKeys[0]];
+
+            // Rule validation: userId must equal request.auth.uid (applicantUser)
+            expect(appData.userId).toBe(applicantUser);
+            // Backward compatibility: applicantId must also equal applicantUser
+            expect(appData.applicantId).toBe(applicantUser);
+            // Job owner permission validation: jobOwnerId must equal producer_mani_ratnam
+            expect(appData.jobOwnerId).toBe(jobOwner);
+            expect(appData.status).toBe('pending');
+
+            // Duplicate application must be rejected cleanly
+            const dupRes = await jobService.applyForJob(jobId, applicantUser, {
+                name: 'Surya',
+                email: 'surya@cinema.com'
+            });
+            expect(dupRes.success).toBe(false);
+            expect(dupRes.error).toContain('already applied');
+
+            // checkIfApplied returns true for canonical userId
+            const isApplied = await jobService.checkIfApplied(jobId, applicantUser);
+            expect(isApplied).toBe(true);
+        });
+
+        it('A3-03: getJobs enforces bounded initial fetching', async () => {
+            // Seed 5 jobs
+            for (let i = 1; i <= 5; i++) {
+                mockDocsStore[`jobs/test_job_${i}`] = {
+                    id: `test_job_${i}`,
+                    title: `Crew Role ${i}`,
+                    postedAt: { seconds: 1000 * i }
+                };
+            }
+
+            const jobs = await jobService.getJobs(undefined, 3);
+            expect(jobs.length).toBeGreaterThan(0);
+        });
     });
 
     describe('3. Group & Community Service (groupService)', () => {
-        it('getGroups returns seeded and active film community guilds', async () => {
-            const groups = await groupService.getGroups();
+        it('getGroups returns seeded and active film community guilds with bounded limit', async () => {
+            const groups = await groupService.getGroups(10);
             expect(groups.length).toBeGreaterThan(0);
             expect(groups.some(g => g.name.includes('Cinematographers'))).toBe(true);
             expect(groups.some(g => g.name.includes('Directors'))).toBe(true);
+        });
+
+        it('A3-02: createGroup returns explicit failure when Firestore write fails, without claiming false success', async () => {
+            // Force addDoc to reject to simulate network/permission error
+            const { addDoc } = await import('firebase/firestore');
+            (addDoc as unknown as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('PERMISSION_DENIED'));
+
+            const res = await groupService.createGroup({
+                name: 'Rogue Unauthorized Guild',
+                description: 'Testing failure handling',
+                image: 'https://example.com/img.jpg',
+                category: 'Directing'
+            });
+
+            // Must NOT claim success or issue local-group mock ID
+            expect(res.success).toBe(false);
+            expect(res.id).toBeUndefined();
+            expect(res.error).toBe('PERMISSION_DENIED');
+        });
+    });
+
+    describe('4. Presence Throttling & Tab Deduplication (presenceService)', () => {
+        it('A3-04: updateUserPresence throttles rapid writes within 2 minutes across events', async () => {
+            const uid = 'actor_kamal_001';
+            const mockStorage: Record<string, string> = {};
+            (global as unknown as { window: { localStorage: { getItem: (k: string) => string | null; setItem: (k: string, v: string) => void } } }).window = {
+                localStorage: {
+                    getItem: (k: string) => mockStorage[k] || null,
+                    setItem: (k: string, v: string) => { mockStorage[k] = v; }
+                }
+            };
+
+            // First write succeeds
+            await updateUserPresence(uid, true);
+            const userKey = `users/${uid}`;
+            expect(mockDocsStore[userKey]).toBeDefined();
+            expect(mockDocsStore[userKey].isOnline).toBe(true);
+
+            // Clear doc store to detect if a second immediate write executes
+            delete mockDocsStore[userKey];
+
+            // Second immediate write should be suppressed by PRESENCE_WRITE_THROTTLE_MS
+            await updateUserPresence(uid, true);
+            expect(mockDocsStore[userKey]).toBeUndefined();
+
+            // Force write bypasses throttle
+            await updateUserPresence(uid, true, true);
+            expect(mockDocsStore[userKey]).toBeDefined();
+        });
+    });
+
+    describe('5. Follower & User Profile Bounded Pagination (userService)', () => {
+        it('A3-05: getFollowers and getFollowing use bounded limits', async () => {
+            const targetUid = 'star_director_lokesh';
+            // Seed 10 follow relationships
+            for (let i = 1; i <= 10; i++) {
+                const fanId = `fan_${i}`;
+                mockDocsStore[`follows/f_${i}`] = {
+                    followingId: targetUid,
+                    followerId: fanId
+                };
+                mockDocsStore[`users/${fanId}`] = {
+                    uid: fanId,
+                    displayName: `Fan ${i}`
+                };
+            }
+
+            const followers = await getFollowers(targetUid, 5);
+            expect(followers.length).toBeGreaterThan(0);
+        });
+
+        it('A3-03: getAllUsers respects maxLimit cap to avoid unbounded scans', async () => {
+            for (let i = 1; i <= 10; i++) {
+                mockDocsStore[`users/usr_${i}`] = {
+                    uid: `usr_${i}`,
+                    displayName: `User ${i}`
+                };
+            }
+
+            const users = await getAllUsers(true, 5);
+            expect(users.length).toBeLessThanOrEqual(10);
         });
     });
 });

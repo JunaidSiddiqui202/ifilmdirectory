@@ -8,18 +8,21 @@ export const ONLINE_THRESHOLD_MS = 5 * 60 * 1000;
 /**
  * Parses any Firestore timestamp or ISO string into epoch milliseconds
  */
-export const parseLastActiveMillis = (lastActive: any): number => {
+export const parseLastActiveMillis = (lastActive: unknown): number => {
     if (!lastActive) return 0;
     if (typeof lastActive === 'number') return lastActive;
     if (typeof lastActive === 'string') {
         const parsed = new Date(lastActive).getTime();
         return isNaN(parsed) ? 0 : parsed;
     }
-    if (lastActive?.toDate && typeof lastActive.toDate === 'function') {
-        return lastActive.toDate().getTime();
-    }
-    if (lastActive?.seconds) {
-        return lastActive.seconds * 1000;
+    if (typeof lastActive === 'object' && lastActive !== null) {
+        const obj = lastActive as { toDate?: () => Date; seconds?: number };
+        if (obj.toDate && typeof obj.toDate === 'function') {
+            return obj.toDate().getTime();
+        }
+        if (typeof obj.seconds === 'number') {
+            return obj.seconds * 1000;
+        }
     }
     return 0;
 };
@@ -90,11 +93,32 @@ export const getUserPresenceInfo = (user?: Partial<UserProfile> | null): {
     return { isOnline: false, statusText: 'Offline', badgeColor: 'zinc', dotClass: 'bg-zinc-600' };
 };
 
+// Minimum interval between Firestore presence writes across tabs or events (2 minutes)
+export const PRESENCE_WRITE_THROTTLE_MS = 2 * 60 * 1000;
+
 /**
- * Updates a user's presence in Firestore
+ * Updates a user's presence in Firestore with cross-tab and event rate-limiting
  */
-export const updateUserPresence = async (uid: string, isOnline: boolean): Promise<void> => {
+export const updateUserPresence = async (uid: string, isOnline: boolean, force: boolean = false): Promise<void> => {
     if (!uid) return;
+
+    const storageKey = `ifilmdirectory_presence_${uid}`;
+    const now = Date.now();
+
+    if (!force && isOnline) {
+        try {
+            if (typeof window !== 'undefined' && window.localStorage) {
+                const lastWritten = parseInt(window.localStorage.getItem(storageKey) || '0', 10);
+                if (now - lastWritten < PRESENCE_WRITE_THROTTLE_MS) {
+                    // Suppress write; another tab or recent event already refreshed presence
+                    return;
+                }
+            }
+        } catch {
+            // LocalStorage inaccessible (incognito / security restrictions)
+        }
+    }
+
     try {
         const userRef = doc(db, 'users', uid);
         const data = {
@@ -103,50 +127,53 @@ export const updateUserPresence = async (uid: string, isOnline: boolean): Promis
         };
         // Use setDoc merge so it never fails if document does not exist yet
         await setDoc(userRef, data, { merge: true });
+
+        if (typeof window !== 'undefined' && window.localStorage && isOnline) {
+            try {
+                window.localStorage.setItem(storageKey, String(now));
+            } catch {
+                // Ignore storage errors
+            }
+        }
     } catch (err) {
         console.warn(`[PresenceService] Could not update presence for ${uid}:`, err);
     }
 };
 
 /**
- * Initializes real-time presence heartbeat for authenticated user
+ * Initializes real-time presence heartbeat for authenticated user with tab deduplication
  */
 export const initUserPresence = (uid: string): (() => void) => {
     if (!uid) return () => {};
 
-    // 1. Mark online immediately
+    // 1. Initial heartbeat (throttled across tabs)
     updateUserPresence(uid, true);
 
-    // 2. Setup periodic heartbeat every 60 seconds while active
-    const HEARTBEAT_INTERVAL = 60 * 1000;
+    // 2. Setup periodic heartbeat every 2 minutes while page is actively visible
+    const HEARTBEAT_INTERVAL = 2 * 60 * 1000;
     const intervalId = setInterval(() => {
         if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
             updateUserPresence(uid, true);
         }
     }, HEARTBEAT_INTERVAL);
 
-    // 3. Listen to page visibility changes
+    // 3. Listen to page visibility changes (throttled to avoid rapid tab switching write amplification)
     const handleVisibilityChange = () => {
         if (document.visibilityState === 'visible') {
             updateUserPresence(uid, true);
         }
     };
 
-    // 4. Window focus
+    // 4. Window focus (throttled)
     const handleFocus = () => {
-        updateUserPresence(uid, true);
-    };
-
-    // 5. Unload / closing tab
-    const handleBeforeUnload = () => {
-        // Attempt fast update before page unloads
-        updateUserPresence(uid, false);
+        if (document.visibilityState === 'visible') {
+            updateUserPresence(uid, true);
+        }
     };
 
     if (typeof window !== 'undefined') {
         window.addEventListener('visibilitychange', handleVisibilityChange);
         window.addEventListener('focus', handleFocus);
-        window.addEventListener('beforeunload', handleBeforeUnload);
     }
 
     // Return cleanup function
@@ -155,8 +182,6 @@ export const initUserPresence = (uid: string): (() => void) => {
         if (typeof window !== 'undefined') {
             window.removeEventListener('visibilitychange', handleVisibilityChange);
             window.removeEventListener('focus', handleFocus);
-            window.removeEventListener('beforeunload', handleBeforeUnload);
         }
-        updateUserPresence(uid, false);
     };
 };
