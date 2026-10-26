@@ -96,49 +96,66 @@ if (!$authenticatedUid) {
     exit;
 }
 
-// 5. Atomic Rate Limiting (Per-User & Per-IP via File Locking)
-$clientIp = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-$lockKey = md5($authenticatedUid . '_' . $clientIp);
-$rateLimitFile = sys_get_temp_dir() . '/ai_rate_' . $lockKey . '.json';
-$fp = fopen($rateLimitFile, 'c+');
-
-if (!$fp || !flock($fp, LOCK_EX)) {
-    http_response_code(500);
-    header('Content-Type: application/json; charset=utf-8');
-    echo json_encode(['error' => 'Internal concurrency lock error.']);
-    exit;
+// 5. Atomic Rate Limiting (Independent Per-Account AND Per-IP Quotas via File Locking)
+$clientIp = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+// In case of multiple forwarded IPs, use the first client IP
+if (strpos($clientIp, ',') !== false) {
+    $ipParts = explode(',', $clientIp);
+    $clientIp = trim($ipParts[0]);
 }
 
-$fileData = '';
-while (!feof($fp)) {
-    $fileData .= fread($fp, 8192);
-}
+// Function to atomically evaluate sliding-window rate limit
+function checkAtomicRateLimit(string $bucketName, string $idKey, int $maxRequests, int $windowSeconds, string $errorMessage): void {
+    $safeKey = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $idKey);
+    $rateLimitFile = sys_get_temp_dir() . '/ai_rate_' . $bucketName . '_' . md5($safeKey) . '.json';
+    $fp = fopen($rateLimitFile, 'c+');
 
-$currentTime = time();
-$requests = json_decode($fileData, true) ?: [];
+    if (!$fp || !flock($fp, LOCK_EX)) {
+        http_response_code(500);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['error' => 'Concurrency rate lock error.']);
+        exit;
+    }
 
-// Sliding window: prune records older than 60 seconds
-$requests = array_filter($requests, function($ts) use ($currentTime) {
-    return ($currentTime - $ts) < 60;
-});
+    $fileData = '';
+    while (!feof($fp)) {
+        $fileData .= fread($fp, 8192);
+    }
 
-// Enforce quota: Max 15 AI requests per minute per verified account
-if (count($requests) >= 15) {
+    $currentTime = time();
+    $timestamps = json_decode($fileData, true) ?: [];
+
+    // Sliding window: filter entries within window
+    $timestamps = array_filter($timestamps, function($ts) use ($currentTime, $windowSeconds) {
+        return ($currentTime - $ts) < $windowSeconds;
+    });
+
+    if (count($timestamps) >= $maxRequests) {
+        flock($fp, LOCK_UN);
+        fclose($fp);
+        http_response_code(429);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['error' => $errorMessage]);
+        exit;
+    }
+
+    $timestamps[] = $currentTime;
+    ftruncate($fp, 0);
+    rewind($fp);
+    fwrite($fp, json_encode(array_values($timestamps)));
+    fflush($fp);
     flock($fp, LOCK_UN);
     fclose($fp);
-    http_response_code(429);
-    header('Content-Type: application/json; charset=utf-8');
-    echo json_encode(['error' => 'Account AI rate limit exceeded (15 req/min). Please try again shortly.']);
-    exit;
 }
 
-$requests[] = $currentTime;
-ftruncate($fp, 0);
-rewind($fp);
-fwrite($fp, json_encode(array_values($requests)));
-fflush($fp);
-flock($fp, LOCK_UN);
-fclose($fp);
+// Enforce independent per-account rate limit: 15 req/min
+checkAtomicRateLimit('user', $authenticatedUid, 15, 60, 'Account AI rate limit exceeded (15 req/min). Please try again shortly.');
+
+// Enforce independent per-IP rate limit: 30 req/min (protects against multi-account IP bot attacks)
+checkAtomicRateLimit('ip', $clientIp, 30, 60, 'IP AI rate limit exceeded (30 req/min). Please try again shortly.');
+
+// Enforce daily per-account budget: 200 req/day
+checkAtomicRateLimit('user_daily', $authenticatedUid, 200, 86400, 'Daily account AI quota exceeded (200 requests/day).');
 
 // 6. Parse and Validate Request Payload
 $input = file_get_contents('php://input');
@@ -165,27 +182,34 @@ if (strlen($prompt) > 8000) {
     exit;
 }
 
-// 7. Load Credentials from Server Environment or Secure Config Outside Web Root
-$GROQ_KEY = getenv('GROQ_API_KEY');
-$GEMINI_KEY = getenv('GEMINI_API_KEY');
+// 7. Load Credentials Strictly from Server Environment or Secure Storage Outside Public Web Root
+$GROQ_KEY = getenv('GROQ_API_KEY') ?: getenv('REDIRECT_GROQ_API_KEY');
+$GEMINI_KEY = getenv('GEMINI_API_KEY') ?: getenv('REDIRECT_GEMINI_API_KEY');
 
 if (!$GROQ_KEY || !$GEMINI_KEY) {
-    $envPath = dirname(__DIR__, 2) . '/.env';
-    if (!file_exists($envPath)) {
-        $envPath = dirname(__DIR__) . '/.env';
-    }
-    if (file_exists($envPath)) {
-        $lines = @file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
-        foreach ($lines as $line) {
-            $line = trim($line);
-            if (strpos($line, '#') === 0) continue;
-            if (strpos($line, '=') !== false) {
-                list($k, $v) = explode('=', $line, 2);
-                $k = trim($k);
-                $v = trim($v);
-                if (($k === 'VITE_GROQ_API_KEY' || $k === 'GROQ_API_KEY') && !$GROQ_KEY) $GROQ_KEY = $v;
-                if (($k === 'VITE_GEMINI_API_KEY' || $k === 'GEMINI_API_KEY') && !$GEMINI_KEY) $GEMINI_KEY = $v;
+    // Check for secure configuration file outside public web root (e.g. Hostinger parent /home/u.../ or repository parent)
+    $candidatePaths = [
+        dirname($_SERVER['DOCUMENT_ROOT'] ?? '') . '/config.secure.php',
+        dirname($_SERVER['DOCUMENT_ROOT'] ?? '') . '/.env.ai',
+        dirname(__DIR__, 2) . '/.env.ai',
+        dirname(__DIR__, 2) . '/.env' // Root workspace directory, never uploaded to /public_html
+    ];
+
+    foreach ($candidatePaths as $candidate) {
+        if (!empty($candidate) && file_exists($candidate) && is_readable($candidate)) {
+            $lines = @file($candidate, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
+            foreach ($lines as $line) {
+                $line = trim($line);
+                if (strpos($line, '#') === 0) continue;
+                if (strpos($line, '=') !== false) {
+                    list($k, $v) = explode('=', $line, 2);
+                    $k = trim($k);
+                    $v = trim($v);
+                    if (($k === 'GROQ_API_KEY' || $k === 'VITE_GROQ_API_KEY') && !$GROQ_KEY) $GROQ_KEY = $v;
+                    if (($k === 'GEMINI_API_KEY' || $k === 'VITE_GEMINI_API_KEY') && !$GEMINI_KEY) $GEMINI_KEY = $v;
+                }
             }
+            if ($GROQ_KEY && $GEMINI_KEY) break;
         }
     }
 }

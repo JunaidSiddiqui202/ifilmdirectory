@@ -301,7 +301,11 @@ service cloud.firestore {
 
       function isIncomingChatParticipant() {
         return isAuthenticated() && (
-          (request.resource.data.participants != null && request.auth.uid in request.resource.data.participants) ||
+          (request.resource.data.participants != null && 
+           request.resource.data.participants is list &&
+           request.resource.data.participants.size() >= 1 &&
+           request.resource.data.participants.size() <= 10 &&
+           request.auth.uid in request.resource.data.participants) ||
           isAdmin()
         );
       }
@@ -309,13 +313,27 @@ service cloud.firestore {
       allow read: if isChatParticipant();
       allow create: if isIncomingChatParticipant();
       
-      // Updates allowed ONLY if caller is already a participant and participants list is unchanged
+      // Updates allowed ONLY if caller is already a participant, participants list cannot be altered or injected,
+      // and update keys are strictly limited to legitimate chat conversation metadata:
       allow update: if isChatParticipant() && (
-        request.resource.data.participants == resource.data.participants ||
-        isAdmin()
+        isAdmin() || (
+          request.resource.data.participants == resource.data.participants &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'lastMessage', 'lastMessageTime', 'lastSenderId', 'updatedAt', 'unreadBy'
+          ]) &&
+          (
+            !('lastSenderId' in request.resource.data) || 
+            request.resource.data.lastSenderId == request.auth.uid ||
+            request.resource.data.lastSenderId == resource.data.lastSenderId
+          ) &&
+          (
+            !('lastMessage' in request.resource.data) ||
+            (request.resource.data.lastMessage is string && request.resource.data.lastMessage.size() <= 2000)
+          )
+        )
       );
       
-      allow delete: if isChatParticipant();
+      allow delete: if isChatParticipant() || isAdmin();
       
       // Messages subcollection
       match /messages/{messageId} {
@@ -361,10 +379,22 @@ service cloud.firestore {
     match /notifications/{notificationId} {
       allow read: if isOwner(resource.data.userId) || isAdmin();
       
-      // Notification creation requires authenticated user matching senderId to prevent spam & spoofing
+      // Notification creation requires authenticated user matching senderId,
+      // strictly valid recipient (cannot notify oneself maliciously),
+      // permissible notification types, bounded size, and initial unread status
       allow create: if isAuthenticated() && (
-        request.resource.data.senderId == request.auth.uid ||
-        isAdmin()
+        isAdmin() || (
+          request.resource.data.senderId == request.auth.uid &&
+          request.resource.data.userId is string &&
+          request.resource.data.userId.size() > 0 &&
+          request.resource.data.userId != request.auth.uid &&
+          request.resource.data.type in ['like', 'comment', 'follow', 'job', 'system', 'connection', 'message'] &&
+          request.resource.data.title is string &&
+          request.resource.data.title.size() <= 200 &&
+          request.resource.data.message is string &&
+          request.resource.data.message.size() <= 1000 &&
+          request.resource.data.isRead == false
+        )
       );
       
       allow update: if (isOwner(resource.data.userId) || isAdmin()) && notModifyingOwner('userId');
@@ -408,21 +438,30 @@ service cloud.firestore {
       allow read: if true;
       allow create: if isAdmin();
       
-      // Restrict poll updates strictly to legitimate single-vote operations:
-      // 1. Question, active status, createdAt, and options length cannot change
-      // 2. Affected keys restricted strictly to 'voters', 'totalVotes', and 'options'
-      // 3. User must not be in current voters, must be in new voters, and previous voters must remain intact
-      // 4. totalVotes must increment by exactly 1
+      // Restrict poll updates strictly to legitimate single-vote operations on active polls:
+      // 1. Poll must be active (active == true) and cannot be marked inactive by voters
+      // 2. Question, type, active, createdAt, and options length cannot change
+      // 3. User must not have already voted (!voters.hasAny([request.auth.uid]))
+      // 4. Exactly one new voter (the calling user) must be added and old voters preserved
+      // 5. totalVotes must increment by exactly 1
+      // 6. Affected keys restricted strictly to ['voters', 'totalVotes', 'options']
       allow update: if isAuthenticated() && (
         isAdmin() || (
+          resource.data.active == true &&
+          request.resource.data.active == true &&
           request.resource.data.diff(resource.data).affectedKeys().hasOnly(['voters', 'totalVotes', 'options']) &&
           request.resource.data.question == resource.data.question &&
-          request.resource.data.active == resource.data.active &&
+          (!('type' in resource.data) || request.resource.data.type == resource.data.type) &&
+          resource.data.voters is list &&
+          request.resource.data.voters is list &&
           !resource.data.voters.hasAny([request.auth.uid]) &&
           request.resource.data.voters.hasAll(resource.data.voters) &&
           request.resource.data.voters.hasAny([request.auth.uid]) &&
           request.resource.data.voters.size() == resource.data.voters.size() + 1 &&
-          request.resource.data.totalVotes == resource.data.totalVotes + 1
+          request.resource.data.totalVotes == resource.data.totalVotes + 1 &&
+          resource.data.options is list &&
+          request.resource.data.options is list &&
+          request.resource.data.options.size() == resource.data.options.size()
         )
       );
       
@@ -511,19 +550,30 @@ service cloud.firestore {
       allow read: if true;
       allow create: if isAuthenticated() && (request.resource.data.creatorId == request.auth.uid || isAdmin());
       
-      // Helper function to check if join/leave strictly modifies only caller's UID:
+      // Strict helper function to check if join/leave strictly modifies only caller's UID:
+      // - Both old and new members must be valid lists
+      // - Standard users can only join open/public groups (cannot self-join private/gated groups)
+      // - Joining: exactly caller's UID added; previous list preserved; length increments by 1
+      // - Leaving: exactly caller's UID removed; remaining list preserved; length decrements by 1
+      // - memberCount MUST equal the exact length of the new members list
       function isValidMembershipToggle() {
-        // Case 1: Joining group (UID added)
-        let isJoining = !resource.data.members.hasAny([request.auth.uid]) &&
+        let isPublicGroup = !('isPrivate' in resource.data) || resource.data.isPrivate == false;
+        let oldMembersValid = resource.data.members is list;
+        let newMembersValid = request.resource.data.members is list;
+        
+        let isJoining = isPublicGroup &&
+                        !resource.data.members.hasAny([request.auth.uid]) &&
                         request.resource.data.members.hasAny([request.auth.uid]) &&
                         request.resource.data.members.hasAll(resource.data.members) &&
                         request.resource.data.members.size() == resource.data.members.size() + 1;
-        // Case 2: Leaving group (UID removed)
+                        
         let isLeaving = resource.data.members.hasAny([request.auth.uid]) &&
                         !request.resource.data.members.hasAny([request.auth.uid]) &&
                         resource.data.members.hasAll(request.resource.data.members) &&
                         request.resource.data.members.size() == resource.data.members.size() - 1;
-        return isJoining || isLeaving;
+                        
+        return oldMembersValid && newMembersValid && (isJoining || isLeaving) &&
+               request.resource.data.memberCount == request.resource.data.members.size();
       }
 
       allow update: if isAuthenticated() && (
@@ -533,10 +583,7 @@ service cloud.firestore {
           notModifyingOwner('creatorId') &&
           notModifyingOwner('name') &&
           notModifyingOwner('category') &&
-          (
-            // If members is a list of UIDs, enforce single add/remove
-            !(resource.data.members is list) || isValidMembershipToggle()
-          )
+          isValidMembershipToggle()
         ) ||
         isAdmin()
       );
