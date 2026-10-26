@@ -8,6 +8,7 @@ import {
     query,
     orderBy,
     where,
+    limit,
     Timestamp
 } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
@@ -23,7 +24,7 @@ export interface Job {
     deadline: string;
     type: 'Job' | 'Audition' | 'Crew' | 'Post-Production';
     postedBy: string; // User ID
-    postedAt: any; // Timestamp
+    postedAt: Timestamp | Date | string | number | null; // Timestamp
     postedAtDate?: Date;
     applicationEmail?: string;
     logo?: string; // URL to company logo
@@ -59,7 +60,7 @@ export const jobService = {
     createJob: async (jobData: Omit<Job, 'id' | 'postedAt'>) => {
         try {
             // Remove undefined values to prevent Firestore errors
-            const cleanedData: any = {};
+            const cleanedData: Record<string, unknown> = {};
             Object.entries(jobData).forEach(([key, value]) => {
                 if (value !== undefined) {
                     cleanedData[key] = value;
@@ -107,12 +108,16 @@ export const jobService = {
     },
 
     // Get all jobs (merging Firestore database jobs with live Film Fraternity RSS jobs)
-    getJobs: async (filterType?: string) => {
+    getJobs: async (filterType?: string, limitCount: number = 50) => {
         try {
-            // 1. Fetch Firestore jobs ordered by date
+            // 1. Fetch Firestore jobs ordered by date with query limit
             let firestoreJobs: (Job & { postedAtDate: Date })[] = [];
             try {
-                const q = query(collection(db, JOBS_COLLECTION), orderBy('postedAt', 'desc'));
+                const q = query(
+                    collection(db, JOBS_COLLECTION),
+                    orderBy('postedAt', 'desc'),
+                    limit(limitCount)
+                );
                 const snapshot = await getDocs(q);
 
                 firestoreJobs = snapshot.docs.map(doc => {
@@ -244,12 +249,12 @@ export const jobService = {
         message?: string;
     }) => {
         try {
-            // Check if already applied
+            // Check if already applied using canonical userId (matching request.auth.uid)
             const applicationsRef = collection(db, 'job_applications');
             const existingQuery = query(
                 applicationsRef,
                 where('jobId', '==', jobId),
-                where('applicantId', '==', applicantId)
+                where('userId', '==', applicantId)
             );
             const existing = await getDocs(existingQuery);
 
@@ -257,13 +262,20 @@ export const jobService = {
                 return { success: false, error: 'You have already applied for this job.' };
             }
 
-            // Save application
+            // Retrieve job to capture trustworthy jobOwnerId for Firestore security rule alignment
+            const jobSnap = await getDoc(doc(db, JOBS_COLLECTION, jobId));
+            const jobData = jobSnap.exists() ? jobSnap.data() : null;
+            const jobOwnerId = jobData?.postedBy || '';
+
+            // Save application with canonical userId, backward-compatible applicantId, and jobOwnerId
             await addDoc(applicationsRef, {
                 jobId,
-                applicantId,
+                userId: applicantId,       // Required by firestore.rules (request.resource.data.userId == request.auth.uid)
+                applicantId,               // Maintained for backward compatibility with existing application UI readers
+                jobOwnerId,                // Authoritative owner ID enabling job creator read/update access under rules
                 ...applicantData,
                 appliedAt: Timestamp.now(),
-                status: 'pending' // pending, reviewed, shortlisted, rejected
+                status: 'pending'          // pending, reviewed, shortlisted, rejected
             });
 
             return { success: true };
@@ -277,13 +289,23 @@ export const jobService = {
     checkIfApplied: async (jobId: string, userId: string): Promise<boolean> => {
         try {
             const applicationsRef = collection(db, 'job_applications');
+            // Check canonical userId
             const q = query(
+                applicationsRef,
+                where('jobId', '==', jobId),
+                where('userId', '==', userId)
+            );
+            const snapshot = await getDocs(q);
+            if (!snapshot.empty) return true;
+
+            // Fallback for pre-migration documents created under legacy applicantId field
+            const fallbackQ = query(
                 applicationsRef,
                 where('jobId', '==', jobId),
                 where('applicantId', '==', userId)
             );
-            const snapshot = await getDocs(q);
-            return !snapshot.empty;
+            const fallbackSnap = await getDocs(fallbackQ);
+            return !fallbackSnap.empty;
         } catch (error) {
             console.error("Error checking application:", error);
             return false;
@@ -296,7 +318,16 @@ export const jobService = {
             const applicationsRef = collection(db, 'job_applications');
             const q = query(applicationsRef, where('jobId', '==', jobId), orderBy('appliedAt', 'desc'));
             const snapshot = await getDocs(q);
-            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            return snapshot.docs.map(doc => {
+                const data = doc.data();
+                return {
+                    id: doc.id,
+                    ...data,
+                    // Normalize applicantId if only userId was present or vice-versa
+                    applicantId: data.applicantId || data.userId,
+                    userId: data.userId || data.applicantId
+                } as Record<string, unknown>;
+            });
         } catch (error) {
             console.error("Error fetching applications:", error);
             return [];
@@ -315,9 +346,10 @@ export const jobService = {
                 updatedAt: Timestamp.now()
             });
             return { success: true };
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Error updating application status:", error);
-            return { success: false, error: error.message || 'Failed to update status' };
+            const msg = error instanceof Error ? error.message : 'Failed to update status';
+            return { success: false, error: msg };
         }
     },
 

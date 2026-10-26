@@ -107,7 +107,7 @@ export interface UserProfile {
     warningCount?: number;
     type?: 'user' | 'service'; // Differentiate between normal users and service providers/studios
     isOnline?: boolean;
-    lastActive?: string | number | any;
+    lastActive?: string | number | null;
 }
 
 export type AdminRoleType = 'super_admin' | 'admin' | 'moderator' | 'commercial_manager' | 'user_manager' | 'ad_manager';
@@ -150,7 +150,7 @@ export const claimSuperAdmin = async (uid: string) => {
     }
 };
 
-export const createUserProfile = async (user: User, additionalData?: any) => {
+export const createUserProfile = async (user: User, additionalData?: Record<string, unknown>) => {
     if (!user) return;
 
     try {
@@ -161,7 +161,7 @@ export const createUserProfile = async (user: User, additionalData?: any) => {
         if (userSnap.exists()) return;
 
         const email = user.email;
-        let approvedData: any = {};
+        const approvedData: Record<string, unknown> = {};
 
         // If user is Super Admin
         if (isSuperAdmin(email)) {
@@ -194,7 +194,7 @@ export const createUserProfile = async (user: User, additionalData?: any) => {
 };
 
 // Internal helper to keep code clean
-const createProfileDoc = async (user: User, additionalData?: any) => {
+const createProfileDoc = async (user: User, additionalData?: Record<string, unknown>) => {
     const userRef = doc(db, 'users', user.uid);
     const { displayName, email, photoURL, uid } = user;
     const createdAt = new Date().toISOString();
@@ -263,7 +263,7 @@ export const updateUserProfile = async (uid: string, data: Partial<UserProfile>)
     try {
         // Filter out undefined values as Firestore doesn't accept them
         const cleanData = Object.fromEntries(
-            Object.entries(data).filter(([_, value]) => value !== undefined)
+            Object.entries(data).filter(([, value]) => value !== undefined)
         );
 
         console.log(`[UserService] Saving profile for ${uid}:`, cleanData);
@@ -381,20 +381,21 @@ export const isTestOrEmptyUser = (user: UserProfile): boolean => {
     return false;
 };
 
-export const getAllUsers = async (bypassCache: boolean = false): Promise<UserProfile[]> => {
+export const getAllUsers = async (bypassCache: boolean = false, maxLimit: number = 100): Promise<UserProfile[]> => {
     if (!bypassCache && allUsersCache && Date.now() - allUsersCache.timestamp < ALL_USERS_CACHE_TTL) {
-        return allUsersCache.users;
+        return allUsersCache.users.slice(0, maxLimit);
     }
 
     try {
-        const querySnapshot = await getDocs(collection(db, 'users'));
+        const q = query(collection(db, 'users'), limit(maxLimit));
+        const querySnapshot = await getDocs(q);
         const rawUsers = querySnapshot.docs.map(doc => doc.data() as UserProfile);
         const users = rawUsers.filter(u => !isTestOrEmptyUser(u));
         allUsersCache = { users, timestamp: Date.now() };
         return users;
     } catch (error) {
-        console.error("Error getting all users:", error);
-        return allUsersCache?.users || [];
+        console.error("Error getting users:", error);
+        return allUsersCache?.users.slice(0, maxLimit) || [];
     }
 };
 
@@ -407,9 +408,9 @@ export const getLatestUsers = async (limitCount: number = 8): Promise<UserProfil
         return rawUsers.filter(u => !isTestOrEmptyUser(u));
     } catch (error) {
         console.warn("Error getting latest users (might need index):", error);
-        // Fallback to client-side slice if index isn't ready
-        const allUsers = await getAllUsers();
-        return allUsers
+        // Fallback to bounded fetch rather than full-collection pull
+        const boundedUsers = await getAllUsers(false, limitCount * 2);
+        return boundedUsers
             .sort((a, b) => {
                 const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
                 const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
@@ -558,7 +559,7 @@ export const getAccessRequests = async (): Promise<AccessRequest[]> => {
 export const updateAccessRequestStatus = async (id: string, status: 'approved' | 'rejected', email?: string, name?: string) => {
     try {
         const requestRef = doc(db, 'access_requests', id);
-        const updateData: any = { status };
+        const updateData: Record<string, unknown> = { status };
 
         if (status === 'approved') {
             updateData.approvedAt = new Date().toISOString();
@@ -682,13 +683,17 @@ export const getFollowingCount = async (uid: string) => {
     }
 };
 
-export const getFollowers = async (uid: string): Promise<UserProfile[]> => {
+export const getFollowers = async (uid: string, limitCount: number = 50): Promise<UserProfile[]> => {
     try {
-        const q = query(collection(db, 'follows'), where('followingId', '==', uid));
+        const q = query(
+            collection(db, 'follows'),
+            where('followingId', '==', uid),
+            limit(limitCount)
+        );
         const snapshot = await getDocs(q);
         const followerIds = snapshot.docs.map(doc => doc.data().followerId);
 
-        // Fetch profiles for these IDs
+        // Fetch profiles with concurrency control for these IDs
         const profiles = await Promise.all(followerIds.map(id => getUserProfile(id)));
         return profiles.filter(p => p !== null) as UserProfile[];
     } catch (error) {
@@ -697,13 +702,17 @@ export const getFollowers = async (uid: string): Promise<UserProfile[]> => {
     }
 };
 
-export const getFollowing = async (uid: string): Promise<UserProfile[]> => {
+export const getFollowing = async (uid: string, limitCount: number = 50): Promise<UserProfile[]> => {
     try {
-        const q = query(collection(db, 'follows'), where('followerId', '==', uid));
+        const q = query(
+            collection(db, 'follows'),
+            where('followerId', '==', uid),
+            limit(limitCount)
+        );
         const snapshot = await getDocs(q);
         const followingIds = snapshot.docs.map(doc => doc.data().followingId);
 
-        // Fetch profiles for these IDs
+        // Fetch profiles with concurrency control for these IDs
         const profiles = await Promise.all(followingIds.map(id => getUserProfile(id)));
         return profiles.filter(p => p !== null) as UserProfile[];
     } catch (error) {

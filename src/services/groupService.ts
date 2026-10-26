@@ -1,4 +1,4 @@
-import { collection, addDoc, getDocs, query, orderBy, where, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, orderBy, where, limit, Timestamp } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 
 export interface Group {
@@ -8,7 +8,7 @@ export interface Group {
     members: number;
     image: string;
     category: string;
-    lastActive: any;
+    lastActive: Timestamp | Date | string | number | null;
 }
 
 export interface ForumPost {
@@ -23,7 +23,7 @@ export interface ForumPost {
     image?: string;
     likes: number;
     comments: number;
-    createdAt: any;
+    createdAt: Timestamp | Date | string | number | null;
 }
 
 export interface ForumComment {
@@ -34,7 +34,7 @@ export interface ForumComment {
     authorImage: string;
     authorRole?: string;
     content: string;
-    createdAt: any;
+    createdAt: Timestamp | Date | string | number | null;
     likes: number;
 }
 
@@ -165,7 +165,7 @@ const DEFAULT_POSTS: ForumPost[] = [
 ];
 
 export const groupService = {
-    createGroup: async (groupData: Omit<Group, 'id' | 'members' | 'lastActive'>) => {
+    createGroup: async (groupData: Omit<Group, 'id' | 'members' | 'lastActive'>): Promise<{ success: boolean; id?: string; error?: string }> => {
         try {
             const docRef = await addDoc(collection(db, 'groups'), {
                 ...groupData,
@@ -173,16 +173,21 @@ export const groupService = {
                 lastActive: Timestamp.now()
             });
             return { success: true, id: docRef.id };
-        } catch (error) {
-            console.warn("Could not save group to Firestore (using local state):", error);
-            const localId = `local-group-${Date.now()}`;
-            return { success: true, id: localId };
+        } catch (error: unknown) {
+            const msg = error instanceof Error ? error.message : 'Failed to create group in database';
+            console.error("Failed to persist group in Firestore:", error);
+            // Explicit failure status. Do NOT claim false success with a local mock ID.
+            return { success: false, error: msg };
         }
     },
 
-    getGroups: async (): Promise<Group[]> => {
+    getGroups: async (limitCount: number = 50): Promise<Group[]> => {
         try {
-            const q = query(collection(db, 'groups'), orderBy('lastActive', 'desc'));
+            const q = query(
+                collection(db, 'groups'),
+                orderBy('lastActive', 'desc'),
+                limit(limitCount)
+            );
             const snapshot = await getDocs(q);
             if (!snapshot.empty) {
                 const fetched = snapshot.docs.map(doc => ({
@@ -192,18 +197,27 @@ export const groupService = {
                 return fetched;
             }
             return DEFAULT_GROUPS;
-        } catch (error) {
+        } catch {
             // Graceful fallback to default seed groups if permissions pending or offline
             console.info("Notice: Using curated groups (Firestore permissions pending or offline)");
             return DEFAULT_GROUPS;
         }
     },
 
-    getForumPosts: async (groupId?: string): Promise<ForumPost[]> => {
+    getForumPosts: async (groupId?: string, limitCount: number = 50): Promise<ForumPost[]> => {
         try {
-            let q = query(collection(db, 'forumPosts'), orderBy('createdAt', 'desc'));
+            let q = query(
+                collection(db, 'forumPosts'),
+                orderBy('createdAt', 'desc'),
+                limit(limitCount)
+            );
             if (groupId) {
-                q = query(collection(db, 'forumPosts'), where('groupId', '==', groupId), orderBy('createdAt', 'desc'));
+                q = query(
+                    collection(db, 'forumPosts'),
+                    where('groupId', '==', groupId),
+                    orderBy('createdAt', 'desc'),
+                    limit(limitCount)
+                );
             }
             const snapshot = await getDocs(q);
             if (!snapshot.empty) {
@@ -217,7 +231,7 @@ export const groupService = {
                 return DEFAULT_POSTS.filter(p => p.groupId === groupId);
             }
             return DEFAULT_POSTS;
-        } catch (error) {
+        } catch {
             // Graceful fallback to default seed posts if permissions pending or offline
             console.info("Notice: Using curated forum discussions (Firestore permissions pending or offline)");
             if (groupId) {
@@ -254,7 +268,7 @@ export const groupService = {
                     ...doc.data()
                 })) as ForumComment[];
             }
-        } catch (e) {
+        } catch {
             console.info("Using local demo comments for post:", postId);
         }
 

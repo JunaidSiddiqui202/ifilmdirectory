@@ -10,6 +10,7 @@ import {
     doc,
     updateDoc,
     where,
+    limit,
     arrayRemove,
     arrayUnion
 } from 'firebase/firestore';
@@ -144,12 +145,15 @@ export const markChatAsRead = async (chatId: string, userId: string) => {
 };
 
 /**
- * Get all chats for display
+ * Get chats for display (scoped to caller's participation to comply with security rules and bound reads)
  */
-export const getChats = async () => {
+export const getChats = async (userId?: string, limitCount: number = 50) => {
     try {
         const chatsRef = collection(db, 'chats');
-        const snapshot = await getDocs(chatsRef);
+        const q = userId
+            ? query(chatsRef, where('participants', 'array-contains', userId), limit(limitCount))
+            : query(chatsRef, limit(limitCount));
+        const snapshot = await getDocs(q);
         const chats = snapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
