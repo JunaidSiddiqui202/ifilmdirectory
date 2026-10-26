@@ -30,9 +30,16 @@ export const generateText = async (prompt: string, context: string = '', languag
 
     // 1. Try secure backend endpoint first
     try {
+        const { auth } = await import('../firebaseConfig');
+        const token = auth.currentUser ? await auth.currentUser.getIdToken() : '';
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
         const proxyRes = await fetch('/api/ai-proxy', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers,
             body: JSON.stringify({
                 prompt,
                 context,

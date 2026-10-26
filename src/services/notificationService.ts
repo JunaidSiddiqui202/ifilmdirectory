@@ -93,9 +93,12 @@ export const markNotificationAsRead = async (notificationId: string) => {
 
 export const createNotification = async (notification: Omit<NotificationData, 'id' | 'createdAt' | 'isRead'>) => {
     try {
+        const { auth } = await import('../firebaseConfig');
+        const senderId = auth.currentUser?.uid || '';
         const notificationsRef = collection(db, 'notifications');
         await addDoc(notificationsRef, {
             ...notification,
+            senderId,
             createdAt: serverTimestamp(),
             isRead: false
         });
