@@ -25,7 +25,7 @@ interface PortfolioSection {
     id: string;
     type: 'about' | 'experience' | 'showreel' | 'gallery' | 'testimonials' | 'skills' | 'awards';
     title: string;
-    content: any;
+    content: Record<string, unknown>;
     visible: boolean;
 }
 
@@ -174,8 +174,9 @@ export const PortfolioBuilder = () => {
     };
 
     const handleAddSection = (type: PortfolioSection['type']) => {
+        const uniqueId = `section_${type}_${sections.length + 1}`;
         const newSection: PortfolioSection = {
-            id: Date.now().toString(),
+            id: uniqueId,
             type,
             title: type.charAt(0).toUpperCase() + type.slice(1),
             content: {},
@@ -186,18 +187,17 @@ export const PortfolioBuilder = () => {
     };
 
     const handleSave = async () => {
-        try {
-            // TODO: Save to database
-            console.log('Saving portfolio:', sections);
-            alert('Portfolio saved successfully!');
-        } catch (error) {
-            console.error('Failed to save portfolio:', error);
-            alert('Failed to save portfolio');
-        }
+        // Audit 2 (A2-06): Dormant unrouted component. Prevent false success alert without real persistence.
+        alert('Portfolio layout preview updated locally. Cloud persistence for custom portfolio layouts is scheduled for the upcoming profile release.');
     };
 
     return (
         <div className="max-w-4xl mx-auto p-6">
+            <div className="mb-4 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg text-xs text-amber-600 dark:text-amber-400 flex items-center gap-2">
+                <span className="material-symbols-outlined text-base">info</span>
+                <span><strong>Developer Notice:</strong> This Portfolio Builder layout tool is currently in staging preview and is not linked to public routing.</span>
+            </div>
+
             <div className="flex items-center justify-between mb-6">
                 <div>
                     <h1 className="text-3xl font-bold mb-2">Portfolio Builder</h1>
@@ -219,7 +219,7 @@ export const PortfolioBuilder = () => {
                         onClick={handleSave}
                         className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
                     >
-                        Save Portfolio
+                        Save Preview
                     </button>
                 </div>
             </div>

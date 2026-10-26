@@ -4,7 +4,6 @@ import ProtectedRoute from './components/ProtectedRoute';
 import NotificationListener from './components/NotificationListener';
 import { ToastProvider } from './context/ToastContext';
 import { UnreadProvider } from './context/UnreadContext';
-import { seedGuilds } from './seedGuilds';
 
 // Loading component for Suspense fallback
 const PageLoader = () => (
@@ -28,8 +27,8 @@ function lazyWithRetry<T extends React.ComponentType<any>>(
     const retryKey = `chunk_retry_${name}`;
     try {
       return await factory();
-    } catch (error: any) {
-      const msg = (error?.message || error?.toString() || '').toString();
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
       const isChunkLoadFailed =
         msg.includes('dynamically imported module') ||
         msg.includes('Loading chunk') ||
@@ -105,10 +104,6 @@ function ScrollToTop() {
 }
 
 function App() {
-  useEffect(() => {
-    seedGuilds();
-  }, []);
-
   return (
     <BrowserRouter>
       <ScrollToTop />

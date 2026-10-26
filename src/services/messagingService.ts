@@ -18,11 +18,13 @@ import { createNotification, markNotificationAsRead } from './notificationServic
 
 const db = getFirestore(app);
 
+import type { Timestamp, FieldValue } from 'firebase/firestore';
+
 export interface Message {
     id: string;
     text: string;
     senderId: string;
-    createdAt: any; // Firestore Timestamp
+    createdAt: Timestamp | { seconds: number; nanoseconds?: number } | null;
     type: 'text' | 'audio';
     mediaUrl?: string;
     isRead?: boolean;
@@ -32,12 +34,12 @@ export interface Message {
 export interface ChatThread {
     id: string;
     lastMessage?: string;
-    lastMessageTime?: any;
+    lastMessageTime?: Timestamp | { seconds: number; nanoseconds?: number } | null;
     lastSenderId?: string;
     participants?: string[];
     unreadBy?: string[];
-    updatedAt?: any;
-    [key: string]: any;
+    updatedAt?: Timestamp | { seconds: number; nanoseconds?: number } | null;
+    [key: string]: unknown;
 }
 
 /**
@@ -56,7 +58,7 @@ export const sendMessage = async (
         const batch = writeBatch(db);
 
         const chatRef = doc(db, 'chats', chatId);
-        const chatUpdatePayload: any = {
+        const chatUpdatePayload: Record<string, string | FieldValue | string[] | undefined> = {
             lastMessage: message.text || (message.type === 'audio' ? '🎤 Voice message' : 'Media file'),
             lastMessageTime: serverTimestamp(),
             lastSenderId: message.senderId,
@@ -114,28 +116,13 @@ export const sendMessage = async (
 export const markChatAsRead = async (chatId: string, userId: string) => {
     if (!chatId || !userId) return;
     try {
+        // 1. Atomically remove user from unreadBy array on the chat document (allowed by firestore.rules)
         const chatRef = doc(db, 'chats', chatId);
         await updateDoc(chatRef, {
             unreadBy: arrayRemove(userId)
-        }).catch(() => {});
+        });
 
-        // Mark messages in this chat from the other user as read
-        try {
-            const messagesRef = collection(db, 'chats', chatId, 'messages');
-            const unreadMsgsQuery = query(
-                messagesRef,
-                where('isRead', '==', false)
-            );
-            const unreadSnapshot = await getDocs(unreadMsgsQuery);
-            const updates = unreadSnapshot.docs
-                .filter(docSnap => docSnap.data().senderId !== userId)
-                .map(docSnap => updateDoc(docSnap.ref, { isRead: true }).catch(() => {}));
-            await Promise.all(updates);
-        } catch (msgErr) {
-            console.warn("Could not mark messages as read:", msgErr);
-        }
-
-        // Also mark any unread message notifications corresponding to this chat as read
+        // 2. Mark any unread message notifications corresponding to this chat as read
         const notifRef = collection(db, 'notifications');
         const q = query(
             notifRef,
@@ -143,12 +130,14 @@ export const markChatAsRead = async (chatId: string, userId: string) => {
             where('isRead', '==', false)
         );
         const snapshot = await getDocs(q);
-        snapshot.docs.forEach(async (docSnap) => {
-            const data = docSnap.data();
-            if (data.type === 'message' && (data.actionLink?.includes(chatId) || data.metadata?.chatId === chatId)) {
-                await markNotificationAsRead(docSnap.id);
-            }
-        });
+        const notificationUpdates = snapshot.docs
+            .filter(docSnap => {
+                const data = docSnap.data();
+                return data.type === 'message' && (data.actionLink?.includes(chatId) || data.metadata?.chatId === chatId);
+            })
+            .map(docSnap => markNotificationAsRead(docSnap.id));
+
+        await Promise.all(notificationUpdates);
     } catch (error) {
         console.error("Error marking chat as read:", error);
     }

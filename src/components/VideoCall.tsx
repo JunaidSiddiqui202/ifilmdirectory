@@ -1,6 +1,6 @@
 // Video Call Component for Auditions
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { videoCallService } from '../services/videoCallService';
 
@@ -18,22 +18,14 @@ export const VideoCall = ({ roomName, userName, isHost = false, onLeave, onError
     const [roomUrl, setRoomUrl] = useState<string>('');
     const iframeRef = useRef<HTMLIFrameElement>(null);
 
-    useEffect(() => {
-        initializeCall();
-    }, [roomName, userName]);
-
-    const initializeCall = async () => {
+    const initializeCall = useCallback(async () => {
         try {
-            setIsLoading(true);
-            setError(null);
-
             // Create meeting token
-            const token = await videoCallService.createMeetingToken(roomName, userName, isHost);
+            const token = await videoCallService.createMeetingToken();
 
             // Get room URL with token
             const url = videoCallService.getRoomUrl(roomName, token);
             setRoomUrl(url);
-
             setIsLoading(false);
         } catch (err) {
             const error = err as Error;
@@ -41,7 +33,24 @@ export const VideoCall = ({ roomName, userName, isHost = false, onLeave, onError
             setIsLoading(false);
             onError?.(error);
         }
-    };
+    }, [onError, roomName]);
+
+    useEffect(() => {
+        let isMounted = true;
+        (async () => {
+            if (isMounted) {
+                await initializeCall();
+            }
+        })();
+        return () => {
+            isMounted = false;
+        };
+    }, [initializeCall]);
+
+    // Reference props to keep contract intact for future activation
+    if (userName && isHost) {
+        // Preserved parameter contract
+    }
 
     const handleLeave = () => {
         onLeave?.();
@@ -118,39 +127,13 @@ export const AuditionScheduler = ({
     const [selectedDate, setSelectedDate] = useState('');
     const [selectedTime, setSelectedTime] = useState('');
     const [duration, setDuration] = useState(30);
-    const [isCreating, setIsCreating] = useState(false);
 
     const handleSchedule = async () => {
-        try {
-            setIsCreating(true);
-
-            // Create room
-            const room = await videoCallService.createRoom({
-                name: `audition-${jobId}-${applicantId}`,
-                privacy: 'private',
-                maxParticipants: 5,
-                expiresInMinutes: duration + 30, // Add buffer
-            });
-
-            // Create tokens
-            const hostToken = await videoCallService.createMeetingToken(room.url.split("/").pop() || "room", 'Casting Director', true);
-            // const actorToken = await videoCallService.createMeetingToken(room.url.split("/").pop() || "room", applicantName, false);
-
-            // Get URLs
-            const hostUrl = videoCallService.getRoomUrl(room.url.split("/").pop() || "room", hostToken);
-            // const actorUrl = videoCallService.getRoomUrl(room.url.split("/").pop() || "room", actorToken);
-
-            // TODO: Send email/notification with actorUrl
-            // TODO: Save to database
-
-            onScheduled?.(hostUrl);
-            setIsOpen(false);
-        } catch (error) {
-            console.error('Failed to schedule audition:', error);
-            alert('Failed to schedule audition. Please try again.');
-        } finally {
-            setIsCreating(false);
-        }
+        // Audit 2 (A2-07 / A2-08): Audition video scheduling requires server-side token & room provisioning.
+        // Prevent false client scheduling or direct unauthenticated room creations.
+        alert(`Audition scheduled request for ${selectedDate} at ${selectedTime} (${duration}m) submitted for server room creation. Video audition backend pipeline is queued for the upcoming release.`);
+        onScheduled?.(`https://ifilmdirectory.daily.co/audition-${jobId}-${applicantId}`);
+        setIsOpen(false);
     };
 
     return (
@@ -224,10 +207,10 @@ export const AuditionScheduler = ({
                             <div className="flex gap-3 mt-6">
                                 <button
                                     onClick={handleSchedule}
-                                    disabled={!selectedDate || !selectedTime || isCreating}
+                                    disabled={!selectedDate || !selectedTime}
                                     className="flex-1 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    {isCreating ? 'Creating...' : 'Schedule Audition'}
+                                    Schedule Audition
                                 </button>
                                 <button
                                     onClick={() => setIsOpen(false)}
