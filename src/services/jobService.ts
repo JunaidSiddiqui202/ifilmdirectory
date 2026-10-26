@@ -24,7 +24,8 @@ export interface Job {
     deadline: string;
     type: 'Job' | 'Audition' | 'Crew' | 'Post-Production';
     postedBy: string; // User ID
-    postedAt: Timestamp | Date | string | number | null; // Timestamp
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    postedAt: any; // Timestamp
     postedAtDate?: Date;
     applicationEmail?: string;
     logo?: string; // URL to company logo
@@ -326,7 +327,8 @@ export const jobService = {
                     // Normalize applicantId if only userId was present or vice-versa
                     applicantId: data.applicantId || data.userId,
                     userId: data.userId || data.applicantId
-                } as Record<string, unknown>;
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                } as any;
             });
         } catch (error) {
             console.error("Error fetching applications:", error);
