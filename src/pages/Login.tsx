@@ -168,7 +168,9 @@ export default function Login() {
 
         setLoading(true);
 
-        const redirectUrl = searchParams.get('redirect') || '/home';
+        const rawRedirect = searchParams.get('redirect') || '/home';
+        // Validate internal path to strictly prevent open redirects
+        const redirectUrl = (rawRedirect.startsWith('/') && !rawRedirect.startsWith('//')) ? rawRedirect : '/home';
 
         try {
             if (view === 'login') {
@@ -272,7 +274,8 @@ export default function Login() {
             return;
         }
 
-        const redirectUrl = searchParams.get('redirect') || '/home';
+        const rawRedirect = searchParams.get('redirect') || '/home';
+        const redirectUrl = (rawRedirect.startsWith('/') && !rawRedirect.startsWith('//')) ? rawRedirect : '/home';
 
         try {
             setError('');

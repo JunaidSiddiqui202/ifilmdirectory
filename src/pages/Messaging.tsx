@@ -25,15 +25,10 @@ export default function Messaging() {
     const toast = useToast();
 
     const [messageText, setMessageText] = useState('');
-    const [callState, setCallState] = useState<{ isOpen: boolean; type: 'audio' | 'video' | null }>({
-        isOpen: false,
-        type: null
-    });
     const [showAttachments, setShowAttachments] = useState(false);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [allowCalls, setAllowCalls] = useState(true);
     const [showSettings, setShowSettings] = useState(false);
-    const [showCallConfirmation, setShowCallConfirmation] = useState(false);
 
     // Audio Recording State
     const [isRecording, setIsRecording] = useState(false);
@@ -182,10 +177,6 @@ export default function Messaging() {
     }, [chatId, currentUserId]);
 
     useEffect(() => {
-        if (location.state?.startCall) {
-            setCallState({ isOpen: true, type: 'audio' });
-            window.history.replaceState({}, document.title);
-        }
         return () => {
             if (timerRef.current) clearInterval(timerRef.current);
             if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
@@ -487,18 +478,11 @@ export default function Messaging() {
                             {/* Voice Call */}
                             <button
                                 onClick={() => {
-                                    if (allowCalls) {
-                                        setShowCallConfirmation(true);
-                                    } else {
-                                        toast.info("Voice calls are currently disabled for this thread.");
-                                    }
+                                    toast.info("Live audio/video calls are temporarily under backend upgrade. Please use encrypted text messaging.");
                                 }}
-                                className={`flex items-center justify-center rounded-xl size-9 border transition-all ${
-                                    allowCalls
-                                        ? 'bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] border-zinc-200 dark:border-white/[0.08] text-amber-500 dark:text-amber-400 hover:border-amber-500/40'
-                                        : 'bg-zinc-100 dark:bg-white/[0.02] border-zinc-200 dark:border-white/[0.04] text-zinc-400 cursor-not-allowed'
-                                }`}
-                                title="Start Voice Call"
+                                className="flex items-center justify-center rounded-xl size-9 bg-zinc-100 dark:bg-white/[0.05] border border-zinc-200 dark:border-white/[0.08] text-zinc-400 hover:text-amber-500 hover:border-amber-500/40 transition-all cursor-pointer"
+                                title="Live calls under backend upgrade"
+                                aria-label="Start Voice Call (Under backend upgrade)"
                             >
                                 <span className="material-symbols-outlined text-lg">call</span>
                             </button>
@@ -508,8 +492,9 @@ export default function Messaging() {
                                 onClick={toggleDarkMode}
                                 className="flex md:hidden size-9 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] border border-zinc-200 dark:border-white/[0.08] text-zinc-600 dark:text-zinc-300 transition-colors"
                                 title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                                aria-label={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
                             >
-                                <span className="material-symbols-outlined text-lg">
+                                <span className="material-symbols-outlined text-lg" aria-hidden="true">
                                     {isDarkMode ? 'light_mode' : 'dark_mode'}
                                 </span>
                             </button>
@@ -519,8 +504,10 @@ export default function Messaging() {
                                 onClick={() => setShowSettings(!showSettings)}
                                 className="flex items-center justify-center rounded-xl size-9 bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] border border-zinc-200 dark:border-white/[0.08] text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white transition-all"
                                 title="Chat Settings"
+                                aria-label="Open Chat Settings and Actions"
+                                aria-expanded={showSettings}
                             >
-                                <span className="material-symbols-outlined text-lg">more_vert</span>
+                                <span className="material-symbols-outlined text-lg" aria-hidden="true">more_vert</span>
                             </button>
 
                             <HamburgerMenu />
@@ -804,8 +791,10 @@ export default function Messaging() {
                                             : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.06]'
                                     }`}
                                     title="Add Media / Documents"
+                                    aria-label="Add Media or Documents"
+                                    aria-expanded={showAttachments}
                                 >
-                                    <span className="material-symbols-outlined text-xl">add</span>
+                                    <span className="material-symbols-outlined text-xl" aria-hidden="true">add</span>
                                 </button>
 
                                 <input
@@ -814,6 +803,7 @@ export default function Messaging() {
                                     value={messageText}
                                     onChange={(e) => setMessageText(e.target.value)}
                                     onKeyPress={handleKeyPress}
+                                    aria-label="Message text"
                                 />
 
                                 <button
@@ -827,25 +817,29 @@ export default function Messaging() {
                                             : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white'
                                     }`}
                                     title="Cinema Emoji"
+                                    aria-label="Insert Cinema Emoji"
+                                    aria-expanded={showEmojiPicker}
                                 >
-                                    <span className="material-symbols-outlined text-xl">sentiment_satisfied</span>
+                                    <span className="material-symbols-outlined text-xl" aria-hidden="true">sentiment_satisfied</span>
                                 </button>
 
                                 {messageText.trim() ? (
                                     <button
                                         onClick={handleSendMessage}
                                         className="flex items-center justify-center size-9 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-400 hover:to-amber-500 shadow-md shadow-amber-500/25 active:scale-95 transition-all"
-                                        title="Send"
+                                        title="Send message"
+                                        aria-label="Send message"
                                     >
-                                        <span className="material-symbols-outlined text-base font-bold">send</span>
+                                        <span className="material-symbols-outlined text-base font-bold" aria-hidden="true">send</span>
                                     </button>
                                 ) : (
                                     <button
                                         onClick={startRecording}
                                         className="flex items-center justify-center size-9 rounded-xl text-zinc-500 hover:text-amber-500 dark:text-zinc-400 dark:hover:text-amber-400 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors"
                                         title="Record Voice Note"
+                                        aria-label="Record voice note"
                                     >
-                                        <span className="material-symbols-outlined text-xl">mic</span>
+                                        <span className="material-symbols-outlined text-xl" aria-hidden="true">mic</span>
                                     </button>
                                 )}
                             </>
@@ -855,99 +849,6 @@ export default function Messaging() {
             </div>
 
             <BottomNav />
-
-            {/* Calling Screen Overlay */}
-            {callState.isOpen && (
-                <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md animate-in fade-in"
-                    onClick={() => setCallState({ isOpen: false, type: null })}
-                >
-                    <div
-                        className="flex flex-col items-center gap-8 p-8 text-white max-w-sm w-full"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <div className="flex flex-col items-center gap-4">
-                            <div className="size-32 rounded-full overflow-hidden border-4 border-amber-500/40 p-1 shadow-2xl">
-                                <PostMedia
-                                    src={chatAvatar}
-                                    fallbackType="USER_MALE"
-                                    className="size-full object-cover rounded-full"
-                                />
-                            </div>
-                            <div className="text-center">
-                                <h3 className="text-2xl font-black">{chatName}</h3>
-                                <p className="text-amber-400/80 text-xs font-semibold tracking-wider uppercase mt-1">
-                                    {callState.type === 'video' ? 'Connecting Video Feed...' : 'Calling Production Line...'}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-6">
-                            <button className="flex size-14 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors">
-                                <span className="material-symbols-outlined text-2xl">mic_off</span>
-                            </button>
-                            <button
-                                onClick={() => setCallState({ isOpen: false, type: null })}
-                                className="flex size-16 items-center justify-center rounded-full bg-red-500 hover:bg-red-600 transition-colors shadow-lg shadow-red-500/30 active:scale-95"
-                            >
-                                <span className="material-symbols-outlined text-3xl">call_end</span>
-                            </button>
-                            <button
-                                onClick={() => setCallState(prev => ({ ...prev, type: prev.type === 'video' ? 'audio' : 'video' }))}
-                                className={`flex size-14 items-center justify-center rounded-full transition-colors ${callState.type === 'video' ? 'bg-white text-black' : 'bg-white/10 hover:bg-white/20'}`}
-                            >
-                                <span className="material-symbols-outlined text-2xl">
-                                    {callState.type === 'video' ? 'videocam' : 'videocam_off'}
-                                </span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Voice Call Confirmation Modal */}
-            {showCallConfirmation && (
-                <div
-                    className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200"
-                    onClick={() => setShowCallConfirmation(false)}
-                >
-                    <div
-                        className="bg-white dark:bg-[#15171C] w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-zinc-200 dark:border-white/10 animate-in zoom-in-95 duration-200"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <div className="flex flex-col items-center text-center">
-                            <div className="size-16 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-500 mb-4 shadow-sm">
-                                <span className="material-symbols-outlined text-3xl">call</span>
-                            </div>
-                            <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2">
-                                Voice Call
-                            </h3>
-                            <p className="text-zinc-500 dark:text-zinc-400 text-xs sm:text-sm mb-6 leading-relaxed">
-                                Start an encrypted voice call with <br />
-                                <span className="font-bold text-amber-600 dark:text-amber-400 text-sm sm:text-base">{chatName}</span>?
-                            </p>
-
-                            <div className="flex flex-col w-full gap-2.5">
-                                <button
-                                    onClick={() => {
-                                        setShowCallConfirmation(false);
-                                        setCallState({ isOpen: true, type: 'audio' });
-                                    }}
-                                    className="w-full py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-white font-bold text-sm shadow-lg shadow-amber-500/25 active:scale-98 transition-all"
-                                >
-                                    Start Call
-                                </button>
-                                <button
-                                    onClick={() => setShowCallConfirmation(false)}
-                                    className="w-full py-3 rounded-2xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.06] dark:hover:bg-white/[0.1] text-zinc-700 dark:text-zinc-300 font-semibold text-xs transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
 
             {/* Global Popover Backdrops */}
             {(showSettings || showAttachments || showEmojiPicker) && (

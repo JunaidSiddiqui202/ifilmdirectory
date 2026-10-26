@@ -11,6 +11,7 @@ import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
 import { useAuthModal } from '../context/AuthModalContext';
 import { useTheme } from '../context/ThemeContext';
+import { useModalAccessibility } from '../hooks/useModalAccessibility';
 import SEO from '../components/SEO';
 
 const formatTimeAgo = (timestamp: any) => {
@@ -42,9 +43,17 @@ export default function Jobs() {
     
     // Full Content Reader Modal (like news & reviews)
     const [selectedJobModal, setSelectedJobModal] = useState<Job | null>(null);
+    const { modalRef: jobModalRef } = useModalAccessibility({
+        isOpen: !!selectedJobModal,
+        onClose: () => setSelectedJobModal(null)
+    });
 
     // Platform Disclaimer Modal (1st time check)
     const [showDisclaimerModal, setShowDisclaimerModal] = useState(false);
+    const { modalRef: disclaimerModalRef } = useModalAccessibility({
+        isOpen: showDisclaimerModal,
+        onClose: () => setShowDisclaimerModal(false)
+    });
     const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
     const [disclaimerConfirmed, setDisclaimerConfirmed] = useState(true);
 
@@ -447,20 +456,12 @@ export default function Jobs() {
                             return (
                                 <article
                                     key={job.id}
-                                    onClick={() => setSelectedJobModal(job)}
-                                    className="flex cursor-pointer flex-col justify-between rounded-2xl bg-white dark:bg-[#121316] p-5 shadow-sm dark:shadow-lg border border-zinc-200 dark:border-white/[0.06] hover:border-amber-500/50 hover:shadow-md hover:-translate-y-1 transition-all duration-200 group relative overflow-hidden"
+                                    className="flex flex-col justify-between rounded-2xl bg-white dark:bg-[#121316] p-5 shadow-sm dark:shadow-lg border border-zinc-200 dark:border-white/[0.06] hover:border-amber-500/50 hover:shadow-md hover:-translate-y-1 transition-all duration-200 group relative overflow-hidden"
                                 >
                                     {/* Top Accents */}
-                                    <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/[0.03] rounded-full blur-2xl group-hover:bg-amber-500/[0.08] transition-colors" />
+                                    <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/[0.03] rounded-full blur-2xl group-hover:bg-amber-500/[0.08] transition-colors pointer-events-none" />
 
-                                    {/* Link overlay for accessibility, SEO and open-in-new-tab */}
-                                    <Link
-                                        to={`/job/${job.id}`}
-                                        className="absolute inset-0 z-0"
-                                        aria-label={`View opportunity: ${job.title} at ${job.company}`}
-                                    />
-
-                                    <div className="relative z-10 pointer-events-none">
+                                    <div className="relative z-10">
                                         <div className="flex items-start justify-between gap-3 mb-3">
                                             <div className="flex items-center gap-3 min-w-0">
                                                 <div className="shrink-0">
@@ -479,8 +480,13 @@ export default function Jobs() {
                                                         <span>{job.company}</span>
                                                         {renderVerificationBadge(job.user_details?.verification_tier)}
                                                     </p>
-                                                    <h3 className="font-extrabold text-zinc-900 dark:text-white text-base tracking-tight leading-snug group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors line-clamp-1">
-                                                        {job.title}
+                                                    <h3 className="font-extrabold text-zinc-900 dark:text-white text-base tracking-tight leading-snug line-clamp-1">
+                                                        <Link
+                                                            to={`/job/${job.id}`}
+                                                            className="hover:text-amber-500 dark:hover:text-amber-400 transition-colors focus:outline-hidden focus:underline"
+                                                        >
+                                                            {job.title}
+                                                        </Link>
                                                     </h3>
                                                 </div>
                                             </div>
@@ -530,16 +536,31 @@ export default function Jobs() {
                                         </div>
                                     </div>
 
-                                    {/* Footer Details */}
-                                    <div className="pt-3 border-t border-zinc-100 dark:border-white/[0.06] flex items-center justify-between text-xs mt-2">
-                                        <span className="text-[11px] text-zinc-400 dark:text-zinc-500 flex items-center gap-1">
-                                            <span className="material-symbols-outlined text-[13px]">schedule</span>
+                                    {/* Footer Details with separate primary link and quick-preview button */}
+                                    <div className="pt-3 border-t border-zinc-100 dark:border-white/[0.06] flex items-center justify-between text-xs mt-2 gap-2">
+                                        <span className="text-[11px] text-zinc-400 dark:text-zinc-500 flex items-center gap-1 shrink-0">
+                                            <span className="material-symbols-outlined text-[13px]" aria-hidden="true">schedule</span>
                                             <span>Posted {formatTimeAgo(job.postedAt)}</span>
                                         </span>
-                                        <span className="font-black text-amber-600 dark:text-amber-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform text-xs">
-                                            <span>Full Details</span>
-                                            <span className="material-symbols-outlined text-sm">arrow_forward</span>
-                                        </span>
+                                        
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => setSelectedJobModal(job)}
+                                                className="px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-zinc-700 dark:text-zinc-300 font-bold text-[11px] transition-colors focus:outline-hidden focus:ring-2 focus:ring-amber-500"
+                                                aria-label={`Quick view summary for ${job.title}`}
+                                            >
+                                                Quick View
+                                            </button>
+                                            <Link
+                                                to={`/job/${job.id}`}
+                                                className="font-black text-amber-600 dark:text-amber-400 flex items-center gap-0.5 hover:underline text-xs shrink-0"
+                                                aria-label={`View full details for ${job.title}`}
+                                            >
+                                                <span>Full Details</span>
+                                                <span className="material-symbols-outlined text-sm" aria-hidden="true">arrow_forward</span>
+                                            </Link>
+                                        </div>
                                     </div>
                                 </article>
                             );
@@ -611,9 +632,14 @@ export default function Jobs() {
                 <div 
                     className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md animate-fade-in"
                     onClick={() => setSelectedJobModal(null)}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="job-modal-title"
                 >
                     <div 
-                        className="relative w-full max-w-2xl max-h-[90vh] bg-white dark:bg-[#121316] rounded-2xl border border-zinc-200 dark:border-white/10 shadow-2xl overflow-y-auto flex flex-col"
+                        ref={jobModalRef}
+                        tabIndex={-1}
+                        className="relative w-full max-w-2xl max-h-[90vh] bg-white dark:bg-[#121316] rounded-2xl border border-zinc-200 dark:border-white/10 shadow-2xl overflow-y-auto flex flex-col outline-none"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Modal Header */}
@@ -637,7 +663,7 @@ export default function Jobs() {
                                             <span className="text-[10px] text-zinc-400">• {selectedJobModal.sourceName}</span>
                                         )}
                                     </div>
-                                    <h2 className="text-base sm:text-lg font-black text-zinc-900 dark:text-white truncate">
+                                    <h2 id="job-modal-title" className="text-base sm:text-lg font-black text-zinc-900 dark:text-white truncate">
                                         {selectedJobModal.title}
                                     </h2>
                                 </div>
@@ -646,8 +672,9 @@ export default function Jobs() {
                             <button
                                 onClick={() => setSelectedJobModal(null)}
                                 className="p-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 rounded-xl transition-colors"
+                                aria-label="Close opportunity modal"
                             >
-                                <span className="material-symbols-outlined text-xl">close</span>
+                                <span className="material-symbols-outlined text-xl" aria-hidden="true">close</span>
                             </button>
                         </div>
 
@@ -824,18 +851,23 @@ export default function Jobs() {
                 <div 
                     className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in"
                     onClick={() => setShowDisclaimerModal(false)}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="disclaimer-modal-title"
                 >
                     <div 
-                        className="bg-white dark:bg-[#141519] border border-amber-300/60 dark:border-amber-500/30 rounded-3xl p-6 sm:p-7 max-w-lg w-full shadow-2xl space-y-5 animate-scale-in"
+                        ref={disclaimerModalRef}
+                        tabIndex={-1}
+                        className="bg-white dark:bg-[#141519] border border-amber-300/60 dark:border-amber-500/30 rounded-3xl p-6 sm:p-7 max-w-lg w-full shadow-2xl space-y-5 animate-scale-in outline-none"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Header */}
                         <div className="flex items-center gap-3 border-b border-zinc-200 dark:border-white/10 pb-4">
                             <div className="size-11 rounded-2xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-500/30 shrink-0">
-                                <span className="material-symbols-outlined text-2xl">verified_user</span>
+                                <span className="material-symbols-outlined text-2xl" aria-hidden="true">verified_user</span>
                             </div>
                             <div>
-                                <h3 className="text-base sm:text-lg font-black text-zinc-900 dark:text-white leading-tight">
+                                <h3 id="disclaimer-modal-title" className="text-base sm:text-lg font-black text-zinc-900 dark:text-white leading-tight">
                                     Casting & Opportunity Safety Notice
                                 </h3>
                                 <p className="text-xs text-zinc-500 dark:text-zinc-400">

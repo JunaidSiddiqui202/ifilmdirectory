@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthModal } from '../context/AuthModalContext';
 import { auth, googleProvider } from '../firebaseConfig';
 import { signInWithPopup } from 'firebase/auth';
 import { createUserProfile } from '../services/userService';
 import { useToast } from '../context/ToastContext';
+import { useModalAccessibility } from '../hooks/useModalAccessibility';
 import Logo from './Logo';
 
 export default function AuthModal() {
@@ -14,16 +15,10 @@ export default function AuthModal() {
     const location = useLocation();
     const toast = useToast();
 
-    // Close on ESC key
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape' && isOpen) {
-                closeAuthModal();
-            }
-        };
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [isOpen, closeAuthModal]);
+    const { modalRef } = useModalAccessibility({
+        isOpen,
+        onClose: closeAuthModal
+    });
 
     if (!isOpen) return null;
 
@@ -41,10 +36,11 @@ export default function AuthModal() {
             }
             toast.success(`Welcome, ${result.user.displayName || 'Filmmaker'}!`);
             onSuccessLogin();
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('[AuthModal] Google Sign-In Error:', err);
-            if (err?.code !== 'auth/popup-closed-by-user') {
-                toast.error(err?.message || 'Google sign-in failed. Please try again.');
+            const authErr = err as { code?: string; message?: string };
+            if (authErr?.code !== 'auth/popup-closed-by-user') {
+                toast.error(authErr?.message || 'Google sign-in failed. Please try again.');
             }
         } finally {
             setGoogleLoading(false);
@@ -70,7 +66,9 @@ export default function AuthModal() {
             aria-labelledby="auth-modal-title"
         >
             <div
-                className="w-full sm:max-w-md bg-white dark:bg-[#121316] rounded-t-[32px] sm:rounded-3xl border border-zinc-200 dark:border-white/10 shadow-2xl p-6 sm:p-7 space-y-5 animate-in slide-in-from-bottom-6 sm:zoom-in-95 duration-200 text-zinc-900 dark:text-white max-h-[92vh] overflow-y-auto"
+                ref={modalRef}
+                tabIndex={-1}
+                className="w-full sm:max-w-md bg-white dark:bg-[#121316] rounded-t-[32px] sm:rounded-3xl border border-zinc-200 dark:border-white/10 shadow-2xl p-6 sm:p-7 space-y-5 animate-in slide-in-from-bottom-6 sm:zoom-in-95 duration-200 text-zinc-900 dark:text-white max-h-[92vh] overflow-y-auto outline-none"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header with Logo and Close Button */}

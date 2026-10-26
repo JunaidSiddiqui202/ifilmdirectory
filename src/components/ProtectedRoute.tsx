@@ -35,9 +35,10 @@ export default function ProtectedRoute({ children, allowGuest = false }: Protect
     }
 
     if (!currentUser && !allowGuest) {
-        console.log('[ProtectedRoute] No user found and route requires auth, redirecting to login with return URL:', location.pathname);
-        // Preserve the current path so user can return after login
-        return <Navigate to={`/login?redirect=${encodeURIComponent(location.pathname)}`} replace />;
+        // Preserve full relative path (path, query, and hash) so user returns to exact destination
+        const fullPath = location.pathname + location.search + location.hash;
+        console.log('[ProtectedRoute] No user found and route requires auth, redirecting to login with return URL:', fullPath);
+        return <Navigate to={`/login?redirect=${encodeURIComponent(fullPath)}`} replace />;
     }
 
     const isShowreelViewer = location.pathname.startsWith('/showreel/view');
