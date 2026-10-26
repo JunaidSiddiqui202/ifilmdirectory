@@ -97,17 +97,16 @@ if (!$authenticatedUid) {
 }
 
 // 5. Atomic Rate Limiting (Independent Per-Account AND Per-IP Quotas via File Locking)
-// Anti-Spoofing: Strictly use REMOTE_ADDR unless requests come from known trusted proxies (Cloudflare / Hostinger reverse proxies)
+// Anti-Spoofing: Strictly use REMOTE_ADDR unless requests come from known, explicitly configured trusted reverse proxies
 $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
 $trustedProxies = [
     '127.0.0.1',
     '::1',
-    '195.35.44.253' // Hostinger server internal loopback / proxy
+    '195.35.44.253' // Hostinger dedicated server outbound / local loopback interface
 ];
 
-// Determine if connection is through a verified trusted proxy before accepting forwarded headers
-$isTrustedProxy = in_array($remoteAddr, $trustedProxies, true) ||
-                  preg_match('/^(10\.|172\.(1[6-9]|2[0-9]|3[01])\.|192\.168\.)/', $remoteAddr);
+// Anti-Spoofing Defense: Never trust unverified RFC1918 client IP spoofing
+$isTrustedProxy = in_array($remoteAddr, $trustedProxies, true);
 
 if ($isTrustedProxy && !empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
     $clientIp = trim($_SERVER['HTTP_CF_CONNECTING_IP']);
@@ -115,7 +114,7 @@ if ($isTrustedProxy && !empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
     $forwarded = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
     $clientIp = trim($forwarded[0]);
 } else {
-    // Untrusted or direct connection: strictly bind to the physical TCP socket IP
+    // Untrusted, shared network, or direct connection: strictly bind to the physical TCP socket IP
     $clientIp = $remoteAddr;
 }
 

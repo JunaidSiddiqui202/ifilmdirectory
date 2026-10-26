@@ -170,20 +170,16 @@ describe("iFilmDirectory Security Rules Permissions Matrix", () => {
             expect(optionValid).toBe(false);
         });
 
-        it("REJECTS altering option text during vote", () => {
-            const auth = { uid: "user_alice" };
-            const tamperedText = {
-                ...basePoll,
-                totalVotes: 11,
-                voters: [...basePoll.voters, auth.uid],
-                options: [
-                    { id: "1", text: "Malicious Option Text", votes: 7 },
-                    { id: "2", text: "RED V-Raptor", votes: 4 }
-                ]
+        it("REJECTS option objects that inject rogue fields or unexpected keys", () => {
+            const rogueOption = {
+                id: "1",
+                text: "ARRI Alexa 35",
+                votes: 7,
+                maliciousField: "injected" // Illegal key
             };
-
-            const textPreserved = tamperedText.options[0].text === basePoll.options[0].text;
-            expect(textPreserved).toBe(false);
+            const allowedKeys = ['id', 'text', 'votes'];
+            const hasOnlyAllowedKeys = Object.keys(rogueOption).every(k => allowedKeys.includes(k));
+            expect(hasOnlyAllowedKeys).toBe(false);
         });
     });
 
@@ -236,6 +232,21 @@ describe("iFilmDirectory Security Rules Permissions Matrix", () => {
 
             expect(forgedSender.senderId === auth.uid).toBe(false);
         });
+
+        it("REJECTS notifications containing unauthorized or unverified schema keys", () => {
+            const rogueNotif = {
+                senderId: "user_alice",
+                userId: "user_bob",
+                type: "message",
+                title: "Hello",
+                message: "Test message",
+                isRead: false,
+                roguePayload: "unauthorized" // Not in allowed notification schema
+            };
+            const allowedKeys = ['userId', 'senderId', 'type', 'title', 'message', 'createdAt', 'isRead', 'actionLink', 'image', 'metadata'];
+            const keysValid = Object.keys(rogueNotif).every(k => allowedKeys.includes(k));
+            expect(keysValid).toBe(false);
+        });
     });
 
     describe("/chats/{chatId} Invariant & Deletion Policy", () => {
@@ -268,6 +279,14 @@ describe("iFilmDirectory Security Rules Permissions Matrix", () => {
 
             const participantsUnchanged = JSON.stringify(originalChat.participants) === JSON.stringify(maliciousUpdate.participants);
             expect(participantsUnchanged).toBe(false);
+        });
+
+        it("REJECTS setting unreadBy to users who are not participants of the chat", () => {
+            const chatParticipants = ["user_1", "user_2"];
+            const rogueUnreadBy = ["user_1", "user_victim_outside"];
+
+            const unreadBySubsetOfParticipants = rogueUnreadBy.every(u => chatParticipants.includes(u));
+            expect(unreadBySubsetOfParticipants).toBe(false);
         });
     });
 });

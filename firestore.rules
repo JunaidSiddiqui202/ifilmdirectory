@@ -305,7 +305,8 @@ service cloud.firestore {
            request.resource.data.participants is list &&
            request.resource.data.participants.size() >= 1 &&
            request.resource.data.participants.size() <= 10 &&
-           request.auth.uid in request.resource.data.participants) ||
+           request.auth.uid in request.resource.data.participants &&
+           (!('creatorId' in request.resource.data) || request.resource.data.creatorId == request.auth.uid)) ||
           isAdmin()
         );
       }
@@ -318,6 +319,7 @@ service cloud.firestore {
       allow update: if isChatParticipant() && (
         isAdmin() || (
           request.resource.data.participants == resource.data.participants &&
+          (!('creatorId' in resource.data) || notModifyingOwner('creatorId')) &&
           request.resource.data.diff(resource.data).affectedKeys().hasOnly([
             'lastMessage', 'lastMessageTime', 'lastSenderId', 'updatedAt', 'unreadBy'
           ]) &&
@@ -332,7 +334,8 @@ service cloud.firestore {
           ) &&
           (
             !('unreadBy' in request.resource.data) ||
-            request.resource.data.unreadBy is list
+            (request.resource.data.unreadBy is list &&
+             resource.data.participants.hasAll(request.resource.data.unreadBy))
           )
         )
       );
@@ -392,9 +395,11 @@ service cloud.firestore {
       // - Regular users can ONLY send user-level peer notifications ('like', 'comment', 'follow', 'job', 'connection', 'message')
       // - Sending 'system' notifications is strictly prohibited for standard users (reserved for admin/backend)
       // - Must not notify oneself
+      // - Field keys strictly limited to permitted notification schema
       // - String length limits and initial unread status enforced
       allow create: if isAuthenticated() && (
         isAdmin() || (
+          request.resource.data.keys().hasOnly(['userId', 'senderId', 'type', 'title', 'message', 'createdAt', 'isRead', 'actionLink', 'image', 'metadata']) &&
           request.resource.data.senderId == request.auth.uid &&
           request.resource.data.userId is string &&
           request.resource.data.userId.size() > 0 &&
@@ -404,6 +409,7 @@ service cloud.firestore {
           request.resource.data.title.size() <= 200 &&
           request.resource.data.message is string &&
           request.resource.data.message.size() <= 1000 &&
+          (!('actionLink' in request.resource.data) || (request.resource.data.actionLink is string && request.resource.data.actionLink.size() <= 500)) &&
           request.resource.data.isRead == false
         )
       );
@@ -495,7 +501,13 @@ service cloud.firestore {
           )
         );
 
-        return valid2 || valid3 || valid4;
+        // Option Key Invariant: Every option object must contain strictly and only ['id', 'text', 'votes']
+        let keysValid = newOpts[0].keys().hasOnly(['id', 'text', 'votes']) &&
+                        newOpts[1].keys().hasOnly(['id', 'text', 'votes']) &&
+                        (n < 3 || newOpts[2].keys().hasOnly(['id', 'text', 'votes'])) &&
+                        (n < 4 || newOpts[3].keys().hasOnly(['id', 'text', 'votes']));
+
+        return keysValid && (valid2 || valid3 || valid4);
       }
       
       // Restrict poll updates strictly to legitimate single-vote operations on active polls:
